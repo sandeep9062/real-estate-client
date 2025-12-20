@@ -46,7 +46,7 @@ const Header: React.FC = () => {
         scrolled ? "bg-white/80 shadow-sm" : "bg-background/60"
       }`}
     >
-      <div className="max-w-[96vw] mx-auto flex items-center justify-between px-4 py-1 md:py-2">
+      <div className="max-w-[96vw] mx-auto flex items-center justify-between px-4 py-1 md:py-[0.3rem]">
         {/* Logo */}
         <Link
           href="/"
