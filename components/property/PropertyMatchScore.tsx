@@ -1,6 +1,12 @@
 "use client";
 
-export default function PropertyMatchScore({ data }) {
+interface PropertyMatchData {
+  score: number;
+  reasons: string[];
+  warning?: string;
+}
+
+export default function PropertyMatchScore({ data }: { data: PropertyMatchData }) {
   if (!data) return null;
 
   return (
