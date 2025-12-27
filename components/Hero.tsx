@@ -33,21 +33,20 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
           {/* LEFT SIDE */}
           <div className="flex flex-col gap-4 text-center md:text-left">
             {/* TITLE */}
-            <motion.h1
-              initial={{ y: "2rem", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 1.2, type: "spring" }}
-              className="font-bold text-4xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-wide  "
-            >
-              Discover <br className="hidden sm:block" />
-              Your Perfect Home in Tricity
-            </motion.h1>
+<motion.h1
+  initial={{ y: "2rem", opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  transition={{ duration: 1.2, type: "spring" }}
+  className="font-extrabold text-4xl sm:text-5xl lg:text-7xl tracking-tighter leading-[1.1] text-slate-900"
+>
+  Discover <br className="hidden sm:block" />
+  Your Perfect <span className="text-[#4161df]">Home in Tricity</span>
+</motion.h1> 
 
             {/* SUBTEXT */}
-            <p className="text-muted-foreground sm:text-lg max-w-md mx-auto md:mx-0">
-          From luxury apartments to independent houses — discover homes that truly 
-match your lifestyle across Chandigarh, Mohali & Panchkula.
-
+            <p className="text-muted-foreground sm:text-lg max-w-full mb-4 mx-auto md:mx-0">
+              From luxury apartments to independent houses — discover homes that
+              truly match your lifestyle across Chandigarh, Mohali & Panchkula.
             </p>
 
             {/* SEARCH BAR */}
@@ -91,7 +90,7 @@ match your lifestyle across Chandigarh, Mohali & Panchkula.
             <div className="flex justify-center items-center gap-6 sm:gap-10 mt-4 flex-nowrap">
               {/* ITEM */}
               <div className="flex flex-col items-center">
-                <span className="text-[14px] sm:text-4xl font-bold leading-none">
+                <span className="text-[14px] sm:text-3xl font-semibold text-gray-500 leading-none">
                   <CountUp start={798} end={900} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[10px] sm:text-base leading-none mt-1">
@@ -104,7 +103,7 @@ match your lifestyle across Chandigarh, Mohali & Panchkula.
 
               {/* ITEM */}
               <div className="flex flex-col items-center">
-                <span className="text-[14px] sm:text-4xl font-bold leading-none">
+                <span className="text-[14px] sm:text-3xl font-semibold text-gray-500 leading-none">
                   <CountUp start={150} end={200} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[10px] sm:text-base leading-none mt-1">
@@ -117,7 +116,7 @@ match your lifestyle across Chandigarh, Mohali & Panchkula.
 
               {/* ITEM */}
               <div className="flex flex-col items-center">
-                <span className="text-[14px] sm:text-4xl font-bold leading-none">
+                <span className="text-[14px] sm:text-3xl font-semibold text-gray-500 leading-none">
                   <CountUp start={15} end={20} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[10px] sm:text-base leading-none mt-1">

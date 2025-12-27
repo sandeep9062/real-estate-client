@@ -22,7 +22,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   return (
     <div className="flex w-full items-center justify-center">
-      <div className="flex w-full max-w-2xl items-center gap-2 rounded-full border border-border bg-white/70 p-2 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200">
+      <div className="flex w-full max-w-2xl py-4 items-center gap-2 rounded-full border border-border bg-white/70 p-2 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200">
         <HiLocationMarker className="text-[#4161df]" size={25} />
         <input
           placeholder="Search by title, city, or country..."
