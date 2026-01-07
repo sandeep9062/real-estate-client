@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import SearchBar from "../../components/SearchBar";
+import SearchBar, { SearchFilters } from "../../components/SearchBar";
 import { PuffLoader } from "react-spinners";
 import PropertyCard from "../../components/PropertyCard";
 import { useSelector } from "react-redux";
@@ -10,7 +10,7 @@ import { useGetFavouritesQuery } from "@/services/userApi";
 import Link from "next/link";
 
 const Favourites = () => {
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState<SearchFilters>({ query: "" });
   const [mounted, setMounted] = useState(false);
 
   // Auth State
@@ -21,7 +21,7 @@ const Favourites = () => {
 
   // Filtered favourites
   const filtered = useMemo(() => {
-    const q = filter.toLowerCase();
+    const q = filter.query.toLowerCase();
     return (favourites || []).filter((property: any) => {
       return (
         property.title?.toLowerCase().includes(q) ||

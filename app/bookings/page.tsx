@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import SearchBar from "../../components/SearchBar";
+import SearchBar, { SearchFilters } from "../../components/SearchBar";
 import { PuffLoader } from "react-spinners";
 import PropertyCard from "../../components/PropertyCard";
 import { useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import { useGetBookingsQuery } from "@/services/userApi";
 import Link from "next/link";
 
 const Bookings = () => {
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState<SearchFilters>({ query: "" });
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const {
@@ -35,13 +35,13 @@ const Bookings = () => {
     return bookings.filter(
       (booking: any) =>
         (booking.property.title?.toLowerCase() ?? "").includes(
-          filter.toLowerCase()
+          filter.query.toLowerCase()
         ) ||
         (booking.property.city?.toLowerCase() ?? "").includes(
-          filter.toLowerCase()
+          filter.query.toLowerCase()
         ) ||
         (booking.property.country?.toLowerCase() ?? "").includes(
-          filter.toLowerCase()
+          filter.query.toLowerCase()
         )
     );
   }, [bookings, filter]);

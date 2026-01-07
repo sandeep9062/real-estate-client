@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import SearchBar from "../../components/SearchBar";
+import SearchBar, { SearchFilters } from "../../components/SearchBar";
 import { PuffLoader } from "react-spinners";
 import PropertyCard from "@/components/PropertyCard";
 
@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 const OwnedPropertiesPage = () => {
   const router = useRouter();
 
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState<SearchFilters>({ query: "" });
   const [modalOpened, setModalOpened] = useState(false);
   const [editingProperty, setEditingProperty] = useState<any>(null);
 
@@ -56,7 +56,7 @@ const OwnedPropertiesPage = () => {
   // Filter logic
   const filtered = useMemo(() => {
     return properties.filter((property: any) => {
-      const q = filter.toLowerCase();
+      const q = filter.query.toLowerCase();
 
       return (
         (property.title?.toLowerCase() ?? "").includes(q) ||
@@ -64,7 +64,7 @@ const OwnedPropertiesPage = () => {
         (property.location?.city?.toLowerCase() ?? "").includes(q) ||
         (property.location?.country?.toLowerCase() ?? "").includes(q)||
         (property.location?.address?.toLowerCase() ?? "").includes(q)
-      ); 
+      );
     });
   }, [properties, filter]);
 
