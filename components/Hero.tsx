@@ -3,17 +3,17 @@
 import React from "react";
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
-import SearchBar from "./SearchBar";
+import SearchBar, { SearchFilters } from "./SearchBar";
 import Link from "next/link";
 import Image from "next/image";
 
 interface HeroProps {
-  setFilter: React.Dispatch<React.SetStateAction<string>>;
+  setFilter: React.Dispatch<React.SetStateAction<SearchFilters>>;
 }
 
 const Hero: React.FC<HeroProps> = ({ setFilter }) => {
-  const handleSearch = (searchTerm: string) => {
-    setFilter(searchTerm);
+  const handleSearch = (filters: SearchFilters) => {
+    setFilter(filters);
   };
 
   return (
@@ -33,15 +33,16 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
           {/* LEFT SIDE */}
           <div className="flex flex-col gap-4 text-center md:text-left">
             {/* TITLE */}
-<motion.h1
-  initial={{ y: "2rem", opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  transition={{ duration: 1.2, type: "spring" }}
-  className="font-extrabold text-4xl sm:text-5xl lg:text-7xl tracking-tighter leading-[1.1] text-slate-900"
->
-  Discover <br className="hidden sm:block" />
-  Your Perfect <span className="text-[#4161df]">Home in Tricity</span>
-</motion.h1> 
+            <motion.h1
+              initial={{ y: "2rem", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, type: "spring" }}
+              className="font-extrabold text-4xl sm:text-5xl lg:text-7xl tracking-tighter leading-[1.1] text-slate-900"
+            >
+              Discover <br className="hidden sm:block" />
+              Your Perfect{" "}
+              <span className="text-[#4161df]">Home in Tricity</span>
+            </motion.h1>
 
             {/* SUBTEXT */}
             <p className="text-muted-foreground sm:text-lg max-w-full mb-4 mx-auto md:mx-0">

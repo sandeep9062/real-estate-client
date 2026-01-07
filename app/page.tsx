@@ -13,22 +13,75 @@ import PostPropertyCTA from "@/components/PostPropertyCTA";
 import AdvertiserTypeCard from "@/components/AdvertiserTypeCard";
 import ExploreServices from "@/components/ExploreServices";
 import PropertyCarousel from "@/components/PropertyCrousal";
+import { SearchFilters } from "@/components/SearchBar";
 
 export default function Home() {
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState<SearchFilters>({ query: "" });
   const { data, isError, isLoading } = useGetAllPropertiesQuery(undefined);
 
-  // filter data
+  // Smart filter data based on parsed filters
   const filteredData = (data || []).filter((p: any) => {
-    const text = filter.toLowerCase();
-    return (
-      p.title?.toLowerCase().includes(text) ||
-      p.description?.toLowerCase().includes(text) ||
-      p.location?.city?.toLowerCase().includes(text) ||
-      p.location?.state?.toLowerCase().includes(text) ||
-      p.location?.country?.toLowerCase().includes(text) ||
-      p.location?.address?.toLowerCase().includes(text)
-    );
+    // Check if any specific filters are set
+    const hasSpecificFilters = filter.bedrooms || filter.deal || filter.type ||
+                              filter.propertyCategory || filter.maxPrice ||
+                              filter.minPrice || filter.city || filter.state || filter.country;
+
+    // If we have specific filters, use those as primary criteria
+    // Otherwise, fall back to text search
+    let matchesFilters = true;
+
+    if (hasSpecificFilters) {
+      // Bedrooms filter
+      if (filter.bedrooms && p.facilities?.bedrooms !== filter.bedrooms) {
+        matchesFilters = false;
+      }
+
+      // Deal type filter (Rent/Sale)
+      if (filter.deal && p.deal !== filter.deal) {
+        matchesFilters = false;
+      }
+
+      // Property type filter (Residential/Commercial)
+      if (filter.type && p.type !== filter.type) {
+        matchesFilters = false;
+      }
+
+      // Property category filter
+      if (filter.propertyCategory && p.propertyCategory !== filter.propertyCategory) {
+        matchesFilters = false;
+      }
+
+      // Price filters
+      if (filter.maxPrice && p.price > filter.maxPrice) {
+        matchesFilters = false;
+      }
+      if (filter.minPrice && p.price < filter.minPrice) {
+        matchesFilters = false;
+      }
+
+      // Location filters
+      if (filter.city && p.location?.city?.toLowerCase() !== filter.city) {
+        matchesFilters = false;
+      }
+      if (filter.state && p.location?.state?.toLowerCase() !== filter.state) {
+        matchesFilters = false;
+      }
+      if (filter.country && p.location?.country?.toLowerCase() !== filter.country) {
+        matchesFilters = false;
+      }
+    } else {
+      // No specific filters, use text search
+      matchesFilters = (
+        p.title?.toLowerCase().includes(filter.query) ||
+        p.description?.toLowerCase().includes(filter.query) ||
+        p.location?.city?.toLowerCase().includes(filter.query) ||
+        p.location?.state?.toLowerCase().includes(filter.query) ||
+        p.location?.country?.toLowerCase().includes(filter.query) ||
+        p.location?.address?.toLowerCase().includes(filter.query)
+      );
+    }
+
+    return matchesFilters;
   });
 
   return (
@@ -48,8 +101,9 @@ export default function Home() {
 
       <Hero setFilter={setFilter} />
 
-      {/* show search results only when filter exists */}
-      {filter && (
+      {/* show search results only when filter has content */}
+      {(filter.query || filter.bedrooms || filter.deal || filter.type || filter.propertyCategory ||
+        filter.maxPrice || filter.minPrice || filter.city || filter.state || filter.country) && (
         <section className="container mx-auto px-4">
           <PropertyGrid properties={filteredData} />
         </section>
