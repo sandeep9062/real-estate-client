@@ -175,7 +175,7 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu Dropdown */}
       {mounted && menuOpened && (
-        <div className="md:hidden flex flex-col gap-5 bg-white/95 backdrop-blur text-black font-medium p-6 shadow-xl absolute right-4 top-[70px] rounded-2xl border w-[80vw] max-w-sm animate-in fade-in zoom-in-95">
+        <div className="md:hidden flex flex-col gap-5 bg-white/95 backdrop-blur text-black font-medium p-6 shadow-xl absolute right-4 top-17.5 rounded-2xl border w-[80vw] max-w-sm animate-in fade-in zoom-in-95">
           <Link
             href="/properties"
             onClick={toggleMenu}

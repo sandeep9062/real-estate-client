@@ -7,7 +7,8 @@ import { IoMdClose } from "react-icons/io";
 export default function WhatsAppWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const whatsappLink = "https://wa.me/919034009062";
+  const whatsappLink = "https://wa.me/919729907448?text=Hello%20PropertyBulbul%20Team%2C%20I%20am%20looking%20for%20a%20property%20in%20Chandigarh%2FMohali%2FPanchkula.%20Kindly%20share%20available%20options.";
+
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">

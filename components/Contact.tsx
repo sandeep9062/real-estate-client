@@ -80,6 +80,29 @@ interface ModeProps {
 }
 
 const ContactMode = ({ icon, title, detail, buttonLabel }: ModeProps) => {
+  const handleContactAction = () => {
+    const phoneNumber = "9729907448";
+
+    switch (title) {
+      case "Call":
+        window.location.href = `tel:${phoneNumber}`;
+        break;
+      case "Chat":
+        const message = encodeURIComponent("Hi, I'm interested in your real estate services and would like to know more about available properties.");
+        window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
+        break;
+      case "Video Call":
+        window.open(`https://meet.google.com/`, "_blank");
+        break;
+      case "Message":
+        const smsMessage = encodeURIComponent("Hi, I'm interested in your real estate services and would like to know more about available properties.");
+        window.location.href = `sms:${phoneNumber}?body=${smsMessage}`;
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-5 transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl">
       <div className="flex items-center gap-5">
@@ -91,7 +114,10 @@ const ContactMode = ({ icon, title, detail, buttonLabel }: ModeProps) => {
           <span className="text-gray-500">{detail}</span>
         </div>
       </div>
-      <button className="w-full bg-[#4161df] hover:bg-[#3759dd] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <button
+        onClick={handleContactAction}
+        className="w-full bg-[#4161df] hover:bg-[#3759dd] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+      >
         {buttonLabel}
       </button>
     </div>
