@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useResetPasswordMutation } from "@/services/authApi";
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long"),
@@ -19,10 +20,11 @@ type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const params = useParams();
   const token = params.token as string;
+
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const {
     register,
@@ -41,30 +43,16 @@ export default function ResetPasswordPage() {
   const handleResetPassword = async (data: ResetPasswordFormValues) => {
     if (!token) return;
 
-    setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/reset-password/${token}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password: data.password }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to reset password");
-      }
+      const result = await resetPassword({ token, password: data.password }).unwrap();
 
       setSuccess(true);
       setError("");
       toast.success("Password reset successful!");
     } catch (err: any) {
-      setError(err.message || "Failed to reset password");
-      toast.error(err.message || "Failed to reset password");
-    } finally {
-      setIsLoading(false);
+      const message = err?.data?.message || err.message || "Failed to reset password";
+      setError(message);
+      toast.error(message);
     }
   };
 

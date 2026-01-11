@@ -160,6 +160,9 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning={true}
     >
+      <head>
+        <link rel="preload" href="/real-estate-login.jpg" as="image" />
+      </head>
       <body className="antialiased">
         <RootStructuredData />
         <Providers>
