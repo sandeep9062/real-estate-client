@@ -2,12 +2,21 @@
 import { useState } from "react";
 import LoginPage from "@/components/LoginPage";
 import SignupPage from "@/components/SignupPage";
+import ForgotPasswordPage from "@/components/ForgotPasswordPage";
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgotPassword'>('login');
 
-  const toggleAuthMode = () => {
-    setIsLogin((prev) => !prev);
+  const switchToSignup = () => {
+    setAuthMode('signup');
+  };
+
+  const switchToLogin = () => {
+    setAuthMode('login');
+  };
+
+  const switchToForgotPassword = () => {
+    setAuthMode('forgotPassword');
   };
 
   const handleLoginSuccess = () => {
@@ -16,14 +25,17 @@ const AuthPage = () => {
   };
 
   return (
-    <div className=" justify-center bg-gray-100">
-      {isLogin ? (
+    <div className="justify-center bg-gray-100">
+      {authMode === 'login' ? (
         <LoginPage
           onLoginSuccess={handleLoginSuccess}
-          toggleAuthMode={toggleAuthMode}
+          toggleAuthMode={switchToSignup}
+          onForgotPassword={switchToForgotPassword}
         />
+      ) : authMode === 'signup' ? (
+        <SignupPage toggleAuthMode={switchToLogin} />
       ) : (
-        <SignupPage toggleAuthMode={toggleAuthMode} />
+        <ForgotPasswordPage onBackToLogin={switchToLogin} />
       )}
     </div>
   );

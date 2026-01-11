@@ -19,9 +19,11 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage({
   onLoginSuccess,
   toggleAuthMode,
+  onForgotPassword,
 }: {
   onLoginSuccess: () => void;
   toggleAuthMode: () => void;
+  onForgotPassword: () => void;
 }) {
   const [error, setError] = useState("");
   const router = useRouter();
@@ -92,6 +94,16 @@ export default function LoginPage({
                 {errors.password.message}
               </p>
             )}
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Forgot Password?
+            </button>
           </div>
 
           <button
