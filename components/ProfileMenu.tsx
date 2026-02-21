@@ -17,10 +17,10 @@ import {
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { useLogoutMutation } from "../services/authApi";
 import { useUpdateProfileMutation } from "../services/userApi";
 import { logoutSuccess as logoutAction, setUser } from "../store/authSlice";
-import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@/hooks/use-toast";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
@@ -43,7 +43,6 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
-  const [logout] = useLogoutMutation();
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,11 +73,13 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
 
   const handleLogout = async () => {
     try {
-      await logout().unwrap();
+      // Sign out using better-auth
+      await authClient.signOut();
       dispatch(logoutAction());
-      router.push("/auth");
+      router.push("/login");
     } catch (error) {
       console.error("Failed to logout:", error);
+      toast.error("Failed to logout");
     }
   };
 
@@ -107,14 +108,16 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
       );
       toast.success("Profile updated successfully");
       setIsModalOpen(false);
-    } catch (error) {
-      toast.error("Failed to update profile");
+    } catch (error: any) {
       console.error("Failed to update profile:", {
-        status: (error as any)?.status,
-        data: (error as any)?.data,
-        message: (error as any)?.message,
+        status: error?.status,
+        data: error?.data,
+        message: error?.message,
         error: error,
       });
+      
+      const errorMessage = error?.data?.message || error?.message || "Failed to update profile";
+      toast.error(errorMessage);
     }
   };
 

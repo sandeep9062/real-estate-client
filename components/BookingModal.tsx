@@ -3,7 +3,7 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import { selectUser } from "../store/authSlice";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { useBookVisitMutation } from "@/services/userApi";
 
 type Props = {

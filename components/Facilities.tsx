@@ -4,7 +4,7 @@ import { Box, Button, Group, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React from "react";
 import { useSelector } from "react-redux";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import {
   selectUser,
   selectToken,

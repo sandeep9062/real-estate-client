@@ -1,17 +1,36 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export async function getPropertyServer(id: string) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api';
+  
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/properties/${id}`, {
-      method: 'GET'
+    const response = await fetch(`${apiUrl}/properties/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
     });
+    
     if (response.status === 404) return null;
+    
     if (!response.ok) {
-      throw new Error("Failed to fetch data");
+      const errorText = await response.text().catch(() => 'Unknown error');
+      console.error(`API Error [${response.status}]: ${errorText}`);
+      throw new Error(`API request failed with status ${response.status}`);
     }
+    
     return await response.json();
   } catch (error) {
-    throw new Error("Failed to fetch data");
+    // Log the actual error for debugging
+    console.error('getPropertyServer error:', error);
+    
+    // Re-throw with more context if it's a network error
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error(`Unable to connect to API at ${apiUrl}. Please ensure the backend server is running.`);
+    }
+    
+    throw error;
   }
 }
 

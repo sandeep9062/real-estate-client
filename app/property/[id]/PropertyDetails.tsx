@@ -6,7 +6,7 @@ const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 import Heart from "../../../components/Heart";
 import BookingModal from "../../../components/BookingModal";
 import MediaGallery from "@/components/MediaGallery";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 import { FiShare2 } from "react-icons/fi";
 

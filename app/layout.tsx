@@ -4,14 +4,9 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import "@mantine/core/styles.css";
 import { Providers } from "./providers";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import ScrollToTopButton from "../components/ScrollToTopButton";
 import RouteTransitionWrapper from "@/components/RouteTransitionWrapper";
 import { Toaster } from "sonner";
-import SocialMediaLinks from "@/components/SocialMediaLinks";
-import MortgageCalculator from "@/components/Calculator";
-import ClientChatBotWrapper from "@/components/ClientChatBotWrapper";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://propertybulbul.com"),
@@ -167,31 +162,27 @@ export default function RootLayout({
         <RootStructuredData />
         <Providers>
           <RouteTransitionWrapper>
-            <Header />
-            <Toaster
-              richColors
-              closeButton
-              duration={2500}
-              toastOptions={{
-                className:
-                  "backdrop-blur-md border border-white/20 shadow-xl rounded-xl p-4 w-full md:w-auto",
-                classNames: {
-                  title: "text-[15px] font-semibold",
-                  description: "text-sm text-neutral-400",
-                  success: "bg-emerald-500/20 text-emerald-400",
-                  error: "bg-red-500/20 text-red-400",
-                  warning: "bg-yellow-500/20 text-yellow-500",
-                  info: "bg-blue-500/20 text-blue-400",
-                },
-              }}
-              style={{ zIndex: 9999 }}
-            />
-            {children}
-            <SocialMediaLinks />
-            <Footer />
-            <ScrollToTopButton />
-            {/* <MortgageCalculator /> */}
-            <ClientChatBotWrapper />
+            <LayoutWrapper>
+              <Toaster
+                richColors
+                closeButton
+                duration={2500}
+                toastOptions={{
+                  className:
+                    "backdrop-blur-md border border-white/20 shadow-xl rounded-xl p-4 w-full md:w-auto",
+                  classNames: {
+                    title: "text-[15px] font-semibold",
+                    description: "text-sm text-neutral-400",
+                    success: "bg-emerald-500/20 text-emerald-400",
+                    error: "bg-red-500/20 text-red-400",
+                    warning: "bg-yellow-500/20 text-yellow-500",
+                    info: "bg-blue-500/20 text-blue-400",
+                  },
+                }}
+                style={{ zIndex: 9999 }}
+              />
+              {children}
+            </LayoutWrapper>
           </RouteTransitionWrapper>
         </Providers>
       </body>

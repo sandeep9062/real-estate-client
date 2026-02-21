@@ -36,7 +36,7 @@ const Header: React.FC = () => {
     if (isAuthenticated) {
       setModalOpened(true);
     } else {
-      router.push("/auth");
+      router.push("/login");
     }
   };
 
@@ -126,7 +126,7 @@ const Header: React.FC = () => {
 
               {!isAuthenticated ? (
                 <button
-                  onClick={() => router.push("/auth")}
+                  onClick={() => router.push("/login")}
                   className="bg-linear-to-tr from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-colors shadow-sm"
                 >
                   Login
@@ -149,7 +149,7 @@ const Header: React.FC = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    router.push("/auth");
+                    router.push("/login");
                   }}
                   className="px-4 py-1.5 text-sm font-medium rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md"
                 >
