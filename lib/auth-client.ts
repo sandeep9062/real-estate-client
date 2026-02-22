@@ -21,6 +21,11 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api
 
 export const authClient = createAuthClient({
   baseURL: `${apiBaseUrl}/better-auth`,
+  // Enable cross-site cookies for production
+  cookieOptions: {
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+  },
 });
 
 // Export hooks for easier usage
