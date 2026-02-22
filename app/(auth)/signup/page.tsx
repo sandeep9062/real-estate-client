@@ -88,92 +88,63 @@ const page = () => {
   // 3. Define a submit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { data, error } = await authClient.signUp.email({
-        email: values.email,
-        password: values.password,
-        name: values.name,
+      // Get the API base URL
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        (typeof window !== "undefined" &&
+        (window.location.hostname === "www.propertybulbul.com" ||
+          window.location.hostname === "propertybulbul.com")
+          ? "https://real-estate-server-6pzl.onrender.com/api"
+          : "http://localhost:9000/api");
+
+      // Use custom signup endpoint that returns token directly
+      const response = await fetch(`${apiBaseUrl}/better-auth/custom-signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          phone: values.phone,
+        }),
       });
 
-      if (error) {
-        toast.error(error.message || "Failed to create account.");
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        toast.error(result.message || "Failed to create account.");
         return;
       }
 
-      // Update Redux store with user data
-      if (data?.user) {
-        const userData = data.user as any;
-
-        // Better Auth sets cookies, but for cross-origin we need to get the token
-        // Call our custom endpoint to get the session token
-        let sessionToken = "";
-        try {
-          // Get the API base URL
-          const apiBaseUrl =
-            process.env.NEXT_PUBLIC_API_URL ||
-            (typeof window !== "undefined" &&
-            (window.location.hostname === "www.propertybulbul.com" ||
-              window.location.hostname === "propertybulbul.com")
-              ? "https://real-estate-server-6pzl.onrender.com/api"
-              : "http://localhost:9000/api");
-
-          const tokenResponse = await fetch(
-            `${apiBaseUrl}/better-auth/get-token`,
-            {
-              method: "GET",
-              credentials: "include", // Include cookies
-            },
-          );
-
-          if (tokenResponse.ok) {
-            const tokenData = await tokenResponse.json();
-            if (tokenData.success && tokenData.token) {
-              sessionToken = tokenData.token;
-            }
-          }
-        } catch (tokenError) {
-          console.warn("Could not get session token:", tokenError);
-        }
-
+      // Update Redux store with user data and token
+      if (result.user && result.token) {
         dispatch(
           loginSuccess({
             user: {
-              _id: userData.id,
-              name: userData.name,
-              email: userData.email,
-              image: userData.image || undefined,
-              phone: values.phone,
-              role: userData.role || "user",
+              _id: result.user._id || result.user.id,
+              name: result.user.name,
+              email: result.user.email,
+              image: result.user.image || undefined,
+              phone: result.user.phone || values.phone,
+              role: result.user.role || "user",
               favProperties: [],
               bookedVisits: [],
               ownedProperties: [],
             },
-            token: sessionToken,
+            token: result.token,
           }),
         );
-
-        // Update user with additional fields (phone) via backend API
-        if (userData.id) {
-          try {
-            await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/users/${userData.id}`,
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  phone: values.phone,
-                }),
-              },
-            );
-          } catch (updateError) {
-            console.error("Failed to update phone:", updateError);
-          }
-        }
+        toast.success("Account created successfully!");
+        router.push("/");
+      } else {
+        toast.error("Signup failed. Please try again.");
       }
-
-      toast.success("Account created successfully!");
-      router.push("/");
     } catch (error) {
-      toast.error("Failed to create account.");
+      console.error("Signup error:", error);
+      toast.error("Failed to create account. Please check your connection.");
     }
   };
 

@@ -81,80 +81,61 @@ const page = () => {
   // 3. Define a submit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Add 10 second timeout to prevent hanging on slow/unavailable server
-      const result = await withTimeout(
-        authClient.signIn.email({
+      // Get the API base URL
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        (typeof window !== "undefined" &&
+        (window.location.hostname === "www.propertybulbul.com" ||
+          window.location.hostname === "propertybulbul.com")
+          ? "https://real-estate-server-6pzl.onrender.com/api"
+          : "http://localhost:9000/api");
+
+      // Use custom login endpoint that returns token directly
+      const response = await fetch(`${apiBaseUrl}/better-auth/custom-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
           email: values.email,
           password: values.password,
         }),
-        10000,
-      );
+      });
 
-      const { data, error } = result;
+      const result = await response.json();
 
-      if (error) {
-        toast.error(error.message || "Failed to login.");
+      if (!response.ok || !result.success) {
+        toast.error(result.message || "Failed to login.");
         return;
       }
 
-      // Update Redux store with user data
-      if (data?.user) {
-        const userData = data.user as any;
-
-        // Better Auth sets cookies, but for cross-origin we need to get the token
-        // Call our custom endpoint to get the session token
-        let sessionToken = "";
-        try {
-          // Get the API base URL
-          const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 
-            (typeof window !== 'undefined' && 
-              (window.location.hostname === 'www.propertybulbul.com' || 
-               window.location.hostname === 'propertybulbul.com')
-              ? 'https://real-estate-server-6pzl.onrender.com/api'
-              : 'http://localhost:9000/api');
-
-          const tokenResponse = await fetch(`${apiBaseUrl}/better-auth/get-token`, {
-            method: 'GET',
-            credentials: 'include', // Include cookies
-          });
-
-          if (tokenResponse.ok) {
-            const tokenData = await tokenResponse.json();
-            if (tokenData.success && tokenData.token) {
-              sessionToken = tokenData.token;
-            }
-          }
-        } catch (tokenError) {
-          console.warn("Could not get session token:", tokenError);
-        }
-
+      // Update Redux store with user data and token
+      if (result.user && result.token) {
         dispatch(
           loginSuccess({
             user: {
-              _id: userData.id,
-              name: userData.name,
-              email: userData.email,
-              image: userData.image || undefined,
-              phone: userData.phone,
-              role: userData.role || "user",
-              favProperties: userData.favProperties || [],
-              bookedVisits: userData.bookedVisits || [],
-              ownedProperties: userData.ownedProperties || [],
+              _id: result.user._id || result.user.id,
+              name: result.user.name,
+              email: result.user.email,
+              image: result.user.image || undefined,
+              phone: result.user.phone,
+              role: result.user.role || "user",
+              favProperties: result.user.favProperties || [],
+              bookedVisits: result.user.bookedVisits || [],
+              ownedProperties: result.user.ownedProperties || [],
             },
-            token: sessionToken,
+            token: result.token,
           }),
         );
-      }
-      toast.success("Logged in successfully!");
-      router.push("/");
-    } catch (error) {
-      if (error instanceof Error && error.message === "Request timeout") {
-        toast.error(
-          "Login request timed out. Please check if the server is running.",
-        );
+        toast.success("Logged in successfully!");
+        router.push("/");
       } else {
-        toast.error("Failed to login.");
+        toast.error("Login failed. Please try again.");
       }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Failed to login. Please check your connection.");
     }
   };
 
