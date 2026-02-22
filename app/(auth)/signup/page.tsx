@@ -103,16 +103,35 @@ const page = () => {
       if (data?.user) {
         const userData = data.user as any;
 
-        // Better Auth sets cookies automatically, but we need to get the session token
-        // Call getSession to retrieve the session token
+        // Better Auth sets cookies, but for cross-origin we need to get the token
+        // Call our custom endpoint to get the session token
         let sessionToken = "";
         try {
-          const sessionResult = await authClient.getSession();
-          if (sessionResult?.data?.session?.token) {
-            sessionToken = sessionResult.data.session.token;
+          // Get the API base URL
+          const apiBaseUrl =
+            process.env.NEXT_PUBLIC_API_URL ||
+            (typeof window !== "undefined" &&
+            (window.location.hostname === "www.propertybulbul.com" ||
+              window.location.hostname === "propertybulbul.com")
+              ? "https://real-estate-server-6pzl.onrender.com/api"
+              : "http://localhost:9000/api");
+
+          const tokenResponse = await fetch(
+            `${apiBaseUrl}/better-auth/get-token`,
+            {
+              method: "GET",
+              credentials: "include", // Include cookies
+            },
+          );
+
+          if (tokenResponse.ok) {
+            const tokenData = await tokenResponse.json();
+            if (tokenData.success && tokenData.token) {
+              sessionToken = tokenData.token;
+            }
           }
-        } catch (sessionError) {
-          console.warn("Could not get session token:", sessionError);
+        } catch (tokenError) {
+          console.warn("Could not get session token:", tokenError);
         }
 
         dispatch(
