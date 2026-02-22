@@ -1,8 +1,24 @@
 import { createAuthClient } from "better-auth/react";
 
-// Better-auth client pointing to the backend API
-// The backend has the database adapter configured for user persistence
+/**
+ * Better Auth Client Configuration
+ * 
+ * This client connects to the Better Auth server running on the backend.
+ * All authentication logic is handled by the backend at /api/better-auth
+ * 
+ * Available endpoints on backend:
+ * - POST /api/better-auth/sign-up/email - Create new account
+ * - POST /api/better-auth/sign-in/email - Sign in with email/password
+ * - POST /api/better-auth/sign-out - Sign out
+ * - GET /api/better-auth/session - Get current session
+ * - GET /api/better-auth/sign-in/social - Social login (Google)
+ * - POST /api/better-auth/forgot-password - Request password reset
+ * - POST /api/better-auth/reset-password - Reset password
+ */
+
+// The API URL should point to the backend server
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api";
+
 export const authClient = createAuthClient({
   baseURL: `${apiBaseUrl}/better-auth`,
 });
@@ -15,7 +31,7 @@ export const {
   useSession,
 } = authClient;
 
-// Export types
+// Export types for TypeScript
 export type Session = {
   id: string;
   userId: string;

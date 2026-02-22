@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
 import SearchBar, { SearchFilters } from "./SearchBar";
@@ -11,10 +11,25 @@ interface HeroProps {
   setFilter: React.Dispatch<React.SetStateAction<SearchFilters>>;
 }
 
+// Reduce animation complexity for better performance
+const heroVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const imageVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
+};
+
 const Hero: React.FC<HeroProps> = ({ setFilter }) => {
-  const handleSearch = (filters: SearchFilters) => {
-    setFilter(filters);
-  };
+  // Memoize the search handler to prevent unnecessary re-renders
+  const handleSearch = useCallback(
+    (filters: SearchFilters) => {
+      setFilter(filters);
+    },
+    [setFilter],
+  );
 
   return (
     <section className="relative bg-background text-foreground py-8 md:py-20 overflow-hidden">

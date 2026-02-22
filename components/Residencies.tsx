@@ -1,20 +1,32 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useMemo, memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import PropertyCard from "./PropertyCard";
-import { PuffLoader } from "react-spinners";
 import { sliderSettings } from "@/lib/utils";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+
+// Memoized PropertyCard wrapper to prevent unnecessary re-renders
+const MemoizedPropertyCard = memo(PropertyCard);
 
 interface ResidenciesProps {
   filter?: { [key: string]: string };
 }
 
 const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
-  const { data, isError, isLoading } = useGetAllPropertiesQuery(filter);
+  // Use RTK Query's caching - this will use cached data if available
+  const { data, isError, isLoading } = useGetAllPropertiesQuery(filter, {
+    // Skip refetching if we already have data
+    refetchOnMountOrArgChange: false,
+  });
   const swiperRef = useRef<any>(null);
+
+  // Memoize the sliced data to show only first 8 properties
+  const displayProperties = useMemo(() => {
+    if (!data) return [];
+    return data.slice(0, 8);
+  }, [data]);
 
   if (isError) {
     return (
@@ -27,7 +39,10 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
   if (isLoading) {
     return (
       <div className="w-full flex items-center justify-center h-[60vh]">
-        <PuffLoader color="#4066ff" size={60} />
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-gray-500">Loading properties...</span>
+        </div>
       </div>
     );
   }
@@ -103,9 +118,9 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
             onSwiper={(swiper) => (swiperRef.current = swiper)}
             className="pb-10 pt-6 -mx-2"
           >
-            {data?.map((card: any, index: number) => (
-              <SwiperSlide key={index} className="px-2">
-                <PropertyCard card={card} />
+            {displayProperties.map((card: any, index: number) => (
+              <SwiperSlide key={card._id || index} className="px-2">
+                <MemoizedPropertyCard card={card} />
               </SwiperSlide>
             ))}
           </Swiper>

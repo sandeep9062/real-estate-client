@@ -1,21 +1,20 @@
 // Testimonial.tsx
-"use client"; // Important for components using state and event listeners in Next.js App Router
+"use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
 import Image from "next/image";
 import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-// Define the type for a single testimonial item
 interface TestimonialItem {
   id: number;
   name: string;
   role: string;
   image: string;
   text: string;
-  rating: number; // Assuming a rating out of 5 for stars
+  rating: number;
 }
 
-// Cleaned and standardized dummy data for testimonials
+// Static data moved outside component to prevent recreation
 const testimonials: TestimonialItem[] = [
   {
     id: 1,
@@ -114,17 +113,15 @@ const Testimonial: React.FC = () => {
   const translateXValue = currentPage * 100;
 
   // --- UI Helpers ---
-  // Helper to render star ratings
-  const renderStars = (rating: number) => {
+  // Memoized star rating renderer
+  const renderStars = useCallback((rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <FaStar
         key={i}
-        className={`w-4 h-4 transition-colors ${
-          i < rating ? "text-yellow-500" : "text-gray-300"
-        }`}
+        className={`w-4 h-4 ${i < rating ? "text-yellow-500" : "text-gray-300"}`}
       />
     ));
-  };
+  }, []);
 
   // Function to scroll to the top of the page
 

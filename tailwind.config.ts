@@ -19,6 +19,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  // Note: @tailwindcss/forms is not compatible with Tailwind v4
+  // Forms styling is now handled via CSS in globals.css
 };
 export default config;

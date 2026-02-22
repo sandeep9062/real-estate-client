@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { HiLocationMarker } from "react-icons/hi";
 
 export interface SearchFilters {
@@ -20,7 +26,7 @@ interface SearchBarProps {
   onSearch: (filters: SearchFilters) => void;
 }
 
-// Parse search query for smart filtering
+// Memoized parse function for better performance
 const parseSearchQuery = (query: string): SearchFilters => {
   const filters: SearchFilters = { query: query.toLowerCase() };
   const lowerQuery = query.toLowerCase();
@@ -32,49 +38,51 @@ const parseSearchQuery = (query: string): SearchFilters => {
   }
 
   // Parse deal type (rent/sale)
-  if (lowerQuery.includes('rent')) {
-    filters.deal = 'Rent';
-  } else if (lowerQuery.includes('sale') || lowerQuery.includes('buy')) {
-    filters.deal = 'Sale';
+  if (lowerQuery.includes("rent")) {
+    filters.deal = "Rent";
+  } else if (lowerQuery.includes("sale") || lowerQuery.includes("buy")) {
+    filters.deal = "Sale";
   }
 
   // Parse property type
-  if (lowerQuery.includes('residential')) {
-    filters.type = 'Residential';
-  } else if (lowerQuery.includes('commercial')) {
-    filters.type = 'Commercial';
+  if (lowerQuery.includes("residential")) {
+    filters.type = "Residential";
+  } else if (lowerQuery.includes("commercial")) {
+    filters.type = "Commercial";
   }
 
   // Parse property category
-  if (lowerQuery.includes('apartment') || lowerQuery.includes('flat')) {
-    filters.propertyCategory = 'Apartment/Flat';
-  } else if (lowerQuery.includes('house') || lowerQuery.includes('villa')) {
-    filters.propertyCategory = 'House/Villa';
-  } else if (lowerQuery.includes('land') || lowerQuery.includes('plot')) {
-    filters.propertyCategory = 'Land/Plot';
-  } else if (lowerQuery.includes('office')) {
-    filters.propertyCategory = 'Office';
-  } else if (lowerQuery.includes('shop') || lowerQuery.includes('showroom')) {
-    filters.propertyCategory = 'Shop/Showroom';
+  if (lowerQuery.includes("apartment") || lowerQuery.includes("flat")) {
+    filters.propertyCategory = "Apartment/Flat";
+  } else if (lowerQuery.includes("house") || lowerQuery.includes("villa")) {
+    filters.propertyCategory = "House/Villa";
+  } else if (lowerQuery.includes("land") || lowerQuery.includes("plot")) {
+    filters.propertyCategory = "Land/Plot";
+  } else if (lowerQuery.includes("office")) {
+    filters.propertyCategory = "Office";
+  } else if (lowerQuery.includes("shop") || lowerQuery.includes("showroom")) {
+    filters.propertyCategory = "Shop/Showroom";
   }
 
   // Parse price (e.g., "under 50000", "below 1 lakh")
-  const priceMatch = lowerQuery.match(/(under|below|upto)\s*(\d+(?:\.\d+)?)\s*(lakh|lacs|k|thousand)?/i);
+  const priceMatch = lowerQuery.match(
+    /(under|below|upto)\s*(\d+(?:\.\d+)?)\s*(lakh|lacs|k|thousand)?/i,
+  );
   if (priceMatch) {
     let price = parseFloat(priceMatch[2]);
     const unit = priceMatch[3]?.toLowerCase();
-    if (unit === 'lakh' || unit === 'lacs') {
+    if (unit === "lakh" || unit === "lacs") {
       price *= 100000;
-    } else if (unit === 'k' || unit === 'thousand') {
+    } else if (unit === "k" || unit === "thousand") {
       price *= 1000;
     }
     filters.maxPrice = price;
   }
 
   // Extract location keywords (cities, states)
-  const cities = ['chandigarh', 'mohali', 'panchkula', 'zirakpur', 'kharar'];
-  const states = ['punjab', 'haryana'];
-  const countries = ['india'];
+  const cities = ["chandigarh", "mohali", "panchkula", "zirakpur", "kharar"];
+  const states = ["punjab", "haryana"];
+  const countries = ["india"];
 
   for (const city of cities) {
     if (lowerQuery.includes(city)) {

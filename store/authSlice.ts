@@ -17,33 +17,13 @@ interface AuthState {
   token: string | null;
 }
 
-const initialState: AuthState = (() => {
-  if (typeof window === "undefined") {
-    return {
-      isAuthenticated: false,
-      user: null,
-      token: null,
-    };
-  }
-  try {
-    const token = localStorage.getItem("token");
-    const userString = localStorage.getItem("user");
-    if (token && userString) {
-      return {
-        isAuthenticated: true,
-        user: JSON.parse(userString),
-        token,
-      };
-    }
-  } catch (error) {
-    console.error("Failed to parse user from localStorage", error);
-  }
-  return {
-    isAuthenticated: false,
-    user: null,
-    token: null,
-  };
-})();
+// Simple initial state - localStorage access moved to StoreProvider
+// This prevents SSR/hydration issues with Next.js
+const initialState: AuthState = {
+  isAuthenticated: false,
+  user: null,
+  token: null,
+};
 
 const authSlice = createSlice({
   name: "auth",

@@ -28,6 +28,16 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/authSlice";
 import { useState } from "react";
 
+// Timeout wrapper for async operations
+const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("Request timeout")), ms),
+    ),
+  ]);
+};
+
 // 1. Define your validation schema
 
 const formSchema = z.object({
@@ -71,10 +81,16 @@ const page = () => {
   // 3. Define a submit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { data, error } = await authClient.signIn.email({
-        email: values.email,
-        password: values.password,
-      });
+      // Add 10 second timeout to prevent hanging on slow/unavailable server
+      const result = await withTimeout(
+        authClient.signIn.email({
+          email: values.email,
+          password: values.password,
+        }),
+        10000,
+      );
+
+      const { data, error } = result;
 
       if (error) {
         toast.error(error.message || "Failed to login.");
@@ -98,15 +114,19 @@ const page = () => {
               ownedProperties: userData.ownedProperties || [],
             },
             token: data.token || "",
-          })
+          }),
         );
       }
-
       toast.success("Logged in successfully!");
-
       router.push("/");
     } catch (error) {
-      toast.error("Failed to login.");
+      if (error instanceof Error && error.message === "Request timeout") {
+        toast.error(
+          "Login request timed out. Please check if the server is running.",
+        );
+      } else {
+        toast.error("Failed to login.");
+      }
     }
   };
 

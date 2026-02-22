@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useMemo, memo } from "react";
 import Image from "next/image";
 import { truncate } from "lodash";
 import { useRouter } from "next/navigation";
 import Heart from "./Heart";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/authSlice";
+
 interface PropertyCardProps {
   card: any;
   isFavourite?: boolean;
@@ -13,11 +14,16 @@ interface PropertyCardProps {
   onEdit?: (property: any) => void;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({ card, isFavourite, editable = false, onEdit }) => {
+const PropertyCard: React.FC<PropertyCardProps> = ({
+  card,
+  isFavourite,
+  editable = false,
+  onEdit,
+}) => {
   const router = useRouter();
   const user = useSelector(selectUser);
 
-  const isBooked = false; // This needs to be re-evaluated if you have booking info available
+  const isBooked = false;
   const isFavourited = isFavourite;
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -25,14 +31,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ card, isFavourite, editable
     onEdit?.(card);
   };
 
-  // Filter out video URLs from images
-  const imageUrls = (card.image || []).filter((img: string) => {
-    const lower = img.toLowerCase();
-    return !(lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg'));
-  });
+  // Memoize image filtering to prevent recalculation
+  const displayImage = useMemo(() => {
+    const imageUrls = (card.image || []).filter((img: string) => {
+      const lower = img.toLowerCase();
+      return !(
+        lower.endsWith(".mp4") ||
+        lower.endsWith(".webm") ||
+        lower.endsWith(".ogg")
+      );
+    });
+    return imageUrls[0] || card.image?.[0];
+  }, [card.image]);
 
-  const displayImage = imageUrls[0] || card.image?.[0]; // Fallback to first if no images
-  const hasValidImage = displayImage && displayImage.trim() !== '';
+  const hasValidImage = displayImage && displayImage.trim() !== "";
 
   return (
     <div
@@ -46,12 +58,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ card, isFavourite, editable
             src={displayImage}
             alt={card.title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
             className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <div className="text-gray-400 text-center">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mx-auto mb-2">
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+                className="mx-auto mb-2"
+              >
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
@@ -73,7 +95,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ card, isFavourite, editable
             className="absolute top-3 right-16 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors"
             title="Edit Property"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
@@ -169,4 +198,5 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ card, isFavourite, editable
   );
 };
 
-export default PropertyCard;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(PropertyCard);
