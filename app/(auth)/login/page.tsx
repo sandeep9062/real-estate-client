@@ -90,6 +90,8 @@ const page = () => {
           ? "https://real-estate-server-6pzl.onrender.com/api"
           : "http://localhost:9000/api");
 
+      console.log("Login API URL:", `${apiBaseUrl}/better-auth/custom-login`);
+
       // Use custom login endpoint that returns token directly
       const response = await fetch(`${apiBaseUrl}/better-auth/custom-login`, {
         method: "POST",
@@ -103,7 +105,10 @@ const page = () => {
         }),
       });
 
+      console.log("Login response status:", response.status);
+
       const result = await response.json();
+      console.log("Login result:", result);
 
       if (!response.ok || !result.success) {
         toast.error(result.message || "Failed to login.");
