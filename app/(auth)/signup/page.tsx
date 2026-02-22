@@ -102,6 +102,9 @@ const page = () => {
       // Update Redux store with user data
       if (data?.user) {
         const userData = data.user as any;
+        // Better Auth returns the session token in data.session.token
+        const sessionToken = (data as any)?.session?.token || "";
+
         dispatch(
           loginSuccess({
             user: {
@@ -115,20 +118,23 @@ const page = () => {
               bookedVisits: [],
               ownedProperties: [],
             },
-            token: data.token || "",
-          })
+            token: sessionToken,
+          }),
         );
 
         // Update user with additional fields (phone) via backend API
         if (userData.id) {
           try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userData.id}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                phone: values.phone,
-              }),
-            });
+            await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/users/${userData.id}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  phone: values.phone,
+                }),
+              },
+            );
           } catch (updateError) {
             console.error("Failed to update phone:", updateError);
           }
@@ -144,8 +150,6 @@ const page = () => {
 
   return (
     <div className="min-h-screen flex">
-
-
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-purple-50 to-pink-100 relative overflow-hidden">
         <Image
           src="/signup.jpg"
@@ -170,7 +174,7 @@ const page = () => {
               Create Your Account
             </CardTitle>
             <CardDescription className="text-lg">
-              Join Property Bulbul 
+              Join Property Bulbul
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -352,9 +356,6 @@ const page = () => {
           </CardContent>
         </Card>
       </div>
-
-   
-      
     </div>
   );
 };

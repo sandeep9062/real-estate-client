@@ -100,6 +100,9 @@ const page = () => {
       // Update Redux store with user data
       if (data?.user) {
         const userData = data.user as any;
+        // Better Auth returns the session token in data.session.token
+        const sessionToken = (data as any)?.session?.token || "";
+
         dispatch(
           loginSuccess({
             user: {
@@ -113,7 +116,7 @@ const page = () => {
               bookedVisits: userData.bookedVisits || [],
               ownedProperties: userData.ownedProperties || [],
             },
-            token: data.token || "",
+            token: sessionToken,
           }),
         );
       }
