@@ -35,6 +35,38 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 
+// Dynamic API URL detection for production vs development
+const getApiBaseUrl = () => {
+  // First priority: Environment variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Second priority: Detect production environment (client-side only)
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+
+    // If on production domain, use Render backend URL
+    if (
+      hostname === "www.propertybulbul.com" ||
+      hostname === "propertybulbul.com"
+    ) {
+      return "https://real-estate-server-6pzl.onrender.com/api";
+    }
+  }
+
+  // Default: localhost for development
+  return "http://localhost:9000/api";
+};
+
+// Helper function to get user image URL
+const getUserImageUrl = (imagePath: string | undefined): string | undefined => {
+  if (!imagePath) return undefined;
+  if (imagePath.startsWith("http")) return imagePath;
+  const baseUrl = getApiBaseUrl().replace("/api", "");
+  return `${baseUrl}/${imagePath.replace(/\\/g, "/")}`;
+};
+
 interface ProfileMenuProps {
   user: any;
 }
@@ -104,7 +136,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
         setUser({
           user: { ...user, ...updatedUser },
           token: localStorage.getItem("token") || "",
-        })
+        }),
       );
       toast.success("Profile updated successfully");
       setIsModalOpen(false);
@@ -115,8 +147,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
         message: error?.message,
         error: error,
       });
-      
-      const errorMessage = error?.data?.message || error?.message || "Failed to update profile";
+
+      const errorMessage =
+        error?.data?.message || error?.message || "Failed to update profile";
       toast.error(errorMessage);
     }
   };
@@ -148,11 +181,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
       >
         <Menu.Target>
           <Avatar
-            src={
-              user?.image && user.image.startsWith("http")
-                ? user.image
-                : `http://localhost:9000/${user?.image?.replace(/\\/g, "/")}`
-            }
+            src={getUserImageUrl(user?.image)}
             alt="user image"
             radius="xl"
             size="44px"
@@ -166,15 +195,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
 
         <Menu.Dropdown>
           <Group gap="sm" px="xs" py="xs">
-            <Avatar
-              src={
-                user?.image && user.image.startsWith("http")
-                  ? user.image
-                  : `http://localhost:9000/${user?.image?.replace(/\\/g, "/")}`
-              }
-              radius="xl"
-              size="lg"
-            />
+            <Avatar src={getUserImageUrl(user?.image)} radius="xl" size="lg" />
             <div>
               <Text fw={600} size="sm">
                 {user?.name || "User"}

@@ -1,7 +1,28 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// Dynamic API URL detection for production vs development
+const getApiUrl = () => {
+  // First priority: Environment variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Second priority: Detect production environment (client-side only)
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    // If on production domain, use Render backend URL
+    if (hostname === 'www.propertybulbul.com' || hostname === 'propertybulbul.com') {
+      return 'https://real-estate-server-6pzl.onrender.com/api';
+    }
+  }
+  
+  // Default: localhost for development
+  return 'http://localhost:9000/api';
+};
+
 export async function getPropertyServer(id: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api';
+  const apiUrl = getApiUrl();
   
   try {
     const response = await fetch(`${apiUrl}/properties/${id}`, {

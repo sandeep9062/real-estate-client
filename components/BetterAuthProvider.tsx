@@ -9,26 +9,50 @@ import axios from "axios";
 
 /**
  * Better Auth Provider Component
- * 
+ *
  * This component:
  * 1. Checks for existing Better Auth session on mount
  * 2. Syncs user data with Redux store
  * 3. Fetches additional user data from backend API
- * 
+ *
  * Authentication flow:
  * - Better Auth handles session management (cookies)
  * - Backend API provides additional user data (favorites, bookings, etc.)
  * - Redux store maintains client-side auth state
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api";
+// Dynamic API URL detection for production vs development
+const getApiUrl = () => {
+  // First priority: Environment variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Second priority: Detect production environment
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+
+    // If on production domain, use Render backend URL
+    if (
+      hostname === "www.propertybulbul.com" ||
+      hostname === "propertybulbul.com"
+    ) {
+      return "https://real-estate-server-6pzl.onrender.com/api";
+    }
+  }
+
+  // Default: localhost for development
+  return "http://localhost:9000/api";
+};
+
+const API_URL = getApiUrl();
 
 // Timeout wrapper for async operations
 const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error("Request timeout")), ms)
+      setTimeout(() => reject(new Error("Request timeout")), ms),
     ),
   ]);
 };
@@ -46,10 +70,16 @@ interface BetterAuthUserData {
   ownedProperties?: string[];
 }
 
-export function BetterAuthProvider({ children }: { children: React.ReactNode }) {
+export function BetterAuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
 
   useEffect(() => {
     const checkSession = async () => {
@@ -63,17 +93,17 @@ export function BetterAuthProvider({ children }: { children: React.ReactNode }) 
         // Get session from Better Auth (uses cookies automatically)
         // Add 5 second timeout to prevent hanging
         const session = await withTimeout(authClient.getSession(), 5000);
-        
+
         if (session?.data?.user && session?.data?.session) {
           // Cast to extended type to include custom fields from Better Auth
           const userData = session.data.user as BetterAuthUserData;
           const sessionToken = session.data.session.token;
-          
+
           // Store session token for API calls
           if (sessionToken) {
             localStorage.setItem("sessionToken", sessionToken);
           }
-          
+
           // Fetch full user data from backend
           // The backend can provide additional data like favorites, bookings, etc.
           try {
@@ -83,9 +113,9 @@ export function BetterAuthProvider({ children }: { children: React.ReactNode }) 
               },
               withCredentials: true, // Include cookies for Better Auth session
             });
-            
+
             const mongoUser = profileResponse.data.user;
-            
+
             dispatch(
               loginSuccess({
                 user: {
@@ -100,13 +130,16 @@ export function BetterAuthProvider({ children }: { children: React.ReactNode }) 
                   ownedProperties: mongoUser.ownedProperties || [],
                 },
                 token: sessionToken,
-              })
+              }),
             );
           } catch (profileError) {
-            // If profile fetch fails (e.g., new user not yet in DB), 
+            // If profile fetch fails (e.g., new user not yet in DB),
             // use Better Auth user data directly
-            console.warn("Could not fetch profile from backend, using Better Auth data:", profileError);
-            
+            console.warn(
+              "Could not fetch profile from backend, using Better Auth data:",
+              profileError,
+            );
+
             dispatch(
               loginSuccess({
                 user: {
@@ -121,7 +154,7 @@ export function BetterAuthProvider({ children }: { children: React.ReactNode }) 
                   ownedProperties: userData.ownedProperties || [],
                 },
                 token: sessionToken,
-              })
+              }),
             );
           }
         }
@@ -129,9 +162,13 @@ export function BetterAuthProvider({ children }: { children: React.ReactNode }) 
         // Handle errors silently - user is not authenticated
         if (error instanceof Error) {
           if (error.message === "Request timeout") {
-            console.warn("Auth session check timed out - server may be slow or unavailable");
+            console.warn(
+              "Auth session check timed out - server may be slow or unavailable",
+            );
           } else if (error.message === "Failed to fetch") {
-            console.warn("Auth server unavailable - running in unauthenticated mode");
+            console.warn(
+              "Auth server unavailable - running in unauthenticated mode",
+            );
           } else {
             // Don't log 401 errors - they're expected for unauthenticated users
             const axiosError = error as any;
@@ -163,7 +200,7 @@ export function BetterAuthProvider({ children }: { children: React.ReactNode }) 
 
     // Expose sign out handler globally
     (window as any).signOut = handleSignOut;
-    
+
     return () => {
       delete (window as any).signOut;
     };
