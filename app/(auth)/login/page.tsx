@@ -100,8 +100,18 @@ const page = () => {
       // Update Redux store with user data
       if (data?.user) {
         const userData = data.user as any;
-        // Better Auth returns the session token in data.session.token
-        const sessionToken = (data as any)?.session?.token || "";
+
+        // Better Auth sets cookies automatically, but we need to get the session token
+        // Call getSession to retrieve the session token
+        let sessionToken = "";
+        try {
+          const sessionResult = await authClient.getSession();
+          if (sessionResult?.data?.session?.token) {
+            sessionToken = sessionResult.data.session.token;
+          }
+        } catch (sessionError) {
+          console.warn("Could not get session token:", sessionError);
+        }
 
         dispatch(
           loginSuccess({

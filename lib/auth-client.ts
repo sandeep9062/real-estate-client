@@ -41,6 +41,10 @@ const apiBaseUrl = getApiBaseUrl();
 
 export const authClient = createAuthClient({
   baseURL: `${apiBaseUrl}/better-auth`,
+  // Enable cross-origin cookie support for production
+  fetchOptions: {
+    credentials: 'include',
+  },
 });
 
 // Export hooks for easier usage
