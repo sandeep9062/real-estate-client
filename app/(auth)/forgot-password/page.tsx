@@ -6,41 +6,81 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
 
-// 1. Define your validation schema
+// Validation schema
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
-const page = () => {
-  // 2. Initialize the form
+const ForgotPasswordPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+
+  // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: "" },
   });
 
-  // 3. Define a submit handler
+  // Submit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+
     try {
-      // Use better-auth password reset - send reset email
-      const response = await authClient.requestPasswordReset({
-        email: values.email,
-        redirectTo: "/reset-password",
+      // Get the API base URL
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        (typeof window !== "undefined" &&
+        (window.location.hostname === "www.propertybulbul.com" ||
+          window.location.hostname === "propertybulbul.com")
+          ? "https://api.propertybulbul.com/api"
+          : "http://localhost:9000/api");
+
+      const response = await fetch(`${apiBaseUrl}/auth/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: values.email,
+        }),
       });
 
-      if (response.error) {
-        toast.error(response.error.message || "Failed to send reset email. Please try again.");
-        return;
-      }
+      const result = await response.json();
 
-      toast.success("Password reset email sent! Check your inbox.");
+      if (response.ok && result.success) {
+        setEmailSent(true);
+        toast.success("Password reset email sent! Check your inbox.");
+      } else {
+        toast.error(
+          result.message || "Failed to send reset email. Please try again.",
+        );
+      }
     } catch (error: any) {
-      toast.error(error.message || "Failed to send reset email. Please try again.");
+      toast.error(
+        error.message || "Failed to send reset email. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,45 +112,74 @@ const page = () => {
               Forgot Password
             </CardTitle>
             <CardDescription className="text-lg">
-              Enter your email address and we'll send you a link to reset your password
+              {emailSent
+                ? "Check your email for the reset link"
+                : "Enter your email address and we'll send you a link to reset your password"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="john.doe@example.com"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  disabled={form.formState.isSubmitting}
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+            {emailSent ? (
+              <div className="text-center space-y-4">
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <p className="text-green-700">
+                    If an account with that email exists, a password reset link
+                    has been sent. Please check your inbox and spam folder.
+                  </p>
+                </div>
+                <Link
+                  href="/login"
+                  className="block w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md text-center leading-[44px]"
                 >
-                  {form.formState.isSubmitting ? "Sending..." : "Send Reset Link"}
-                </Button>
-              </form>
-            </Form>
-            <div className="text-center text-sm text-gray-600">
-              Remember your password?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline font-medium">
-                Sign in
-              </Link>
-            </div>
+                  Back to Login
+                </Link>
+              </div>
+            ) : (
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Email
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="john.doe@example.com"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                  >
+                    {isLoading ? "Sending..." : "Send Reset Link"}
+                  </Button>
+                </form>
+              </Form>
+            )}
+            {!emailSent && (
+              <div className="text-center text-sm text-gray-600">
+                Remember your password?{" "}
+                <Link
+                  href="/login"
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Sign in
+                </Link>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -118,4 +187,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default ForgotPasswordPage;

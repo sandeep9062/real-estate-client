@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../store/authSlice";
 import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +14,7 @@ import { useRegisterMutation } from "../services/authApi";
 const signupSchema = z.object({
   name: z.string().min(1, "Full name is required"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   phone: z.string().min(10, "Phone number is required"),
 });
 
@@ -41,7 +43,12 @@ export default function SignupPage({
 
   const handleSignup = async (data: SignupFormValues) => {
     try {
-      await registerUser(data).unwrap();
+      const result = await registerUser(data).unwrap();
+
+      // Update Redux store with user data
+      // Note: Tokens are stored in HTTP-only cookies automatically
+      dispatch(loginSuccess({ user: result.user }));
+
       toast.success("Signup successful! Please login.");
       toggleAuthMode();
     } catch (err: any) {
@@ -93,21 +100,6 @@ export default function SignupPage({
           </div>
 
           <div>
-            <PhoneInput
-              placeholder="Enter phone number"
-              value={phoneValue}
-              onChange={(value) => setValue("phone", value || "")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              defaultCountry="IN"
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.phone.message}
-              </p>
-            )}
-          </div>
-
-          <div>
             <input
               type="password"
               placeholder="Create password"
@@ -121,25 +113,42 @@ export default function SignupPage({
             )}
           </div>
 
+          <div>
+            <PhoneInput
+              placeholder="Enter phone number"
+              value={phoneValue}
+              onChange={(value) => setValue("phone", value || "")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.phone.message}
+              </p>
+            )}
+          </div>
+
           <button
             type="submit"
-            className="w-full p-3 text-white transition duration-200 bg-indigo-600 rounded-lg hover:bg-indigo-700"
+            disabled={isLoading}
+            className="w-full p-3 bg-[#4161df] text-white rounded-lg hover:bg-[#4161df] transition-colors"
           >
-            Sign Up
+            {isLoading ? "Creating Account..." : "Sign Up"}
           </button>
-        </form>
 
-        <p className="mt-4 text-sm text-center text-gray-700">
-          Already have an account?{" "}
-          <button
-            type="button"
-            onClick={toggleAuthMode}
-            className="text-indigo-600 hover:underline"
-          >
-            Login
-          </button>
-        </p>
+          <p className="text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={toggleAuthMode}
+              className="text-[#4161df] hover:underline"
+            >
+              Login
+            </button>
+          </p>
+        </form>
       </div>
     </div>
   );
 }
+
+export default SignupPage;

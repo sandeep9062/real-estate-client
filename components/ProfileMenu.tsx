@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useUpdateProfileMutation } from "../services/userApi";
 import { logoutSuccess as logoutAction, setUser } from "../store/authSlice";
-import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -46,12 +45,12 @@ const getApiBaseUrl = () => {
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
 
-    // If on production domain, use Render backend URL
+    // If on production domain, use production API URL
     if (
       hostname === "www.propertybulbul.com" ||
       hostname === "propertybulbul.com"
     ) {
-      return "https://real-estate-server-6pzl.onrender.com/api";
+      return "https://api.propertybulbul.com/api";
     }
   }
 
@@ -105,8 +104,20 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
 
   const handleLogout = async () => {
     try {
-      // Sign out using better-auth
-      await authClient.signOut();
+      // Get the API base URL
+      const apiBaseUrl = getApiBaseUrl();
+
+      // Call logout endpoint
+      // Note: HTTP-only cookies are sent automatically with credentials: 'include'
+      await fetch(`${apiBaseUrl}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important: Include cookies
+      });
+
+      // Clear local state
       dispatch(logoutAction());
       router.push("/login");
     } catch (error) {
@@ -132,10 +143,10 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
 
     try {
       const updatedUser = await updateProfile(formData).unwrap();
+      // Update Redux store - no token needed (stored in HTTP-only cookies)
       dispatch(
         setUser({
           user: { ...user, ...updatedUser },
-          token: localStorage.getItem("token") || "",
         }),
       );
       toast.success("Profile updated successfully");

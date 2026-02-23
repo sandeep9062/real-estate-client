@@ -24,10 +24,9 @@ import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Suspense } from "react";
-import { authClient } from "@/lib/auth-client";
+import { Suspense, useState } from "react";
 
-// 1. Define your validation schema
+// Validation schema
 const formSchema = z
   .object({
     password: z.string().min(8, "Password must be at least 8 characters"),
@@ -44,38 +43,67 @@ const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // 2. Initialize the form
+  // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { password: "", confirmPassword: "" },
   });
 
-  // 3. Define a submit handler
+  // Submit handler
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+
     try {
       if (!token) {
         toast.error("Invalid reset token. Please try again.");
         return;
       }
 
-      // Use better-auth password reset
-      const { error } = await authClient.resetPassword({
-        newPassword: values.password,
-        token: token,
+      // Get the API base URL
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        (typeof window !== "undefined" &&
+        (window.location.hostname === "www.propertybulbul.com" ||
+          window.location.hostname === "propertybulbul.com")
+          ? "https://api.propertybulbul.com/api"
+          : "http://localhost:9000/api");
+
+      const response = await fetch(`${apiBaseUrl}/auth/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          token: token,
+          password: values.password,
+        }),
       });
 
-      if (error) {
-        toast.error(error.message || "Failed to reset password. Please try again.");
-        return;
-      }
+      const result = await response.json();
 
-      toast.success(
-        "Password reset successfully! You can now sign in with your new password."
-      );
-      router.push("/login");
+      if (response.ok && result.success) {
+        setIsSuccess(true);
+        toast.success(
+          "Password reset successfully! You can now sign in with your new password.",
+        );
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
+      } else {
+        toast.error(
+          result.message || "Failed to reset password. Please try again.",
+        );
+      }
     } catch (error: any) {
-      toast.error(error.message || "Failed to reset password. Please try again.");
+      toast.error(
+        error.message || "Failed to reset password. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,7 +140,7 @@ const ResetPasswordForm = () => {
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-orange-50 to-red-100 relative overflow-hidden">
         <Image
           src="/mcdi4.jpeg"
-          alt="Master Clinic Password Reset"
+          alt="Property Bulbul Password Reset"
           fill
           className="object-cover"
           priority
@@ -134,71 +162,94 @@ const ResetPasswordForm = () => {
               Reset Password
             </CardTitle>
             <CardDescription className="text-lg">
-              Enter your new password below
+              {isSuccess
+                ? "Password reset successfully!"
+                : "Enter your new password below"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter new password"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Confirm new password"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  disabled={form.formState.isSubmitting}
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+            {isSuccess ? (
+              <div className="text-center space-y-4">
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <p className="text-green-700">
+                    Your password has been reset successfully. Redirecting to
+                    login...
+                  </p>
+                </div>
+                <Link
+                  href="/login"
+                  className="block w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md text-center leading-[44px]"
                 >
-                  {form.formState.isSubmitting
-                    ? "Resetting..."
-                    : "Reset Password"}
-                </Button>
-              </form>
-            </Form>
-            <div className="text-center text-sm text-gray-600">
-              Remember your password?{" "}
-              <Link
-                href="/login"
-                className="text-blue-600 hover:underline font-medium"
-              >
-                Sign in
-              </Link>
-            </div>
+                  Go to Login
+                </Link>
+              </div>
+            ) : (
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          New Password
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter new password"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Confirm New Password
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirm new password"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                  >
+                    {isLoading ? "Resetting..." : "Reset Password"}
+                  </Button>
+                </form>
+              </Form>
+            )}
+            {!isSuccess && (
+              <div className="text-center text-sm text-gray-600">
+                Remember your password?{" "}
+                <Link
+                  href="/login"
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Sign in
+                </Link>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -206,7 +257,7 @@ const ResetPasswordForm = () => {
   );
 };
 
-const page = () => {
+const ResetPasswordPage = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <ResetPasswordForm />
@@ -214,4 +265,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default ResetPasswordPage;

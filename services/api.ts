@@ -1,5 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RootState } from '../store/store';
+import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // Dynamic API URL detection for production vs development
 const getApiBaseUrl = () => {
@@ -12,9 +11,9 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     
-    // If on production domain, use Render backend URL
+    // If on production domain, use production API URL
     if (hostname === 'www.propertybulbul.com' || hostname === 'propertybulbul.com') {
-      return 'https://real-estate-server-6pzl.onrender.com/api';
+      return 'https://api.propertybulbul.com/api';
     }
   }
   
@@ -23,17 +22,14 @@ const getApiBaseUrl = () => {
 };
 
 // Create our baseQuery instance
-const baseQuery = fetchBaseQuery({
+// Authentication is handled via HTTP-only cookies (accessToken and refreshToken)
+// No need to manually add Authorization header - cookies are sent automatically
+export const baseQueryWithAuth = fetchBaseQuery({
   baseUrl: getApiBaseUrl(),
-  credentials: 'include', // Include cookies for better-auth session
-  prepareHeaders: (headers, { getState }) => {
-    // By default, if we have a token in the store, let's use that for authenticated requests
-    const token = (getState() as RootState).auth.token;
-    if (token) {
-      headers.set('authorization', `Bearer ${token}`);
-    }
+  credentials: 'include', // Include cookies for authentication
+  prepareHeaders: (headers) => {
+    // Set content type for JSON requests
+    headers.set('Accept', 'application/json');
     return headers;
   },
 });
-
-export const baseQueryWithAuth = baseQuery;
