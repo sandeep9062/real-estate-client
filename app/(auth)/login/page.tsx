@@ -191,27 +191,40 @@ const LoginPage = () => {
         />
         <div className="absolute inset-0 bg-opacity-20"></div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-white text-center">
-            <h1 className="text-4xl font-bold mb-4">
+          <div className="text-white text-center px-8">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-4">
               Welcome to Property Bulbul
             </h1>
-            <p className="text-lg">Your journey to success starts here</p>
+            <p className="text-base lg:text-lg">
+              Your journey to success starts here
+            </p>
           </div>
         </div>
       </div>
 
       {/* Right side - Login Card */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-gray-900">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gray-50">
+        <Card className="w-full max-w-sm sm:max-w-md shadow-xl">
+          <CardHeader className="text-center px-4 sm:px-6 pt-4 sm:pt-6">
+            {/* Logo */}
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/propertybulbul.png"
+                alt="Property Bulbul"
+                width={140}
+                height={50}
+                className="object-contain w-28 sm:w-32 md:w-36"
+                priority
+              />
+            </div>
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-lg">
+            <CardDescription className="text-sm sm:text-base md:text-lg">
               Sign in to your Property Bulbul
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
             {/* Google Sign In Button */}
             <div className="flex justify-center">
               <GoogleLogin
@@ -239,21 +252,21 @@ const LoginPage = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
               >
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">
+                      <FormLabel className="text-xs sm:text-sm font-medium">
                         Email
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="john.doe@example.com"
-                          className="h-11"
+                          className="h-10 sm:h-11 text-sm sm:text-base"
                           {...field}
                         />
                       </FormControl>
@@ -266,14 +279,14 @@ const LoginPage = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">
+                      <FormLabel className="text-xs sm:text-sm font-medium">
                         Password
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="password"
                           placeholder="Enter your password"
-                          className="h-11"
+                          className="h-10 sm:h-11 text-sm sm:text-base"
                           {...field}
                         />
                       </FormControl>
@@ -284,7 +297,7 @@ const LoginPage = () => {
                 <div className="flex justify-end">
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-[#4161df] hover:underline font-medium"
+                    className="text-xs sm:text-sm text-[#4161df] hover:underline font-medium"
                   >
                     Forgot password?
                   </Link>
@@ -292,14 +305,14 @@ const LoginPage = () => {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-11 bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-colors shadow-sm"
+                  className="w-full h-10 sm:h-11 bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-colors shadow-sm text-sm sm:text-base"
                 >
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
             </Form>
 
-            <div className="text-center text-sm text-[#4161df]">
+            <div className="text-center text-xs sm:text-sm text-[#4161df]">
               Don't have an account?{" "}
               <Link
                 href="/signup"

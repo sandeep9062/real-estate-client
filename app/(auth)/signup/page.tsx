@@ -212,24 +212,39 @@ const SignupPage = () => {
 
         <div className="absolute inset-0 bg-opacity-20"></div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-white text-center">
-            <h1 className="text-4xl font-bold mb-4">Join Our Community</h1>
-            <p className="text-lg">Start your path to excellence today</p>
+          <div className="text-white text-center px-8">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-4">
+              Join Our Community
+            </h1>
+            <p className="text-base lg:text-lg">
+              Start your path to excellence today
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-gray-900">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gray-50">
+        <Card className="w-full max-w-sm sm:max-w-md shadow-xl">
+          <CardHeader className="text-center px-4 sm:px-6 pt-4 sm:pt-6">
+            {/* Logo */}
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/propertybulbul.png"
+                alt="Property Bulbul"
+                width={140}
+                height={50}
+                className="object-contain w-28 sm:w-32 md:w-36"
+                priority
+              />
+            </div>
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900">
               Create Your Account
             </CardTitle>
-            <CardDescription className="text-lg">
+            <CardDescription className="text-sm sm:text-base md:text-lg">
               Join Property Bulbul
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
             {/* Google Sign In Button */}
             <div className="flex justify-center">
               <GoogleLogin
@@ -257,40 +272,64 @@ const SignupPage = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
+                className="space-y-2 sm:space-y-2.5"
               >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Full Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="John Doe"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          Full Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="John Doe"
+                            className="h-9 text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          Phone
+                        </FormLabel>
+                        <FormControl>
+                          <PhoneInput
+                            placeholder="Phone number"
+                            value={field.value}
+                            onChange={field.onChange}
+                            className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            defaultCountry="IN"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">
+                      <FormLabel className="text-xs font-medium">
                         Email
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="john.doe@example.com"
-                          className="h-11"
+                          className="h-9 text-sm"
                           {...field}
                         />
                       </FormControl>
@@ -299,79 +338,60 @@ const SignupPage = () => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Phone
-                      </FormLabel>
-                      <FormControl>
-                        <PhoneInput
-                          placeholder="Enter phone number"
-                          value={field.value}
-                          onChange={field.onChange}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          defaultCountry="IN"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          Password
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Password"
+                            className="h-9 text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-medium">
+                          Confirm
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirm password"
+                            className="h-9 text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Password
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter your password"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Confirm Password
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Confirm your password"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-11 bg-[#4161df] hover:bg-[#4161df]/90 text-white font-medium"
+                  className="w-full h-9 sm:h-10 bg-[#4161df] hover:bg-[#4161df]/90 text-white font-medium text-sm"
                 >
                   {isLoading ? "Creating Account..." : "Sign Up"}
                 </Button>
               </form>
             </Form>
 
-            <div className="text-center text-sm text-gray-600">
+            <div className="text-center text-xs text-gray-600">
               Already have an account?{" "}
               <Link
                 href="/login"
