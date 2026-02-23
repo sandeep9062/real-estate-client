@@ -52,13 +52,14 @@ const PropertiesContent = () => {
 
   return (
     <div className="w-full bg-gray-50">
-      <div className="flex flex-col items-center gap-8 max-w-full mx-auto px-10 py-12">
+      <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 max-w-full mx-auto px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12">
         <div className="w-full text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
             Find Your Perfect Property in Tricity
           </h1>
-          <p className="text-lg text-gray-600">
-            Discover homes, apartments, and commercial spaces for sale and rent in Chandigarh, Panchkula, Mohali & more.
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 px-2">
+            Discover homes, apartments, and commercial spaces for sale and rent
+            in Chandigarh, Panchkula, Mohali & more.
           </p>
         </div>
         <div className="w-full">
