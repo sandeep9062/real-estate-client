@@ -48,11 +48,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   return (
     <div
-      className="flex flex-col bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer overflow-hidden w-full h-[450px]"
+      className="flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer overflow-hidden w-full h-[380px] sm:h-[400px] md:h-[420px] lg:h-[450px]"
       onClick={() => router.push(`/property/${card._id}`)}
     >
       {/* Image */}
-      <div className="relative h-48 sm:h-60 w-full">
+      <div className="relative h-36 sm:h-44 md:h-48 lg:h-60 w-full">
         {hasValidImage ? (
           <Image
             src={displayImage}
@@ -139,25 +139,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </div>
 
       {/* Details */}
-      <div className="p-4 flex flex-col gap-3 grow">
+      <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 grow">
         {/* Price and Area */}
-        <div className="flex flex-wrap justify-between items-center gap-2">
-          <p className="text-xl sm:text-2xl font-bold text-blue-600">
-            <span className="text-sm font-normal">₹</span>
+        <div className="flex flex-wrap justify-between items-center gap-1 sm:gap-2">
+          <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
+            <span className="text-xs sm:text-sm font-normal">₹</span>
             {card.price.toLocaleString()}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+          <p className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 sm:py-1 rounded-md">
             {card.area.value} {card.area.unit}
           </p>
         </div>
 
         {/* Title */}
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate h-14">
+        <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 line-clamp-2 sm:truncate sm:h-14">
           {card.title}
         </h3>
 
         {/* Address */}
-        <p className="text-gray-600 text-sm truncate">
+        <p className="text-gray-600 text-xs sm:text-sm truncate">
           {truncate(`${card.location.address}, ${card.location.city}`, {
             length: 30,
           })}
@@ -167,7 +167,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <div className="grow" />
 
         {/* Facilities */}
-        <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-700 border-t pt-3 mt-auto">
+        <div className="flex flex-wrap justify-start items-center gap-x-3 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-xs text-gray-700 border-t pt-2 sm:pt-3 mt-auto">
           {card.facilities?.bedrooms > 0 && (
             <div className="flex items-center gap-1">
               <span role="img" aria-label="beds">

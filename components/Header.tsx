@@ -46,11 +46,11 @@ const Header: React.FC = () => {
         scrolled ? "bg-white/80 shadow-sm" : "bg-background/60"
       }`}
     >
-      <div className="max-w-[96vw] mx-auto flex items-center justify-between px-4 py-1 md:py-[0.3rem]">
+      <div className="max-w-[96vw] mx-auto flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-1 md:py-[0.3rem]">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-1.5 sm:gap-2 group"
           aria-label="Go to homepage"
         >
           <Image
@@ -59,7 +59,7 @@ const Header: React.FC = () => {
             width={60}
             height={60}
             priority
-            className="transition-transform duration-300 group-hover:scale-[1.03]"
+            className="w-10 h-10 sm:w-12 sm:h-12 md:w-[60px] md:h-[60px] transition-transform duration-300 group-hover:scale-[1.03]"
           />
 
           <div className="hidden md:flex flex-col leading-tight">
@@ -140,7 +140,7 @@ const Header: React.FC = () => {
 
         {/* Mobile Icon */}
         <div
-          className="md:hidden flex items-center gap-4 bg-transparent transition-all cursor-pointer"
+          className="md:hidden flex items-center gap-2 sm:gap-3 md:gap-4 bg-transparent transition-all cursor-pointer"
           onClick={toggleMenu}
         >
           {mounted && (
@@ -151,7 +151,7 @@ const Header: React.FC = () => {
                     e.stopPropagation();
                     router.push("/login");
                   }}
-                  className="px-4 py-1.5 text-sm font-medium rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md"
+                  className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md"
                 >
                   Login
                 </button>
@@ -167,26 +167,26 @@ const Header: React.FC = () => {
           )}
 
           <BiMenuAltRight
-            size={32}
-            className="text-black/90 hover:text-black hover:scale-105 transition-all"
+            size={28}
+            className="sm:w-8 sm:h-8 text-black/90 hover:text-black hover:scale-105 transition-all"
           />
         </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {mounted && menuOpened && (
-        <div className="md:hidden flex flex-col gap-5 bg-white/95 backdrop-blur text-black font-medium p-6 shadow-xl absolute right-4 top-17.5 rounded-2xl border w-[80vw] max-w-sm animate-in fade-in zoom-in-95">
+        <div className="md:hidden flex flex-col gap-3 sm:gap-4 bg-white/95 backdrop-blur text-black font-medium p-4 sm:p-5 md:p-6 shadow-xl absolute right-3 sm:right-4 top-14 sm:top-16 md:top-17.5 rounded-xl sm:rounded-2xl border w-[85vw] sm:w-[80vw] max-w-sm animate-in fade-in zoom-in-95">
           <Link
             href="/properties"
             onClick={toggleMenu}
-            className="hover:text-blue-600 px-2 py-1 rounded-md"
+            className="hover:text-blue-600 px-2 py-1.5 sm:py-2 rounded-md text-sm sm:text-base"
           >
             Properties
           </Link>
           <Link
             href="/contact"
             onClick={toggleMenu}
-            className="hover:text-blue-600 px-2 py-1 rounded-md"
+            className="hover:text-blue-600 px-2 py-1.5 sm:py-2 rounded-md text-sm sm:text-base"
           >
             Contact
           </Link>
@@ -195,14 +195,14 @@ const Header: React.FC = () => {
               toggleMenu();
               handleAddPropertyClick();
             }}
-            className="text-left hover:text-blue-600 px-2 py-1 rounded-md"
+            className="text-left hover:text-blue-600 px-2 py-1.5 sm:py-2 rounded-md text-sm sm:text-base"
           >
             Add Property
           </button>
 
           <button
             onClick={() => router.push("/post-requirement")}
-            className="bg-linear-to-tr from-green-700 to-indigo-900 text-white px-4 py-2 rounded-full hover:from-green-700 hover:to-indigo-700"
+            className="bg-linear-to-tr from-green-700 to-indigo-900 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full hover:from-green-700 hover:to-indigo-700 text-sm sm:text-base"
           >
             Post Requirement
           </button>

@@ -170,7 +170,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
   return (
     <>
       <Menu
-        width={250}
+        width={220}
         position="bottom-end"
         shadow="xl"
         radius="lg"
@@ -181,12 +181,12 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
             backdropFilter: "blur(12px)",
             background: "rgba(255,255,255,0.85)",
             border: "1px solid rgba(255,255,255,0.3)",
-            padding: 10,
+            padding: "8px",
           },
           item: {
-            fontSize: 14,
+            fontSize: 13,
             borderRadius: 8,
-            padding: "9px 12px",
+            padding: "8px 10px",
           },
         }}
       >
@@ -195,7 +195,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
             src={getUserImageUrl(user?.image)}
             alt="user image"
             radius="xl"
-            size="44px"
+            size="36px"
             style={{
               cursor: "pointer",
               border: "2px solid rgba(255,255,255,0.5)",
@@ -206,15 +206,15 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
 
         <Menu.Dropdown>
           <Group gap="sm" px="xs" py="xs">
-            <Avatar src={getUserImageUrl(user?.image)} radius="xl" size="lg" />
-            <div>
-              <Text fw={600} size="sm">
+            <Avatar src={getUserImageUrl(user?.image)} radius="xl" size="md" />
+            <div className="min-w-0 flex-1">
+              <Text fw={600} size="sm" className="truncate">
                 {user?.name || "User"}
               </Text>
-              <Text size="xs" c="dimmed">
+              <Text size="xs" c="dimmed" className="truncate">
                 {user?.email}
               </Text>
-              <Text size="xs" c="dimmed">
+              <Text size="xs" c="dimmed" className="truncate">
                 {user?.phone}
               </Text>
             </div>
@@ -274,24 +274,26 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
         title="Edit Profile"
         centered
         radius="lg"
+        size="sm"
         overlayProps={{
           style: {
             backdropFilter: "blur(5px)",
           },
         }}
         styles={{
-          title: { fontSize: 22, fontWeight: 600 },
-          body: { paddingTop: 18 },
+          title: { fontSize: 18, fontWeight: 600 },
+          body: { paddingTop: 12 },
+          content: { padding: "12px", margin: "8px" },
         }}
       >
-        <Stack gap="md">
+        <Stack gap="sm">
           <TextInput
             label="Name"
             value={name}
             onChange={(e) => setName(e.currentTarget.value)}
             required
             radius="md"
-            size="md"
+            size="sm"
           />
           <TextInput
             label="Email"
@@ -300,15 +302,17 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
             required
             type="email"
             radius="md"
-            size="md"
+            size="sm"
           />
           <div>
-            <label className="text-sm font-medium">Phone Number *</label>
+            <label className="text-xs sm:text-sm font-medium">
+              Phone Number *
+            </label>
             <PhoneInput
               placeholder="Phone Number"
               value={phone}
               onChange={(value) => setPhone(value || "")}
-              className="w-full mt-1 p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full mt-1 p-2 sm:p-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               defaultCountry="IN"
               required
             />
@@ -325,7 +329,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
             radius="md"
             styles={{
               root: {
-                padding: "1rem",
+                padding: "0.75rem",
                 border: "2px dashed #ced4da",
                 backgroundColor: "#fff",
                 transition: "background-color 0.2s",
@@ -335,15 +339,15 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
             <Group
               justify="center"
               gap="xl"
-              mih={180}
+              mih={120}
               style={{ pointerEvents: "none" }}
             >
               {preview ? (
                 <div style={{ position: "relative" }}>
                   <Image
                     src={preview}
-                    width={120}
-                    height={120}
+                    width={100}
+                    height={100}
                     radius="md"
                     style={{
                       border: "2px solid #dee2e6",
@@ -371,8 +375,8 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
                 </div>
               ) : (
                 <Stack align="center" gap="xs">
-                  <Upload size={50} strokeWidth={1.5} color="#495057" />
-                  <Text size="md" c="dimmed">
+                  <Upload size={40} strokeWidth={1.5} color="#495057" />
+                  <Text size="sm" c="dimmed">
                     Drop image here or click to upload
                   </Text>
                   <Text size="xs" c="dimmed">
@@ -386,12 +390,12 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
           <Button
             onClick={handleProfileUpdate}
             unstyled
-            className=" bg-[#4161df] hover:bg-[#3759dd] text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 w-full"
+            className="bg-[#4161df] hover:bg-[#3759dd] text-white font-medium py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 w-full text-sm sm:text-base"
             loading={isLoading}
             fullWidth
-            mt="md"
+            mt="sm"
             radius="md"
-            size="md"
+            size="sm"
           >
             Update Profile
           </Button>

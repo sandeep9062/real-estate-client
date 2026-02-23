@@ -32,7 +32,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
   );
 
   return (
-    <section className="relative bg-background text-foreground py-8 md:py-20 overflow-hidden">
+    <section className="relative bg-background text-foreground py-6 sm:py-10 md:py-16 lg:py-20 overflow-hidden">
       {/* BACKGROUND BLOB EFFECT */}
       <div
         aria-hidden="true"
@@ -43,8 +43,8 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
       </div>
 
       {/* CONTENT */}
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12 items-center">
           {/* LEFT SIDE */}
           <div className="flex flex-col gap-4 text-center md:text-left">
             {/* TITLE */}
@@ -52,7 +52,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               initial={{ y: "2rem", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 1.2, type: "spring" }}
-              className="font-extrabold text-4xl sm:text-5xl lg:text-7xl tracking-tighter leading-[1.1] text-slate-900"
+              className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-7xl tracking-tighter leading-[1.1] text-slate-900"
             >
               Discover <br className="hidden sm:block" />
               Your Perfect{" "}
@@ -60,7 +60,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
             </motion.h1>
 
             {/* SUBTEXT */}
-            <p className="text-muted-foreground sm:text-lg max-w-full mb-4 mx-auto md:mx-0">
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-full mb-3 sm:mb-4 mx-auto md:mx-0 px-2 sm:px-0">
               From luxury apartments to independent houses — discover homes that
               truly match your lifestyle across Chandigarh, Mohali & Panchkula.
             </p>
@@ -103,39 +103,39 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
             </div>
 
             {/* STATS */}
-            <div className="flex justify-center items-center gap-6 sm:gap-10 mt-4 flex-nowrap">
+            <div className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 mt-4 sm:mt-6 flex-nowrap">
               {/* ITEM */}
               <div className="flex flex-col items-center">
-                <span className="text-[14px] sm:text-3xl font-semibold text-gray-500 leading-none">
+                <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
                   <CountUp start={798} end={900} duration={4} />+
                 </span>
-                <span className="text-muted-foreground text-[10px] sm:text-base leading-none mt-1">
+                <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Premium Listings
                 </span>
               </div>
 
               {/* Divider */}
-              <div className="h-8 w-px bg-border" />
+              <div className="h-6 sm:h-8 w-px bg-border" />
 
               {/* ITEM */}
               <div className="flex flex-col items-center">
-                <span className="text-[14px] sm:text-3xl font-semibold text-gray-500 leading-none">
+                <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
                   <CountUp start={150} end={200} duration={4} />+
                 </span>
-                <span className="text-muted-foreground text-[10px] sm:text-base leading-none mt-1">
+                <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Happy Customers
                 </span>
               </div>
 
               {/* Divider */}
-              <div className="h-8 w-px bg-border" />
+              <div className="h-6 sm:h-8 w-px bg-border" />
 
               {/* ITEM */}
               <div className="flex flex-col items-center">
-                <span className="text-[14px] sm:text-3xl font-semibold text-gray-500 leading-none">
+                <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
                   <CountUp start={15} end={20} duration={4} />+
                 </span>
-                <span className="text-muted-foreground text-[10px] sm:text-base leading-none mt-1">
+                <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Projects
                 </span>
               </div>
@@ -143,12 +143,12 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
           </div>
 
           {/* RIGHT SIDE IMAGE */}
-          <div className="flex justify-center">
+          <div className="flex justify-center order-first md:order-last">
             <motion.div
               initial={{ x: "7rem", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 1.5, type: "spring" }}
-              className="relative w-66 h-74 sm:w-80 sm:h-[26rem] md:w-[26rem] md:h-[32rem] overflow-hidden rounded-t-[12rem] border-8 border-border shadow-lg"
+              className="relative w-48 h-56 sm:w-64 sm:h-72 md:w-80 md:h-96 lg:w-[26rem] lg:h-[32rem] overflow-hidden rounded-t-[8rem] sm:rounded-t-[10rem] md:rounded-t-[12rem] border-4 sm:border-6 md:border-8 border-border shadow-lg"
             >
               <Image
                 src="/hero-image.png"

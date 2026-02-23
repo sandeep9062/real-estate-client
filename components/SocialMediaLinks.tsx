@@ -65,13 +65,13 @@ const socialLinks = [
 
 export default function SocialMediaLinks() {
   return (
-    <section className="text-center py-3 bg-white dark:bg-[#0F111A]">
+    <section className="text-center py-2 sm:py-3 bg-white dark:bg-[#0F111A]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
-        className="flex justify-center gap-6"
+        className="flex justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 flex-wrap px-2"
       >
         {socialLinks.map((item, i) => (
           <a
@@ -80,7 +80,7 @@ export default function SocialMediaLinks() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={item.label}
-            className={`text-xl text-gray-700 dark:text-gray-300 hover:scale-110 transition duration-300 ${item.color}`}
+            className={`text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-300 hover:scale-110 transition duration-300 ${item.color}`}
           >
             {item.icon}
           </a>

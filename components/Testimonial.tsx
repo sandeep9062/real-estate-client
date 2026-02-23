@@ -123,29 +123,20 @@ const Testimonial: React.FC = () => {
     ));
   }, []);
 
-  // Function to scroll to the top of the page
-
-  // const scrollToTop = () => {
-  //   window.scrollTo({
-  //     top: 0,
-  //     behavior: "smooth",
-  //   });
-  // };
-
   return (
-    <div className="w-full bg-white py-12 px-4 md:px-8 font-sans">
+    <div className="w-full bg-white py-8 sm:py-10 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 font-sans">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="mb-12 text-center">
-          <p className="text-indigo-600 font-semibold mb-2 text-lg uppercase tracking-wider">
+        <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center">
+          <p className="text-indigo-600 font-semibold mb-1 sm:mb-2 text-xs sm:text-sm md:text-base lg:text-lg uppercase tracking-wider">
             Client Stories
           </p>
-          <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
             <span className="bg-clip-text text-transparent bg-gray-900">
               FOLKS WHO LOVE US!
             </span>
           </h2>
-          <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
+          <p className="text-gray-600 mt-2 sm:mt-3 max-w-2xl mx-auto text-sm sm:text-base">
             See why our clients trust us to find their perfect property.
           </p>
         </div>
@@ -153,7 +144,7 @@ const Testimonial: React.FC = () => {
         {/* Carousel Container */}
         <div className="relative">
           {/* Inner Track (Viewport) */}
-          <div className="overflow-hidden md:p-8">
+          <div className="overflow-hidden sm:p-4 md:p-6 lg:p-8">
             <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${translateXValue}%)` }}
@@ -162,17 +153,17 @@ const Testimonial: React.FC = () => {
                 <div
                   key={testimonial.id}
                   // Card sizing: Always takes full width on mobile, and half the width on desktop (md)
-                  className="w-full shrink-0 md:w-1/2 p-4"
+                  className="w-full shrink-0 md:w-1/2 p-2 sm:p-3 md:p-4"
                 >
-                  <div className="bg-white border border-gray-200 h-full p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                  <div className="bg-white border border-gray-200 h-full p-4 sm:p-5 md:p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
                     {/* User Info and Quote */}
-                    <p className="text-gray-700 text-base mb-6 italic leading-relaxed grow">
+                    <p className="text-gray-700 text-sm sm:text-base mb-4 sm:mb-5 md:mb-6 italic leading-relaxed grow">
                       "{testimonial.text}"
                     </p>
 
-                    <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-indigo-500 shadow-sm">
+                    <div className="pt-3 sm:pt-4 border-t border-gray-200 flex items-center justify-between gap-2">
+                      <div className="flex items-center min-w-0">
+                        <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full overflow-hidden shrink-0 border-2 border-indigo-500 shadow-sm">
                           <Image
                             src={testimonial.image}
                             alt={testimonial.name}
@@ -184,16 +175,16 @@ const Testimonial: React.FC = () => {
                             unoptimized={true} // Use this for placeholder URLs
                           />
                         </div>
-                        <div className="ml-4">
-                          <h3 className="text-md font-bold text-gray-800">
+                        <div className="ml-2 sm:ml-3 md:ml-4 min-w-0">
+                          <h3 className="text-sm sm:text-base md:text-md font-bold text-gray-800 truncate">
                             {testimonial.name}
                           </h3>
-                          <p className="text-xs text-indigo-500 font-medium">
+                          <p className="text-xs text-indigo-500 font-medium truncate">
                             {testimonial.role}
                           </p>
                         </div>
                       </div>
-                      <div className="flex text-sm">
+                      <div className="flex text-xs sm:text-sm flex-shrink-0">
                         {renderStars(testimonial.rating)}
                       </div>
                     </div>
@@ -206,22 +197,22 @@ const Testimonial: React.FC = () => {
           {/* Navigation Buttons (Absolute Positioning) */}
           <button
             onClick={handlePrev}
-            className="absolute top-1/2 left-0 md:-left-8 transform -translate-y-1/2 bg-white text-gray-700 p-3 rounded-full shadow-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 z-10 hidden md:block"
+            className="absolute top-1/2 left-0 sm:-left-2 md:-left-4 lg:-left-8 transform -translate-y-1/2 bg-white text-gray-700 p-2 sm:p-3 rounded-full shadow-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 z-10 hidden sm:flex items-center justify-center"
             aria-label="Previous testimonial"
           >
-            <FaChevronLeft className="w-5 h-5" />
+            <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute top-1/2 right-0 md:-right-8 transform -translate-y-1/2 bg-white text-gray-700 p-3 rounded-full shadow-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 z-10 hidden md:block"
+            className="absolute top-1/2 right-0 sm:-right-2 md:-right-4 lg:-right-8 transform -translate-y-1/2 bg-white text-gray-700 p-2 sm:p-3 rounded-full shadow-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 z-10 hidden sm:flex items-center justify-center"
             aria-label="Next testimonial"
           >
-            <FaChevronRight className="w-5 h-5" />
+            <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Pagination Dots (Mobile and Desktop) */}
-        <div className="flex justify-center mt-4 space-x-4">
+        <div className="flex justify-center mt-3 sm:mt-4 space-x-2 sm:space-x-3 md:space-x-4">
           {Array.from({ length: totalPages }).map((_, index) => (
             <button
               key={index}

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { sendChatMessage, generateSessionId, BOT_MESSAGES, ChatMessage } from "../services/chatBotApi";
+import {
+  sendChatMessage,
+  generateSessionId,
+  BOT_MESSAGES,
+  ChatMessage,
+} from "../services/chatBotApi";
 
 export default function ChatbotWidget() {
   const [open, setOpen] = useState(false);
@@ -50,7 +55,10 @@ export default function ChatbotWidget() {
       }, 1000);
     } catch (err) {
       setTimeout(() => {
-        const errorMessage: ChatMessage = { sender: "bot", text: BOT_MESSAGES.ERROR };
+        const errorMessage: ChatMessage = {
+          sender: "bot",
+          text: BOT_MESSAGES.ERROR,
+        };
         setMessages((prev) => [...prev, errorMessage]);
         setIsTyping(false);
         setError("Failed to send message. Please try again.");
@@ -74,30 +82,32 @@ export default function ChatbotWidget() {
   };
 
   return (
-    <div className="fixed bottom-18 right-5  md:bottom-4 md:right-22 z-50">
+    <div className="fixed bottom-16 right-3 sm:bottom-18 sm:right-5 md:bottom-4 md:right-22 z-50">
       {/* Chat Window */}
       <div
         className={`transition-all duration-300 ease-in-out ${
-          open ? "w-[88vw] sm:w-[380px] h-[50vh] sm:h-[420px]" : "w-0 h-0"
+          open
+            ? "w-[92vw] sm:w-[360px] md:w-[380px] h-[55vh] sm:h-[400px] md:h-[420px]"
+            : "w-0 h-0"
         }`}
       >
         {open && (
-          <div className="w-full h-full bg-white shadow-2xl rounded-2xl flex flex-col border border-gray-200">
+          <div className="w-full h-full bg-white shadow-2xl rounded-xl sm:rounded-2xl flex flex-col border border-gray-200">
             {/* Header */}
-            <div className="flex justify-between items-center px-4 py-3 bg-[#4161df] text-white rounded-t-2xl">
-              <h3 className="font-semibold text-base sm:text-lg">
+            <div className="flex justify-between items-center px-3 sm:px-4 py-2.5 sm:py-3 bg-[#4161df] text-white rounded-t-xl sm:rounded-t-2xl">
+              <h3 className="font-semibold text-sm sm:text-base md:text-lg">
                 Property Assistant
               </h3>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   onClick={clearChat}
-                  className="p-1 rounded-lg hover:bg-[#193fd4] text-xs sm:text-sm"
+                  className="p-1 sm:p-1.5 rounded-lg hover:bg-[#193fd4] text-xs"
                 >
                   Clear
                 </button>
                 <button
                   onClick={() => setOpen(false)}
-                  className="p-1 hover:bg-[#193fd4] rounded-full text-lg"
+                  className="p-1 sm:p-1.5 hover:bg-[#193fd4] rounded-full text-base sm:text-lg"
                 >
                   ✖
                 </button>
@@ -105,7 +115,7 @@ export default function ChatbotWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 px-3 py-3 overflow-y-auto bg-gray-50 space-y-3">
+            <div className="flex-1 px-2.5 sm:px-3 py-2.5 sm:py-3 overflow-y-auto bg-gray-50 space-y-2.5 sm:space-y-3">
               {messages.map((m, i) => (
                 <div
                   key={i}
@@ -114,7 +124,7 @@ export default function ChatbotWidget() {
                   }`}
                 >
                   <div
-                    className={`px-4 py-2 rounded-xl max-w-[80%] text-sm shadow-sm ${
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl max-w-[85%] sm:max-w-[80%] text-xs sm:text-sm shadow-sm ${
                       m.sender === "bot"
                         ? "bg-white text-gray-800 border border-gray-200"
                         : "bg-[#4161df] text-white"
@@ -127,11 +137,11 @@ export default function ChatbotWidget() {
 
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="px-4 py-2 rounded-xl max-w-[70%] text-sm shadow-sm bg-white text-gray-800 border border-gray-200">
+                  <div className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl max-w-[70%] text-xs sm:text-sm shadow-sm bg-white text-gray-800 border border-gray-200">
                     <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></div>
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-300"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-500 rounded-full animate-bounce delay-150"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-500 rounded-full animate-bounce delay-300"></div>
                     </div>
                   </div>
                 </div>
@@ -141,9 +151,9 @@ export default function ChatbotWidget() {
             </div>
 
             {/* Input Area */}
-            <div className="p-3 bg-white border-t flex items-center gap-2">
+            <div className="p-2.5 sm:p-3 bg-white border-t flex items-center gap-1.5 sm:gap-2">
               <input
-                className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-[#4161df] outline-none"
+                className="flex-1 border border-gray-300 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm focus:ring-2 focus:ring-[#4161df] outline-none"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -151,7 +161,7 @@ export default function ChatbotWidget() {
               />
               <button
                 onClick={sendMessage}
-                className="bg-[#4161df] text-white px-4 py-2 rounded-full hover:bg-[#3759dd] text-sm"
+                className="bg-[#4161df] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full hover:bg-[#3759dd] text-xs sm:text-sm"
               >
                 Send
               </button>
@@ -164,7 +174,7 @@ export default function ChatbotWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 bg-[#4161df] hover:bg-[#3759dd] text-white  py-2.5 px-2.5 md:px-5 rounded-full shadow-lg transition-all text-sm sm:text-base"
+          className="flex items-center gap-1.5 sm:gap-2 bg-[#4161df] hover:bg-[#3759dd] text-white py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-5 rounded-full shadow-lg transition-all text-sm sm:text-base"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

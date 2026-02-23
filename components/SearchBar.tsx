@@ -123,20 +123,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   }, [value, onSearch]);
 
   return (
-    <div className="flex w-full items-center justify-center">
-      <div className="flex w-full max-w-2xl py-4 items-center gap-2 rounded-full border border-border bg-white/70 p-2 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200">
-        <HiLocationMarker className="text-[#4161df]" size={25} />
+    <div className="flex w-full items-center justify-center px-2 sm:px-0">
+      <div className="flex w-full max-w-2xl py-2 sm:py-3 md:py-4 items-center gap-2 sm:gap-3 rounded-full border border-border bg-white/70 p-2 sm:p-3 md:p-4 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200">
+        <HiLocationMarker className="text-[#4161df] w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 flex-shrink-0" />
         <input
-          placeholder="Try: '2bhk rent chandigarh under 50000' or '3 bedroom apartment sale'..."
+          placeholder="Search properties..."
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="flex-grow bg-transparent text-foreground focus:outline-none placeholder:text-gray-400"
+          className="flex-grow bg-transparent text-sm sm:text-base text-foreground focus:outline-none placeholder:text-gray-400 min-w-0"
         />
         {value && (
           <button
             aria-label="Clear search"
-            className="text-xs text-gray-500 hover:text-gray-700 px-2"
+            className="text-xs text-gray-500 hover:text-gray-700 px-2 sm:px-3 py-1 flex-shrink-0"
             onClick={() => {
               setValue("");
             }}
