@@ -51,24 +51,19 @@ const PropertiesContent = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
-      <div className="flex flex-col items-center gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-12">
-        {/* Header Section */}
+    <div className="w-full bg-gray-50">
+      <div className="flex flex-col items-center gap-8 max-w-full mx-auto px-10 py-12">
         <div className="w-full text-center">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 lg:mb-4">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Find Your Perfect Property in Tricity
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover homes, apartments, and commercial spaces for sale and rent
-            in Chandigarh, Panchkula, Mohali & more.
+          <p className="text-lg text-gray-600">
+            Discover homes, apartments, and commercial spaces for sale and rent in Chandigarh, Panchkula, Mohali & more.
           </p>
         </div>
-
-        {/* Search Bar */}
-        <div className="w-full max-w-5xl">
+        <div className="w-full">
           <TopSearchBar onApply={handleApplyFilters} initialFilters={query} />
         </div>
-
         {/* Properties Listing */}
         {Object.keys(query).length > 0 ? (
           <SearchResults query={query as any} />

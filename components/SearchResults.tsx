@@ -17,12 +17,10 @@ export default function SearchResults({ query }: SearchResultsProps) {
   if (isLoading) {
     return (
       <div className="w-full">
-        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
-          <h2 className="text-base sm:text-lg lg:text-xl font-semibold">
-            Searching for "{query.search || ""}"
-          </h2>
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="text-xl font-semibold">Searching for “{query.search || ''}”</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="h-40 w-full rounded-lg bg-gray-200" />
@@ -49,13 +47,11 @@ export default function SearchResults({ query }: SearchResultsProps) {
     const descriptions = [];
     if (query.deal) descriptions.push(`Deal: ${query.deal}`);
     if (query.type) descriptions.push(`Type: ${query.type}`);
-    if (query.propertyCategory)
-      descriptions.push(`Category: ${query.propertyCategory}`);
+    if (query.propertyCategory) descriptions.push(`Category: ${query.propertyCategory}`);
     if (query.city) descriptions.push(`City: ${query.city}`);
     if (query.bedrooms) descriptions.push(`Bedrooms: ${query.bedrooms}`);
     if (query.furnishing) descriptions.push(`Furnishing: ${query.furnishing}`);
-    if (query.availability)
-      descriptions.push(`Availability: ${query.availability}`);
+    if (query.availability) descriptions.push(`Availability: ${query.availability}`);
     if (query.postedBy) descriptions.push(`Posted By: ${query.postedBy}`);
     if (query.priceMin && query.priceMax) {
       descriptions.push(`Price: ₹${query.priceMin} - ₹${query.priceMax}`);
@@ -63,18 +59,14 @@ export default function SearchResults({ query }: SearchResultsProps) {
     if (query.areaMin && query.areaMax) {
       descriptions.push(`Area: ${query.areaMin} - ${query.areaMax} sqft`);
     }
-    return descriptions.join(", ");
+    return descriptions.join(', ');
   };
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-2 mb-4">
-        <h2 className="text-base sm:text-lg lg:text-xl font-semibold line-clamp-2">
-          Results for "{generateQueryString(query) || "All Properties"}"
-        </h2>
-        <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
-          {results.length} found
-        </span>
+      <div className="flex items-baseline justify-between mb-4">
+        <h2 className="text-xl font-semibold">Results for “{generateQueryString(query) || 'All Properties'}”</h2>
+        <span className="text-sm text-gray-500">{results.length} found</span>
       </div>
       <PropertyGrid properties={results} />
     </div>
