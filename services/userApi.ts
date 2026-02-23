@@ -56,7 +56,7 @@ export const userApi = createApi({
         url: `/users`,
         method: "POST",
         body: data,
-      }), 
+      }),
       invalidatesTags: ["User"],
     }),
 
@@ -103,10 +103,7 @@ export const userApi = createApi({
     }),
 
     // ✅ Book a property visit
-    bookVisit: builder.mutation<
-      User,
-      { propertyId: string; date: string }
-    >({
+    bookVisit: builder.mutation<User, { propertyId: string; date: string }>({
       query: ({ propertyId, date }) => ({
         url: `/users/bookings`,
         method: "POST",
@@ -119,24 +116,21 @@ export const userApi = createApi({
       ) {
         const state = getState() as RootState;
         const currentUser = state.auth.user;
-        const token = state.auth.token || "";
         if (!currentUser) return;
 
         const optimistic = {
           ...currentUser,
-          bookedVisits: [...(currentUser.bookedVisits || []), { id: propertyId, date }],
+          bookedVisits: [
+            ...(currentUser.bookedVisits || []),
+            { id: propertyId, date },
+          ],
         } as User as any;
 
-        dispatch(
-          setUser({
-            user: optimistic,
-            token,
-          })
-        );
+        dispatch(setUser({ user: optimistic }));
 
         try {
           const { data: serverUser } = await queryFulfilled;
-          dispatch(setUser({ user: serverUser as any, token }));
+          dispatch(setUser({ user: serverUser as any }));
         } catch {
           // no-op; keep optimistic state or handle rollback if needed
         }
@@ -150,10 +144,12 @@ export const userApi = createApi({
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
-      async onQueryStarted(propertyId, { dispatch, getState, queryFulfilled }) {
+      async onQueryStarted(
+        propertyId,
+        { dispatch, getState, queryFulfilled }
+      ) {
         const state = getState() as RootState;
         const currentUser = state.auth.user;
-        const token = state.auth.token || "";
         if (!currentUser) return;
 
         const optimistic = {
@@ -163,11 +159,11 @@ export const userApi = createApi({
           ),
         } as User as any;
 
-        dispatch(setUser({ user: optimistic, token }));
+        dispatch(setUser({ user: optimistic }));
 
         try {
           const { data: serverUser } = await queryFulfilled;
-          dispatch(setUser({ user: serverUser as any, token }));
+          dispatch(setUser({ user: serverUser as any }));
         } catch {
           // no-op; keep optimistic state or handle rollback if needed
         }
@@ -194,17 +190,17 @@ export const userApi = createApi({
             if (draft) {
               const cardId = card._id || card.id;
               const isFavourited = draft.favProperties.some((fav: any) => {
-                const favId = typeof fav === "string" ? fav : fav?._id || fav?.id;
+                const favId =
+                  typeof fav === "string" ? fav : fav?._id || fav?.id;
                 return favId === cardId;
               });
 
               if (isFavourited) {
-                draft.favProperties = draft.favProperties.filter(
-                  (fav: any) => {
-                    const favId = typeof fav === "string" ? fav : fav?._id || fav?.id;
-                    return favId !== cardId;
-                  }
-                );
+                draft.favProperties = draft.favProperties.filter((fav: any) => {
+                  const favId =
+                    typeof fav === "string" ? fav : fav?._id || fav?.id;
+                  return favId !== cardId;
+                });
               } else {
                 draft.favProperties.push(card);
               }
@@ -214,12 +210,7 @@ export const userApi = createApi({
 
         try {
           const { data: updatedUser } = await queryFulfilled;
-          dispatch(
-            setUser({
-              user: updatedUser,
-              token: localStorage.getItem("token") || "",
-            })
-          );
+          dispatch(setUser({ user: updatedUser }));
         } catch {
           patchResult.undo();
         }

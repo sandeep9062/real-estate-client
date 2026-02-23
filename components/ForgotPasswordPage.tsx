@@ -31,7 +31,7 @@ export default function ForgotPasswordPage({
 
   const handleForgotPassword = async (data: ForgotPasswordFormValues) => {
     try {
-      const result = await forgotPassword(data.email).unwrap();
+      const result = await forgotPassword({ email: data.email }).unwrap();
       setSuccess(true);
       setError("");
       toast.success("Password reset email sent successfully!");
@@ -58,7 +58,8 @@ export default function ForgotPasswordPage({
             Check Your Email
           </h2>
           <p className="mb-6 text-center text-gray-700">
-            We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.
+            We've sent a password reset link to your email address. Please check
+            your inbox and follow the instructions to reset your password.
           </p>
           <button
             onClick={onBackToLogin}
@@ -81,7 +82,8 @@ export default function ForgotPasswordPage({
           Forgot Password
         </h2>
         <p className="mb-6 text-center text-gray-700">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we'll send you a link to reset your
+          password.
         </p>
         {error && <p className="mb-4 text-center text-red-500">{error}</p>}
 

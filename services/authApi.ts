@@ -108,6 +108,7 @@ export const authApi = createApi({
     forgotPassword: builder.mutation<{
       success: boolean;
       message: string;
+      resetLink?: string;
     }, {
       email: string;
     }>({

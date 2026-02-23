@@ -80,16 +80,15 @@ export const propertiesApi = createApi({
     createProperty: builder.mutation({
       query: (property) => {
         const formData = new FormData();
-        const { token, ...propertyData } = property;
-        Object.keys(propertyData).forEach((key) => {
+        Object.keys(property).forEach((key) => {
           if (key === "image") {
-            propertyData[key].forEach((file: File) => {
+            property[key].forEach((file: File) => {
               formData.append(key, file);
             });
-          } else if (typeof propertyData[key] === "object" && propertyData[key] !== null) {
-            formData.append(key, JSON.stringify(propertyData[key]));
+          } else if (typeof property[key] === "object" && property[key] !== null) {
+            formData.append(key, JSON.stringify(property[key]));
           } else {
-            formData.append(key, propertyData[key]);
+            formData.append(key, property[key]);
           }
         });
         return {
