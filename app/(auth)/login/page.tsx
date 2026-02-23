@@ -221,7 +221,7 @@ const LoginPage = () => {
               Welcome Back
             </CardTitle>
             <CardDescription className="text-sm sm:text-base md:text-lg">
-              Sign in to your Property Bulbul
+              Sign in to Property Bulbul
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
