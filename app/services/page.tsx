@@ -5,24 +5,24 @@ import Link from "next/link";
 
 const ServicesPage = () => {
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-white dark:bg-[#0F111A]">
       {/* Hero Section */}
-      <div className="w-full bg-gradient-to-r from-gray-800 to-black text-white py-24 px-4 flex flex-col items-center text-center">
-        <h1 className="text-4xl md:text-6xl font-bold">
+      <div className="w-full bg-gradient-to-r from-gray-800 to-black text-white py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 flex flex-col items-center text-center">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">
           Comprehensive Real Estate Services
         </h1>
-        <p className="mt-4 text-lg text-gray-300 max-w-3xl">
+        <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl px-2">
           From buying your dream home to making smart investments, we offer a
           complete suite of services to cater to all your real estate needs.
         </p>
       </div>
 
       {/* Services Section */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <h2 className="text-3xl md:text-4xl font-semibold text-center text-black mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16 lg:py-20">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
           How We Can Help You
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           <ServiceCard
             icon={<HomeIcon />}
             title="Buy a Property"
@@ -62,12 +62,12 @@ const ServicesPage = () => {
       </div>
 
       {/* Why Choose Us Section */}
-      <div className="w-full bg-gray-50 py-20 px-4">
+      <div className="w-full bg-gray-50 dark:bg-[#141824] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-semibold text-center text-black mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
             Why Choose Our Services?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center">
             <Feature
               icon={<UsersIcon />}
               title="Expert Guidance"
@@ -93,13 +93,13 @@ const ServicesPage = () => {
       </div>
 
       {/* How It Works Section */}
-      <div className="max-w-7xl mx-auto px-4 py-20">
-        <h2 className="text-3xl md:text-4xl font-semibold text-center text-black mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16 lg:py-20">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
           Our Process
         </h2>
         <div className="relative">
-          <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-200"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+          <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 relative">
             <ProcessStep
               step="01"
               title="Consultation"
@@ -120,9 +120,9 @@ const ServicesPage = () => {
       </div>
 
       {/* FAQ Section */}
-      <div className="w-full bg-white py-20 px-4">
+      <div className="w-full bg-white dark:bg-[#0F111A] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-semibold text-center text-black mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
             Frequently Asked Questions
           </h2>
           <FAQ />
@@ -130,17 +130,17 @@ const ServicesPage = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="w-full bg-indigo-600 py-20 px-4 flex flex-col items-center text-center">
-        <h2 className="text-3xl md:text-4xl font-semibold text-white">
+      <div className="w-full bg-indigo-600 py-12 sm:py-14 md:py-16 lg:py-20 px-4 sm:px-6 flex flex-col items-center text-center">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">
           Ready to Get Started?
         </h2>
-        <p className="text-indigo-100 mt-3 max-w-2xl">
+        <p className="text-indigo-100 mt-2 sm:mt-3 text-sm sm:text-base max-w-2xl px-2">
           Whether you're buying, selling, or investing, our team is ready to
           assist you. Contact us today for a free consultation.
         </p>
         <Link
           href="/contact"
-          className="mt-8 bg-white text-indigo-600 px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
+          className="mt-6 sm:mt-8 bg-white text-indigo-600 px-8 sm:px-10 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
         >
           Contact Us Now
         </Link>
@@ -160,12 +160,16 @@ const ServiceCard = ({
   title: string;
   desc: string;
 }) => (
-  <div className="bg-gray-50 rounded-xl p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out border border-gray-200/80">
-    <div className="bg-indigo-100 text-indigo-600 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+  <div className="bg-gray-50 dark:bg-[#1a1f2e] rounded-xl p-5 sm:p-6 md:p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out border border-gray-200/80 dark:border-gray-700">
+    <div className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full w-12 h-12 sm:w-14 md:w-16 flex items-center justify-center mb-4 sm:mb-6">
       {icon}
     </div>
-    <h3 className="text-2xl font-semibold text-black mb-3">{title}</h3>
-    <p className="text-gray-600 leading-relaxed">{desc}</p>
+    <h3 className="text-xl sm:text-2xl font-semibold text-black dark:text-white mb-2 sm:mb-3">
+      {title}
+    </h3>
+    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
+      {desc}
+    </p>
   </div>
 );
 
@@ -178,10 +182,16 @@ const Feature = ({
   title: string;
   desc: string;
 }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-    <div className="text-indigo-600 mb-4 inline-block">{icon}</div>
-    <h3 className="text-xl font-semibold text-black mb-2">{title}</h3>
-    <p className="text-gray-600">{desc}</p>
+  <div className="bg-white dark:bg-[#1a1f2e] p-5 sm:p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+    <div className="text-indigo-600 dark:text-indigo-400 mb-3 sm:mb-4 inline-block">
+      {icon}
+    </div>
+    <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mb-1 sm:mb-2">
+      {title}
+    </h3>
+    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+      {desc}
+    </p>
   </div>
 );
 
@@ -194,12 +204,16 @@ const ProcessStep = ({
   title: string;
   desc: string;
 }) => (
-  <div className="bg-white p-8 rounded-lg text-center relative">
-    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
+  <div className="bg-white dark:bg-[#1a1f2e] p-6 sm:p-8 rounded-lg text-center relative border border-gray-100 dark:border-gray-700 shadow-sm">
+    <div className="absolute -top-5 sm:-top-6 left-1/2 -translate-x-1/2 bg-indigo-600 text-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center font-bold text-base sm:text-lg">
       {step}
     </div>
-    <h3 className="text-xl font-semibold text-black mt-8 mb-3">{title}</h3>
-    <p className="text-gray-600">{desc}</p>
+    <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mt-6 sm:mt-8 mb-2 sm:mb-3">
+      {title}
+    </h3>
+    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+      {desc}
+    </p>
   </div>
 );
 
@@ -234,22 +248,25 @@ const FAQ = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {faqs.map((faq, index) => (
-        <div key={index} className="border border-gray-200 rounded-lg">
+        <div
+          key={index}
+          className="border border-gray-200 dark:border-gray-700 rounded-lg"
+        >
           <button
             onClick={() => toggleFAQ(index)}
-            className="w-full flex justify-between items-center p-5 text-left"
+            className="w-full flex justify-between items-center p-4 sm:p-5 text-left"
           >
-            <span className="font-semibold text-lg text-black">
+            <span className="font-semibold text-base sm:text-lg text-black dark:text-white pr-4">
               {faq.question}
             </span>
-            <span className="text-indigo-600">
+            <span className="text-indigo-600 dark:text-indigo-400 flex-shrink-0">
               {activeIndex === index ? <MinusIcon /> : <PlusIcon />}
             </span>
           </button>
           {activeIndex === index && (
-            <div className="p-5 pt-0 text-gray-600">
+            <div className="p-4 sm:p-5 pt-0 text-gray-600 dark:text-gray-300 text-sm sm:text-base">
               <p>{faq.answer}</p>
             </div>
           )}
@@ -264,7 +281,7 @@ const FAQ = () => {
 const PlusIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
+    className="h-5 w-5 sm:h-6 sm:w-6"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -281,7 +298,7 @@ const PlusIcon = () => (
 const MinusIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
+    className="h-5 w-5 sm:h-6 sm:w-6"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -298,7 +315,7 @@ const MinusIcon = () => (
 const HomeIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -315,7 +332,7 @@ const HomeIcon = () => (
 const TagIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -332,7 +349,7 @@ const TagIcon = () => (
 const TrendingUpIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -349,7 +366,7 @@ const TrendingUpIcon = () => (
 const BriefcaseIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -366,7 +383,7 @@ const BriefcaseIcon = () => (
 const UsersIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -383,7 +400,7 @@ const UsersIcon = () => (
 const ShieldCheckIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -400,7 +417,7 @@ const ShieldCheckIcon = () => (
 const AcademicCapIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-8 w-8"
+    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
