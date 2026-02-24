@@ -55,9 +55,11 @@ const Contact = () => {
 
           {/* Right Side */}
           <div className="flex justify-center md:justify-end order-first md:order-last">
-            <div className="border-4 sm:border-6 md:border-8 border-gray-200 rounded-lg overflow-hidden shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md">
+            <div className="border-4 sm:border-6 md:border-8 border-gray-200 h-[550] rounded-lg overflow-hidden shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md">
+              {/* i gave this image height -[600] */}
               <Image
-                src="/contact-image3.png"
+                src="/chandigarh.jpg"
+                //  src="/contact-image3.png"
                 alt="Contact us illustration"
                 width={600}
                 height={700}
