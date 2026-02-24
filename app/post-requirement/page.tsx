@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
@@ -94,7 +93,7 @@ const EnquiryForm2: React.FC = () => {
       // You may need to replace import.meta.env with process.env depending on your Next.js setup
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/enquiry`, // Use Next.js Public env variable
-        data
+        data,
       );
 
       if (response.status === 201 || response.status === 200) {
@@ -624,7 +623,7 @@ const EnquiryForm2: React.FC = () => {
                         />
                         {t}
                       </label>
-                    )
+                    ),
                   )}
                 </div>
                 {errors.timeline && (
@@ -697,8 +696,8 @@ const EnquiryForm2: React.FC = () => {
                     className="accent-green-600"
                   />
                   By submitting your details, you agree to be contacted via
-                  call, SMS, WhatsApp, or email by PoPT and its partners
-                  regarding your enquiry.
+                  call, SMS, WhatsApp, or email by Property Bulbul and its
+                  partners regarding your enquiry.
                 </label>
                 {errors.consentGiven && (
                   <p className="text-red-500 text-sm">
