@@ -47,38 +47,38 @@ const points = [
 
 const UniqueSection = () => {
   return (
-    <section className="w-full py-20">
-      <div className="max-w-7xl mx-auto px-4">
+    <section className="w-full py-12 sm:py-16 lg:py-20 dark:bg-[#0F111A]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight">
             Why Choose Us for{" "}
             <span className="text-[#4161df]">Your Next Home?</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2">
             Discover a smarter, simpler, and more transparent way to find your
             perfect property. We are committed to making your real estate
             journey a success.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* LEFT - IMAGE MOCKUPS */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
+          {/* LEFT - IMAGE MOCKUPS - Hidden on mobile */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="relative flex justify-center items-center h-full"
+            className="hidden lg:flex relative justify-center items-center h-full"
             style={{ perspective: "1000px" }}
           >
-            <div className="relative w-full max-w-3xl h-[770px]">
+            <div className="relative w-full max-w-3xl h-[500px] xl:h-[600px] 2xl:h-[770px]">
               {/* Desktop Mockup */}
               <motion.div
                 initial={{ x: -20, opacity: 0, rotateY: 15 }}
@@ -118,8 +118,8 @@ const UniqueSection = () => {
           </motion.div>
 
           {/* RIGHT - FEATURE POINTS */}
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               {points.map((item, idx) => {
                 const Icon = item.icon;
                 return (
@@ -129,19 +129,19 @@ const UniqueSection = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: idx * 0.1 }}
                     viewport={{ once: true }}
-                    className="transform bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                    className="transform bg-white dark:bg-[#1a1f2e] p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border border-gray-100 dark:border-gray-700"
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3 sm:gap-4">
                       <div className="flex-shrink-0">
-                        <div className="flex items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100 p-3 text-blue-600">
-                          <Icon className="h-6 w-6" />
+                        <div className="flex items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 p-2.5 sm:p-3 text-blue-600 dark:text-blue-400">
+                          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                         </div>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           {item.title}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                           {item.desc}
                         </p>
                       </div>
