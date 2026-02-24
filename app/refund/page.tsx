@@ -2,21 +2,22 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   ReceiptIndianRupee,
-  clock,
+  Clock,
   ShieldCheck,
   HelpCircle,
-  Route,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 const RefundPolicy = () => {
-  const route = useRouter();
+  const router = useRouter();
+
   const policySections = [
     {
       title: "Cancellation Period",
       content:
-        "There may be a specified period during which users can cancel their subscription or request a refund. This period is often limited to a certain number of days from the date of purchase.",
+        "There may be a specified period during which users can cancel their subscription or request a refund from Property Bulbul. This period is often limited to a certain number of days from the date of purchase.",
     },
     {
       title: "Conditions for Refund",
@@ -26,37 +27,37 @@ const RefundPolicy = () => {
     {
       title: "Processing Fees",
       content:
-        "Some property websites may charge processing fees for refunds. It's important to clarify whether any fees will be deducted from the refund amount.",
+        "Property Bulbul may charge processing fees for refunds. It's important to clarify whether any fees will be deducted from the refund amount.",
     },
     {
       title: "Communication of Issues",
       content:
-        "Users may be required to communicate any issues or concerns that led to the refund request to the website's customer support before a refund is considered.",
+        "Users may be required to communicate any issues or concerns that led to the refund request to Property Bulbul's customer support before a refund is considered.",
     },
     {
       title: "Partial Refunds",
       content:
-        "In certain cases, a property website may offer partial refunds instead of full refunds, especially if the user has utilized some of the services or features during the subscription period.",
+        "In certain cases, Property Bulbul may offer partial refunds instead of full refunds, especially if the user has utilized some of the services or features during the subscription period.",
     },
     {
       title: "Non-Refundable Services",
       content:
-        "Some services or features provided by the property website may be explicitly labeled as non-refundable. Users should be aware of such exclusions.",
+        "Some services or features provided by Property Bulbul may be explicitly labeled as non-refundable. Users should be aware of such exclusions.",
     },
     {
       title: "Subscription Renewal",
       content:
-        "If the refund request is related to a subscription, the policy may address whether refunds will be provided for automatic subscription renewals.",
+        "If the refund request is related to a subscription, the policy addresses whether refunds will be provided for automatic subscription renewals.",
     },
     {
       title: "Timely Requests",
       content:
-        "Users may be required to submit refund requests within a specific timeframe. Late requests may not be considered.",
+        "Users are required to submit refund requests within the specified timeframe. Late requests may not be considered.",
     },
     {
       title: "Refund Methods",
       content:
-        "The policy may outline the methods through which refunds will be processed, such as crediting the original payment method or providing refunds in the form of website credits.",
+        "Refunds will be processed by crediting the original payment method or providing refunds in the form of Property Bulbul website credits.",
     },
   ];
 
@@ -74,8 +75,8 @@ const RefundPolicy = () => {
               Refund Policy
             </h1>
             <p className="text-gray-600 text-lg">
-              Everything you need to know about our refund process and
-              conditions.
+              Everything you need to know about the Property Bulbul refund
+              process and conditions.
             </p>
           </motion.div>
         </div>
@@ -125,7 +126,7 @@ const RefundPolicy = () => {
             </p>
           </div>
           <button
-            onClick={route.push("/contact")}
+            onClick={() => router.push("/contact")}
             className="bg-white text-[#4161df] px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-all whitespace-nowrap shadow-lg"
           >
             Contact Support
