@@ -14,7 +14,7 @@ const AboutPage = () => {
       description:
         "Chandigarh native with 12+ years in real estate. Built PropertyBulbul from ground up with a vision to simplify property dealings for Tricity residents.",
       experience: "12 Years",
-      image: "/mohit.png",
+      image: "/priyanka-sharma.jpg",
       social: {
         linkedin: "#",
       },
@@ -25,7 +25,7 @@ const AboutPage = () => {
       description:
         "Expert in luxury residential and commercial properties. Helped 500+ families find their dream homes across Chandigarh and Mohali.",
       experience: "8 Years",
-      image: "/neha.png",
+      image: "/neha-verma.jpg",
       social: {
         linkedin: "#",
       },
@@ -36,7 +36,7 @@ const AboutPage = () => {
       description:
         "Digital marketing specialist focused on helping Tricity property seekers connect with verified sellers through modern technology.",
       experience: "6 Years",
-      image: "/rahul.png",
+      image: "/ritika.jpg",
       social: {
         linkedin: "#",
       },
@@ -242,7 +242,7 @@ const Feature = ({
 
 const TeamMemberCard = ({ member }: { member: any }) => (
   <div className="bg-gray-50 rounded-lg overflow-hidden text-center shadow-lg hover:shadow-2xl transition-shadow duration-300">
-    <div className="relative w-full h-64 sm:h-72 md:h-80">
+    <div className="relative w-full h-72 sm:h-76 md:h-88">
       <Image
         src={member.image}
         alt={`${member.name} - ${member.role} at PropertyBulbul`}
@@ -250,17 +250,17 @@ const TeamMemberCard = ({ member }: { member: any }) => (
         className="object-cover"
       />
     </div>
-    <div className="p-4 sm:p-6">
+    <div className="p-2 sm:p-3">
       <h3 className="text-xl sm:text-2xl font-semibold text-black mb-1 sm:mb-2">
         {member.name}
       </h3>
-      <p className="text-sm sm:text-base text-indigo-600 font-medium mb-2 sm:mb-3">
+      <p className="text-sm sm:text-base text-indigo-600 font-medium mb-1 sm:mb-2">
         {member.role}
       </p>
-      <p className="text-xs sm:text-sm font-semibold text-gray-500 mb-2 sm:mb-3">
+      <p className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 sm:mb-2">
         {member.experience} Experience
       </p>
-      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-3 sm:mb-4">
+      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-2 sm:mb-3">
         {member.description}
       </p>
       <div className="flex justify-center space-x-4">
