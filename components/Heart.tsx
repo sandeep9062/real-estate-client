@@ -38,11 +38,11 @@ const Heart: React.FC<HeartProps> = ({ card }) => {
       await toFav(card).unwrap(); // mutation toggles it
       refetch();
       toast.success(
-        favourited ? "Removed from favourites" : "Added to favourites"
+        favourited ? "Removed from favourites" : "Added to favourites",
       );
     } catch (error: any) {
       toast.error(
-        error?.data?.message || error?.error || "Something went wrong"
+        error?.data?.message || error?.error || "Something went wrong",
       );
     }
   };
