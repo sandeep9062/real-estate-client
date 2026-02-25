@@ -242,7 +242,7 @@ const Feature = ({
 
 const TeamMemberCard = ({ member }: { member: any }) => (
   <div className="bg-gray-50 rounded-lg overflow-hidden text-center shadow-lg hover:shadow-2xl transition-shadow duration-300">
-    <div className="relative w-full h-72 sm:h-76 md:h-88">
+    <div className="relative w-full h-72 sm:h-76 md:h-80">
       <Image
         src={member.image}
         alt={`${member.name} - ${member.role} at PropertyBulbul`}
@@ -250,17 +250,17 @@ const TeamMemberCard = ({ member }: { member: any }) => (
         className="object-cover"
       />
     </div>
-    <div className="p-2 sm:p-3">
+    <div className="p-4 sm:p-6">
       <h3 className="text-xl sm:text-2xl font-semibold text-black mb-1 sm:mb-2">
         {member.name}
       </h3>
-      <p className="text-sm sm:text-base text-indigo-600 font-medium mb-1 sm:mb-2">
+      <p className="text-sm sm:text-base text-indigo-600 font-medium mb-2 sm:mb-3">
         {member.role}
       </p>
-      <p className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 sm:mb-2">
+      <p className="text-xs sm:text-sm font-semibold text-gray-500 mb-2 sm:mb-3">
         {member.experience} Experience
       </p>
-      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-2 sm:mb-3">
+      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-3 sm:mb-4">
         {member.description}
       </p>
       <div className="flex justify-center space-x-4">
