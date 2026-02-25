@@ -89,7 +89,7 @@ const DisclaimerPage = () => {
       {/* MAIN CONTENT */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* INTRO BOX */}
             <div className="bg-blue-50 border-l-4 border-[#4161df] p-6 mb-12 rounded-r-xl shadow-sm">
               <div className="flex gap-4">

@@ -207,7 +207,8 @@ const FAQPage = () => {
           </div>
 
           {/* CONTACT FORM COLUMN */}
-          <aside className="lg:col-span-1">
+
+          {/* <aside className="lg:col-span-1">
             <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 sticky top-24">
               <h3 className="text-[#4161df] font-bold text-sm uppercase mb-2">
                 Contact Us
@@ -262,7 +263,7 @@ const FAQPage = () => {
                 </button>
               </form>
             </div>
-          </aside>
+          </aside> */}
         </div>
       </section>
     </main>

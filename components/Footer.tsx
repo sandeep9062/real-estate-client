@@ -14,7 +14,7 @@ const Footer = () => {
             <Link href="/">
               <Image
                 src="/propertybulbul.png"
-                alt="Property Bulbul logo"
+                alt="Property Bulbul"
                 width={160}
                 height={60}
                 priority
@@ -67,6 +67,8 @@ const Footer = () => {
                 ["Services", "/services"],
                 ["About Us", "/about-us"],
                 ["Projects", "/projects"],
+                ["FAQ", "/faq"],
+                ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
               ].map(([label, link]) => (
                 <Link
