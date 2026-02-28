@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Heart from "./Heart";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/authSlice";
+import { FaBed, FaBath, FaCar, FaMapMarkerAlt } from "react-icons/fa";
 
 interface PropertyCardProps {
   card: any;
@@ -21,17 +22,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   onEdit,
 }) => {
   const router = useRouter();
-  const user = useSelector(selectUser);
 
-  const isBooked = false;
-  const isFavourited = isFavourite;
-
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit?.(card);
-  };
-
-  // Memoize image filtering to prevent recalculation
   const displayImage = useMemo(() => {
     const imageUrls = (card.image || []).filter((img: string) => {
       const lower = img.toLowerCase();
@@ -48,100 +39,74 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   return (
     <div
-      className="flex flex-col bg-white rounded-xl sm:rounded-2xl shadow-md border border-gray-200 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer overflow-hidden w-full h-[380px] sm:h-[400px] md:h-[420px] lg:h-[450px]"
+      className="group flex flex-col bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-2xl hover:border-blue-100 transition-all duration-500 cursor-pointer overflow-hidden w-full h-full min-h-[420px]"
       onClick={() => router.push(`/property/${card._id}`)}
     >
-      {/* Image */}
-      <div className="relative h-36 sm:h-44 md:h-48 lg:h-60 w-full">
+      {/* Image Container */}
+      <div className="relative h-52 sm:h-60 w-full overflow-hidden">
         {hasValidImage ? (
           <Image
             src={displayImage}
             alt={card.title}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading="lazy"
-            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <div className="text-gray-400 text-center">
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-                className="mx-auto mb-2"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-              <span className="text-sm">No Image</span>
-            </div>
+          <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+            <span className="text-slate-400 text-sm">No Image Available</span>
           </div>
         )}
 
-        {/* Heart */}
-        <div className="absolute top-3 right-3 z-10">
-          <Heart card={card} />
-        </div>
+        {/* Gradient Overlay for bottom text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        {/* Edit Button */}
-        {editable && (
-          <button
-            onClick={handleEditClick}
-            className="absolute top-3 right-16 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors"
-            title="Edit Property"
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-          </button>
-        )}
-
-        {/* Deal Tag */}
-        <div className="absolute top-3 left-3 z-10">
+        {/* Top Actions */}
+        <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
           <span
-            className={`text-xs font-medium px-1 py-1 rounded-b-md border backdrop-blur-sm ${
+            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md shadow-sm border ${
               card.deal === "Sale"
-                ? "bg-green-100 text-green-800 border-green-200"
-                : "bg-red-100 text-red-800 border-red-200"
+                ? "bg-emerald-500/90 text-white border-emerald-400"
+                : "bg-rose-500/90 text-white border-rose-400"
             }`}
           >
             For {card.deal}
           </span>
+          <div className="flex gap-2">
+            {editable && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(card);
+                }}
+                className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white text-slate-700 transition-all"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+            )}
+            <div className="bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all">
+              <Heart card={card} />
+            </div>
+          </div>
         </div>
 
-        {/* Favourite / Booked Tag */}
-        {(isFavourited || isBooked) && (
-          <div className="absolute bottom-3 left-3 z-10">
-            <span
-              className={`text-xs font-medium px-2 py-1 rounded-full border backdrop-blur-sm ${
-                isBooked
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : "bg-rose-50 text-rose-600 border-rose-200"
-              }`}
-            >
-              {isBooked ? "Booked" : "Favourited"}
-            </span>
-          </div>
-        )}
-
+        {/* Featured Tag */}
         {card.isFeatured && (
           <div className="absolute bottom-0 left-0 z-10">
             <div
-              className="bg-[#4161df] text-white text-[10px] font-black px-4 py-1.5 
-      rounded-tr-2xl shadow-md flex items-center gap-1 uppercase tracking-tighter"
+              className="bg-[#4161df] text-white text-[10px] font-black px-4 py-1.5
+
+rounded-tr-3xl shadow-md flex items-center gap-1 uppercase tracking-tighter"
             >
               <span>★</span> FEATURED
             </div>
@@ -149,65 +114,82 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         )}
       </div>
 
-      {/* Details */}
-      <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 grow">
-        {/* Price and Area */}
-        <div className="flex flex-wrap justify-between items-center gap-1 sm:gap-2">
-          <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
-            <span className="text-xs sm:text-sm font-normal">₹</span>
-            {card.price.toLocaleString()}
-          </p>
-          <p className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 sm:py-1 rounded-md">
-            {card.area.value} {card.area.unit}
-          </p>
+      {/* Content Section */}
+      <div className="p-5 flex flex-col flex-1 gap-3">
+        {/* Price & Badge */}
+        <div className="flex justify-between items-baseline">
+          <h4 className="text-2xl font-black text-[#4161df] tracking-tight">
+            ₹{card.price.toLocaleString("en-IN")}
+          </h4>
+          <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">
+            {card.propertyCategory}
+          </span>
         </div>
 
-        {/* Title */}
-        <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 line-clamp-2 sm:truncate sm:h-14">
-          {card.title}
-        </h3>
+        {/* Title & Address */}
+        <div className="space-y-1">
+          <h3 className="text-lg font-bold text-slate-900 leading-snug group-hover:text-[#4161df] transition-colors line-clamp-1">
+            {card.title}
+          </h3>
+          <div className="flex items-center gap-1 text-slate-500">
+            <FaMapMarkerAlt className="text-[#4161df] text-xs" />
+            <p className="text-xs font-medium truncate">
+              {card.location.address}, {card.location.city}
+              {card.location.state && `, ${card.location.state}`}
+            </p>
+          </div>
+        </div>
 
-        {/* Address */}
-        <p className="text-gray-600 text-xs sm:text-sm truncate">
-          {truncate(`${card.location.address}, ${card.location.city}`, {
-            length: 30,
-          })}
-        </p>
+        {/* Features Row */}
+        <div className="flex items-center justify-between border-t border-slate-50 pt-4 mt-auto">
+          <div className="flex items-center gap-4 text-slate-600">
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                <FaBed className="text-[#4161df]" />
+                <span>{card.facilities?.bedrooms || 0}</span>
+              </div>
+              <span className="text-[10px] uppercase text-slate-400 tracking-wider">
+                Beds
+              </span>
+            </div>
 
-        {/* Spacer */}
-        <div className="grow" />
+            <div className="w-[1px] h-6 bg-slate-100" />
 
-        {/* Facilities */}
-        <div className="flex flex-wrap justify-start items-center gap-x-3 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-xs text-gray-700 border-t pt-2 sm:pt-3 mt-auto">
-          {card.facilities?.bedrooms > 0 && (
-            <div className="flex items-center gap-1">
-              <span role="img" aria-label="beds">
-                🛏️
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                <FaBath className="text-[#4161df]" />
+                <span>{card.facilities?.bathrooms || 0}</span>
+              </div>
+              <span className="text-[10px] uppercase text-slate-400 tracking-wider">
+                Baths
               </span>
-              <span>{card.facilities.bedrooms} Beds</span>
             </div>
-          )}
-          {card.facilities?.bathrooms > 0 && (
-            <div className="flex items-center gap-1">
-              <span role="img" aria-label="baths">
-                🛁
+
+            <div className="w-[1px] h-6 bg-slate-100" />
+
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                <FaCar className="text-[#4161df]" />
+                <span>{card.facilities?.parkings || 0}</span>
+              </div>
+              <span className="text-[10px] uppercase text-slate-400 tracking-wider">
+                Park
               </span>
-              <span>{card.facilities.bathrooms} Baths</span>
             </div>
-          )}
-          {card.facilities?.parkings > 0 && (
-            <div className="flex items-center gap-1">
-              <span role="img" aria-label="parking">
-                🚗
-              </span>
-              <span>{card.facilities.parkings} Parking</span>
-            </div>
-          )}
+          </div>
+
+          <div className="text-right">
+            <span className="block text-sm font-bold text-slate-900">
+              {card.area.value}
+            </span>
+            <span className="block text-[10px] text-slate-400 uppercase">
+              {card.area.unit}
+            </span>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(PropertyCard);

@@ -91,7 +91,7 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    nocache: false,// check it if required or not
+    nocache: false, // check it if required or not
     googleBot: {
       index: true,
       follow: true,
@@ -166,17 +166,36 @@ export default function RootLayout({
               <Toaster
                 richColors
                 closeButton
-                duration={2500}
+                position="top-right"
+                expand={false} // Keeps it clean, stacked look
+                duration={3000}
                 toastOptions={{
-                  className:
-                    "backdrop-blur-md border border-white/20 shadow-xl rounded-xl p-4 w-full md:w-auto",
+                  // Main container styling
+                  style: {
+                    background: "rgba(255, 255, 255, 0.8)", // Semi-transparent white
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(0, 0, 0, 0.05)",
+                    boxShadow:
+                      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                  },
+                  // Tailwind class overrides
+                  className: "rounded-2xl p-4 border border-white/50",
                   classNames: {
-                    title: "text-[15px] font-semibold",
-                    description: "text-sm text-neutral-400",
-                    success: "bg-emerald-500/20 text-emerald-400",
-                    error: "bg-red-500/20 text-red-400",
-                    warning: "bg-yellow-500/20 text-yellow-500",
-                    info: "bg-blue-500/20 text-blue-400",
+                    toast: "group", // Allows child element targeting
+                    title:
+                      "text-[14px] font-bold tracking-tight text-slate-900",
+                    description: "text-[12px] text-slate-500 font-medium",
+                    actionButton:
+                      "bg-blue-600 text-white rounded-lg px-3 py-1 text-xs font-bold",
+                    cancelButton:
+                      "bg-slate-100 text-slate-900 rounded-lg px-3 py-1 text-xs font-bold",
+                    // Status-specific color tweaks for better accessibility
+                    success:
+                      "!bg-emerald-50/80 !text-emerald-700 !border-emerald-200/50",
+                    error: "!bg-rose-50/80 !text-rose-700 !border-rose-200/50",
+                    info: "!bg-blue-50/80 !text-blue-700 !border-blue-200/50",
+                    warning:
+                      "!bg-amber-50/80 !text-amber-700 !border-amber-200/50",
                   },
                 }}
                 style={{ zIndex: 9999 }}
