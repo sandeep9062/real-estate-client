@@ -151,7 +151,7 @@ const Header: React.FC = () => {
                     e.stopPropagation();
                     router.push("/login");
                   }}
-                  className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-full bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md"
+                  className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-full bg-[#4161df] text-white shadow-md"
                 >
                   Login
                 </button>

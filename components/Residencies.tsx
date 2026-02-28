@@ -37,6 +37,8 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
     // .slice(0, 10);
   }, [data]);
 
+  //console.log(displayProperties, "featured-proeprties");
+
   if (isError) {
     return (
       <div className="w-full flex items-center justify-center py-20 text-red-500 font-semibold">

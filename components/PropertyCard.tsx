@@ -136,6 +136,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </span>
           </div>
         )}
+
+        {card.isFeatured && (
+          <div className="absolute bottom-0 left-0 z-10">
+            <div
+              className="bg-[#4161df] text-white text-[10px] font-black px-4 py-1.5 
+      rounded-tr-2xl shadow-md flex items-center gap-1 uppercase tracking-tighter"
+            >
+              <span>★</span> FEATURED
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Details */}
