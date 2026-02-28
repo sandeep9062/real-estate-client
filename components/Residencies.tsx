@@ -17,16 +17,24 @@ interface ResidenciesProps {
 
 const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
   // Use RTK Query's caching - this will use cached data if available
-  const { data, isError, isLoading } = useGetAllPropertiesQuery(filter, {
-    // Skip refetching if we already have data
-    refetchOnMountOrArgChange: false,
-  });
+  const { data, isError, isLoading } = useGetAllPropertiesQuery(
+    {
+      ...filter,
+      isFeatured: true,
+    },
+    {
+      // Skip refetching if we already have data
+      refetchOnMountOrArgChange: false,
+    },
+  );
+
   const swiperRef = useRef<any>(null);
 
   // Memoize the sliced data to show only first 10 properties
   const displayProperties = useMemo(() => {
     if (!data) return [];
-    return data.slice(0, 10);
+    return data.filter((property: any) => property.isFeatured === true);
+    // .slice(0, 10);
   }, [data]);
 
   if (isError) {
