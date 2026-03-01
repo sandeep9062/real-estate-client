@@ -7,6 +7,7 @@ import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import PropertyCard from "./PropertyCard";
 import { sliderSettings } from "@/lib/utils";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { fa } from "zod/v4/locales";
 
 // Memoized PropertyCard wrapper to prevent unnecessary re-renders
 const MemoizedPropertyCard = memo(PropertyCard);
@@ -132,7 +133,7 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
-            loop={true}
+            loop={false}
             onSwiper={(swiper) => (swiperRef.current = swiper)}
             className="pb-10 pt-6 -mx-2"
           >
