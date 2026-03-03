@@ -133,7 +133,7 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
-            loop={false}
+            loop={false} // Set loop to false to prevent infinite scrolling
             onSwiper={(swiper) => (swiperRef.current = swiper)}
             className="pb-10 pt-6 -mx-2"
           >

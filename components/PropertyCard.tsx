@@ -29,10 +29,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       return !(
         lower.endsWith(".mp4") ||
         lower.endsWith(".webm") ||
-        lower.endsWith(".ogg")
+        lower.endsWith(".ogg") ||
+        lower.includes("youtube.com")
       );
     });
-    return imageUrls[0] || card.image?.[0];
+    return (
+      imageUrls[0] ||
+      card.image?.[0] ||
+      // card.images?.[0] ||
+      "/images/property-tricity.jpg"
+    );
   }, [card.image]);
 
   const hasValidImage = displayImage && displayImage.trim() !== "";

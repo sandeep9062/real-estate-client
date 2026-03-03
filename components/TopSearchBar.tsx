@@ -19,11 +19,18 @@ import {
 } from "lucide-react";
 
 const DEAL_OPTIONS = ["Sale", "Rent"];
-const TYPE_OPTIONS = ["Residential", "Commercial"];
+const TYPE_OPTIONS = [
+  "Residential",
+  "Commercial",
+  "Industrial",
+  "Agricultural",
+];
 const CATEGORY_OPTIONS = [
   "Apartment/Flat",
   "House/Villa",
   "Land/Plot",
+  "PG/Hostel",
+  "Farmhouse",
   "Retail",
   "Office",
   "Industrial",
