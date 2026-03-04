@@ -76,10 +76,10 @@ const PropertyDetails = ({ data }: { data: any }) => {
   };
 
   const isBooked = bookings.some(
-    (b: any) => (b?.property?._id || b?.property || b?.id) === id
+    (b: any) => (b?.property?._id || b?.property || b?.id) === id,
   );
   const bookedDate = bookings.find(
-    (b: any) => (b?.property?._id || b?.property || b?.id) === id
+    (b: any) => (b?.property?._id || b?.property || b?.id) === id,
   )?.date;
 
   return (
@@ -161,6 +161,10 @@ const PropertyDetails = ({ data }: { data: any }) => {
             <div className="flex flex-col">
               <span className="font-semibold">Furnishing</span>
               <span>{data?.furnishing}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="font-semibold">Facing</span>
+              <span>{data?.facing}</span>
             </div>
             <div className="flex flex-col">
               <span className="font-semibold">Verified</span>

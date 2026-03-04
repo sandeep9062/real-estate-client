@@ -1,8 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./api";
 
-const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/v1/contacts`;
-
 export const contactApi = createApi({
   reducerPath: "contactApi",
   baseQuery: baseQueryWithAuth,
@@ -10,20 +8,20 @@ export const contactApi = createApi({
   endpoints: (builder) => ({
     // ✅ GET all contacts
     getContacts: builder.query<any, void>({
-      query: () => `/contacts`,
+      query: () => `/v1/contacts`,
       providesTags: ["Contacts"],
     }),
 
     // ✅ GET single contact by ID
     getContactById: builder.query<any, string>({
-      query: (id) => `/contacts/${id}`,
+      query: (id) => `/v1/contacts/${id}`,
       providesTags: ["Contacts"],
     }),
 
     // ✅ POST new contact (JSON payload)
     addContact: builder.mutation<any, any>({
       query: (body) => ({
-        url: `/contacts`,
+        url: `/v1/contacts`,
         method: "POST",
         body,
       }),
@@ -33,7 +31,7 @@ export const contactApi = createApi({
     // ✅ UPDATE contact (JSON payload)
     updateContact: builder.mutation<any, { id: string; body: any }>({
       query: ({ id, body }) => ({
-        url: `/contacts/${id}`,
+        url: `/v1/contacts/${id}`,
         method: "PUT",
         body,
       }),
@@ -43,7 +41,7 @@ export const contactApi = createApi({
     // ✅ DELETE contact
     deleteContact: builder.mutation<any, string>({
       query: (id) => ({
-        url: `/contacts/${id}`,
+        url: `/v1/contacts/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Contacts"],
