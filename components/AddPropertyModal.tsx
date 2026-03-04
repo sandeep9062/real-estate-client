@@ -21,7 +21,7 @@ const AddPropertyModal = ({
   editingProperty?: any;
 }) => {
   const [active, setActive] = useState(0);
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const user = useSelector(selectUser);
   const { getAll } = useCountries();
   const countries = getAll();
@@ -36,6 +36,7 @@ const AddPropertyModal = ({
     area: { value: 1000, unit: "sqft" },
     availability: "Ready to Move",
     furnishing: "Un-Furnished",
+    facing: "",
     postedBy: "Owner",
     location: {
       address: "",
@@ -57,7 +58,9 @@ const AddPropertyModal = ({
     userEmail: user?.email,
   };
 
-  const [propertyDetails, setPropertyDetails] = useState(defaultPropertyDetails);
+  const [propertyDetails, setPropertyDetails] = useState(
+    defaultPropertyDetails,
+  );
 
   /* ✅ NORMALIZE COUNTRY HERE (KEY FIX) */
   const normalizeCountry = (raw: string) => {
@@ -70,7 +73,7 @@ const AddPropertyModal = ({
     const match = countries.find(
       (c) =>
         c.name?.toLowerCase() === raw.toLowerCase() ||
-        c.label.toLowerCase().includes(raw.toLowerCase())
+        c.label.toLowerCase().includes(raw.toLowerCase()),
     );
 
     return match?.value || "";
@@ -78,30 +81,44 @@ const AddPropertyModal = ({
 
   // Function to convert GeoJSON coordinates to {lat, lng}
   const convertGeoJSONToLatLng = (coordinates: any) => {
-    if (coordinates && coordinates.coordinates && Array.isArray(coordinates.coordinates) && coordinates.coordinates.length >= 2) {
+    if (
+      coordinates &&
+      coordinates.coordinates &&
+      Array.isArray(coordinates.coordinates) &&
+      coordinates.coordinates.length >= 2
+    ) {
       // GeoJSON: [lng, lat]
-      return { lat: coordinates.coordinates[1], lng: coordinates.coordinates[0] };
+      return {
+        lat: coordinates.coordinates[1],
+        lng: coordinates.coordinates[0],
+      };
     }
     return { lat: 0, lng: 0 };
   };
 
   // Function to convert {lat, lng} to GeoJSON
   const convertLatLngToGeoJSON = (coords: { lat: number; lng: number }) => {
-    if (coords && typeof coords.lat === 'number' && typeof coords.lng === 'number') {
+    if (
+      coords &&
+      typeof coords.lat === "number" &&
+      typeof coords.lng === "number"
+    ) {
       return {
         type: "Point",
-        coordinates: [coords.lng, coords.lat] // [lng, lat]
+        coordinates: [coords.lng, coords.lat], // [lng, lat]
       };
     }
     return {
       type: "Point",
-      coordinates: [0, 0]
+      coordinates: [0, 0],
     };
   };
 
   useEffect(() => {
     if (editingProperty) {
-      const normalizedCoordinates = convertGeoJSONToLatLng(editingProperty.location?.coordinates);
+      const normalizedCoordinates = convertGeoJSONToLatLng(
+        editingProperty.location?.coordinates,
+      );
       setPropertyDetails({
         ...defaultPropertyDetails,
         ...editingProperty,
@@ -132,12 +149,12 @@ const AddPropertyModal = ({
       zIndex={1300}
       centered={!isMobile}
       styles={{
-        content: { width: '100vw', maxWidth: 'none' },
+        content: { width: "100vw", maxWidth: "none" },
       }}
       overlayProps={{
         style: {
-          backdropFilter: 'blur(5px)',
-        }
+          backdropFilter: "blur(5px)",
+        },
       }}
     >
       <Container>

@@ -39,6 +39,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
       areaUnit: propertyDetails.area.unit,
       availability: propertyDetails.availability,
       furnishing: propertyDetails.furnishing,
+      facing: propertyDetails.facing || "",
       postedBy: propertyDetails.postedBy,
       commercialPropertyTypes: propertyDetails.commercialPropertyTypes,
       investmentOptions: propertyDetails.investmentOptions,
@@ -62,6 +63,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
     areaUnit,
     availability,
     furnishing,
+    facing,
     postedBy,
     commercialPropertyTypes,
     investmentOptions,
@@ -81,6 +83,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         area: { value: areaValue, unit: areaUnit },
         availability,
         furnishing,
+        facing,
         postedBy,
         commercialPropertyTypes,
         investmentOptions,
@@ -178,6 +181,10 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
             "Apartment/Flat",
             "House/Villa",
             "Land/Plot",
+            "Studio Apartment",
+            "Builder Floor",
+            "PG/Hostel",
+            "Farmhouse",
             "Retail",
             "Office",
             "Industrial",
@@ -222,6 +229,23 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         />
 
         <Select
+          label="Facing"
+          data={[
+            "North",
+            "South",
+            "East",
+            "West",
+            "North-East",
+            "North-West",
+            "South-East",
+            "South-West",
+          ]}
+          {...form.getInputProps("facing")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        <Select
           label="Posted By"
           data={["Owner", "Agent", "Builder"]}
           {...form.getInputProps("postedBy")}
@@ -233,7 +257,9 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
           <Button variant="default" onClick={prevStep}>
             Back
           </Button>
-          <Button type="submit" color="blue">Next step</Button>
+          <Button type="submit" color="blue">
+            Next step
+          </Button>
         </Group>
       </form>
     </Box>

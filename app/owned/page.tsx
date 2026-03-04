@@ -42,7 +42,7 @@ const OwnedPropertiesPage = () => {
   // Fetch user (used for permissions sometimes)
   const { data: userData, isFetching: fetchingUser } = useGetUserByIdQuery(
     user?._id as string,
-    { skip: !user?._id }
+    { skip: !user?._id },
   );
 
   // Fetch properties user owns
@@ -50,8 +50,7 @@ const OwnedPropertiesPage = () => {
 
   const properties = data || [];
 
-
-  console.log(properties,"proeprpeprep")
+  // console.log(properties,"owned-properties-data")
 
   // Filter logic
   const filtered = useMemo(() => {
@@ -62,7 +61,7 @@ const OwnedPropertiesPage = () => {
         (property.title?.toLowerCase() ?? "").includes(q) ||
         (property.description?.toLowerCase() ?? "").includes(q) ||
         (property.location?.city?.toLowerCase() ?? "").includes(q) ||
-        (property.location?.country?.toLowerCase() ?? "").includes(q)||
+        (property.location?.country?.toLowerCase() ?? "").includes(q) ||
         (property.location?.address?.toLowerCase() ?? "").includes(q)
       );
     });
