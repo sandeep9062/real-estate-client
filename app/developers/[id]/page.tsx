@@ -3,7 +3,7 @@ import { useParams } from "next/navigation";
 import { useGetDeveloperByIdQuery } from "@/services/developersApi";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Globe, Award, ShieldCheck } from "lucide-react";
-
+import { Building } from "lucide-react";
 export default function DeveloperProfilePage() {
   const { id } = useParams();
 
