@@ -40,9 +40,9 @@ const AddPropertyModal = ({
     postedBy: "Owner",
     location: {
       address: "",
-      city: "",
+      city: "Chandigarh",
       state: "",
-      country: "",
+      country: "IN",
       pincode: "",
       coordinates: { lat: 0, lng: 0 },
     },

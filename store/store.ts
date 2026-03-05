@@ -6,19 +6,27 @@ import { authApi } from "@/services/authApi";
 import { propertiesApi } from "@/services/propertiesApi";
 import { userApi } from "@/services/userApi";
 import { contactApi } from "@/services/contactApi";
+
+import { projectsApi } from "@/services/projectsApi";
+import { developersApi } from "@/services/developersApi";
 const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [propertiesApi.reducerPath]: propertiesApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [contactApi.reducerPath]: contactApi.reducer,
+    [projectsApi.reducerPath]: projectsApi.reducer,
+    [developersApi.reducerPath]: developersApi.reducer,
     auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
       contactApi.middleware,
+      projectsApi.middleware,
+      developersApi.middleware,
       propertiesApi.middleware,
+
       userApi.middleware
     ),
   devTools: process.env.NODE_ENV !== "production", // ✅ enable Redux DevTools in development
