@@ -18,7 +18,10 @@ export const projectsApi = createApi({
       providesTags: (result, error, id) => [{ type: "Project", id }],
     }),
     getProjectBySlug: builder.query({
-      query: (slug) => `/v1/projects/slug/${slug}`,
+      query: (slug) => {
+        console.log("Fetching project with slug:", slug);
+        return `/v1/projects/slug/${slug}`;
+      },
       providesTags: (result, error, slug) => [{ type: "Project", slug }],
     }),
     createProject: builder.mutation({
@@ -26,7 +29,9 @@ export const projectsApi = createApi({
         const formData = new FormData();
         Object.keys(projectData).forEach((key) => {
           if (key === "images") {
-            projectData[key].forEach((file: File) => formData.append("images", file));
+            projectData[key].forEach((file: File) =>
+              formData.append("images", file),
+            );
           } else if (typeof projectData[key] === "object") {
             formData.append(key, JSON.stringify(projectData[key]));
           } else {
@@ -47,7 +52,10 @@ export const projectsApi = createApi({
         method: "PUT",
         body: update,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Project", id }, "Project"],
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Project", id },
+        "Project",
+      ],
     }),
     deleteProject: builder.mutation({
       query: (id) => ({

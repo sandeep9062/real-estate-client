@@ -4,7 +4,7 @@ import { MapPin, Building2, CheckCircle2 } from "lucide-react";
 
 export const ProjectCard = ({ project }: { project: any }) => {
   return (
-    <Link href={`/projects/${project._id}`} className="group">
+    <Link href={`/projects/${project.slug}`} className="group">
       <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100">
         <div className="relative aspect-video">
           <img
@@ -13,7 +13,7 @@ export const ProjectCard = ({ project }: { project: any }) => {
             alt={project.name}
           />
           <div className="absolute top-3 left-3 flex gap-2">
-            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+            <span className="bg-[#4161df] text-white text-xs font-bold px-2 py-1 rounded">
               {project.constructionStatus}
             </span>
             {project.isVerified && (
@@ -25,7 +25,7 @@ export const ProjectCard = ({ project }: { project: any }) => {
         </div>
 
         <div className="p-4">
-          <div className="flex items-center gap-2 text-blue-600 mb-1">
+          <div className="flex items-center gap-2 text-[#4161df] mb-1">
             <Building2 size={16} />
             <span className="text-xs font-semibold uppercase tracking-wider">
               {project.developer?.name || "Premium Developer"}
@@ -42,11 +42,11 @@ export const ProjectCard = ({ project }: { project: any }) => {
           <div className="mt-4 flex items-center justify-between border-t pt-3">
             <div>
               <p className="text-gray-400 text-xs">Starting from</p>
-              <p className="text-blue-700 font-bold text-lg">
+              <p className="text-[#4161df] font-bold text-lg">
                 ₹{project.pricing.from.toLocaleString("en-IN")}
               </p>
             </div>
-            <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-600 transition-colors">
+            <button className="bg-[#4161df] text-white px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-[#4161df]/90 transition-colors">
               View Details
             </button>
           </div>
