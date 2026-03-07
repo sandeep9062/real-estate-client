@@ -40,7 +40,7 @@ const Footer = () => {
                   <li key={city}>
                     <Link
                       href={`/properties/${city.toLowerCase()}`}
-                      className="hover:text-blue-600 transition"
+                      className="hover:text-[#4161df] transition"
                     >
                       {city}
                     </Link>
@@ -74,7 +74,7 @@ const Footer = () => {
                 <Link
                   key={label}
                   href={link}
-                  className="hover:text-blue-600 transition"
+                  className="hover:text-[#4161df] transition"
                 >
                   {label}
                 </Link>

@@ -166,9 +166,9 @@ export default function Home() {
         <PostPropertyCTA />
       </section>
 
-      <section className="container mx-auto px-4 bg-white/60">
+      {/* <section className="container mx-auto px-4 bg-white/60">
         <Contact />
-      </section>
+      </section> */}
 
       <section className="container mx-auto px-4 bg-white/60">
         <Testimonial />

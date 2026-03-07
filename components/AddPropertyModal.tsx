@@ -10,7 +10,7 @@ import UploadImage from "./UploadImage";
 import BasicDetails from "./BasicDetails";
 import Facilities from "./Facilities";
 import useCountries from "../lib/useCountries";
-
+//import MagicFill from "./MagicFill";
 const AddPropertyModal = ({
   opened,
   setOpened,
@@ -159,6 +159,14 @@ const AddPropertyModal = ({
     >
       <Container>
         <Stepper active={active} onStepClick={setActive}>
+          {/* <Stepper.Step label="AI Magic" description="Auto-fill data">
+            <MagicFill
+              nextStep={nextStep}
+              propertyDetails={propertyDetails}
+              setPropertyDetails={setPropertyDetails}
+            />
+          </Stepper.Step> */}
+
           <Stepper.Step label="Location">
             <AddLocation
               nextStep={nextStep}
