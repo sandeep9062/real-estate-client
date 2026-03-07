@@ -97,20 +97,35 @@ const MagicFill = ({
     try {
       const result = await magicFill(rawText).unwrap();
 
-      console.log(result, "ai-data-extrast");
-
+      console.log(result, "ai-result");
       if (result.success && result.data) {
-        // Parse the plain text response to extract structured data
-        const extractedData = parsePlainTextResponse(result.data);
+        const aiData = result.data;
 
         setPropertyDetails((prev: any) => ({
           ...prev,
-          ...extractedData,
+          title: aiData.title || prev.title,
+          description: aiData.description || prev.description,
+          price: aiData.price || prev.price,
+          // Merge nested objects carefully
+          location: {
+            ...prev.location,
+            ...aiData.location,
+          },
+          facilities: {
+            ...prev.facilities,
+            ...aiData.facilities,
+          },
+          area: {
+            ...prev.area,
+            ...aiData.area,
+          },
         }));
-        nextStep();
+
+        nextStep(); // Move to the next screen to see the filled data
       }
     } catch (error) {
       console.error("AI Extraction failed:", error);
+      // Optional: Add a toast notification here for the user
     } finally {
       setLoading(false);
     }
