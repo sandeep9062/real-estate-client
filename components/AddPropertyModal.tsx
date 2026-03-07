@@ -167,15 +167,6 @@ const AddPropertyModal = ({
             />
           </Stepper.Step>
 
-          <Stepper.Step label="Location">
-            <AddLocation
-              nextStep={nextStep}
-              propertyDetails={propertyDetails}
-              setPropertyDetails={setPropertyDetails}
-              convertLatLngToGeoJSON={convertLatLngToGeoJSON}
-            />
-          </Stepper.Step>
-
           <Stepper.Step label="Images">
             <UploadImage
               prevStep={prevStep}
@@ -183,6 +174,14 @@ const AddPropertyModal = ({
               propertyDetails={propertyDetails}
               setPropertyDetails={setPropertyDetails}
               isEditing={!!editingProperty}
+            />
+          </Stepper.Step>
+          <Stepper.Step label="Location">
+            <AddLocation
+              nextStep={nextStep}
+              propertyDetails={propertyDetails}
+              setPropertyDetails={setPropertyDetails}
+              convertLatLngToGeoJSON={convertLatLngToGeoJSON}
             />
           </Stepper.Step>
 
