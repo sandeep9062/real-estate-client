@@ -11,6 +11,7 @@ import BasicDetails from "./BasicDetails";
 import Facilities from "./Facilities";
 import useCountries from "../lib/useCountries";
 import MagicFill from "./MagicFill";
+
 const AddPropertyModal = ({
   opened,
   setOpened,

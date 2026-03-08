@@ -49,7 +49,7 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
     type: initialFilters.type || "",
     propertyCategory: initialFilters.propertyCategory || "",
     priceMin: initialFilters.priceMin || 0,
-    priceMax: initialFilters.priceMax || 100000000,
+    priceMax: initialFilters.priceMax || 1000000000,
     areaMin: initialFilters.areaMin || 0,
     areaMax: initialFilters.areaMax || 100000,
     bedrooms: initialFilters.bedrooms || "",
@@ -74,7 +74,7 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
       type: "",
       propertyCategory: "",
       priceMin: 0,
-      priceMax: 100000000,
+      priceMax: 1000000000,
       areaMin: 0,
       areaMax: 100000,
       bedrooms: "",
@@ -267,7 +267,7 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
             <div className="px-1 -mt-0.5">
               <Slider
                 min={0}
-                max={100000000}
+                max={1000000000}
                 step={100000}
                 value={[filters.priceMin, filters.priceMax]}
                 onValueChange={([min, max]) =>
