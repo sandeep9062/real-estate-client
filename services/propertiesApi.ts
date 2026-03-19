@@ -16,7 +16,7 @@ const getApiUrl = () => {
       hostname === "www.propertybulbul.com" ||
       hostname === "propertybulbul.com"
     ) {
-      return "https://real-estate-server-6pzl.onrender.com/api";
+      return "https://api.propertybulbul.com/api";
     }
   }
 
