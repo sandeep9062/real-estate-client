@@ -63,7 +63,11 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch brochure");
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          errorData?.message ||
+            `Failed to fetch brochure: ${response.status} ${response.statusText}`,
+        );
       }
 
       // Get the blob from response
