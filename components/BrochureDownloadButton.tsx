@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, FileDown } from "lucide-react";
 import { useGetPropertyBrochureQuery } from "@/services/propertiesApi";
 
 interface BrochureDownloadButtonProps {
@@ -18,6 +18,7 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
   className,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const {
     data: brochureData,
     isLoading,
@@ -43,12 +44,12 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
         if (typeof window !== "undefined") {
           const hostname = window.location.hostname;
 
-          // If on production domain, use Render backend URL
+          // If on production domain, use api.propertybulbul.com backend URL
           if (
             hostname === "www.propertybulbul.com" ||
             hostname === "propertybulbul.com"
           ) {
-            return "https://real-estate-server-6pzl.onrender.com/api";
+            return "https://api.propertybulbul.com/api";
           }
         }
 
@@ -95,19 +96,57 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
     <Button
       onClick={handleDownloadBrochure}
       disabled={isDownloading}
-      className={`bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`
+        group relative overflow-hidden
+        bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800
+        hover:from-blue-700 hover:via-blue-800 hover:to-indigo-900
+        text-white font-semibold tracking-wide
+        shadow-lg hover:shadow-xl
+        transform hover:scale-105 transition-all duration-300
+        border border-white/20 hover:border-white/40
+        before:absolute before:inset-0 before:bg-white/0 
+        before:transition-all before:duration-300
+        hover:before:bg-white/10
+        after:absolute after:inset-0 after:bg-gradient-to-t 
+        after:from-transparent after:via-white/5 after:to-transparent
+        after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300
+        focus-visible:ring-4 focus-visible:ring-blue-300/50 dark:focus-visible:ring-blue-400/30
+        disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100
+        disabled:hover:shadow-lg
+        ${className}
+      `}
       size="lg"
     >
-      {isDownloading ? (
-        <>
-          <Download className="mr-2 h-4 w-4 animate-spin" />
-          Downloading...
-        </>
-      ) : (
-        <>
-          <FileText className="mr-2 h-4 w-4" />
-          Download Brochure
-        </>
+      {/* Animated background shimmer effect */}
+      <div
+        className={`
+        absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
+        transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]
+        transition-transform duration-1000 ease-out
+        opacity-0 group-hover:opacity-100
+      `}
+      />
+
+      {/* Content */}
+      <div className="relative flex items-center z-10">
+        {isDownloading ? (
+          <>
+            <Download className="mr-3 h-5 w-5 animate-spin transition-transform duration-200 group-hover:scale-110" />
+            <span className="tracking-wide">Downloading Brochure...</span>
+          </>
+        ) : (
+          <>
+            <FileDown className="mr-3 h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-12" />
+            <span className="tracking-wide">Download Brochure</span>
+          </>
+        )}
+      </div>
+
+      {/* Download progress overlay */}
+      {isDownloading && (
+        <div className="absolute bottom-0 left-0 h-1 bg-white/30 animate-pulse w-full" />
       )}
     </Button>
   );
