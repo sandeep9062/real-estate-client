@@ -149,39 +149,48 @@ rounded-tr-3xl shadow-md flex items-center gap-1 uppercase tracking-tighter"
         {/* Features Row */}
         <div className="flex items-center justify-between border-t border-slate-50 pt-4 mt-auto">
           <div className="flex items-center gap-4 text-slate-600">
-            <div className="flex flex-col items-center gap-1">
-              <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                <FaBed className="text-[#4161df]" />
-                <span>{card.facilities?.bedrooms || 0}</span>
-              </div>
-              <span className="text-[10px] uppercase text-slate-400 tracking-wider">
-                Beds
-              </span>
-            </div>
+            {card.facilities?.bedrooms > 0 && (
+              <>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                    <FaBed className="text-[#4161df]" />
+                    <span>{card.facilities?.bedrooms || 0}</span>
+                  </div>
+                  <span className="text-[10px] uppercase text-slate-400 tracking-wider">
+                    Beds
+                  </span>
+                </div>
+                <div className="w-[1px] h-6 bg-slate-100" />{" "}
+              </>
+            )}
+            {card.facilities?.bathrooms > 0 && (
+              <>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                    <FaBath className="text-[#4161df]" />
+                    <span>{card.facilities?.bathrooms || 0}</span>
+                  </div>
+                  <span className="text-[10px] uppercase text-slate-400 tracking-wider">
+                    Baths
+                  </span>
+                </div>
+                <div className="w-[1px] h-6 bg-slate-100" />
+              </>
+            )}
 
-            <div className="w-[1px] h-6 bg-slate-100" />
-
-            <div className="flex flex-col items-center gap-1">
-              <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                <FaBath className="text-[#4161df]" />
-                <span>{card.facilities?.bathrooms || 0}</span>
-              </div>
-              <span className="text-[10px] uppercase text-slate-400 tracking-wider">
-                Baths
-              </span>
-            </div>
-
-            <div className="w-[1px] h-6 bg-slate-100" />
-
-            <div className="flex flex-col items-center gap-1">
-              <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                <FaCar className="text-[#4161df]" />
-                <span>{card.facilities?.parkings || 0}</span>
-              </div>
-              <span className="text-[10px] uppercase text-slate-400 tracking-wider">
-                Park
-              </span>
-            </div>
+            {card.facilities?.parkings > 0 && (
+              <>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                    <FaCar className="text-[#4161df]" />
+                    <span>{card.facilities?.parkings || 0}</span>
+                  </div>
+                  <span className="text-[10px] uppercase text-slate-400 tracking-wider">
+                    Park
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="text-right">
