@@ -104,8 +104,8 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
       onMouseLeave={() => setIsHovered(false)}
       className={`
         group relative overflow-hidden
-        bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800
-        hover:from-blue-700 hover:via-blue-800 hover:to-indigo-900
+        bg-gradient-to-br from-[#4161df] via-blue-700 to-indigo-800
+        hover:from-[#4161df] hover:via-blue-800 hover:to-indigo-900
         text-white font-semibold tracking-wide
         shadow-lg hover:shadow-xl
         transform hover:scale-105 transition-all duration-300
@@ -138,12 +138,14 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
         {isDownloading ? (
           <>
             <Download className="mr-3 h-5 w-5 animate-spin transition-transform duration-200 group-hover:scale-110" />
-            <span className="tracking-wide">Downloading Brochure...</span>
+            <span className="tracking-wide text-white ">
+              Downloading Brochure...
+            </span>
           </>
         ) : (
           <>
-            <FileDown className="mr-3 h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-12" />
-            <span className="tracking-wide">Download Brochure</span>
+            <FileDown className="mr-3 text-white h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-12" />
+            <span className="tracking-wide text-white">Download Brochure</span>
           </>
         )}
       </div>
