@@ -27,7 +27,7 @@ import {
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 
 const PropertyDetails = ({ data }: { data: any }) => {
-  //console.log(data, "prororor-data");
+  // console.log(data, "prororor-data");
 
   const params = useParams();
   const router = useRouter();
