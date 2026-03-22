@@ -137,7 +137,7 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
       <div className="relative flex items-center z-10">
         {isDownloading ? (
           <>
-            <Download className="mr-3 h-5 w-5 animate-spin transition-transform duration-200 group-hover:scale-110" />
+            <Download className="mr-3 h-5 w-5 text-white animate-spin transition-transform duration-200 group-hover:scale-110" />
             <span className="tracking-wide text-white ">
               Downloading Brochure...
             </span>
