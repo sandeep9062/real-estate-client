@@ -18,7 +18,7 @@ const PostPropertyCTA = () => {
     if (isAuthenticated) {
       setModalOpened(true);
     } else {
-      router.push("/auth");
+      router.push("/login");
     }
   };
 
