@@ -19,6 +19,7 @@ import Heart from "../../../components/Heart";
 import BookingModal from "../../../components/BookingModal";
 import MediaGallery from "@/components/MediaGallery";
 import BrochureDownloadButton from "@/components/BrochureDownloadButton";
+import WhatsAppActions from "@/components/WhatsAppActions";
 import { toast } from "@/hooks/use-toast";
 import {
   useCancelBookingMutation,
@@ -267,6 +268,15 @@ const PropertyDetails = ({ data }: { data: any }) => {
                   No charges for booking a visit. Standard terms apply.
                 </p>
               </div>
+
+              {/* WhatsApp Actions */}
+              {/* 
+              <WhatsAppActions
+                propertyId={id}
+                propertyTitle={data?.title}
+                propertyCity={data?.location?.city}
+                className="w-full"
+              /> */}
             </div>
           </div>
         </div>

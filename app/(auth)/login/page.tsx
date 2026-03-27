@@ -186,8 +186,10 @@ const LoginPage = () => {
           src="/login-page.jpg"
           alt="Property Bulbul RealEstate"
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: "cover" }}
+          priority // Use priority for LCP images (backgrounds)
           className="object-cover"
-          priority
         />
         <div className="absolute inset-0 bg-opacity-20"></div>
         <div className="absolute inset-0 flex items-center justify-center">

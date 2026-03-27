@@ -156,6 +156,14 @@ export const propertiesApi = createApi({
         responseHandler: (response) => response.blob(),
       }),
     }),
+    createWhatsAppLead: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/properties/${id}/whatsapp-lead`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Property"],
+    }),
   }),
 });
 
@@ -167,4 +175,5 @@ export const {
   useUpdatePropertyMutation,
   useDeletePropertyMutation,
   useGetPropertyBrochureQuery,
+  useCreateWhatsAppLeadMutation,
 } = propertiesApi;
