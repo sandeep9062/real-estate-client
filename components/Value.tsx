@@ -91,7 +91,7 @@ const Value = () => {
                       </span>
 
                       <MdOutlineArrowDropDown
-                        className="text-blue-600 flex-shrink-0"
+                        className="text-[#4161df] flex-shrink-0"
                         size={20}
                       />
                     </AccordionItemButton>

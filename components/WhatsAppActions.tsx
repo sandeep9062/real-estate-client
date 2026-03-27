@@ -209,7 +209,7 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  className="bg-[#4161df] hover:bg-#4161df/10"
                   loading={false}
                 >
                   Send to WhatsApp

@@ -93,7 +93,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
               {data?.title}
             </h1>
             <div className="flex items-center gap-1 text-slate-500">
-              <MdLocationPin className="text-blue-600" size={20} />
+              <MdLocationPin className="text-[#4161df]" size={20} />
               <span className="text-lg">
                 {data?.location?.address}, {data?.location?.city}
               </span>
@@ -124,7 +124,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
             {/* Quick Stats */}
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <MdMeetingRoom className="text-blue-500 mb-2" size={24} />
+                <MdMeetingRoom className="text-[#4161df] mb-2" size={24} />
                 <span className="text-slate-900 font-bold">
                   {data?.facilities?.bedrooms}
                 </span>
@@ -133,7 +133,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                 </span>
               </div>
               <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <FaShower className="text-blue-500 mb-2" size={24} />
+                <FaShower className="text-[#4161df] mb-2" size={24} />
                 <span className="text-slate-900 font-bold">
                   {data?.facilities?.bathrooms}
                 </span>
@@ -142,7 +142,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                 </span>
               </div>
               <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <FaCar className="text-blue-500 mb-2" size={24} />
+                <FaCar className="text-[#4161df] mb-2" size={24} />
                 <span className="text-slate-900 font-bold">
                   {data?.facilities?.parkings || 0}
                 </span>
@@ -151,7 +151,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                 </span>
               </div>
               <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <RiServiceLine className="text-blue-500 mb-2" size={24} />
+                <RiServiceLine className="text-[#4161df] mb-2" size={24} />
                 <span className="text-slate-900 font-bold">
                   {data?.facilities?.servantRooms || 0}
                 </span>
@@ -201,7 +201,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
             {/* Map Section */}
             <section className="space-y-4">
               <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                <FiMapPin className="text-blue-600" /> Location
+                <FiMapPin className="text-[#4161df]" /> Location
               </h3>
               <div className="rounded-3xl overflow-hidden border-4 border-white shadow-lg h-[400px]">
                 <Map key={data?._id} location={data?.location?.coordinates} />
@@ -231,7 +231,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                   <BrochureDownloadButton
                     propertyId={id}
                     propertyTitle={data?.title}
-                    className="w-full justify-center py-4 rounded-xl border-2 border-blue-600 text-blue-600 font-bold hover:bg-blue-50 transition-colors"
+                    className="w-full justify-center py-4 rounded-xl border-2 border-[#4161df] text-[#4161df] font-bold hover:bg-blue-50 transition-colors"
                   />
 
                   {isBooked ? (
@@ -253,7 +253,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                     </div>
                   ) : (
                     <button
-                      className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300 transition-all active:scale-[0.98]"
+                      className="w-full bg-[#4161df] text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-[#3759dd] hover:shadow-blue-300 transition-all active:scale-[0.98]"
                       onClick={() => {
                         if (!isAuthenticated) return router.push("/auth");
                         setModalOpened(true);

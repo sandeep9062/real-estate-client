@@ -104,7 +104,7 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
       onMouseLeave={() => setIsHovered(false)}
       className={`
         group relative overflow-hidden
-        bg-gradient-to-br from-[#4161df] via-blue-700 to-indigo-800
+        bg-gradient-to-br from-[#4161df] via-[#4161df] to-[#4161df]
         hover:from-[#4161df] hover:via-blue-800 hover:to-indigo-900
         text-white font-semibold tracking-wide
         shadow-lg hover:shadow-xl
