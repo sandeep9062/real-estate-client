@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "@/hooks/use-toast";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -41,10 +42,20 @@ export default function ContactPage() {
     resolver: zodResolver(contactSchema),
   });
   const phoneValue = watch("phone");
+  const { executeRecaptchaToken } = useRecaptcha();
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      await addContact(data).unwrap();
+      // Execute reCAPTCHA and get token
+      const recaptchaToken = await executeRecaptchaToken();
+
+      if (!recaptchaToken) {
+        toast.error("reCAPTCHA verification failed. Please try again.");
+        return;
+      }
+
+      // Submit form data with reCAPTCHA token
+      await addContact({ ...data, recaptchaToken }).unwrap();
       toast.success("Message sent successfully!");
       reset();
     } catch (error) {
