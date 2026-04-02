@@ -124,7 +124,7 @@ const Testimonial: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full bg-white py-8 sm:py-10 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 font-sans">
+    <div className="w-full  py-8 sm:py-10 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 font-sans">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center">

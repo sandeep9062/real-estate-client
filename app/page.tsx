@@ -4,22 +4,23 @@ import { useState, useMemo, useCallback } from "react";
 import { SearchFilters } from "@/components/SearchBar";
 import Hero from "@/components/Hero";
 import { useGetAllPropertiesQuery } from "../services/propertiesApi";
-
+import Testimonial from "@/components/Testimonial";
+import GetStarted from "@/components/GetStarted";
 // Lazy load heavy components for better initial load
 const Companies = dynamic(() => import("@/components/Companies"), {
   ssr: false,
 });
 const Contact = dynamic(() => import("@/components/Contact"), { ssr: false });
-const GetStarted = dynamic(() => import("@/components/GetStarted"), {
-  ssr: false,
-});
+const TestimonialGetStartedWrapper = dynamic(
+  () => import("@/components/TestimonialGetStartedWrapper"),
+  {
+    ssr: false,
+  },
+);
 const PropertyGrid = dynamic(() => import("@/components/PropertyGrid"), {
   ssr: false,
 });
 const Residencies = dynamic(() => import("@/components/Residencies"), {
-  ssr: false,
-});
-const Testimonial = dynamic(() => import("@/components/Testimonial"), {
   ssr: false,
 });
 const Value = dynamic(() => import("@/components/Value"), { ssr: false });
@@ -170,13 +171,14 @@ export default function Home() {
         <Contact />
       </section> */}
 
-      <section className="container mx-auto px-4 bg-white/60">
+      <section className=" bg-white/60 relative z-10">
         <Testimonial />
       </section>
-
-      <section className="container mx-auto px-4 bg-white/60">
+      <section className="bg-white/60 relative z-10">
         <GetStarted />
       </section>
+
+      {/* <TestimonialGetStartedWrapper /> */}
     </main>
   );
 }
