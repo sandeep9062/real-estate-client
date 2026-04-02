@@ -57,9 +57,9 @@ const DisclaimerPage = () => {
   ];
 
   return (
-    <main className="min-h-screen pt-20 bg-white">
+    <main className="min-h-screen bg-white">
       {/* HEADER SECTION */}
-      <section className="bg-slate-900 py-20 text-white relative overflow-hidden">
+      <section className="bg-slate-900 pt-20 py-20 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
           <ShieldAlert size={400} strokeWidth={0.5} />
         </div>
