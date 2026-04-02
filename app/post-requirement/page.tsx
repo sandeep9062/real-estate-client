@@ -118,7 +118,7 @@ const EnquiryForm2: React.FC = () => {
 
   return (
     <>
-      <div className="w-full min-h-screen m-0 pb-4 bg-gray-50 flex flex-col pt-20 items-center font-sans">
+      <div className="w-full min-h-screen m-0 pb-4 bg-gray-50 flex flex-col items-center font-sans">
         {/* Banner Image */}
         <div className="w-full md:h-[600px] overflow-hidden">
           {/* Replace <img> with Next.js <Image> component for optimization in a real project */}
