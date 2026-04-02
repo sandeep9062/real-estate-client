@@ -103,7 +103,7 @@ const OwnedPropertiesPage = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full pt-20">
       <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="w-full flex flex-col items-center gap-2">

@@ -92,7 +92,7 @@ const FAQPage = () => {
   };
 
   return (
-    <main className="relative bg-gray-50/50">
+    <main className="relative pt-20 bg-gray-50/50">
       {/* BACKGROUND BLOB EFFECT */}
       <div
         aria-hidden="true"

@@ -8,7 +8,7 @@ export default function DevelopersPage() {
   const { data: developers, isLoading } = useGetDevelopersQuery({});
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="max-w-7xl pt-20 mx-auto px-4 py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-extrabold text-gray-900">
           Top Developers in Tricity

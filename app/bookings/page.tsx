@@ -35,14 +35,14 @@ const Bookings = () => {
     return bookings.filter(
       (booking: any) =>
         (booking.property.title?.toLowerCase() ?? "").includes(
-          filter.query.toLowerCase()
+          filter.query.toLowerCase(),
         ) ||
         (booking.property.city?.toLowerCase() ?? "").includes(
-          filter.query.toLowerCase()
+          filter.query.toLowerCase(),
         ) ||
         (booking.property.country?.toLowerCase() ?? "").includes(
-          filter.query.toLowerCase()
-        )
+          filter.query.toLowerCase(),
+        ),
     );
   }, [bookings, filter]);
 
@@ -69,7 +69,7 @@ const Bookings = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full pt-20">
       <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-12">
         <div className="w-full flex flex-col items-center gap-2">
           <h1 className="text-2xl font-semibold">Your Booked Visits</h1>

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const ServicesPage = () => {
   return (
-    <div className="w-full bg-white dark:bg-[#0F111A]">
+    <div className="w-full pt-20 bg-white dark:bg-[#0F111A]">
       {/* Hero Section */}
       <div className="w-full bg-gradient-to-r from-gray-800 to-black text-white py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 flex flex-col items-center text-center">
         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">

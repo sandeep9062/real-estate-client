@@ -62,7 +62,7 @@ const RefundPolicy = () => {
   ];
 
   return (
-    <main className="relative min-h-screen bg-white">
+    <main className="relative pt-20 min-h-screen bg-white">
       {/* HERO HEADER */}
       <section className="bg-slate-50 border-b border-gray-200 py-16">
         <div className="container mx-auto px-4">
