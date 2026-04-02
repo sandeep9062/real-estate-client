@@ -64,7 +64,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
   const displayCity = cityMap[city] || "Tricity";
 
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full pt-20 bg-gray-50">
       <div className="flex flex-col items-center gap-8 max-w-full mx-auto px-10 py-12">
         <div className="w-full text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">

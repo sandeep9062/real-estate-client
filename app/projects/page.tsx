@@ -8,7 +8,7 @@ export default function ProjectsPage() {
   const { data: projects, isLoading } = useGetProjectsQuery(filters);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
+    <div className="max-w-7xl pt-20 mx-auto px-4 py-10">
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">

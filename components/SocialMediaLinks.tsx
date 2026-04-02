@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 import {
   FaFacebookF,
   FaInstagram,
@@ -66,13 +64,7 @@ const socialLinks = [
 export default function SocialMediaLinks() {
   return (
     <section className="text-center py-2 sm:py-3 bg-white dark:bg-[#0F111A]">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="flex justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 flex-wrap px-2"
-      >
+      <div className="flex justify-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 flex-wrap px-2">
         {socialLinks.map((item, i) => (
           <a
             key={i}
@@ -85,7 +77,7 @@ export default function SocialMediaLinks() {
             {item.icon}
           </a>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }

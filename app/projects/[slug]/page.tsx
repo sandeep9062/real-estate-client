@@ -93,7 +93,7 @@ export default function ProjectDetailsPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
+    <div className="bg-gray-50 min-h-screen pt-20 pb-20">
       {/* Hero Gallery */}
       <div className="h-[60vh] bg-gray-900 relative overflow-hidden">
         <img

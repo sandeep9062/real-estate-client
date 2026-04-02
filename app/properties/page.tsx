@@ -51,7 +51,7 @@ const PropertiesContent = () => {
   }
 
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full pt-20 bg-gray-50">
       <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 max-w-full mx-auto px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12">
         <div className="w-full text-center">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
