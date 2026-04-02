@@ -32,7 +32,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
   );
 
   return (
-    <section className="relative bg-background text-foreground py-6 sm:py-10 md:py-16 lg:py-20 overflow-hidden">
+    <section className="relative bg-background text-foreground pt-22 sm:pt-26 md:pt-36 pb-6 sm:pb-10 md:pb-16 lg:pb-20 overflow-hidden">
       {/* BACKGROUND BLOB EFFECT */}
       <div
         aria-hidden="true"

@@ -42,11 +42,15 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-1150 w-full border-b border-border/40 backdrop-blur supports-backdrop-filter:bg-background/60 transition-all ${
-        scrolled ? "bg-white/80 shadow-sm" : "bg-background/60"
+      className={`fixed top-0 left-0 right-0 z-1150 w-full transition-all duration-300 ${
+        scrolled
+          ? "bg-white/70 backdrop-blur-md shadow-sm border-b border-border/40"
+          : "bg-transparent backdrop-blur-none border-b border-transparent"
       }`}
     >
-      <div className="max-w-[96vw] mx-auto flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-1 md:py-[0.3rem]">
+      <div
+        className={`max-w-[96vw] mx-auto flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-1 md:py-[0.3rem] ${!scrolled ? "text-gray-900" : ""}`}
+      >
         {/* Logo */}
         <Link
           href="/"
