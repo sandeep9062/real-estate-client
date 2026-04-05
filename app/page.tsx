@@ -6,6 +6,7 @@ import Hero from "@/components/Hero";
 import { useGetAllPropertiesQuery } from "../services/propertiesApi";
 import Testimonial from "@/components/Testimonial";
 import GetStarted from "@/components/GetStarted";
+import WhyPropertyBulbul from "@/components/WhyPropertyBulbul";
 // Lazy load heavy components for better initial load
 const Companies = dynamic(() => import("@/components/Companies"), {
   ssr: false,
@@ -163,14 +164,14 @@ export default function Home() {
         <ExploreServices />
       </section> */}
 
-      <section className="container mx-auto px-4 bg-white/60">
-        <PostPropertyCTA />
-      </section>
-
       {/* <section className="container mx-auto px-4 bg-white/60">
         <Contact />
       </section> */}
 
+      <WhyPropertyBulbul />
+      <section className="container mx-auto px-4 bg-white/60">
+        <PostPropertyCTA />
+      </section>
       <section className=" bg-white/60 relative z-10">
         <Testimonial />
       </section>
