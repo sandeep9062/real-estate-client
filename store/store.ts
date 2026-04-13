@@ -9,6 +9,8 @@ import { projectsApi } from "@/services/projectsApi";
 import { developersApi } from "@/services/developersApi";
 import { aiBasedApi } from "@/services/aiBasedApi";
 
+import { journalApi } from "@/services/journalApi";
+
 const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
@@ -18,6 +20,7 @@ const store = configureStore({
     [contactApi.reducerPath]: contactApi.reducer,
     [projectsApi.reducerPath]: projectsApi.reducer,
     [developersApi.reducerPath]: developersApi.reducer,
+    [journalApi.reducerPath]: journalApi.reducer, // Add journalApi reducer
     auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -29,6 +32,7 @@ const store = configureStore({
       propertiesApi.middleware,
       aiBasedApi.middleware,
       userApi.middleware,
+      journalApi.middleware, // Add journalApi middleware
     ),
   devTools: process.env.NODE_ENV !== "production", // ✅ enable Redux DevTools in development
 });

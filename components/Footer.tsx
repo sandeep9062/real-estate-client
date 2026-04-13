@@ -65,6 +65,7 @@ const Footer = () => {
                 ["Properties", "/properties"],
                 ["Contact", "/contact"],
                 ["Services", "/services"],
+                ["Journals", "/journal"],
                 ["About Us", "/about-us"],
                 ["Projects", "/projects"],
                 ["FAQ", "/faq"],
