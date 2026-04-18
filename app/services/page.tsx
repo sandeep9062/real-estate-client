@@ -7,11 +7,11 @@ const ServicesPage = () => {
   return (
     <div className="w-full bg-white dark:bg-[#0F111A]">
       {/* Hero Section */}
-      <div className="w-full pt-20 bg-gradient-to-r from-gray-800 to-black text-white py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 flex flex-col items-center text-center">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">
+      <div className="w-full pt-20 bg-gradient-to-r from-gray-100 to-blue-300 text-white py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 flex flex-col items-center text-center">
+        <h1 className="text-2xl text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">
           Comprehensive Real Estate Services
         </h1>
-        <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl px-2">
+        <p className="mt-3 sm:mt-4 text-gray-900 text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl px-2">
           From buying your dream home to making smart investments, we offer a
           complete suite of services to cater to all your real estate needs.
         </p>

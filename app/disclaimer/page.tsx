@@ -59,7 +59,7 @@ const DisclaimerPage = () => {
   return (
     <main className="min-h-screen bg-white">
       {/* HEADER SECTION */}
-      <section className="bg-slate-900 pt-20 py-20 text-white relative overflow-hidden">
+      <section className="bg-gradient-to-r from-gray-100 to-blue-300  pt-30 py-20 text-black relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
           <ShieldAlert size={400} strokeWidth={0.5} />
         </div>
@@ -70,14 +70,14 @@ const DisclaimerPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl"
           >
-            <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-sm mb-4">
+            <div className="flex items-center gap-2 text-blue-900 font-bold uppercase tracking-widest text-sm mb-4">
               <AlertTriangle size={18} />
               Legal Information
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
               Disclaimer
             </h1>
-            <p className="text-slate-300 text-lg leading-relaxed">
+            <p className=" text-gray-900 text-lg leading-relaxed">
               **Property Bulbul** is the registered identity of our realty
               services, and is used throughout this platform to represent our
               property listing and facilitation services.
