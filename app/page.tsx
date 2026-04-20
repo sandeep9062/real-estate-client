@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useState, useMemo, useCallback } from "react";
 import { SearchFilters } from "@/components/SearchBar";
 import Hero from "@/components/Hero";
+
 import { useGetAllPropertiesQuery } from "../services/propertiesApi";
 import Testimonial from "@/components/Testimonial";
 import GetStarted from "@/components/GetStarted";
@@ -159,19 +160,19 @@ export default function Home() {
       {/* <section className="container mx-auto px-4 bg-white/60">
         <AdvertiserTypeCard />
       </section> */}
-
-      {/* <section className="container mx-auto px-4 bg-white/60">
+      {/* 
+      <section className="container mx-auto px-4 bg-white/60">
         <ExploreServices />
-      </section> */}
-
-      {/* <section className="container mx-auto px-4 bg-white/60">
-        <Contact />
       </section> */}
 
       <WhyPropertyBulbul />
       <section className="container mx-auto px-4 bg-white/60">
         <PostPropertyCTA />
       </section>
+      <section className="container mx-auto px-4 bg-white/60">
+        <Contact />
+      </section>
+
       <section className=" bg-white/60 relative z-10">
         <Testimonial />
       </section>
