@@ -7,6 +7,7 @@ import { FiShare2, FiCheckCircle, FiMapPin } from "react-icons/fi";
 import { FaShower, FaBed, FaCar, FaUserTie } from "react-icons/fa";
 import { MdLocationPin, MdMeetingRoom } from "react-icons/md";
 import { RiServiceLine } from "react-icons/ri";
+import { FaWhatsapp } from "react-icons/fa";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -28,7 +29,7 @@ import {
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 
 const PropertyDetails = ({ data }: { data: any }) => {
-  // console.log(data, "prororor-data");
+  console.log(data, "prororor-data");
 
   const params = useParams();
   const router = useRouter();
@@ -261,6 +262,18 @@ const PropertyDetails = ({ data }: { data: any }) => {
                     >
                       Book a Visit
                     </button>
+                  )}
+
+                  {data?.user?.phone && (
+                    <a
+                      href={`https://wa.me/${data.user.phone}?text=${encodeURIComponent(`Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: ${window.location.href}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full bg-green-500 text-white py-4 rounded-xl text-lg shadow-lg shadow-green-200 hover:bg-green-600 hover:shadow-green-300 transition-all active:scale-[0.98]"
+                    >
+                      <FaWhatsapp size={20} />
+                      Chat on WhatsApp
+                    </a>
                   )}
                 </div>
 

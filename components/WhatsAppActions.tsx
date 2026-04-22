@@ -74,7 +74,7 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
 
       if (result.success && result.data?.brokerPhone) {
         // Open WhatsApp chat with broker
-        const message = `Hi, I just viewed ${propertyTitle} on PropertyBulbul. Can you share the details?`;
+        const message = `Hi, I just viewed ${propertyTitle} on PropertyBulbul. Can you share the details?\n\nProperty link: ${window.location.href}`;
         const whatsappUrl = `https://wa.me/${result.data.brokerPhone}?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, "_blank");

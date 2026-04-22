@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 import Heart from "./Heart";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/store/authSlice";
-import { FaBed, FaBath, FaCar, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  FaBed,
+  FaBath,
+  FaCar,
+  FaMapMarkerAlt,
+  FaWhatsapp,
+} from "react-icons/fa";
 
 interface PropertyCardProps {
   card: any;
@@ -79,6 +85,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             For {card.deal}
           </span>
           <div className="flex gap-2">
+            {card.agent?.phone && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const message = `Hi, I saw your property "${card.title}" on PropertyBulbul. Is it still available?`;
+                  const whatsappUrl = `https://wa.me/91${card.agent.phone}?text=${encodeURIComponent(message)}`;
+                  window.open(whatsappUrl, "_blank");
+                }}
+                className="bg-green-500/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-green-600 text-white transition-all"
+                title="Contact on WhatsApp"
+              >
+                <FaWhatsapp size={16} />
+              </button>
+            )}
             {editable && (
               <button
                 onClick={(e) => {
