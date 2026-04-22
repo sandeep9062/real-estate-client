@@ -266,7 +266,9 @@ const PropertyDetails = ({ data }: { data: any }) => {
 
                   {data?.user?.phone && (
                     <a
-                      href={`https://wa.me/${data.user.phone}?text=${encodeURIComponent(`Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: ${window.location.href}`)}`}
+                      href={`https://wa.me/${data.user.phone}?text=${encodeURIComponent(
+                        `Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${id}`,
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full bg-green-500 text-white py-4 rounded-xl text-lg shadow-lg shadow-green-200 hover:bg-green-600 hover:shadow-green-300 transition-all active:scale-[0.98]"
