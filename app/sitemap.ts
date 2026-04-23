@@ -44,11 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/properties/zirakpur`, lastModified: new Date() },
     { url: `${baseUrl}/properties/kharar`, lastModified: new Date() },
 
-
-
-
-
-
+    // ✅ Tool pages (SEO magnets)
+    {
+      url: `${baseUrl}/emi-calculator`,
+      lastModified: new Date(),
+      priority: 0.9,
+    },
 
     ...propertyUrls,
   ];
