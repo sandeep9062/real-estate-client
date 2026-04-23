@@ -21,7 +21,6 @@ import BookingModal from "../../../components/BookingModal";
 import MediaGallery from "@/components/MediaGallery";
 import BrochureDownloadButton from "@/components/BrochureDownloadButton";
 import WhatsAppActions from "@/components/WhatsAppActions";
-import EMICalculatorWidget from "@/components/EMICalculatorWidget";
 import { toast } from "@/hooks/use-toast";
 import {
   useCancelBookingMutation,
@@ -284,15 +283,6 @@ const PropertyDetails = ({ data }: { data: any }) => {
                   No charges for booking a visit. Standard terms apply.
                 </p>
               </div>
-
-              {/* EMI Calculator - only for Sale properties */}
-              {data?.deal === "Sale" && (
-                <EMICalculatorWidget
-                  defaultPrice={data?.price}
-                  inline
-                  propertyTitle={data?.title}
-                />
-              )}
 
               {/* WhatsApp Actions */}
               {/* 

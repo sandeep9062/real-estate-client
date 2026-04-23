@@ -60,37 +60,6 @@ export async function getPropertyServer(id: string) {
   }
 }
 
-export async function getAllPropertiesServer(params?: Record<string, string>) {
-  const apiUrl = getApiUrl();
-  const queryString = params ? new URLSearchParams(params).toString() : "";
-  const url = queryString
-    ? `${apiUrl}/properties?${queryString}`
-    : `${apiUrl}/properties`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      console.error(
-        `getAllPropertiesServer API Error [${response.status}]: ${response.statusText}`,
-      );
-      return [];
-    }
-
-    const json = await response.json();
-    return json?.data || [];
-  } catch (error) {
-    console.error("getAllPropertiesServer error:", error);
-    return [];
-  }
-}
-
 import { baseQueryWithAuth } from "./api";
 
 export const propertiesApi = createApi({
