@@ -12,6 +12,7 @@ import {
   FaCar,
   FaMapMarkerAlt,
   FaWhatsapp,
+  FaCalculator,
 } from "react-icons/fa";
 
 interface PropertyCardProps {
@@ -144,9 +145,23 @@ rounded-tr-3xl shadow-md flex items-center gap-1 uppercase tracking-tighter"
       <div className="p-5 flex flex-col flex-1 gap-3">
         {/* Price & Badge */}
         <div className="flex justify-between items-baseline">
-          <h4 className="text-2xl font-black text-[#4161df] tracking-tight">
-            ₹{card.price.toLocaleString("en-IN")}
-          </h4>
+          <div>
+            <h4 className="text-2xl font-black text-[#4161df] tracking-tight">
+              ₹{card.price.toLocaleString("en-IN")}
+            </h4>
+            {/* EMI Preview for Sale properties */}
+            {card.deal === "Sale" && (
+              <a
+                href={`/tools/emi-calculator?price=${card.price}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 mt-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-full transition-colors"
+                title="Check EMI for this property"
+              >
+                <FaCalculator size={10} />
+                Check EMI
+              </a>
+            )}
+          </div>
           <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">
             {card.propertyCategory}
           </span>

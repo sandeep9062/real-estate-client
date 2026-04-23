@@ -2,13 +2,22 @@ import { Metadata } from "next";
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import PropertyDetails from "./PropertyDetails";
-import { getPropertyServer } from "../../../services/propertiesApi";
+import { getPropertyServer } from "../../../lib/api";
 
 type Props = {
   params: Promise<{
     id: string;
   }>;
 };
+
+export async function generateStaticParams() {
+  // Pre-render the most important property pages at build time.
+  // During build, we may not have the backend available, so we
+  // fall back to ISR (revalidate below) for dynamic discovery.
+  return [];
+}
+
+export const revalidate = 3600; // ISR: revalidate every 1 hour
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
