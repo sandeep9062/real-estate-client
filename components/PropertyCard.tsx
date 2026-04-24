@@ -29,25 +29,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const router = useRouter();
 
-  const displayImage = useMemo(() => {
-    const imageUrls = (card.image || []).filter((img: string) => {
-      const lower = img.toLowerCase();
-      return !(
-        lower.endsWith(".mp4") ||
-        lower.endsWith(".webm") ||
-        lower.endsWith(".ogg") ||
-        lower.includes("youtube.com")
-      );
-    });
-    return (
-      imageUrls[0] ||
-      card.image?.[0] ||
-      // card.images?.[0] ||
-      "/images/property-tricity.jpg"
-    );
-  }, [card.image]);
+  const firstMedia = (card.image || [])[0] || "/images/property-tricity.jpg";
 
-  const hasValidImage = displayImage && displayImage.trim() !== "";
+  const isVideo = useMemo(() => {
+    const lower = firstMedia.toLowerCase();
+    return (
+      lower.endsWith(".mp4") ||
+      lower.endsWith(".webm") ||
+      lower.endsWith(".ogg")
+    );
+  }, [firstMedia]);
+
+  const hasValidMedia = firstMedia && firstMedia.trim() !== "";
 
   return (
     <div
@@ -56,14 +49,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     >
       {/* Image Container */}
       <div className="relative h-52 sm:h-60 w-full overflow-hidden">
-        {hasValidImage ? (
-          <Image
-            src={displayImage}
-            alt={card.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-          />
+        {hasValidMedia ? (
+          isVideo ? (
+            <video
+              src={firstMedia}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          ) : (
+            <Image
+              src={firstMedia}
+              alt={card.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          )
         ) : (
           <div className="w-full h-full bg-slate-100 flex items-center justify-center">
             <span className="text-slate-400 text-sm">No Image Available</span>
