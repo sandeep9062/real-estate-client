@@ -257,7 +257,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                     <button
                       className="w-full bg-[#4161df] text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-[#3759dd] hover:shadow-blue-300 transition-all active:scale-[0.98]"
                       onClick={() => {
-                        if (!isAuthenticated) return router.push("/auth");
+                        if (!isAuthenticated) return router.push("/login");
                         setModalOpened(true);
                       }}
                     >

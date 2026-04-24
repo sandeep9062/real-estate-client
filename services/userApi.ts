@@ -112,7 +112,7 @@ export const userApi = createApi({
       invalidatesTags: ["User"],
       async onQueryStarted(
         { propertyId, date },
-        { dispatch, getState, queryFulfilled }
+        { dispatch, getState, queryFulfilled },
       ) {
         const state = getState() as RootState;
         const currentUser = state.auth.user;
@@ -140,14 +140,11 @@ export const userApi = createApi({
     // ✅ Cancel a property visit
     cancelBooking: builder.mutation<User, string>({
       query: (propertyId) => ({
-        url: `/bookings/${propertyId}`,
+        url: `/users/bookings/${propertyId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
-      async onQueryStarted(
-        propertyId,
-        { dispatch, getState, queryFulfilled }
-      ) {
+      async onQueryStarted(propertyId, { dispatch, getState, queryFulfilled }) {
         const state = getState() as RootState;
         const currentUser = state.auth.user;
         if (!currentUser) return;
@@ -155,7 +152,7 @@ export const userApi = createApi({
         const optimistic = {
           ...currentUser,
           bookedVisits: (currentUser.bookedVisits || []).filter(
-            (b: any) => (b?.property?._id || b?.property) !== propertyId
+            (b: any) => (b?.property?._id || b?.property) !== propertyId,
           ),
         } as User as any;
 
@@ -205,7 +202,7 @@ export const userApi = createApi({
                 draft.favProperties.push(card);
               }
             }
-          })
+          }),
         );
 
         try {
