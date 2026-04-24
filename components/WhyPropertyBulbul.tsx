@@ -66,18 +66,50 @@ export default function WhyPropertyBulbul() {
           <h3 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-8">
             The Direct Comparison
           </h3>
-          <div className="overflow-x-auto">
+
+          {/* Mobile Compact Layout */}
+          <div className="md:hidden bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="flex items-center px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 text-[10px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+              <div className="flex-1">Feature</div>
+              <div className="w-10 text-center text-[#4161df]">PB</div>
+              <div className="w-10 text-center">Others</div>
+            </div>
+            {tableData.map((item) => (
+              <div
+                key={item.feature}
+                className="flex items-start px-3 py-2.5 border-b border-gray-100 last:border-0"
+              >
+                <div className="flex-1 min-w-0 pr-2">
+                  <span className="text-sm font-semibold text-gray-800 leading-tight block">
+                    {item.feature}
+                  </span>
+                  <span className="text-[11px] text-gray-400 leading-snug block mt-0.5">
+                    {item.desc}
+                  </span>
+                </div>
+                <div className="w-10 flex justify-center pt-0.5 shrink-0">
+                  <IconCircleCheck className="text-green-600" size={18} />
+                </div>
+                <div className="w-10 flex justify-center pt-0.5 shrink-0">
+                  <IconCircleX className="text-red-500" size={18} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden md:block overflow-x-auto">
             <div className="inline-block min-w-full align-middle">
               <table className="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden shadow-lg border border-gray-200">
                 <thead>
                   <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
-                    <th className="px-4 sm:px-6 py-4 text-left text-xs sm:text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
                       Feature
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-bold text-[#4161df] uppercase tracking-wider border-b border-gray-200">
+                    <th className="px-6 py-4 text-center text-sm font-bold text-[#4161df] uppercase tracking-wider border-b border-gray-200">
                       PropertyBulbul
                     </th>
-                    <th className="px-4 sm:px-6 py-4 text-center text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
                       99acres / MagicBricks
                     </th>
                   </tr>
@@ -90,9 +122,9 @@ export default function WhyPropertyBulbul() {
                         index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
                       }`}
                     >
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-gray-800 text-sm sm:text-base">
+                          <span className="font-semibold text-gray-800 text-base">
                             {item.feature}
                           </span>
                           <span className="text-xs text-gray-400 mt-1">
@@ -100,9 +132,9 @@ export default function WhyPropertyBulbul() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                             <IconCircleCheck
                               className="text-green-600"
                               size={20}
@@ -110,9 +142,9 @@ export default function WhyPropertyBulbul() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-center">
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-100 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                             <IconCircleX className="text-red-500" size={20} />
                           </div>
                         </div>

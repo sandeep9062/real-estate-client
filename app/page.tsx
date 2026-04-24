@@ -166,6 +166,7 @@ export default function Home() {
       </section> */}
 
       <WhyPropertyBulbul />
+
       <section className="container mx-auto px-4 bg-white/60">
         <PostPropertyCTA />
       </section>
