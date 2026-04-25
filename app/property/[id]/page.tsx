@@ -10,6 +10,16 @@ type Props = {
   }>;
 };
 
+function sanitizeMetaText(text: string): string {
+  // Replace "0 BHK" (with optional space or no space) with "Studio/1BHK"
+  return text.replace(/0\s*BHK/gi, "Studio/1BHK");
+}
+
+function getBedroomLabel(bedrooms: number | undefined): string {
+  if (!bedrooms || bedrooms === 0) return "Studio/1BHK";
+  return `${bedrooms} Bedroom${bedrooms > 1 ? "s" : ""}`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const data = await getPropertyServer(id);
@@ -21,12 +31,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `${data?.title} in ${data?.location?.city} | Propertybulbul`;
-  const description = `${data.description} Located at ${
+  const rawTitle = `${data?.title} in ${data?.location?.city} | Propertybulbul`;
+  const title = sanitizeMetaText(rawTitle);
+
+  const bedroomLabel = getBedroomLabel(data?.facilities?.bedrooms);
+  const rawDescription = `${data.description} Located at ${
     data?.location?.address
   }, ${data?.location?.city}. ₹${data?.price.toLocaleString()}. ${
-    data?.facilities?.bedrooms
-  } Bedrooms, ${data?.facilities?.bathrooms} Bathrooms.`;
+    bedroomLabel
+  }, ${data?.facilities?.bathrooms || 0} Bathroom${
+    data?.facilities?.bathrooms !== 1 ? "s" : ""
+  }.`;
+  const description = sanitizeMetaText(rawDescription);
   const keywords = [
     `${data?.type} for ${data?.deal} ${data?.location?.city}`,
     `${data?.propertyCategory} ${data?.location?.city}`,
@@ -69,7 +85,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images:
         imageUrls.slice(0, 5)?.map((img: string) => ({
           url: img,
-          alt: `${data?.title} - ${data?.location?.city}`,
+          alt: sanitizeMetaText(`${data?.title} - ${data?.location?.city}`),
         })) || [],
     },
     twitter: {
@@ -90,8 +106,8 @@ const PropertyPage = async ({ params }: Props) => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
-    name: data?.title,
-    description: data?.description,
+    name: sanitizeMetaText(data?.title || ""),
+    description: sanitizeMetaText(data?.description || ""),
     address: {
       "@type": "PostalAddress",
       streetAddress: data?.location?.address,
@@ -102,8 +118,8 @@ const PropertyPage = async ({ params }: Props) => {
     price: data?.price,
     priceCurrency: "INR",
     offerType: data?.deal,
-    numberOfRooms: data?.facilities?.bedrooms,
-    numberOfBathrooms: data?.facilities?.bathrooms,
+    numberOfRooms: data?.facilities?.bedrooms || 0,
+    numberOfBathrooms: data?.facilities?.bathrooms || 0,
     floorSize: {
       "@type": "QuantitativeValue",
       value: data?.area?.value,
@@ -134,7 +150,7 @@ const PropertyPage = async ({ params }: Props) => {
         {
           "@type": "ListItem",
           position: 3,
-          name: data?.title,
+          name: sanitizeMetaText(data?.title || ""),
           item: `https://propertybulbul.com/property/${id}`,
         },
       ],
