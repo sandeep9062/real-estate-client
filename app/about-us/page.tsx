@@ -186,7 +186,7 @@ const AboutPage = () => {
       </div>
 
       {/* Meet the Team Section */}
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16 md:py-20">
+      {/* <div className="max-w-7xl mx-auto px-4 py-12 sm:py-16 md:py-20">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black mb-8 sm:mb-12">
           Meet Our Team
         </h2>
@@ -195,7 +195,7 @@ const AboutPage = () => {
             <TeamMemberCard key={index} member={member} />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Testimonials Section */}
       <Testimonial />
