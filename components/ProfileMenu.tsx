@@ -306,10 +306,10 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
           />
           <div>
             <label className="text-xs sm:text-sm font-medium">
-              Phone Number *
+              Phone Number (with Country code) *
             </label>
             <PhoneInput
-              placeholder="Phone Number"
+              placeholder="Phone Number (with Country code)"
               value={phone}
               onChange={(value) => setPhone(value || "")}
               className="w-full mt-1 p-2 sm:p-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
