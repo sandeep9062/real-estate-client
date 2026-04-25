@@ -125,42 +125,53 @@ const PropertyDetails = ({ data }: { data: any }) => {
           <div className="lg:col-span-2 space-y-10">
             {/* Quick Stats */}
             <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <MdMeetingRoom className="text-[#4161df] mb-2" size={24} />
-                <span className="text-slate-900 font-bold">
-                  {data?.facilities?.bedrooms}
-                </span>
-                <span className="text-slate-500 text-xs uppercase font-medium">
-                  Bedrooms
-                </span>
-              </div>
-              <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <FaShower className="text-[#4161df] mb-2" size={24} />
-                <span className="text-slate-900 font-bold">
-                  {data?.facilities?.bathrooms}
-                </span>
-                <span className="text-slate-500 text-xs uppercase font-medium">
-                  Bathrooms
-                </span>
-              </div>
-              <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <FaCar className="text-[#4161df] mb-2" size={24} />
-                <span className="text-slate-900 font-bold">
-                  {data?.facilities?.parkings || 0}
-                </span>
-                <span className="text-slate-500 text-xs uppercase font-medium">
-                  Parking
-                </span>
-              </div>
-              <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                <RiServiceLine className="text-[#4161df] mb-2" size={24} />
-                <span className="text-slate-900 font-bold">
-                  {data?.facilities?.servantRooms || 0}
-                </span>
-                <span className="text-slate-500 text-xs uppercase font-medium">
-                  Servant R.
-                </span>
-              </div>
+              {data?.facilities?.bedrooms > 0 && (
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                  <MdMeetingRoom className="text-[#4161df] mb-2" size={24} />
+                  <span className="text-slate-900 font-bold">
+                    {data?.facilities?.bedrooms}
+                  </span>
+                  <span className="text-slate-500 text-xs uppercase font-medium">
+                    Bedrooms
+                  </span>
+                </div>
+              )}
+
+              {data?.facilities?.bathrooms > 0 && (
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                  <FaShower className="text-[#4161df] mb-2" size={24} />
+                  <span className="text-slate-900 font-bold">
+                    {data?.facilities?.bathrooms}
+                  </span>
+                  <span className="text-slate-500 text-xs uppercase font-medium">
+                    Bathrooms
+                  </span>
+                </div>
+              )}
+
+              {data?.facilities?.parkings > 0 && (
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                  <FaCar className="text-[#4161df] mb-2" size={24} />
+                  <span className="text-slate-900 font-bold">
+                    {data?.facilities?.parkings || 0}
+                  </span>
+                  <span className="text-slate-500 text-xs uppercase font-medium">
+                    Parking
+                  </span>
+                </div>
+              )}
+
+              {data?.facilities?.servantRooms > 0 && (
+                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                  <RiServiceLine className="text-[#4161df] mb-2" size={24} />
+                  <span className="text-slate-900 font-bold">
+                    {data?.facilities?.servantRooms || 0}
+                  </span>
+                  <span className="text-slate-500 text-xs uppercase font-medium">
+                    Servant R.
+                  </span>
+                </div>
+              )}
             </section>
 
             {/* Description */}
