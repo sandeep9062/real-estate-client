@@ -1,5 +1,25 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./api";
+import { getApiUrl } from "./propertiesApi";
+
+export async function getJournalBySlugServer(slug: string) {
+  const apiUrl = getApiUrl();
+  try {
+    const response = await fetch(`${apiUrl}/v1/journals/slug/${slug}`, {
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (response.status === 404) return null;
+    if (!response.ok) {
+      console.error(`Journal API Error [${response.status}]`);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("getJournalBySlugServer error:", error);
+    return null;
+  }
+}
 
 export const journalApi = createApi({
   reducerPath: "journalApi",

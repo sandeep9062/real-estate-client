@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner in Chandigarh",
+  title:
+    "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner in Chandigarh",
   description:
     "Know the story behind PropertyBulbul, Tricity's most trusted real estate partner. Established with a mission to simplify property buying, selling, and investment in Chandigarh, Panchkula, Mohali. Meet our expert team and discover why thousands trust us for their property needs.",
   keywords: [
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/og-about.jpg",
+        url: "https://propertybulbul.com/about-image.jpg",
         width: 1200,
         height: 630,
         alt: "About PropertyBulbul - Real Estate Experts in Tricity",
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     title: "About PropertyBulbul - Tricity Real Estate Experts",
     description:
       "Discover PropertyBulbul's story and mission in Tricity. Expert real estate services in Chandigarh, Panchkula, and Mohali.",
-    images: ["https://propertybulbul.com/twitter-about.jpg"],
+    images: ["https://propertybulbul.com/about-image.jpg"],
   },
   robots: {
     index: true,
@@ -59,117 +60,122 @@ function AboutStructuredData() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About PropertyBulbul - Tricity Real Estate Experts",
-    "description": "Learn about PropertyBulbul, Tricity's most trusted real estate partner. Meet our team of experts serving Chandigarh, Panchkula, and Mohali.",
-    "url": "https://propertybulbul.com/about-us",
-    "mainEntity": {
+    name: "About PropertyBulbul - Tricity Real Estate Experts",
+    description:
+      "Learn about PropertyBulbul, Tricity's most trusted real estate partner. Meet our team of experts serving Chandigarh, Panchkula, and Mohali.",
+    url: "https://propertybulbul.com/about-us",
+    mainEntity: {
       "@type": "RealEstateAgent",
-      "name": "PropertyBulbul",
-      "description": "Tricity's most helpful real estate partner with expert guidance in buying, selling, and investing in properties across Chandigarh, Panchkula, and Mohali.",
-      "foundingDate": "2024",
-      "founder": {
+      name: "PropertyBulbul",
+      description:
+        "Tricity's most helpful real estate partner with expert guidance in buying, selling, and investing in properties across Chandigarh, Panchkula, and Mohali.",
+      foundingDate: "2024",
+      founder: {
         "@type": "Person",
-        "name": "Mohit Sharma",
-        "jobTitle": "Founder & CEO"
+        name: "Mohit Sharma",
+        jobTitle: "Founder & CEO",
       },
-      "address": {
+      address: {
         "@type": "PostalAddress",
-        "streetAddress": "145, Sector-15",
-        "addressLocality": "Chandigarh",
-        "addressRegion": "Chandigarh",
-        "postalCode": "160015",
-        "addressCountry": "IN"
+        streetAddress: "145, Sector-15",
+        addressLocality: "Chandigarh",
+        addressRegion: "Chandigarh",
+        postalCode: "160015",
+        addressCountry: "IN",
       },
-      "contactPoint": [
+      contactPoint: [
         {
           "@type": "ContactPoint",
-          "telephone": "+91-97299-07448",
-          "contactType": "customer service",
-          "availableLanguage": "English",
-          "hoursAvailable": {
+          telephone: "+91-97299-07448",
+          contactType: "customer service",
+          availableLanguage: "English",
+          hoursAvailable: {
             "@type": "OpeningHoursSpecification",
-            "opens": "09:00",
-            "closes": "19:00",
-            "dayOfWeek": [
+            opens: "09:00",
+            closes: "19:00",
+            dayOfWeek: [
               "Monday",
               "Tuesday",
               "Wednesday",
               "Thursday",
               "Friday",
-              "Saturday"
-            ]
-          }
-        }
+              "Saturday",
+            ],
+          },
+        },
       ],
-      "areaServed": [
+      areaServed: [
         {
           "@type": "Place",
-          "name": "Chandigarh"
+          name: "Chandigarh",
         },
         {
           "@type": "Place",
-          "name": "Mohali"
+          name: "Mohali",
         },
         {
           "@type": "Place",
-          "name": "Panchkula"
+          name: "Panchkula",
         },
         {
           "@type": "Place",
-          "name": "Zirakpur"
-        }
+          name: "Zirakpur",
+        },
       ],
-      "knowsAbout": [
+      knowsAbout: [
         "Real Estate in Tricity",
         "Property Buying Chandigarh",
         "Property Selling Mohali",
         "Investment Properties Panchkula",
         "Legal Assistance Real Estate",
         "Student Accommodation",
-        "Commercial Properties"
+        "Commercial Properties",
       ],
-      "hasOfferCatalog": {
+      hasOfferCatalog: {
         "@type": "OfferCatalog",
-        "name": "Real Estate Services",
-        "itemListElement": [
+        name: "Real Estate Services",
+        itemListElement: [
           {
             "@type": "Offer",
-            "itemOffered": {
+            itemOffered: {
               "@type": "Service",
-              "name": "Property Buying Services",
-              "description": "Expert assistance in buying residential and commercial properties."
-            }
+              name: "Property Buying Services",
+              description:
+                "Expert assistance in buying residential and commercial properties.",
+            },
           },
           {
             "@type": "Offer",
-            "itemOffered": {
+            itemOffered: {
               "@type": "Service",
-              "name": "Property Selling Services",
-              "description": "Premium marketing and sales support for property sellers."
-            }
+              name: "Property Selling Services",
+              description:
+                "Premium marketing and sales support for property sellers.",
+            },
           },
           {
             "@type": "Offer",
-            "itemOffered": {
+            itemOffered: {
               "@type": "Service",
-              "name": "Investment Consulting",
-              "description": "Market analysis and guidance for property investments."
-            }
-          }
-        ]
+              name: "Investment Consulting",
+              description:
+                "Market analysis and guidance for property investments.",
+            },
+          },
+        ],
       },
-      "aggregateRating": {
+      aggregateRating: {
         "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "bestRating": "5",
-        "ratingCount": "500"
+        ratingValue: "4.8",
+        bestRating: "5",
+        ratingCount: "500",
       },
-      "priceRange": "$$",
-      "sameAs": [
+      priceRange: "$$",
+      sameAs: [
         "https://www.facebook.com/propertybulbul",
-        "https://www.instagram.com/propertybulbul"
-      ]
-    }
+        "https://www.instagram.com/propertybulbul",
+      ],
+    },
   };
 
   return (

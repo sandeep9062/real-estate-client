@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // Dynamic API URL detection for production vs development
-const getApiUrl = () => {
+export const getApiUrl = () => {
   // First priority: Environment variable
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;

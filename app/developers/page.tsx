@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { useGetDevelopersQuery } from "@/services/developersApi";
 import Link from "next/link";
 import { ExternalLink, Building } from "lucide-react";
@@ -23,11 +24,13 @@ export default function DevelopersPage() {
         {developers?.map((dev: any) => (
           <Link key={dev._id} href={`/developers/${dev._id}`}>
             <div className="group bg-white border rounded-2xl p-6 hover:shadow-xl transition-all text-center flex flex-col items-center">
-              <div className="w-24 h-24 mb-4 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
-                <img
+              <div className="w-24 h-24 mb-4 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all relative">
+                <Image
                   src={dev.logo}
                   alt={dev.name}
-                  className="max-h-full object-contain"
+                  fill
+                  className="object-contain"
+                  sizes="96px"
                 />
               </div>
               <h3 className="font-bold text-gray-800 group-hover:text-blue-600">

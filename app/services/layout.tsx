@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/og-services.jpg",
+        url: "https://propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Our Real Estate Services",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     title: "Real Estate Services - PropertyBulbul | Tricity Property Experts",
     description:
       "Comprehensive real estate services in Tricity. Expert property buying, selling, investment consulting, legal assistance & student accommodation.",
-    images: ["https://propertybulbul.com/twitter-services.jpg"],
+    images: ["https://propertybulbul.com/property-tricity.jpg"],
   },
   robots: {
     index: true,

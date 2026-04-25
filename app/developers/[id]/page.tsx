@@ -1,82 +1,120 @@
-"use client";
-import { useParams } from "next/navigation";
-import { useGetDeveloperByIdQuery } from "@/services/developersApi";
-import { ProjectCard } from "@/components/ProjectCard";
-import { Globe, Award, ShieldCheck } from "lucide-react";
-import { Building } from "lucide-react";
-export default function DeveloperProfilePage() {
-  const { id } = useParams();
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Script from "next/script";
+import DeveloperDetailClient from "./DeveloperDetailClient";
+import { getDeveloperByIdServer } from "@/services/developersApi";
 
-  // 1. Hook call
-  const { data, isLoading, isError } = useGetDeveloperByIdQuery(id);
+type Props = {
+  params: Promise<{
+    id: string;
+  }>;
+};
 
-  // 2. Loading State
-  if (isLoading)
-    return <div className="p-20 text-center">Loading Brand Profile...</div>;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const data = await getDeveloperByIdServer(id);
 
-  // 3. Error State (Crucial for debugging)
-  if (isError || !data) {
-    return (
-      <div className="p-20 text-center text-red-500">
-        Developer not found or failed to load data.
-      </div>
-    );
+  if (!data?.developer) {
+    return {
+      title: "Developer Not Found | Propertybulbul",
+      description: "The developer you're looking for could not be found.",
+    };
   }
 
-  // 4. Safe Destructuring (Now it's guaranteed to exist)
-  const { developer, projects } = data;
+  const developer = data.developer;
+  const title = `${developer.name} | Verified Developer on Propertybulbul`;
+  const description =
+    developer.description?.substring(0, 160) ||
+    `Explore ${developer.name}'s projects and listings on Propertybulbul. Verified developer in Tricity.`;
+  const canonicalUrl = `https://propertybulbul.com/developers/${id}`;
+  const imageUrl =
+    developer.logo || "https://propertybulbul.com/property-tricity.jpg";
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: "profile",
+      images: [
+        {
+          url: imageUrl,
+          width: 400,
+          height: 400,
+          alt: developer.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
+  };
+}
+
+export default async function DeveloperDetailPage({ params }: Props) {
+  const { id } = await params;
+  const data = await getDeveloperByIdServer(id);
+
+  if (!data?.developer) {
+    notFound();
+  }
+
+  const developer = data.developer;
+  const canonicalUrl = `https://propertybulbul.com/developers/${id}`;
+
+  // Developer / Organization structured data
+  const developerSchema = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    name: developer.name,
+    description: developer.description,
+    url: canonicalUrl,
+    logo: developer.logo,
+    ...(developer.website && { sameAs: [developer.website] }),
+    areaServed: ["Chandigarh", "Mohali", "Panchkula", "Zirakpur"],
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://propertybulbul.com",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Developers",
+          item: "https://propertybulbul.com/developers",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: developer.name,
+          item: canonicalUrl,
+        },
+      ],
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Brand Header */}
-      <div className="bg-white border-b py-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-8 items-center">
-          <div className="w-32 h-32 md:w-48 md:h-48 border rounded-2xl p-4 flex items-center justify-center bg-white shadow-sm">
-            <img
-              src={developer.logo}
-              className="max-h-full object-contain"
-              alt={developer.name}
-            />
-          </div>
-          <div className="flex-1 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-              <h1 className="text-3xl font-bold">{developer.name}</h1>
-              <ShieldCheck className="text-blue-500" fill="currentColor" />
-            </div>
-            <p className="text-gray-600 max-w-2xl mb-4">
-              {developer.description}
-            </p>
-            <div className="flex gap-4 justify-center md:justify-start">
-              <a
-                href={developer.website}
-                target="_blank"
-                className="flex items-center text-sm font-medium text-blue-600 hover:underline"
-              >
-                <Globe size={16} className="mr-1" /> Official Website
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Developer's Projects Section */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-          <Building className="text-gray-400" />
-          Active Projects by {developer.name}
-        </h2>
-
-        {projects?.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {projects.map((project: any) => (
-              <ProjectCard key={project._id} project={project} />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white p-12 rounded-2xl border text-center text-gray-400">
-            No active projects listed for this developer yet.
-          </div>
-        )}
-      </div>
-    </div>
+    <>
+      <Script
+        id="developer-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(developerSchema),
+        }}
+      />
+      <DeveloperDetailClient id={id} />
+    </>
   );
 }

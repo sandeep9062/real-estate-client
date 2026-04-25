@@ -1,63 +1,105 @@
-import {
-  Box,
-  Container,
-  Text,
-  Title,
-  Stack,
-  TextInput,
-  Button,
-  Group,
-} from "@mantine/core";
-import { IconMail } from "@tabler/icons-react";
-import React from "react";
+import { Metadata } from "next";
 
-export default function BlogLayout({
+export const metadata: Metadata = {
+  title: "Real Estate Journal | Market Insights for Tricity",
+  description:
+    "Expert analysis, market trends, and property investment guides for Chandigarh, Mohali, Panchkula, and Zirakpur. Read the PropertyBulbul Journal for data-driven real estate insights.",
+  keywords: [
+    "real estate journal",
+    "property market insights",
+    "tricity real estate news",
+    "chandigarh property guide",
+    "mohali investment tips",
+    "panchkula property trends",
+    "zirakpur real estate",
+    "property investment india",
+    "real estate blog",
+    "property buying guide",
+  ],
+  alternates: {
+    canonical: "https://propertybulbul.com/journal",
+  },
+  openGraph: {
+    title: "Real Estate Journal | Market Insights for Tricity",
+    description:
+      "Expert analysis and property investment guides for Chandigarh, Mohali, Panchkula, and Zirakpur.",
+    url: "https://propertybulbul.com/journal",
+    siteName: "Propertybulbul",
+    locale: "en_IN",
+    type: "website",
+    images: [
+      {
+        url: "https://propertybulbul.com/property-tricity.jpg",
+        width: 1200,
+        height: 630,
+        alt: "PropertyBulbul Real Estate Journal",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Real Estate Journal | Market Insights for Tricity",
+    description:
+      "Expert analysis and property investment guides for Chandigarh, Mohali, Panchkula, and Zirakpur.",
+    images: ["https://propertybulbul.com/property-tricity.jpg"],
+  },
+};
+
+// Structured Data for Blog Listing Page
+function JournalStructuredData() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "PropertyBulbul Journal",
+    description:
+      "Expert analysis, market trends, and property investment guides for Tricity.",
+    url: "https://propertybulbul.com/journal",
+    publisher: {
+      "@type": "Organization",
+      name: "Propertybulbul",
+      url: "https://propertybulbul.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://propertybulbul.com/propertybulbul.png",
+      },
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://propertybulbul.com",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Journal",
+          item: "https://propertybulbul.com/journal",
+        },
+      ],
+    },
+  };
+
+  return (
+    <script
+      id="journal-jsonld"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
+
+export default function JournalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <Box>
-      {/* Main Blog Content */}
-      <Box component="section" style={{ minHeight: "70vh" }}>
-        {children}
-      </Box>
-
-      {/* Blog-Specific Footer / Newsletter Section */}
-      <Box
-        bg="blue.0"
-        py={80}
-        style={{ borderTop: "1px solid var(--mantine-color-blue-1)" }}
-      >
-        <Container size="sm">
-          <Stack align="center" ta="center" gap="md">
-            <IconMail size={40} color="#4161df" />
-            <Title order={2} fw={900}>
-              Get Tricity Market Updates
-            </Title>
-            <Text c="dimmed" size="lg">
-              Join 500+ local investors and brokers. We send one email a week
-              with the best property deals in Mohali and Zirakpur.
-            </Text>
-
-            <Group w="100%" gap="xs" mt="md">
-              <TextInput
-                placeholder="Enter your email"
-                size="lg"
-                radius="md"
-                style={{ flex: 1 }}
-              />
-              <Button size="lg" radius="md" color="#4161df">
-                Subscribe
-              </Button>
-            </Group>
-
-            <Text size="xs" c="dimmed">
-              No spam. Just local market insights. Unsubscribe anytime.
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
-    </Box>
+    <>
+      <JournalStructuredData />
+      {children}
+    </>
   );
 }

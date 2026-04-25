@@ -1,171 +1,140 @@
-"use client";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Script from "next/script";
+import JournalDetailClient from "./JournalDetailClient";
+import { getJournalBySlugServer } from "@/services/journalApi";
 
-import {
-  Container,
-  Title,
-  Text,
-  Image,
-  Stack,
-  Badge,
-  Group,
-  Divider,
-  TypographyStylesProvider,
-  Skeleton,
-  Button,
-  Box,
-  Paper,
-} from "@mantine/core";
-import { useGetJournalBySlugQuery } from "@/services/journalApi";
-import { useGetProjectsQuery } from "@/services/projectsApi";
-import { useParams } from "next/navigation";
-import {
-  IconCalendar,
-  IconUser,
-  IconArrowLeft,
-  IconHome,
-} from "@tabler/icons-react";
-import Link from "next/link";
+type Props = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
-export default function BlogDetailPage() {
-  const { slug } = useParams();
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const journal = await getJournalBySlugServer(slug);
 
-  // 1. Fetch Journal Content
-  const { data: journal, isLoading: journalLoading } = useGetJournalBySlugQuery(
-    slug as string,
-  );
+  if (!journal) {
+    return {
+      title: "Article Not Found | Propertybulbul Journal",
+      description: "The article you're looking for could not be found.",
+    };
+  }
 
-  // 2. Fetch Related Properties (using the sector/city from the journal)
-  const { data: relatedProps, isLoading: propsLoading } = useGetProjectsQuery(
-    { sector: journal?.targetSector, limit: 3 },
-    { skip: !journal?.targetSector },
-  );
+  const title = `${journal.title} | Propertybulbul Journal`;
+  const description =
+    journal.content?.replace(/<[^>]*>/g, "").substring(0, 160) ||
+    `Read ${journal.title} on Propertybulbul Journal - expert real estate insights for Tricity.`;
+  const canonicalUrl = `https://propertybulbul.com/journal/${slug}`;
+  const imageUrl =
+    journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
 
-  if (journalLoading)
-    return (
-      <Container size="xl" py={100} px={{ base: 8, md: 12, lg: 16 }}>
-        <Skeleton height={400} radius="md" />
-      </Container>
-    );
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: "article",
+      publishedTime: journal.createdAt,
+      authors: [journal.author || "PropertyBulbul Editorial"],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: journal.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
+  };
+}
 
-  if (!journal)
-    return (
-      <Container
-        size="xl"
-        py={100}
-        ta="center"
-        px={{ base: 8, md: 12, lg: 16 }}
-      >
-        <Title>Guide not found</Title>
-      </Container>
-    );
+export default async function JournalDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const journal = await getJournalBySlugServer(slug);
+
+  if (!journal) {
+    notFound();
+  }
+
+  const canonicalUrl = `https://propertybulbul.com/journal/${slug}`;
+  const imageUrl =
+    journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
+
+  // Article structured data
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: journal.title,
+    description:
+      journal.content?.replace(/<[^>]*>/g, "").substring(0, 200) ||
+      journal.title,
+    image: imageUrl,
+    datePublished: journal.createdAt,
+    dateModified: journal.createdAt,
+    author: {
+      "@type": "Organization",
+      name: journal.author || "PropertyBulbul Editorial",
+      url: "https://propertybulbul.com",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Propertybulbul",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://propertybulbul.com/propertybulbul.png",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonicalUrl,
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://propertybulbul.com",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Journal",
+          item: "https://propertybulbul.com/journal",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: journal.title,
+          item: canonicalUrl,
+        },
+      ],
+    },
+  };
 
   return (
-    <Container size="xl" py={80} px={{ base: 8, md: 12, lg: 16 }}>
-      <Button
-        component={Link}
-        href="/journal"
-        color="#4161df"
-        variant="subtle"
-        leftSection={<IconArrowLeft size={16} />}
-        mb="xl"
-      >
-        Back to Insights
-      </Button>
-
-      <Stack gap="lg">
-        <Badge size="lg" variant="filled" color="#4161df">
-          {journal.category}
-        </Badge>
-
-        <Title order={1} size="42px" fw={900} style={{ lineHeight: 1.1 }}>
-          {journal.title}
-        </Title>
-
-        <Group gap="xl" c="dimmed">
-          <Group gap={5}>
-            <IconCalendar size={18} />
-            <Text size="sm">
-              {new Date(journal.createdAt).toLocaleDateString("en-IN")}
-            </Text>
-          </Group>
-          <Group gap={5}>
-            <IconUser size={18} />
-            <Text size="sm">PropertyBulbul Editorial</Text>
-          </Group>
-        </Group>
-
-        <Image
-          src={
-            journal.coverImage ||
-            "https://images.unsplash.com/photo-1590066305974-26999a08ec40?q=80&w=1200"
-          }
-          radius="md"
-          alt={journal.title}
-          h={400}
-        />
-
-        {/* This renders the HTML generated by your AI */}
-        <TypographyStylesProvider p={0} mt="xl">
-          <div dangerouslySetInnerHTML={{ __html: journal.content }} />
-        </TypographyStylesProvider>
-
-        <Divider my={50} label="Related Listings" labelPosition="center" />
-
-        {/* Real-time Properties from the same Sector */}
-        <Box>
-          <Title order={2} mb="xl" ta="center">
-            Properties in {journal.targetSector || "this area"}
-          </Title>
-          <Stack gap="md">
-            {relatedProps?.map((prop: any) => (
-              <Paper key={prop._id} withBorder p="md" radius="md">
-                <Group justify="space-between">
-                  <Stack gap={0}>
-                    <Text fw={700} size="lg">
-                      {prop.title}
-                    </Text>
-                    <Text size="sm" c="dimmed">
-                      📍 {prop.location.address}
-                    </Text>
-                  </Stack>
-                  <Button
-                    variant="light"
-                    component={Link}
-                    color="#4161df"
-                    href={`/projects/${prop.slug}`}
-                  >
-                    View Details
-                  </Button>
-                </Group>
-              </Paper>
-            ))}
-            {!propsLoading && relatedProps?.length === 0 && (
-              <Text ta="center" c="dimmed">
-                No active listings in this sector currently.
-              </Text>
-            )}
-          </Stack>
-        </Box>
-
-        <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
-          <IconHome size={40} color="#4161df" />
-          <Title order={3} mt="md">
-            Ready to move to {journal.targetSector}?
-          </Title>
-          <Text mb="xl">
-            Browse our full list of verified properties in this locality.
-          </Text>
-          <Button
-            size="lg"
-            radius="md"
-            color="#4161df"
-            component={Link}
-            href={`/properties?sector=${journal.targetSector}`}
-          >
-            Explore All Listings
-          </Button>
-        </Paper>
-      </Stack>
-    </Container>
+    <>
+      <Script
+        id="article-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleSchema),
+        }}
+      />
+      <JournalDetailClient slug={slug} />
+    </>
   );
 }

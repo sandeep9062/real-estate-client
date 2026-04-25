@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/og-post-requirement.jpg",
+        url: "https://propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Post Your Property Requirement",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     title: "Post Your Property Requirement | Propertybulbul",
     description:
       "Looking for a new property? Post your needs on Propertybulbul and find the perfect match.",
-    images: ["https://propertybulbul.com/twitter-post-requirement.jpg"],
+    images: ["https://propertybulbul.com/property-tricity.jpg"],
   },
 };
 

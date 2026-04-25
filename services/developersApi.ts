@@ -1,5 +1,25 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./api";
+import { getApiUrl } from "./propertiesApi";
+
+export async function getDeveloperByIdServer(id: string) {
+  const apiUrl = getApiUrl();
+  try {
+    const response = await fetch(`${apiUrl}/v1/developers/${id}`, {
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (response.status === 404) return null;
+    if (!response.ok) {
+      console.error(`Developer API Error [${response.status}]`);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("getDeveloperByIdServer error:", error);
+    return null;
+  }
+}
 
 export const developersApi = createApi({
   reducerPath: "developersApi",

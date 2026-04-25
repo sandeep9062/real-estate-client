@@ -1,7 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts in Chandigarh, Panchkula & Mohali",
+  title:
+    "Contact Us - PropertyBulbul | Tricity Real Estate Experts in Chandigarh, Panchkula & Mohali",
   description:
     "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity (Chandigarh, Panchkula, Mohali). Contact us for property buying, selling, or renting. Experienced agents ready to help with your real estate needs. Call +91 97299 07448 now!",
   keywords: [
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/og-contact.jpg",
+        url: "https://propertybulbul.com/contact-image.png",
         width: 1200,
         height: 630,
         alt: "Contact Our Real Estate Team",
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
     title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts",
     description:
       "Get in touch with PropertyBulbul for all your real estate needs in Tricity. Expert assistance for buying, selling, and renting properties.",
-    images: ["https://propertybulbul.com/twitter-contact.jpg"],
+    images: ["https://propertybulbul.com/contact-image.png"],
   },
   robots: {
     index: true,
@@ -61,7 +62,8 @@ function ContactStructuredData() {
     "@context": "https://schema.org",
     "@type": "ContactPage",
     name: "Contact PropertyBulbul - Tricity Real Estate Experts",
-    description: "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity for property buying, selling, and renting services.",
+    description:
+      "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity for property buying, selling, and renting services.",
     url: "https://propertybulbul.com/contact",
     mainEntity: {
       "@type": "RealEstateAgent",
@@ -72,7 +74,7 @@ function ContactStructuredData() {
         addressLocality: "Chandigarh",
         addressRegion: "Chandigarh",
         postalCode: "160015",
-        addressCountry: "IN"
+        addressCountry: "IN",
       },
       contactPoint: [
         {
@@ -90,39 +92,39 @@ function ContactStructuredData() {
               "Wednesday",
               "Thursday",
               "Friday",
-              "Saturday"
-            ]
-          }
+              "Saturday",
+            ],
+          },
         },
         {
           "@type": "ContactPoint",
           email: "bulbulproperty@gmail.com",
-          contactType: "customer service"
-        }
+          contactType: "customer service",
+        },
       ],
       areaServed: [
         {
           "@type": "Place",
-          name: "Chandigarh"
+          name: "Chandigarh",
         },
         {
           "@type": "Place",
-          name: "Mohali"
+          name: "Mohali",
         },
         {
           "@type": "Place",
-          name: "Panchkula"
+          name: "Panchkula",
         },
         {
           "@type": "Place",
-          name: "Zirakpur"
-        }
+          name: "Zirakpur",
+        },
       ],
       sameAs: [
         "https://www.facebook.com/propertybulbul",
-        "https://www.instagram.com/propertybulbul"
-      ]
-    }
+        "https://www.instagram.com/propertybulbul",
+      ],
+    },
   };
 
   return (

@@ -67,13 +67,13 @@ const Header: React.FC = () => {
           />
 
           <div className="hidden md:flex flex-col leading-tight">
-            <h1 className="text-[22px] font-extrabold tracking-tight">
+            <span className="text-[22px] font-extrabold tracking-tight">
               Property
-            </h1>
+            </span>
 
-            <h2 className="text-[20px] font-extrabold text-[#4161df] tracking-tight">
+            <span className="text-[20px] font-extrabold text-[#4161df] tracking-tight">
               Bulbul
-            </h2>
+            </span>
           </div>
         </Link>
 

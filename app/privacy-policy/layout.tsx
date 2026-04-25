@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/og-privacy.jpg",
+        url: "https://propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Privacy Policy",
@@ -30,7 +30,10 @@ export const metadata: Metadata = {
     title: "Privacy Policy | Propertybulbul",
     description:
       "Our commitment to your privacy. Read our policy to understand how we handle your data.",
-    images: ["https://propertybulbul.com/twitter-privacy.jpg"],
+    images: ["https://propertybulbul.com/property-tricity.jpg"],
+  },
+  alternates: {
+    canonical: "https://propertybulbul.com/privacy-policy",
   },
 };
 
