@@ -30,6 +30,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
+import { Eye, EyeOff } from "lucide-react";
 
 // Validation schema
 const formSchema = z
@@ -44,6 +45,39 @@ const formSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
+
+const PasswordInput = ({
+  field,
+  placeholder,
+}: {
+  field: any;
+  placeholder: string;
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <div className="relative">
+      <Input
+        type={showPassword ? "text" : "password"}
+        placeholder={placeholder}
+        className="h-9 text-sm pr-9"
+        {...field}
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword((prev) => !prev)}
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+        tabIndex={-1}
+      >
+        {showPassword ? (
+          <EyeOff className="w-4 h-4" />
+        ) : (
+          <Eye className="w-4 h-4" />
+        )}
+      </button>
+    </div>
+  );
+};
 
 const SignupPage = () => {
   const router = useRouter();
@@ -348,12 +382,7 @@ const SignupPage = () => {
                           Password
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Password"
-                            className="h-9 text-sm"
-                            {...field}
-                          />
+                          <PasswordInput field={field} placeholder="Password" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -368,11 +397,9 @@ const SignupPage = () => {
                           Confirm
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="password"
+                          <PasswordInput
+                            field={field}
                             placeholder="Confirm password"
-                            className="h-9 text-sm"
-                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
