@@ -24,6 +24,17 @@ interface WhatsAppActionsProps {
   className?: string;
 }
 
+// GA4 Event Tracking Helper
+const trackWhatsAppLead = (propertyName: string) => {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", "generate_lead", {
+      event_category: "Engagement",
+      event_label: propertyName,
+      value: 1,
+    });
+  }
+};
+
 const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
   propertyId,
   propertyTitle,
@@ -58,6 +69,9 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
   const handleShareToWhatsApp = () => {
     setIsSharing(true);
 
+    // Track GA4 lead event
+    trackWhatsAppLead(propertyTitle);
+
     const message = `Check out this property on PropertyBulbul: ${propertyTitle} in ${propertyCity}. View details & Brochure here: ${window.location.href}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
 
@@ -73,6 +87,9 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
       }).unwrap();
 
       if (result.success && result.data?.brokerPhone) {
+        // Track GA4 lead event
+        trackWhatsAppLead(propertyTitle);
+
         // Open WhatsApp chat with broker
         const message = `Hi, I just viewed ${propertyTitle} on PropertyBulbul. Can you share the details?\n\nProperty link: ${window.location.href}`;
         const whatsappUrl = `https://wa.me/${result.data.brokerPhone}?text=${encodeURIComponent(message)}`;
