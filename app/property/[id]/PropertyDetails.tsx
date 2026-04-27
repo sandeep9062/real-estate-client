@@ -55,6 +55,19 @@ const PropertyDetails = ({ data }: { data: any }) => {
     (b: any) => (b?.property?._id || b?.property || b?.id) === id,
   )?.date;
 
+  // GA4 WhatsApp Lead Tracking
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    // Track GA4 generate_lead event
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "generate_lead", {
+        event_category: "Engagement",
+        event_label: data?.title || "Unknown Property",
+        value: 1,
+      });
+    }
+    // Allow default link behavior to open WhatsApp
+  };
+
   const handleShare = async () => {
     const shareUrl = window.location.href;
     const imageUrl = Array.isArray(data?.image) ? data.image[0] : data?.image;
@@ -283,6 +296,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={handleWhatsAppClick}
                       className="flex items-center justify-center gap-2 w-full bg-green-500 text-white py-4 rounded-xl text-lg shadow-lg shadow-green-200 hover:bg-green-600 hover:shadow-green-300 transition-all active:scale-[0.98]"
                     >
                       <FaWhatsapp size={20} />
