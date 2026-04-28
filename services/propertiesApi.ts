@@ -1,80 +1,67 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithAuth } from "./api";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-/**
- * 1. DYNAMIC API URL UTILITY
- * We rely on environment variables.
- * On Render/Vercel, set NEXT_PUBLIC_API_URL to https://api.propertybulbul.com/api
- */
+// Dynamic API URL detection for production vs development
 export const getApiUrl = () => {
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api";
+  // First priority: Environment variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Second priority: Detect production environment (client-side only)
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+
+    // If on production domain, use Render backend URL
+    if (
+      hostname === "www.propertybulbul.com" ||
+      hostname === "propertybulbul.com"
+    ) {
+      return "https://api.propertybulbul.com/api";
+    }
+  }
+
+  // Default: localhost for development
+  return "http://localhost:9000/api";
 };
 
-/**
- * 2. SERVER-SIDE FETCH HELPER
- * Used for Next.js Server Components (SSR/ISR)
- */
 export async function getPropertyServer(id: string) {
   const apiUrl = getApiUrl();
 
   try {
     const response = await fetch(`${apiUrl}/properties/${id}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store", // Ensures we get fresh data
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
     });
 
     if (response.status === 404) return null;
 
     if (!response.ok) {
+      const errorText = await response.text().catch(() => "Unknown error");
+      console.error(`API Error [${response.status}]: ${errorText}`);
       throw new Error(`API request failed with status ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
+    // Log the actual error for debugging
     console.error("getPropertyServer error:", error);
+
+    // Re-throw with more context if it's a network error
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw new Error(
+        `Unable to connect to API at ${apiUrl}. Please ensure the backend server is running.`,
+      );
+    }
+
     throw error;
   }
 }
 
-/**
- * 3. HELPER: CONVERT OBJECT TO FORMDATA
- * Centralizes the logic for handling file arrays and JSON strings
- */
-const preparePropertyFormData = (data: any) => {
-  const formData = new FormData();
+import { baseQueryWithAuth } from "./api";
 
-  Object.keys(data).forEach((key) => {
-    const value = data[key];
-
-    if (key === "image" && Array.isArray(value)) {
-      // Handle Image uploads (Files and existing URL strings)
-      const existingImages = value.filter((img) => typeof img === "string");
-      const newFiles = value.filter((img) => img instanceof File);
-
-      if (existingImages.length > 0) {
-        formData.append("existingImages", JSON.stringify(existingImages));
-      }
-      newFiles.forEach((file) => formData.append("image", file));
-    } else if (
-      typeof value === "object" &&
-      value !== null &&
-      !(value instanceof File)
-    ) {
-      // Handle nested objects (like address or features)
-      formData.append(key, JSON.stringify(value));
-    } else {
-      // Handle standard strings/numbers
-      formData.append(key, value);
-    }
-  });
-
-  return formData;
-};
-
-/**
- * 4. REDUX TOOLKIT QUERY API
- */
 export const propertiesApi = createApi({
   reducerPath: "propertiesApi",
   baseQuery: baseQueryWithAuth,
@@ -87,38 +74,75 @@ export const propertiesApi = createApi({
       }),
       providesTags: ["Property"],
     }),
-
     getProperty: builder.query({
       query: (id) => `/properties/${id}`,
       providesTags: (result, error, id) => [{ type: "Property", id }],
     }),
-
     getOwnedProperties: builder.query({
       query: () => `/properties/owned`,
       providesTags: ["Property"],
     }),
-
     createProperty: builder.mutation({
-      query: (property) => ({
-        url: "/properties",
-        method: "POST",
-        body: preparePropertyFormData(property),
-      }),
+      query: (property) => {
+        const formData = new FormData();
+        Object.keys(property).forEach((key) => {
+          if (key === "image") {
+            property[key].forEach((file: File) => {
+              formData.append(key, file);
+            });
+          } else if (
+            typeof property[key] === "object" &&
+            property[key] !== null
+          ) {
+            formData.append(key, JSON.stringify(property[key]));
+          } else {
+            formData.append(key, property[key]);
+          }
+        });
+        return {
+          url: "/properties",
+          method: "POST",
+          body: formData,
+        };
+      },
       invalidatesTags: ["Property"],
     }),
-
     updateProperty: builder.mutation({
-      query: ({ id, ...property }) => ({
-        url: `/properties/${id}`,
-        method: "PUT",
-        body: preparePropertyFormData(property),
-      }),
+      query: ({ id, ...property }) => {
+        const formData = new FormData();
+        const existingImages = (property.image || []).filter(
+          (img: File | string) => typeof img === "string",
+        );
+        const newImages = (property.image || []).filter(
+          (img: File | string) => img instanceof File,
+        );
+        formData.append("existingImages", JSON.stringify(existingImages));
+        newImages.forEach((file: File) => {
+          formData.append("image", file);
+        });
+        Object.keys(property).forEach((key) => {
+          if (key === "image") {
+            // Already handled above
+          } else if (
+            typeof property[key] === "object" &&
+            property[key] !== null
+          ) {
+            formData.append(key, JSON.stringify(property[key]));
+          } else {
+            formData.append(key, property[key]);
+          }
+        });
+        return {
+          url: `/properties/${id}`,
+          method: "PUT",
+          body: formData,
+        };
+      },
       invalidatesTags: (result, error, { id }) => [
         { type: "Property", id },
         "Property",
       ],
     }),
-
     deleteProperty: builder.mutation({
       query: (id) => ({
         url: `/properties/${id}`,
@@ -126,14 +150,12 @@ export const propertiesApi = createApi({
       }),
       invalidatesTags: ["Property"],
     }),
-
     getPropertyBrochure: builder.query({
       query: (id) => ({
         url: `/properties/${id}/download-brochure`,
         responseHandler: (response) => response.blob(),
       }),
     }),
-
     createWhatsAppLead: builder.mutation({
       query: ({ id, ...body }) => ({
         url: `/properties/${id}/whatsapp-lead`,
