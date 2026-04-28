@@ -1,38 +1,25 @@
-import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { BaseQueryFn } from '@reduxjs/toolkit/query';
-import type { FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { BaseQueryFn } from "@reduxjs/toolkit/query";
+import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-// Dynamic API URL detection
+/**
+ * 1. CLEANED UP URL DETECTION
+ * We remove the hardcoded domain check. You should set NEXT_PUBLIC_API_URL
+ * in your production environment (Render/Vercel) to "https://api.propertybulbul.com/api".
+ */
 const getApiBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-
-    if (
-      hostname === 'www.propertybulbul.com' ||
-      hostname === 'propertybulbul.com'
-    ) {
-      return 'https://api.propertybulbul.com/api';
-    }
-  }
-
-  return 'http://localhost:9000/api';
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api";
 };
 
-// Base query (original)
 const baseQuery = fetchBaseQuery({
   baseUrl: getApiBaseUrl(),
-  credentials: 'include',
+  credentials: "include", // Essential for sending HttpOnly Cookies
   prepareHeaders: (headers) => {
-    headers.set('Accept', 'application/json');
+    headers.set("Accept", "application/json");
     return headers;
   },
 });
 
-// 🔥 ADD THIS WRAPPER
 export const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -40,31 +27,37 @@ export const baseQueryWithAuth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  // If access token expired
+  // 2. TOKEN REFRESH LOGIC
   if (result.error && result.error.status === 401) {
-    console.log('Access token expired. Trying refresh...');
+    // Check if the current request is ALREADY the refresh call to prevent infinite loops
+    const isRefreshCall =
+      typeof args === "object" && args.url === "/auth/refresh";
 
-    // Try to refresh token
-    const refreshResult = await baseQuery(
-      { url: '/auth/refresh', method: 'POST' },
-      api,
-      extraOptions
-    );
+    if (!isRefreshCall) {
+      console.log("Access token expired. Trying refresh...");
 
-    if (refreshResult.data) {
-      console.log('Token refreshed successfully');
+      const refreshResult = await baseQuery(
+        { url: "/auth/refresh", method: "POST" },
+        api,
+        extraOptions,
+      );
 
-      // Retry original request
-      result = await baseQuery(args, api, extraOptions);
-    } else {
-      console.log('Refresh failed. Logging out...');
+      if (refreshResult.data) {
+        console.log(
+          "Token refreshed successfully. Retrying original request...",
+        );
+        // Retry the original request
+        result = await baseQuery(args, api, extraOptions);
+      } else {
+        console.log("Refresh failed. Redirecting to login...");
 
-      // Logout user (clear Redux state)
-      api.dispatch({ type: 'auth/logout' });
+        // Clear local auth state
+        api.dispatch({ type: "auth/logout" });
 
-      // Redirect to login
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          // Use replace so they can't 'Back' button into a broken state
+          window.location.replace("/login");
+        }
       }
     }
   }

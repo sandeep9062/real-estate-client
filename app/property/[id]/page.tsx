@@ -1,8 +1,13 @@
 import { Metadata } from "next";
-import Script from "next/script";
 import { notFound } from "next/navigation";
 import PropertyDetails from "./PropertyDetails";
 import { getPropertyServer } from "../../../services/propertiesApi";
+import {
+  generateRealEstateSchema,
+  generateFAQSchema,
+  generateBreadcrumbSchema,
+  renderSchemaScript,
+} from "@/lib/schemaUtils";
 
 type Props = {
   params: Promise<{
@@ -102,70 +107,30 @@ const PropertyPage = async ({ params }: Props) => {
   const data = await getPropertyServer(id);
   if (!data) notFound();
 
-  // Structured data for individual property
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    name: sanitizeMetaText(data?.title || ""),
-    description: sanitizeMetaText(data?.description || ""),
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: data?.location?.address,
-      addressLocality: data?.location?.city,
-      addressRegion: data?.location?.city,
-      addressCountry: data?.location?.country,
+  // Generate all schemas for property page
+  const realEstateSchema = generateRealEstateSchema(data, id);
+  const faqSchema = generateFAQSchema(
+    data.description,
+    data?.location?.sector || data?.location?.city,
+  );
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", item: "https://propertybulbul.com" },
+    { name: "Properties", item: "https://propertybulbul.com/properties" },
+    {
+      name: data?.location?.city,
+      item: `https://propertybulbul.com/properties?city=${data?.location?.city}`,
     },
-    price: data?.price,
-    priceCurrency: "INR",
-    offerType: data?.deal,
-    numberOfRooms: data?.facilities?.bedrooms || 0,
-    numberOfBathrooms: data?.facilities?.bathrooms || 0,
-    floorSize: {
-      "@type": "QuantitativeValue",
-      value: data?.area?.value,
-      unitCode: data?.area?.unit,
+    {
+      name: sanitizeMetaText(data?.title || ""),
+      item: `https://propertybulbul.com/property/${id}`,
     },
-    image: data?.image,
-    url: `https://propertybulbul.com/property/${id}`,
-    provider: {
-      "@type": "Organization",
-      name: "Propertybulbul",
-      url: "https://propertybulbul.com",
-    },
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Home",
-          item: "https://propertybulbul.com",
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Properties",
-          item: "https://propertybulbul.com/properties",
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: sanitizeMetaText(data?.title || ""),
-          item: `https://propertybulbul.com/property/${id}`,
-        },
-      ],
-    },
-  };
+  ]);
 
   return (
     <>
-      <Script
-        id="property-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
-        }}
-      />
+      {renderSchemaScript("property-jsonld", realEstateSchema)}
+      {renderSchemaScript("property-faq-jsonld", faqSchema)}
+      {renderSchemaScript("property-breadcrumb-jsonld", breadcrumbSchema)}
       <PropertyDetails data={data} />
     </>
   );

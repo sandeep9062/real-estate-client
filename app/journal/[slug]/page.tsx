@@ -1,8 +1,13 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import JournalDetailClient from "./JournalDetailClient";
 import { getJournalBySlugServer } from "@/services/journalApi";
+import {
+  generateArticleSchema,
+  generateFAQSchema,
+  generateBreadcrumbSchema,
+  renderSchemaScript,
+} from "@/lib/schemaUtils";
 
 type Props = {
   params: Promise<{
@@ -72,68 +77,20 @@ export default async function JournalDetailPage({ params }: Props) {
   const imageUrl =
     journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
 
-  // Article structured data
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: journal.title,
-    description:
-      journal.content?.replace(/<[^>]*>/g, "").substring(0, 200) ||
-      journal.title,
-    image: imageUrl,
-    datePublished: journal.createdAt,
-    dateModified: journal.createdAt,
-    author: {
-      "@type": "Organization",
-      name: journal.author || "PropertyBulbul Editorial",
-      url: "https://propertybulbul.com",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Propertybulbul",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://propertybulbul.com/propertybulbul.png",
-      },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": canonicalUrl,
-    },
-    breadcrumb: {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Home",
-          item: "https://propertybulbul.com",
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Journal",
-          item: "https://propertybulbul.com/journal",
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: journal.title,
-          item: canonicalUrl,
-        },
-      ],
-    },
-  };
+  // Generate all schemas
+  const articleSchema = generateArticleSchema(journal, slug);
+  const faqSchema = generateFAQSchema(journal.content, journal.location);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", item: "https://propertybulbul.com" },
+    { name: "Journal", item: "https://propertybulbul.com/journal" },
+    { name: journal.title, item: canonicalUrl },
+  ]);
 
   return (
     <>
-      <Script
-        id="article-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
-        }}
-      />
+      {renderSchemaScript("article-jsonld", articleSchema)}
+      {renderSchemaScript("faq-jsonld", faqSchema)}
+      {renderSchemaScript("breadcrumb-jsonld", breadcrumbSchema)}
       <JournalDetailClient slug={slug} />
     </>
   );
