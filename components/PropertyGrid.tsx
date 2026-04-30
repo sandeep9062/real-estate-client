@@ -41,7 +41,6 @@ export default function PropertyGrid({
           <div key={pid} data-property-id={pid}>
             <PropertyCard
               card={card}
-              variant="carousel"
               isSelected={!!selectedId && selectedId === String(pid)}
             />
           </div>
