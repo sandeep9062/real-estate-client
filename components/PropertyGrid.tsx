@@ -14,8 +14,7 @@ interface PropertyGridProps {
 const gridClassByColumns: Record<PropertyGridColumns, string> = {
   default:
     "grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6",
-  two:
-    "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6",
+  two: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6",
   three:
     "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6",
 };
@@ -42,6 +41,7 @@ export default function PropertyGrid({
           <div key={pid} data-property-id={pid}>
             <PropertyCard
               card={card}
+              variant="carousel"
               isSelected={!!selectedId && selectedId === String(pid)}
             />
           </div>
