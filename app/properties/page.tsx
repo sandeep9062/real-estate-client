@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useGetAllPropertiesQuery } from "../../services/propertiesApi";
 import SearchResults from "@/components/SearchResults";
 import PropertyGrid from "@/components/PropertyGrid";
-import { PuffLoader } from "react-spinners";
+import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
 import TopSearchBar from "@/components/TopSearchBar";
 
 const PropertiesContent = () => {
@@ -44,8 +44,12 @@ const PropertiesContent = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full flex justify-center items-center h-[60vh]">
-        <PuffLoader size={80} aria-label="puff-loading" />
+      <div className="w-full pt-20 bg-gray-50">
+        <div className="flex flex-col items-center gap-6 max-w-full mx-auto px-4 sm:px-6 md:px-10 py-8">
+          <div className="h-8 w-2/3 max-w-lg animate-pulse rounded-lg bg-slate-200" />
+          <div className="h-12 w-full max-w-3xl animate-pulse rounded-xl bg-slate-200" />
+          <PropertyGridSkeleton count={9} columns="three" />
+        </div>
       </div>
     );
   }

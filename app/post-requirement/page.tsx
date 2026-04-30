@@ -88,15 +88,13 @@ const EnquiryForm2: React.FC = () => {
   const onSubmit: SubmitHandler<IEnquiryForm> = async (data) => {
     isSetSubmitting(true);
     try {
-      toast.success("Submitting enquiry...");
-      // Ensure VITE_BACKEND is correctly configured in your Next.js environment variables
-      // You may need to replace import.meta.env with process.env depending on your Next.js setup
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/enquiry`, // Use Next.js Public env variable
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/enquiry`,
         data,
       );
 
       if (response.status === 201 || response.status === 200) {
+        toast.success("Thanks — we'll reach out shortly.");
         setSubmitted(true);
         reset();
 

@@ -2,12 +2,14 @@
 
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import PropertyGrid from "./PropertyGrid";
+import PropertyGridSkeleton from "./PropertyGridSkeleton";
 
 interface SearchResultsProps {
   query: { [key: string]: string };
+  columns?: "default" | "two" | "three";
 }
 
-export default function SearchResults({ query }: SearchResultsProps) {
+export default function SearchResults({ query, columns = "three" }: SearchResultsProps) {
   const { data, isLoading, isError } = useGetAllPropertiesQuery(query);
 
   if (!query || Object.keys(query).length === 0) {
@@ -22,15 +24,7 @@ export default function SearchResults({ query }: SearchResultsProps) {
             Searching for “{query.search || ""}”
           </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-40 w-full rounded-lg bg-gray-200" />
-              <div className="mt-3 h-4 w-1/2 rounded bg-gray-200" />
-              <div className="mt-2 h-3 w-2/3 rounded bg-gray-200" />
-            </div>
-          ))}
-        </div>
+        <PropertyGridSkeleton count={6} columns={columns} />
       </div>
     );
   }
@@ -76,7 +70,7 @@ export default function SearchResults({ query }: SearchResultsProps) {
           {results.length} found
         </span>
       </div>
-      <PropertyGrid properties={results} />
+      <PropertyGrid properties={results} columns={columns} />
     </div>
   );
 }

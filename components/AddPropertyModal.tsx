@@ -49,12 +49,33 @@ const AddPropertyModal = ({
     },
     commercialPropertyTypes: [],
     investmentOptions: [],
+    listingAvailability: "Available",
+    virtualTourUrl: "",
+    floorPlanImages: [] as string[],
+    nearbyPlaces: {
+      schools: [] as string[],
+      metroStations: [] as string[],
+      hospitals: [] as string[],
+      malls: [] as string[],
+    },
+    reraNumber: "",
+    floorPlanFiles: [] as File[],
     image: [],
+    maintenanceCharge: undefined as number | undefined,
+    securityDeposit: undefined as number | undefined,
+    lockInMonths: undefined as number | undefined,
+    noticePeriodDays: undefined as number | undefined,
+    ocStatus: "" as string,
+    ageOfProperty: undefined as number | undefined,
+    pricePerSqft: undefined as number | undefined,
+    negotiable: true,
+    amenities: [] as string[],
     facilities: {
       bedrooms: 0,
       parkings: 0,
       bathrooms: 0,
       servantRooms: 0,
+      balconies: 0,
     },
     userEmail: user?.email,
   };
@@ -130,6 +151,7 @@ const AddPropertyModal = ({
           coordinates: normalizedCoordinates,
         },
         userEmail: user?.email,
+        floorPlanFiles: [],
       });
       setActive(0);
     } else {
@@ -165,6 +187,7 @@ const AddPropertyModal = ({
               nextStep={nextStep}
               propertyDetails={propertyDetails}
               setPropertyDetails={setPropertyDetails}
+              normalizeCountry={normalizeCountry}
             />
           </Stepper.Step>
 
@@ -188,6 +211,7 @@ const AddPropertyModal = ({
 
           <Stepper.Step label="Basics">
             <BasicDetails
+              key={editingProperty?._id ? String(editingProperty._id) : "new-property"}
               prevStep={prevStep}
               nextStep={nextStep}
               propertyDetails={propertyDetails}
@@ -203,6 +227,20 @@ const AddPropertyModal = ({
               setOpened={setOpened}
               setActiveStep={setActive}
               editingProperty={editingProperty}
+              emptyPropertyDraft={{
+                ...defaultPropertyDetails,
+                userEmail: user?.email,
+                location: { ...defaultPropertyDetails.location },
+                nearbyPlaces: {
+                  schools: [],
+                  metroStations: [],
+                  hospitals: [],
+                  malls: [],
+                },
+                floorPlanImages: [],
+                floorPlanFiles: [],
+                facilities: { ...defaultPropertyDetails.facilities },
+              }}
             />
           </Stepper.Step>
 

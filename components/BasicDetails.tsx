@@ -10,9 +10,54 @@ import {
   NumberInput,
   Select,
   MultiSelect,
+  Divider,
+  Checkbox,
+  Text,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { validateString } from "@/lib/utils";
+import FloorPlanUploadSection from "@/components/FloorPlanUploadSection";
+
+function splitLines(s: string) {
+  return s
+    .split(/\n|,/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+}
+
+function toOptNum(v: unknown): number | undefined {
+  if (v === "" || v == null) return undefined;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+const LISTING_OPTS = [
+  { value: "Available", label: "Available — open enquiries" },
+  { value: "Fresh", label: "Fresh listing" },
+  { value: "Under offer", label: "Under offer" },
+  { value: "Booked", label: "Booked / on hold" },
+];
+
+const AMENITIES_OPTIONS = [
+  "Parking",
+  "Lift",
+  "Power Backup",
+  "Security",
+  "Park",
+  "Gas Pipeline",
+  "Wifi",
+  "Gym",
+  "Swimming Pool",
+  "Club House",
+];
+
+const OC_OPTIONS = [
+  { value: "", label: "— Optional —" },
+  { value: "Available", label: "OC available" },
+  { value: "Applied", label: "OC applied" },
+  { value: "Not issued", label: "Not issued yet" },
+  { value: "NA", label: "Not applicable" },
+];
 
 interface BasicDetailsProps {
   prevStep: () => void;
@@ -43,12 +88,36 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
       postedBy: propertyDetails.postedBy,
       commercialPropertyTypes: propertyDetails.commercialPropertyTypes,
       investmentOptions: propertyDetails.investmentOptions,
+      listingAvailability: propertyDetails.listingAvailability || "Available",
+      virtualTourUrl: propertyDetails.virtualTourUrl || "",
+      schoolsText: (propertyDetails.nearbyPlaces?.schools || []).join("\n"),
+      metroStationsText: (propertyDetails.nearbyPlaces?.metroStations || []).join(
+        "\n",
+      ),
+      hospitalsText: (propertyDetails.nearbyPlaces?.hospitals || []).join("\n"),
+      mallsText: (propertyDetails.nearbyPlaces?.malls || []).join("\n"),
+      reraNumber: propertyDetails.reraNumber || "",
+      maintenanceCharge: propertyDetails.maintenanceCharge ?? "",
+      securityDeposit: propertyDetails.securityDeposit ?? "",
+      lockInMonths: propertyDetails.lockInMonths ?? "",
+      noticePeriodDays: propertyDetails.noticePeriodDays ?? "",
+      ocStatus: propertyDetails.ocStatus || "",
+      ageOfProperty: propertyDetails.ageOfProperty ?? "",
+      pricePerSqft: propertyDetails.pricePerSqft ?? "",
+      negotiable: propertyDetails.negotiable !== false,
+      amenities: propertyDetails.amenities || [],
     },
     validate: {
       title: (value) => validateString(value),
       description: (value) => validateString(value),
       price: (value: number) =>
-        value < 1000 ? "Must be greater than 999 rupees" : null,
+        value == null || !Number.isFinite(value) || value < 1
+          ? "Enter a valid price (min ₹1)"
+          : null,
+      areaValue: (value: number) =>
+        value == null || !Number.isFinite(value) || value < 0
+          ? "Enter a valid area (0 or more)"
+          : null,
     },
   });
 
@@ -67,11 +136,33 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
     postedBy,
     commercialPropertyTypes,
     investmentOptions,
+    listingAvailability,
+    virtualTourUrl,
+    schoolsText,
+    metroStationsText,
+    hospitalsText,
+    mallsText,
+    reraNumber,
+    maintenanceCharge,
+    securityDeposit,
+    lockInMonths,
+    noticePeriodDays,
+    ocStatus,
+    ageOfProperty,
+    pricePerSqft,
+    negotiable,
+    amenities,
   } = form.values;
 
   const handleSubmit = () => {
     const { hasErrors } = form.validate();
     if (!hasErrors) {
+      const nearbyPlaces = {
+        schools: splitLines(schoolsText),
+        metroStations: splitLines(metroStationsText),
+        hospitals: splitLines(hospitalsText),
+        malls: splitLines(mallsText),
+      };
       setPropertyDetails((prev: any) => ({
         ...prev,
         title,
@@ -87,6 +178,19 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         postedBy,
         commercialPropertyTypes,
         investmentOptions,
+        listingAvailability,
+        virtualTourUrl: virtualTourUrl?.trim() || "",
+        nearbyPlaces,
+        reraNumber: reraNumber?.trim() || "",
+        maintenanceCharge: toOptNum(maintenanceCharge),
+        securityDeposit: toOptNum(securityDeposit),
+        lockInMonths: toOptNum(lockInMonths),
+        noticePeriodDays: toOptNum(noticePeriodDays),
+        ocStatus: ocStatus || undefined,
+        ageOfProperty: toOptNum(ageOfProperty),
+        pricePerSqft: toOptNum(pricePerSqft),
+        negotiable,
+        amenities: Array.isArray(amenities) ? amenities : [],
       }));
       nextStep();
     }
@@ -122,7 +226,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         <NumberInput
           withAsterisk
           label="Price"
-          placeholder="1000"
+          placeholder="e.g. 25000"
           min={0}
           {...form.getInputProps("price")}
           classNames={{ input: "border-gray-300" }}
@@ -199,7 +303,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         <Group grow>
           <NumberInput
             label="Area"
-            min={1}
+            min={0}
             {...form.getInputProps("areaValue")}
             classNames={{ input: "border-gray-300" }}
           />
@@ -251,6 +355,165 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
           {...form.getInputProps("postedBy")}
           classNames={{ input: "border-gray-300" }}
           styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        <Divider
+          label="Pricing & terms"
+          labelPosition="center"
+          my="sm"
+        />
+
+        <Text size="sm" c="dimmed">
+          {deal === "Rent"
+            ? "Price is monthly rent (₹)."
+            : "Price is total asking amount (₹)."}
+        </Text>
+
+        {deal === "Rent" && (
+          <>
+            <NumberInput
+              label="Monthly maintenance (₹)"
+              description="Society / common charges if any."
+              min={0}
+              {...form.getInputProps("maintenanceCharge")}
+              classNames={{ input: "border-gray-300" }}
+            />
+            <NumberInput
+              label="Security deposit (₹)"
+              min={0}
+              {...form.getInputProps("securityDeposit")}
+              classNames={{ input: "border-gray-300" }}
+            />
+            <Group grow>
+              <NumberInput
+                label="Lock-in (months)"
+                description="Optional"
+                min={0}
+                {...form.getInputProps("lockInMonths")}
+                classNames={{ input: "border-gray-300" }}
+              />
+              <NumberInput
+                label="Notice period (days)"
+                description="Optional"
+                min={0}
+                {...form.getInputProps("noticePeriodDays")}
+                classNames={{ input: "border-gray-300" }}
+              />
+            </Group>
+          </>
+        )}
+
+        {deal === "Sale" && (
+          <>
+            <NumberInput
+              label="Price per sqft (₹)"
+              description="Optional — helps buyers compare."
+              min={0}
+              {...form.getInputProps("pricePerSqft")}
+              classNames={{ input: "border-gray-300" }}
+            />
+            <Select
+              label="Occupancy certificate (OC)"
+              description="Helps buyers assess legal readiness."
+              data={OC_OPTIONS}
+              {...form.getInputProps("ocStatus")}
+              classNames={{ input: "border-gray-300" }}
+              styles={{ dropdown: { zIndex: 1300 } }}
+            />
+          </>
+        )}
+
+        <NumberInput
+          label="Age of property (years)"
+          description="Optional"
+          min={0}
+          {...form.getInputProps("ageOfProperty")}
+          classNames={{ input: "border-gray-300" }}
+        />
+
+        <Checkbox
+          label="Price is negotiable"
+          {...form.getInputProps("negotiable", { type: "checkbox" })}
+        />
+
+        <MultiSelect
+          label="Amenities"
+          description="Select all that apply."
+          data={AMENITIES_OPTIONS}
+          {...form.getInputProps("amenities")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        <Divider
+          label="Trust & rich listing (optional)"
+          labelPosition="center"
+          my="md"
+        />
+
+        <Select
+          label="Listing status (for buyers)"
+          description="Shows on cards — reduce wasted calls when under offer or booked."
+          data={LISTING_OPTS}
+          {...form.getInputProps("listingAvailability")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        <TextInput
+          label="RERA registration ID"
+          description="If applicable for your state — shown as a trust badge when set."
+          placeholder="e.g. PBRERA-SAS81-RE0834"
+          {...form.getInputProps("reraNumber")}
+          classNames={{ input: "border-gray-300" }}
+        />
+
+        <TextInput
+          label="Virtual tour link"
+          placeholder="https://…"
+          {...form.getInputProps("virtualTourUrl")}
+          classNames={{ input: "border-gray-300" }}
+        />
+
+        <FloorPlanUploadSection
+          urls={propertyDetails.floorPlanImages || []}
+          files={propertyDetails.floorPlanFiles || []}
+          onUrlsChange={(u) =>
+            setPropertyDetails((p: any) => ({ ...p, floorPlanImages: u }))
+          }
+          onFilesChange={(f) =>
+            setPropertyDetails((p: any) => ({ ...p, floorPlanFiles: f }))
+          }
+        />
+
+        <Textarea
+          label="Nearby — schools"
+          description="One per line"
+          autosize
+          minRows={2}
+          {...form.getInputProps("schoolsText")}
+          classNames={{ input: "border-gray-300" }}
+        />
+        <Textarea
+          label="Nearby — metro / transit"
+          autosize
+          minRows={2}
+          {...form.getInputProps("metroStationsText")}
+          classNames={{ input: "border-gray-300" }}
+        />
+        <Textarea
+          label="Nearby — hospitals (optional)"
+          autosize
+          minRows={2}
+          {...form.getInputProps("hospitalsText")}
+          classNames={{ input: "border-gray-300" }}
+        />
+        <Textarea
+          label="Nearby — malls & shopping (optional)"
+          autosize
+          minRows={2}
+          {...form.getInputProps("mallsText")}
+          classNames={{ input: "border-gray-300" }}
         />
 
         <Group justify="center" mt="xl">

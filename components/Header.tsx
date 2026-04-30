@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import ProfileMenu from "./ProfileMenu";
 import { selectIsAuthenticated, selectUser } from "../store/authSlice";
+import { compareCount } from "@/lib/compareStorage";
 import Image from "next/image";
 
 const Header: React.FC = () => {
@@ -25,6 +26,15 @@ const Header: React.FC = () => {
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const [compareN, setCompareN] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => setCompareN(compareCount());
+    refresh();
+    window.addEventListener("pb-compare-changed", refresh);
+    return () => window.removeEventListener("pb-compare-changed", refresh);
   }, []);
 
   const toggleMenu = () => setMenuOpened((prev) => !prev);
@@ -95,6 +105,23 @@ const Header: React.FC = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex items-center gap-6 lg:gap-8 font-medium">
+          <Link
+            href="/compare"
+            className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"
+          >
+            Compare
+            {compareN > 0 && (
+              <span className="ml-1 inline-flex min-w-[1.1rem] justify-center rounded-full bg-[#4161df] text-white text-[10px] px-1 font-bold">
+                {compareN}
+              </span>
+            )}
+          </Link>
+          <Link
+            href="/saved-searches"
+            className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"
+          >
+            Saved searches
+          </Link>
           <Link
             href="/properties"
             className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"
@@ -180,6 +207,20 @@ const Header: React.FC = () => {
       {/* Mobile Menu Dropdown */}
       {mounted && menuOpened && (
         <div className="md:hidden flex flex-col gap-3 sm:gap-4 bg-white/95 backdrop-blur text-black font-medium p-4 sm:p-5 md:p-6 shadow-xl absolute right-3 sm:right-4 top-14 sm:top-16 md:top-17.5 rounded-xl sm:rounded-2xl border w-[85vw] sm:w-[80vw] max-w-sm animate-in fade-in zoom-in-95">
+          <Link
+            href="/compare"
+            onClick={toggleMenu}
+            className="hover:text-blue-600 px-2 py-1.5 sm:py-2 rounded-md text-sm sm:text-base"
+          >
+            Compare {compareN > 0 ? `(${compareN})` : ""}
+          </Link>
+          <Link
+            href="/saved-searches"
+            onClick={toggleMenu}
+            className="hover:text-blue-600 px-2 py-1.5 sm:py-2 rounded-md text-sm sm:text-base"
+          >
+            Saved searches
+          </Link>
           <Link
             href="/properties"
             onClick={toggleMenu}

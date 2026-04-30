@@ -42,6 +42,19 @@ const AVAILABILITY_OPTIONS = ["Ready to Move", "Under Construction"];
 const POSTED_BY_OPTIONS = ["Owner", "Agent", "Builder"];
 const BEDROOMS_OPTIONS = [1, 2, 3, 4, 5, "5+"];
 
+function buildSearchPayload(filters: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(filters)) {
+    if (val === "" || val === undefined || val === null) continue;
+    if (key === "priceMin" && Number(val) === 0) continue;
+    if (key === "priceMax" && Number(val) >= 1000000000) continue;
+    if (key === "areaMin" && Number(val) === 0) continue;
+    if (key === "areaMax" && Number(val) >= 100000) continue;
+    out[key] = val;
+  }
+  return out;
+}
+
 export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [filters, setFilters] = useState({
@@ -57,6 +70,9 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
     availability: initialFilters.availability || "",
     postedBy: initialFilters.postedBy || "",
     city: initialFilters.city || "",
+    sector: initialFilters.sector || "",
+    bbox: initialFilters.bbox || "",
+    polygon: initialFilters.polygon || "",
   });
 
   useEffect(() => {
@@ -82,14 +98,25 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
       availability: "",
       postedBy: "",
       city: "",
+      sector: "",
+      bbox: "",
+      polygon: "",
     };
     setFilters(cleared);
     onApply({});
   };
 
-  const activeFiltersCount = Object.values(filters).filter(
-    (v) => v !== "" && v !== 0 && v !== 100000000 && v !== 100000,
-  ).length;
+  const activeFiltersCount =
+    Object.entries(filters).filter(([key, v]) => {
+      if (key === "bbox" || key === "polygon")
+        return typeof v === "string" && v.length > 0;
+      return (
+        v !== "" &&
+        v !== 0 &&
+        v !== 1000000000 &&
+        v !== 100000
+      );
+    }).length;
 
   const formatPrice = (price: number) => {
     if (price >= 10000000) {
@@ -224,8 +251,35 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
           />
         </div>
 
-        {/* SECONDARY ROW - City & Sliders */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* SECONDARY ROW - Locality, city & sliders */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
+              Locality / sector
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Sector, locality"
+                className="w-full h-8 px-2.5 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#4161df]/20 focus:border-[#4161df] transition-all placeholder:text-gray-400"
+                value={filters.sector}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, sector: e.target.value }))
+                }
+              />
+              {filters.sector && (
+                <button
+                  type="button"
+                  onClick={() => setFilters((prev) => ({ ...prev, sector: "" }))}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-3 h-3 text-gray-400" />
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* City Input */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
@@ -312,6 +366,29 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
           </div>
         </div>
 
+        {(filters.bbox || filters.polygon) && (
+          <div className="flex flex-wrap items-center gap-2 px-1 py-2 border-t border-dashed border-gray-100">
+            <span className="text-[11px] font-medium text-[#4161df] bg-[#4161df]/10 rounded-md px-2 py-1">
+              Map area filter active
+            </span>
+            <button
+              type="button"
+              className="text-[11px] font-semibold text-gray-600 hover:text-gray-900 underline"
+              onClick={() => {
+                const next = {
+                  ...filters,
+                  bbox: "",
+                  polygon: "",
+                };
+                setFilters(next);
+                onApply(buildSearchPayload(next));
+              }}
+            >
+              Clear map filter only
+            </button>
+          </div>
+        )}
+
         {/* ACTION BUTTONS */}
         <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 mt-4 pt-3 border-t border-gray-100">
           <Button
@@ -324,7 +401,7 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
           </Button>
           <Button
             onClick={() => {
-              onApply(filters);
+              onApply(buildSearchPayload(filters));
               setIsExpanded(false);
             }}
             className="h-9 sm:h-8 px-5 text-xs font-medium bg-[#4161df] hover:bg-[#3451c9] text-white w-full sm:w-auto"

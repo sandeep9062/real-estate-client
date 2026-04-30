@@ -110,7 +110,7 @@ const Favourites = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full gap-6">
+          <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
             {filtered.map((card: any) => (
               <PropertyCard card={card} key={card._id} isFavourite={true} />
             ))}

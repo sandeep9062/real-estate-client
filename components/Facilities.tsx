@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, Group, NumberInput } from "@mantine/core";
+import { Box, Button, Group, NumberInput, Select } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -19,6 +19,7 @@ interface FacilitiesProps {
   setOpened: (value: boolean) => void;
   setActiveStep: (value: number) => void;
   editingProperty?: any;
+  emptyPropertyDraft?: Record<string, unknown>;
 }
 
 const Facilities: React.FC<FacilitiesProps> = ({
@@ -28,6 +29,7 @@ const Facilities: React.FC<FacilitiesProps> = ({
   setOpened,
   setActiveStep,
   editingProperty,
+  emptyPropertyDraft,
 }) => {
   const form = useForm({
     initialValues: {
@@ -35,16 +37,19 @@ const Facilities: React.FC<FacilitiesProps> = ({
       parkings: propertyDetails.facilities.parkings,
       bathrooms: propertyDetails.facilities.bathrooms,
       servantRooms: propertyDetails.facilities.servantRooms,
+      balconies: propertyDetails.facilities.balconies ?? 0,
+      parkingType: propertyDetails.facilities.parkingType || "",
     },
     validate: {
       bedrooms: (value: number) =>
-        value < 1 ? "Must have atleast one room" : null,
+        value < 0 ? "Cannot be negative" : null,
       bathrooms: (value: number) =>
-        value < 1 ? "Must have atleast one bathroom" : null,
+        value < 0 ? "Cannot be negative" : null,
     },
   });
 
-  const { bedrooms, parkings, bathrooms, servantRooms } = form.values;
+  const { bedrooms, parkings, bathrooms, servantRooms, balconies, parkingType } =
+    form.values;
 
   const user = useSelector(selectUser);
   const { refetch: refetchProperties } = useGetAllPropertiesQuery({});
@@ -66,7 +71,15 @@ const Facilities: React.FC<FacilitiesProps> = ({
 
     const newProperty = {
       ...propertyDetails,
-      facilities: { bedrooms, parkings, bathrooms, servantRooms },
+      facilities: {
+        ...propertyDetails.facilities,
+        bedrooms,
+        parkings,
+        bathrooms,
+        servantRooms,
+        balconies,
+        ...(parkingType ? { parkingType } : {}),
+      },
       userEmail: user?.email,
     };
 
@@ -82,22 +95,9 @@ const Facilities: React.FC<FacilitiesProps> = ({
         // Create new property
         await createProperty(newProperty).unwrap();
         toast.success("Property added successfully");
-        setPropertyDetails({
-          title: "",
-          description: "",
-          price: 0,
-          country: "",
-          city: "",
-          address: "",
-          image: null,
-          facilities: {
-            bedrooms: 0,
-            parkings: 0,
-            bathrooms: 0,
-            servantRooms: 0,
-          },
-          userEmail: user?.email,
-        });
+        if (emptyPropertyDraft) {
+          setPropertyDetails(emptyPropertyDraft as any);
+        }
       }
       setOpened(false);
       setActiveStep(0);
@@ -137,7 +137,6 @@ const Facilities: React.FC<FacilitiesProps> = ({
         }}
       >
         <NumberInput
-          withAsterisk
           label="No of Bedrooms"
           min={0}
           {...form.getInputProps("bedrooms")}
@@ -152,7 +151,6 @@ const Facilities: React.FC<FacilitiesProps> = ({
         />
 
         <NumberInput
-          withAsterisk
           label="No of Bathrooms"
           min={0}
           {...form.getInputProps("bathrooms")}
@@ -164,6 +162,27 @@ const Facilities: React.FC<FacilitiesProps> = ({
           min={0}
           {...form.getInputProps("servantRooms")}
           classNames={{ input: "border-gray-300" }}
+        />
+
+        <NumberInput
+          label="Balconies"
+          min={0}
+          {...form.getInputProps("balconies")}
+          classNames={{ input: "border-gray-300" }}
+        />
+
+        <Select
+          label="Parking type"
+          data={[
+            { value: "", label: "— Not specified —" },
+            { value: "None", label: "None" },
+            { value: "Open", label: "Open" },
+            { value: "Covered", label: "Covered" },
+            { value: "Both", label: "Both" },
+          ]}
+          {...form.getInputProps("parkingType")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
         />
 
         <Group justify="center" mt="xl">

@@ -29,6 +29,10 @@ const Value = dynamic(() => import("@/components/Value"), { ssr: false });
 const PostPropertyCTA = dynamic(() => import("@/components/PostPropertyCTA"), {
   ssr: false,
 });
+const BecauseYouViewedSection = dynamic(
+  () => import("@/components/BecauseYouViewedSection"),
+  { ssr: false },
+);
 
 export default function Home() {
   const [filter, setFilter] = useState<SearchFilters>({ query: "" });
@@ -120,6 +124,8 @@ export default function Home() {
       {/* hero search bar will set filter */}
 
       <Hero setFilter={setFilter} />
+
+      <BecauseYouViewedSection />
 
       {/* show search results only when filter has content */}
       {(filter.query ||

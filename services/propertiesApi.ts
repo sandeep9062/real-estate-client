@@ -65,7 +65,7 @@ import { baseQueryWithAuth } from "./api";
 export const propertiesApi = createApi({
   reducerPath: "propertiesApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Property"],
+  tagTypes: ["Property", "VisitReviews"],
   endpoints: (builder) => ({
     getAllProperties: builder.query({
       query: (params) => ({
@@ -89,6 +89,10 @@ export const propertiesApi = createApi({
           if (key === "image") {
             property[key].forEach((file: File) => {
               formData.append(key, file);
+            });
+          } else if (key === "floorPlanFiles") {
+            (property.floorPlanFiles || []).forEach((file: File) => {
+              formData.append("floorPlan", file);
             });
           } else if (
             typeof property[key] === "object" &&
@@ -120,9 +124,14 @@ export const propertiesApi = createApi({
         newImages.forEach((file: File) => {
           formData.append("image", file);
         });
+        (property.floorPlanFiles || []).forEach((file: File) => {
+          if (file instanceof File) formData.append("floorPlan", file);
+        });
         Object.keys(property).forEach((key) => {
           if (key === "image") {
             // Already handled above
+          } else if (key === "floorPlanFiles") {
+            // Appended above
           } else if (
             typeof property[key] === "object" &&
             property[key] !== null
@@ -156,6 +165,86 @@ export const propertiesApi = createApi({
         responseHandler: (response) => response.blob(),
       }),
     }),
+    getCompareProperties: builder.query<any[], string>({
+      query: (idsCsv) => ({
+        url: "/properties/compare",
+        params: { ids: idsCsv },
+      }),
+    }),
+    getSimilarProperties: builder.query<any[], { propertyId: string; limit?: number }>({
+      query: ({ propertyId, limit = 8 }) => ({
+        url: "/properties/similar",
+        params: { propertyId, limit },
+      }),
+    }),
+    recordPropertyView: builder.mutation<{ success: boolean }, string>({
+      query: (id) => ({
+        url: `/properties/${id}/view`,
+        method: "POST",
+      }),
+    }),
+    getPropertyVisitReviewSummary: builder.query<
+      {
+        count: number;
+        avgAgentHelpfulness: number | null;
+        avgListingAccuracy: number | null;
+      },
+      string
+    >({
+      query: (propertyId) => `/properties/${propertyId}/visit-reviews/summary`,
+      providesTags: (result, error, propertyId) => [
+        { type: "VisitReviews", id: propertyId },
+      ],
+    }),
+    getPropertyVisitReviews: builder.query<
+      any[],
+      { propertyId: string; limit?: number }
+    >({
+      query: ({ propertyId, limit = 10 }) => ({
+        url: `/properties/${propertyId}/visit-reviews`,
+        params: { limit },
+      }),
+      providesTags: (result, error, { propertyId }) => [
+        { type: "VisitReviews", id: propertyId },
+      ],
+    }),
+    getBookingReviewStatus: builder.query<
+      { reviewed: boolean; eligible: boolean },
+      string
+    >({
+      query: (bookingId) => `/visit-reviews/booking/${bookingId}/status`,
+    }),
+    submitVisitReview: builder.mutation<
+      unknown,
+      {
+        bookingId: string;
+        agentHelpfulness: number;
+        listingAccuracy: number;
+        comment?: string;
+        propertyId: string;
+      }
+    >({
+      query: ({
+        bookingId,
+        agentHelpfulness,
+        listingAccuracy,
+        comment,
+        propertyId: _propertyId,
+      }) => ({
+        url: "/visit-reviews",
+        method: "POST",
+        body: {
+          bookingId,
+          agentHelpfulness,
+          listingAccuracy,
+          comment,
+        },
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: "VisitReviews", id: arg.propertyId },
+        { type: "Property", id: arg.propertyId },
+      ],
+    }),
     createWhatsAppLead: builder.mutation({
       query: ({ id, ...body }) => ({
         url: `/properties/${id}/whatsapp-lead`,
@@ -176,4 +265,12 @@ export const {
   useDeletePropertyMutation,
   useGetPropertyBrochureQuery,
   useCreateWhatsAppLeadMutation,
+  useGetComparePropertiesQuery,
+  useLazyGetComparePropertiesQuery,
+  useGetSimilarPropertiesQuery,
+  useRecordPropertyViewMutation,
+  useGetPropertyVisitReviewSummaryQuery,
+  useGetPropertyVisitReviewsQuery,
+  useGetBookingReviewStatusQuery,
+  useSubmitVisitReviewMutation,
 } = propertiesApi;

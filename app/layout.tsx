@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import "@mantine/core/styles.css";
+import "@mantine/dropzone/styles.css";
 import { Providers } from "./providers";
 import RouteTransitionWrapper from "@/components/RouteTransitionWrapper";
 import { Toaster } from "sonner";

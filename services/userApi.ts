@@ -226,6 +226,10 @@ export const userApi = createApi({
       providesTags: ["User"],
     }),
 
+    getRecentlyViewed: builder.query<any[], void>({
+      query: () => "/users/recently-viewed",
+    }),
+
     // ✅ Update profile
     updateProfile: builder.mutation<User, FormData>({
       query: (data) => ({
@@ -256,4 +260,5 @@ export const {
   useGetFavouritesQuery,
   useGetBookingsQuery,
   useUpdateProfileMutation,
+  useGetRecentlyViewedQuery,
 } = userApi;

@@ -65,7 +65,14 @@ const ForgotPasswordPage = () => {
         }),
       });
 
-      const result = await response.json();
+      const raw = await response.text();
+      let result: { success?: boolean; message?: string } = {};
+      try {
+        result = raw ? JSON.parse(raw) : {};
+      } catch {
+        toast.error("Server returned an invalid response. Check API URL and try again.");
+        return;
+      }
 
       if (response.ok && result.success) {
         setEmailSent(true);

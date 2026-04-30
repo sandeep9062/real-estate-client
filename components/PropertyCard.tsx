@@ -1,38 +1,62 @@
 "use client";
 import React, { useMemo, memo } from "react";
 import Image from "next/image";
-import { truncate } from "lodash";
 import { useRouter } from "next/navigation";
 import Heart from "./Heart";
-import { useSelector } from "react-redux";
-import { selectUser } from "@/store/authSlice";
+import { toggleCompareId, getCompareIds } from "@/lib/compareStorage";
+import { toast } from "@/hooks/use-toast";
 import {
   FaBed,
   FaBath,
   FaCar,
   FaMapMarkerAlt,
   FaWhatsapp,
+  FaHome,
 } from "react-icons/fa";
+import { GitCompare } from "lucide-react";
+import {
+  PropertyTrustBadges,
+  ListingAvailabilityPill,
+} from "@/components/PropertyTrustBadges";
 
 interface PropertyCardProps {
   card: any;
   isFavourite?: boolean;
   editable?: boolean;
   onEdit?: (property: any) => void;
+  isSelected?: boolean;
+  /** Tighter card for carousels: ~65% media / ~35% content, shorter copy */
+  variant?: "default" | "carousel";
 }
+
+const formatInr = (n: number) => `₹${(Number(n) || 0).toLocaleString("en-IN")}`;
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
   card,
-  isFavourite,
+  isFavourite: _isFavourite,
   editable = false,
   onEdit,
+  isSelected = false,
+  variant = "default",
 }) => {
   const router = useRouter();
+  const pid = String(card._id || card.id);
+
+  const [inCompare, setInCompare] = React.useState(false);
+  React.useEffect(() => {
+    const sync = () =>
+      setInCompare(
+        typeof window !== "undefined" && getCompareIds().includes(pid),
+      );
+    sync();
+    window.addEventListener("pb-compare-changed", sync);
+    return () => window.removeEventListener("pb-compare-changed", sync);
+  }, [pid]);
 
   const firstMedia = (card.image || [])[0] || "/images/property-tricity.jpg";
 
   const isVideo = useMemo(() => {
-    const lower = firstMedia.toLowerCase();
+    const lower = String(firstMedia).toLowerCase();
     return (
       lower.endsWith(".mp4") ||
       lower.endsWith(".webm") ||
@@ -40,15 +64,90 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     );
   }, [firstMedia]);
 
-  const hasValidMedia = firstMedia && firstMedia.trim() !== "";
+  const hasValidMedia = firstMedia && String(firstMedia).trim() !== "";
 
+  const areaValue = card.area?.value;
+  const areaUnit = card.area?.unit ?? "sqft";
+  const isRent = card.deal === "Rent";
+  const displayPhone =
+    card.agent?.phone || card.user?.phone?.replace(/\D/g, "").slice(-10);
+
+  const locationLine = [card.location?.address, card.location?.city]
+    .filter(Boolean)
+    .join(", ");
+  const statePart = card.location?.state
+    ? `${locationLine ? ", " : ""}${card.location.state}`
+    : "";
+
+  const carousel = variant === "carousel";
+  const statIconClass = carousel
+    ? "size-3 text-slate-600"
+    : "size-3.5 text-slate-600";
+
+  const statItems = [
+    card.facilities?.bedrooms > 0 && {
+      key: "bed",
+      icon: <FaBed className={statIconClass} aria-hidden />,
+      label: carousel
+        ? `${card.facilities.bedrooms} bed`
+        : `${card.facilities.bedrooms} bedroom${card.facilities.bedrooms !== 1 ? "s" : ""}`,
+    },
+    card.facilities?.bathrooms > 0 && {
+      key: "bath",
+      icon: <FaBath className={statIconClass} aria-hidden />,
+      label: carousel
+        ? `${card.facilities.bathrooms} bath`
+        : `${card.facilities.bathrooms} bathroom${card.facilities.bathrooms !== 1 ? "s" : ""}`,
+    },
+    card.facilities?.parkings > 0 && {
+      key: "park",
+      icon: <FaCar className={statIconClass} aria-hidden />,
+      label: carousel
+        ? `${card.facilities.parkings} park`
+        : `${card.facilities.parkings} parking space${card.facilities.parkings !== 1 ? "s" : ""}`,
+    },
+  ].filter(Boolean) as { key: string; icon: React.ReactNode; label: string }[];
+
+  // MATCHING WHATSAPP LOGIC FROM PROPERTYDETAILS.TSX
+  const handleWhatsAppClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!displayPhone) return;
+
+    const message = `Hi, I saw your property "${card.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${pid}`;
+    const whatsappUrl = `https://wa.me/${displayPhone}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, "_blank");
+
+    // GA4 Lead Tracking
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "generate_lead", {
+        event_category: "Engagement",
+        event_label: card?.title || "Unknown Property",
+        value: 1,
+      });
+    }
+  };
   return (
-    <div
-      className="group flex flex-col bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-2xl hover:border-blue-100 transition-all duration-500 cursor-pointer overflow-hidden w-full h-full min-h-[420px]"
+    <article
+      className={[
+        "group relative w-full max-w-full cursor-pointer overflow-hidden rounded-2xl border bg-white transition-shadow duration-300",
+        carousel
+          ? "flex h-full min-h-0 max-h-full flex-col"
+          : "flex min-h-[460px] h-full flex-col",
+        isSelected
+          ? "border-slate-400/80 shadow-md ring-1 ring-slate-400/60"
+          : "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md",
+      ].join(" ")}
       onClick={() => router.push(`/property/${card._id}`)}
     >
-      {/* Image Container */}
-      <div className="relative h-52 sm:h-60 w-full overflow-hidden">
+      {/* Media — ~65% of card height in carousel variant */}
+      <div
+        className={
+          carousel
+            ? "relative min-h-0 w-full flex-[1.35] basis-0 overflow-hidden"
+            : "relative min-h-[12.5rem] w-full flex-1 basis-0 overflow-hidden sm:min-h-[14rem]"
+        }
+      >
         {hasValidMedia ? (
           isVideo ? (
             <video
@@ -57,59 +156,118 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               muted
               loop
               playsInline
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             />
           ) : (
             <Image
               src={firstMedia}
-              alt={card.title}
+              alt={card.title || "Property"}
               fill
-              sizes="(max-width: 768px) 100vw, 33vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             />
           )
         ) : (
-          <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-            <span className="text-slate-400 text-sm">No Image Available</span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-slate-100">
+            <FaHome
+              className={
+                carousel ? "size-8 text-slate-300" : "size-10 text-slate-300"
+              }
+              aria-hidden
+            />
+            <span
+              className={
+                carousel
+                  ? "text-[10px] font-medium text-slate-500"
+                  : "text-xs font-medium text-slate-500"
+              }
+            >
+              Image not available
+            </span>
           </div>
         )}
 
-        {/* Gradient Overlay for bottom text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Base gradient for readability */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-slate-950/5 to-transparent transition-opacity duration-300 group-hover:from-slate-950/50"
+          aria-hidden
+        />
 
-        {/* Top Actions */}
-        <div className="absolute top-3 left-3 right-3 flex justify-between items-start z-10">
-          <span
-            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest backdrop-blur-md shadow-sm border ${
-              card.deal === "Sale"
-                ? "bg-emerald-500/90 text-white border-emerald-400"
-                : "bg-rose-500/90 text-white border-rose-400"
-            }`}
+        {/* Top row */}
+        <div
+          className={`absolute inset-x-0 top-0 z-10 flex items-start justify-between ${carousel ? "p-2 sm:p-2.5" : "p-3 sm:p-4"}`}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={[
+                "inline-flex items-center rounded-md font-semibold uppercase tracking-widest text-white shadow-sm",
+                carousel ? "px-2 py-0.5 text-[9px]" : "px-2.5 py-1 text-[10px]",
+                isRent ? "bg-slate-800" : "bg-slate-900",
+              ].join(" ")}
+            >
+              {isRent ? "For rent" : "For sale"}
+            </span>
+            {card.type && (
+              <span className="hidden rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white ring-1 ring-white/25 backdrop-blur-sm sm:inline-flex">
+                {card.type}
+              </span>
+            )}
+          </div>
+
+          <div
+            className={`flex items-center ${carousel ? "gap-1" : "gap-1.5"}`}
           >
-            For {card.deal}
-          </span>
-          <div className="flex gap-2">
-            {card.agent?.phone && (
+            <button
+              type="button"
+              aria-label={
+                inCompare ? "Remove from comparison" : "Add to comparison"
+              }
+              title={inCompare ? "Remove from comparison" : "Add to comparison"}
+              onClick={(e) => {
+                e.stopPropagation();
+                const wasIn = getCompareIds().includes(pid);
+                const next = toggleCompareId(pid);
+                setInCompare(next.includes(pid));
+                if (wasIn) {
+                  toast.success("Removed from compare");
+                } else {
+                  toast.success("Added to compare");
+                }
+              }}
+              className={[
+                "flex items-center justify-center rounded-full border border-white/20 bg-white/95 text-slate-700 shadow-sm transition-colors",
+                carousel ? "size-8" : "size-9",
+                inCompare
+                  ? "border-[#4161df]/40 bg-[#4161df] text-white"
+                  : "hover:bg-white hover:text-[#4161df]",
+              ].join(" ")}
+            >
+              <GitCompare
+                className={carousel ? "size-3.5" : "size-4"}
+                strokeWidth={2.25}
+              />
+            </button>
+            {displayPhone && (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const message = `Hi, I saw your property "${card.title}" on PropertyBulbul. Is it still available?`;
-                  const whatsappUrl = `https://wa.me/91${card.agent.phone}?text=${encodeURIComponent(message)}`;
-                  window.open(whatsappUrl, "_blank");
-                }}
-                className="bg-green-500/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-green-600 text-white transition-all"
-                title="Contact on WhatsApp"
+                type="button"
+                onClick={handleWhatsAppClick}
+                className={`flex items-center justify-center rounded-full border border-white/20 bg-[#128C7E] text-white shadow-sm transition-colors hover:bg-[#0f7a6e] ${carousel ? "size-8" : "size-9"}`}
+                title="Contact via WhatsApp"
+                aria-label="Contact via WhatsApp"
               >
-                <FaWhatsapp size={16} />
+                <FaWhatsapp className={carousel ? "size-3.5" : "size-4"} />
               </button>
             )}
             {editable && (
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit?.(card);
                 }}
-                className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white text-slate-700 transition-all"
+                className={`flex items-center justify-center rounded-full border border-white/20 bg-white/95 text-slate-700 shadow-sm transition-colors hover:bg-white ${carousel ? "size-8" : "size-9"}`}
+                title="Edit listing"
+                aria-label="Edit listing"
               >
                 <svg
                   width="16"
@@ -118,116 +276,181 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
+                  aria-hidden
                 >
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                   <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
             )}
-            <div className="bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all">
+            <div className="shrink-0 rounded-full border border-white/20 bg-white/95 shadow-sm">
               <Heart card={card} />
             </div>
           </div>
         </div>
 
-        {/* Featured Tag */}
-        {card.isFeatured && (
-          <div className="absolute bottom-0 left-0 z-10">
-            <div
-              className="bg-[#4161df] text-white text-[10px] font-black px-4 py-1.5
-
-rounded-tr-3xl shadow-md flex items-center gap-1 uppercase tracking-tighter"
+        {/* Bottom badges on image */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 z-10 flex flex-wrap items-end justify-between gap-1.5 ${carousel ? "p-2 sm:p-2.5" : "gap-2 p-3 sm:p-4"}`}
+        >
+          {card.isFeatured && (
+            <span
+              className={`inline-flex items-center rounded-md bg-[#4161df] font-semibold uppercase tracking-widest text-white ${carousel ? "px-2 py-0.5 text-[8px]" : "px-2.5 py-1 text-[10px]"}`}
             >
-              <span>★</span> FEATURED
-            </div>
+              Featured listing
+            </span>
+          )}
+          <div className="ml-auto flex flex-col items-end gap-1.5">
+            <ListingAvailabilityPill
+              listingAvailability={card.listingAvailability}
+            />
+            {(card.virtualTourUrl ||
+              (card.floorPlanImages?.length ?? 0) > 0) && (
+              <span className="inline-flex rounded-md border border-white/25 bg-black/50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+                {card.virtualTourUrl ? "Virtual tour" : "Floor plans"}
+              </span>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Content Section */}
-      <div className="p-5 flex flex-col flex-1 gap-3">
-        {/* Price & Badge */}
-        <div className="flex justify-between items-baseline">
-          <h4 className="text-2xl font-black text-[#4161df] tracking-tight">
-            ₹{card.price.toLocaleString("en-IN")}
-          </h4>
-          <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">
-            {card.propertyCategory}
-          </span>
+      {/* Body — ~35% of card height in carousel variant */}
+      <div
+        className={
+          carousel
+            ? "flex min-h-0 flex-1 basis-0 flex-col gap-1.5 overflow-y-auto overflow-x-hidden overscroll-contain p-2.5 sm:p-3"
+            : "flex shrink-0 flex-col gap-3 p-4 pt-4 sm:p-5"
+        }
+      >
+        <div
+          className={`flex flex-wrap items-end justify-between gap-x-2 ${carousel ? "gap-y-0.5" : "gap-y-1"}`}
+        >
+          <div className="min-w-0">
+            <p
+              className={
+                carousel
+                  ? "text-[9px] font-medium uppercase tracking-wider text-slate-500"
+                  : "text-[11px] font-medium uppercase tracking-wider text-slate-500"
+              }
+            >
+              {isRent ? "Monthly rental" : "Listed price"}
+            </p>
+            <p
+              className={
+                carousel
+                  ? "text-lg font-semibold tracking-tight text-slate-900 sm:text-xl"
+                  : "text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.6rem]"
+              }
+            >
+              {formatInr(card.price ?? 0)}
+              {isRent && (
+                <span
+                  className={
+                    carousel
+                      ? "ml-1 text-xs font-medium text-slate-500"
+                      : "ml-1 text-base font-medium text-slate-500"
+                  }
+                >
+                  per month
+                </span>
+              )}
+            </p>
+          </div>
+          <div
+            className={`flex flex-col items-end ${carousel ? "gap-0.5" : "gap-1"}`}
+          >
+            {card.propertyCategory && (
+              <span
+                className={
+                  carousel
+                    ? "max-w-[9rem] truncate rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-center text-[10px] font-medium text-slate-700"
+                    : "max-w-44 truncate rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-center text-[11px] font-medium text-slate-700"
+                }
+              >
+                {card.propertyCategory}
+              </span>
+            )}
+            {areaValue != null && areaValue !== "" && (
+              <span
+                className={
+                  carousel
+                    ? "text-[10px] font-medium tabular-nums text-slate-600"
+                    : "text-xs font-medium tabular-nums text-slate-600"
+                }
+              >
+                {areaValue}{" "}
+                <span className="font-normal uppercase text-slate-500">
+                  {areaUnit}
+                </span>
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Title & Address */}
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold text-slate-900 leading-snug group-hover:text-[#4161df] transition-colors line-clamp-1">
+        <div className={`min-h-0 ${carousel ? "space-y-1" : "space-y-2"}`}>
+          <h3
+            className={
+              carousel
+                ? "truncate text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#4161df]"
+                : "truncate text-base font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#4161df] sm:text-[1.05rem]"
+            }
+          >
             {card.title}
           </h3>
-          <div className="flex items-center gap-1 text-slate-500">
-            <FaMapMarkerAlt className="text-[#4161df] text-xs" />
-            <p className="text-xs font-medium truncate">
-              {card.location.address}, {card.location.city}
-              {card.location.state && `, ${card.location.state}`}
+          <div
+            className={
+              carousel
+                ? "flex items-center gap-1.5 rounded-md border border-slate-100 bg-slate-50/80 px-2 py-1.5"
+                : "flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/80 px-2.5 py-2"
+            }
+          >
+            <FaMapMarkerAlt
+              className={
+                carousel
+                  ? "size-3 shrink-0 text-slate-500"
+                  : "shrink-0 text-slate-500"
+              }
+              aria-hidden
+            />
+            <p
+              className={
+                carousel
+                  ? "min-w-0 truncate whitespace-nowrap text-[10px] font-normal leading-relaxed text-slate-600"
+                  : "min-w-0 truncate whitespace-nowrap text-xs font-normal leading-relaxed text-slate-600"
+              }
+            >
+              {locationLine}
+              {statePart}
             </p>
           </div>
         </div>
 
-        {/* Features Row */}
-        <div className="flex items-center justify-between border-t border-slate-50 pt-4 mt-auto">
-          <div className="flex items-center gap-4 text-slate-600">
-            {card.facilities?.bedrooms > 0 && (
-              <>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                    <FaBed className="text-[#4161df]" />
-                    <span>{card.facilities?.bedrooms || 0}</span>
-                  </div>
-                  <span className="text-[10px] uppercase text-slate-400 tracking-wider">
-                    Beds
-                  </span>
-                </div>
-                <div className="w-[1px] h-6 bg-slate-100" />{" "}
-              </>
-            )}
-            {card.facilities?.bathrooms > 0 && (
-              <>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                    <FaBath className="text-[#4161df]" />
-                    <span>{card.facilities?.bathrooms || 0}</span>
-                  </div>
-                  <span className="text-[10px] uppercase text-slate-400 tracking-wider">
-                    Baths
-                  </span>
-                </div>
-                <div className="w-[1px] h-6 bg-slate-100" />
-              </>
-            )}
-
-            {card.facilities?.parkings > 0 && (
-              <>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                    <FaCar className="text-[#4161df]" />
-                    <span>{card.facilities?.parkings || 0}</span>
-                  </div>
-                  <span className="text-[10px] uppercase text-slate-400 tracking-wider">
-                    Park
-                  </span>
-                </div>
-              </>
-            )}
+        <PropertyTrustBadges property={card} compact />
+        {statItems.length > 0 && (
+          <div
+            className={
+              carousel
+                ? "mt-auto flex flex-nowrap gap-1 overflow-hidden border-t border-slate-100 pt-2"
+                : "mt-auto flex flex-nowrap gap-2 overflow-hidden border-t border-slate-100 pt-4"
+            }
+          >
+            {statItems.map((s) => (
+              <span
+                key={s.key}
+                className={
+                  carousel
+                    ? "inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[9px] font-medium text-slate-700"
+                    : "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700"
+                }
+              >
+                {s.icon}
+                <span className="truncate">{s.label}</span>
+              </span>
+            ))}
           </div>
-
-          <div className="text-right">
-            <span className="block text-sm font-bold text-slate-900">
-              {card.area.value}
-            </span>
-            <span className="block text-[10px] text-slate-400 uppercase">
-              {card.area.unit}
-            </span>
-          </div>
-        </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 };
 

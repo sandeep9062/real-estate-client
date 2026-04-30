@@ -1,149 +1,194 @@
 "use client";
 import React, { useRef, useMemo, memo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/pagination";
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import PropertyCard from "./PropertyCard";
-import { sliderSettings } from "@/lib/utils";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-import { fa } from "zod/v4/locales";
+import { Layers } from "lucide-react";
 
-// Memoized PropertyCard wrapper to prevent unnecessary re-renders
+/** Wider cards + tighter gutters than the global slider helper */
+const RESIDENCIES_SWIPER = {
+  slidesPerView: 1,
+  spaceBetween: 10,
+  breakpoints: {
+    480: { slidesPerView: 1, spaceBetween: 12 },
+    768: { slidesPerView: 2, spaceBetween: 12 },
+    1024: { slidesPerView: 2, spaceBetween: 14 },
+    1440: { slidesPerView: 4, spaceBetween: 14 },
+  },
+} as const;
+
 const MemoizedPropertyCard = memo(PropertyCard);
 
 interface ResidenciesProps {
   filter?: { [key: string]: string };
 }
 
+const navButtonClass =
+  "absolute top-1/2 z-30 hidden -translate-y-1/2 md:flex size-11 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-sm transition-all duration-200 hover:border-[#4161df]/35 hover:bg-white hover:text-[#4161df] hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]";
+
 const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
-  // Use RTK Query's caching - this will use cached data if available
   const { data, isError, isLoading } = useGetAllPropertiesQuery(
     {
       ...filter,
       isFeatured: true,
     },
     {
-      // Skip refetching if we already have data
       refetchOnMountOrArgChange: false,
     },
   );
 
   const swiperRef = useRef<any>(null);
 
-  // Memoize the sliced data to show only first 10 properties
   const displayProperties = useMemo(() => {
     if (!data) return [];
     return data.filter((property: any) => property.isFeatured === true);
-    // .slice(0, 10);
   }, [data]);
 
-  //console.log(displayProperties, "featured-proeprties");
+  const count = displayProperties.length;
 
   if (isError) {
     return (
-      <div className="w-full flex items-center justify-center py-20 text-red-500 font-semibold">
-        Something went wrong!
-      </div>
+      <section className="border-t border-slate-200/80 bg-slate-50/80 py-16 sm:py-20">
+        <div className="mx-auto max-w-lg px-4 text-center">
+          <div className="rounded-2xl border border-slate-200 bg-white px-8 py-10 shadow-sm">
+            <p className="text-sm font-medium text-slate-800">
+              Listings are temporarily unavailable.
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Please refresh the page or try again shortly.
+            </p>
+          </div>
+        </div>
+      </section>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="w-full flex items-center justify-center h-[60vh]">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-gray-500">Loading properties...</span>
+      <section className="border-t border-slate-200/80 bg-slate-50/80 py-16 sm:py-20">
+        <div className="flex min-h-[40vh] w-full items-center justify-center px-4">
+          <div className="flex flex-col items-center gap-5">
+            <div
+              className="size-11 animate-spin rounded-full border-2 border-slate-200 border-t-[#4161df]"
+              aria-hidden
+            />
+            <p className="text-sm font-medium text-slate-600">
+              Loading featured listings…
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <section className="py-6 sm:py-10 md:py-16 lg:py-20 relative bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Title Section */}
-        <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16">
-          <p className="text-blue-600 font-semibold tracking-wide uppercase text-xs sm:text-sm">
-            Homes You'll Love
-          </p>
+    <section className="relative overflow-hidden border-t border-slate-200/80 bg-slate-50/90 py-12 sm:py-16 md:py-20">
+      {/* Subtle background depth */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(65,97,223,0.06),transparent_55%)]"
+        aria-hidden
+      />
 
-          <h2
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-black
-              bg-clip-text text-transparent leading-tight"
-          >
-            Popular Residencies
+      <div className="relative mx-auto max-w-[100rem] px-3 sm:px-5 lg:px-8">
+        <header className="mx-auto mb-8 max-w-3xl text-center sm:mb-10 md:mb-12">
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#4161df]/50 sm:w-14" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 shadow-sm backdrop-blur-sm">
+              <Layers className="size-3.5 text-[#4161df]" strokeWidth={2} />
+              Featured listings
+            </span>
+            <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#4161df]/50 sm:w-14" />
+          </div>
+
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl md:text-4xl md:leading-[1.15]">
+            Selected properties
           </h2>
 
-          <p className="text-gray-500 mt-2 sm:mt-3 md:mt-4 max-w-xl mx-auto text-sm sm:text-base md:text-lg px-4">
-            Discover premium properties verified for quality, value, and luxury
-            lifestyle.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+            A curated overview of highlighted residential and commercial
+            listings, presented for review and comparison.
           </p>
-        </div>
 
-        {/* Slider Container */}
-        <div className="relative mt-4 sm:mt-6">
-          {/* Left Fade */}
-          <div
-            className="absolute left-0 top-0 bottom-0 w-8 sm:w-10 md:w-16 lg:w-20 
-              bg-gradient-to-r from-white via-white/40 to-transparent
-              pointer-events-none z-20"
-          />
+          {count > 0 && (
+            <p className="mt-5 text-xs font-medium uppercase tracking-wider text-slate-400">
+              {count} listing{count !== 1 ? "s" : ""} in this collection
+            </p>
+          )}
+        </header>
 
-          {/* Right Fade */}
-          <div
-            className="absolute right-0 top-0 bottom-0 w-8 sm:w-10 md:w-16 lg:w-20 
-              bg-gradient-to-l from-white via-white/40 to-transparent
-              pointer-events-none z-20"
-          />
+        {count === 0 ? (
+          <div className="mx-auto max-w-md rounded-2xl border border-dashed border-slate-300 bg-white/60 px-8 py-14 text-center shadow-sm">
+            <Layers
+              className="mx-auto size-10 text-slate-300"
+              strokeWidth={1.5}
+              aria-hidden
+            />
+            <p className="mt-4 text-sm font-medium text-slate-700">
+              No featured listings at the moment
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Check back soon for new highlighted properties.
+            </p>
+          </div>
+        ) : (
+          <div className="relative  p-2  sm:p-3 md:p-4">
+            <div className="pointer-events-none absolute inset-y-2 left-0 z-20 w-5 rounded-l-2xl bg-gradient-to-r from-white via-white/90 to-transparent sm:inset-y-3 sm:w-8 md:w-12" />
+            <div className="pointer-events-none absolute inset-y-2 right-0 z-20 w-5 rounded-r-2xl bg-gradient-to-l from-white via-white/90 to-transparent sm:inset-y-3 sm:w-8 md:w-12" />
 
-          {/* Previous Button */}
-          <button
-            aria-label="Previous"
-            className="hidden md:flex absolute -left-2 sm:-left-4 md:-left-6 lg:-left-10 top-1/2 -translate-y-1/2
-              z-30 p-3 sm:p-4 rounded-full 
-              bg-white/50 backdrop-blur-xl shadow-xl
-              border border-white/40 
-              hover:scale-110 transition-all duration-300 
-              hover:bg-white/90 items-center justify-center"
-            onClick={() => swiperRef.current?.slidePrev()}
-          >
-            <FaArrowLeft className="text-blue-700 text-base sm:text-lg" />
-          </button>
+            <button
+              type="button"
+              aria-label="Previous slide"
+              className={`${navButtonClass} md:left-1 lg:left-2`}
+              onClick={() => swiperRef.current?.slidePrev()}
+            >
+              <FaArrowLeft className="text-sm sm:text-base" />
+            </button>
 
-          {/* Next Button */}
-          <button
-            aria-label="Next"
-            className="hidden md:flex absolute -right-2 sm:-right-4 md:-right-6 lg:-right-10 top-1/2 -translate-y-1/2
-              z-30 p-3 sm:p-4 rounded-full 
-              bg-white/50 backdrop-blur-xl shadow-xl
-              border border-white/40
-              hover:scale-110 transition-all duration-300 
-              hover:bg-white/90 items-center justify-center"
-            onClick={() => swiperRef.current?.slideNext()}
-          >
-            <FaArrowRight className="text-blue-700 text-base sm:text-lg" />
-          </button>
+            <button
+              type="button"
+              aria-label="Next slide"
+              className={`${navButtonClass} md:right-1 lg:right-2`}
+              onClick={() => swiperRef.current?.slideNext()}
+            >
+              <FaArrowRight className="text-sm sm:text-base" />
+            </button>
 
-          <Swiper
-            {...sliderSettings}
-            modules={[Autoplay]}
-            autoplay={{
-              delay: 3000,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-            }}
-            loop={false} // Set loop to false to prevent infinite scrolling
-            onSwiper={(swiper) => (swiperRef.current = swiper)}
-            className="pb-10 pt-6 -mx-2"
-          >
-            {displayProperties.map((card: any, index: number) => (
-              <SwiperSlide key={card._id || index} className="px-2">
-                <MemoizedPropertyCard card={card} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+            <Swiper
+              {...RESIDENCIES_SWIPER}
+              modules={[Autoplay, Pagination]}
+              autoplay={{
+                delay: 4500,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+                dynamicMainBullets: 5,
+              }}
+              loop={false}
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+              }}
+              className="featured-swiper pb-11! pt-1! sm:pb-12! [&_.swiper-slide]:box-border [&_.swiper-slide]:max-w-full [&_.swiper-slide]:overflow-hidden [&_.swiper-pagination]:bottom-1! [&_.swiper-pagination-bullet]:h-1.5 [&_.swiper-pagination-bullet]:w-1.5 [&_.swiper-pagination-bullet]:bg-slate-300 [&_.swiper-pagination-bullet]:opacity-100 [&_.swiper-pagination-bullet-active]:w-5 [&_.swiper-pagination-bullet-active]:rounded-full [&_.swiper-pagination-bullet-active]:bg-[#4161df] [&_.swiper-pagination-bullet-active]:transition-all [&_.swiper-wrapper]:items-stretch [&_.swiper-slide]:min-h-0 [&_.swiper-slide]:min-w-0"
+            >
+              {displayProperties.map((card: any, index: number) => (
+                <SwiperSlide
+                  key={card._id || index}
+                  className="box-border !h-auto min-h-0 min-w-0 max-w-full shrink-0 overflow-hidden px-1 sm:px-1.5"
+                >
+                  <div className="mx-auto flex h-[396px] w-full max-w-full min-h-0 flex-col sm:h-[420px]">
+                    <MemoizedPropertyCard card={card} variant="carousel" />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        )}
       </div>
     </section>
   );

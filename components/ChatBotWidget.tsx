@@ -7,6 +7,7 @@ import {
   BOT_MESSAGES,
   ChatMessage,
 } from "../services/chatBotApi";
+import { toast } from "@/hooks/use-toast";
 
 export default function ChatbotWidget() {
   const [open, setOpen] = useState(false);
@@ -62,6 +63,7 @@ export default function ChatbotWidget() {
         setMessages((prev) => [...prev, errorMessage]);
         setIsTyping(false);
         setError("Failed to send message. Please try again.");
+        toast.error("Assistant could not respond. Please try again.");
       }, 1000);
     }
   }

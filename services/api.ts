@@ -59,13 +59,11 @@ export const baseQueryWithAuth: BaseQueryFn<
     } else {
       console.log("Refresh failed. Logging out...");
 
-      // Logout user (clear Redux state)
-      api.dispatch({ type: "auth/logout" });
+      api.dispatch({ type: "auth/logoutSuccess" });
 
-      // Redirect to login
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
+      // Do not navigate to /login here. Many routes are public (e.g. /property/[id]).
+      // localStorage restore can mark the user authenticated while cookies are stale;
+      // GET /users/:id then returns 401 and would trap visitors on listing pages.
     }
   }
 
