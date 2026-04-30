@@ -125,8 +125,6 @@ export default function Home() {
 
       <Hero setFilter={setFilter} />
 
-      <BecauseYouViewedSection />
-
       {/* show search results only when filter has content */}
       {(filter.query ||
         filter.bedrooms ||
@@ -142,6 +140,8 @@ export default function Home() {
           <PropertyGrid properties={filteredData} />
         </section>
       )}
+
+      <BecauseYouViewedSection />
 
       <div className="mx-auto h-px w-[90%] max-w-7xl bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
 
