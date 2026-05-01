@@ -199,17 +199,18 @@ export default function BlogListingPage() {
                         alt={post.title}
                         style={{ height: "100%", objectFit: "cover" }}
                       />
-
                       {(isFeatured || isMedium) && (
                         <Overlay
-                          background="linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 100%)"
-                          zIndex={1}
-                          p={{ base: "lg", sm: "xl" }}
-                          display="flex"
+                          // Move the gradient to the style prop to satisfy TypeScript
                           style={{
+                            background:
+                              "linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 100%)",
+                            display: "flex",
                             flexDirection: "column",
                             justifyContent: "flex-end",
                           }}
+                          zIndex={1}
+                          p={{ base: "lg", sm: "xl" }}
                         >
                           <Badge
                             color="blue"
