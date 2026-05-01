@@ -81,9 +81,9 @@ export default function ContactPage() {
 
           <div className="space-y-4 sm:space-y-5">
             {[
-              // { icon: Phone, text: "+91 97299 07448" },
-              // { icon: Mail, text: "bulbulproperty@gmail.com" },
-              { icon: MapPin, text: "145, Sector-15, Chandigarh, India" },
+              { icon: Phone, text: "+91 97299 07448" },
+              { icon: Mail, text: "bulbulproperty@gmail.com" },
+              // { icon: MapPin, text: "145, Sector-15, Chandigarh, India" },
               { icon: Clock, text: "Mon - Sat, 9 AM - 7 PM" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 sm:gap-4">
