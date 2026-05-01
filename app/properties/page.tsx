@@ -48,7 +48,7 @@ const PropertiesContent = () => {
         <div className="flex flex-col items-center gap-6 max-w-full mx-auto px-4 sm:px-6 md:px-10 py-8">
           <div className="h-8 w-2/3 max-w-lg animate-pulse rounded-lg bg-slate-200" />
           <div className="h-12 w-full max-w-3xl animate-pulse rounded-xl bg-slate-200" />
-          <PropertyGridSkeleton count={9} columns="three" />
+          <PropertyGridSkeleton count={9} columns="three" variant="default" />
         </div>
       </div>
     );
@@ -73,7 +73,7 @@ const PropertiesContent = () => {
         {Object.keys(query).length > 0 ? (
           <SearchResults query={query as any} />
         ) : (
-          <PropertyGrid properties={data || []} />
+          <PropertyGrid properties={data || []} variant="default" />
         )}
       </div>
     </div>

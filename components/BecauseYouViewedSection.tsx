@@ -29,7 +29,7 @@ export default function BecauseYouViewedSection() {
         aria-busy="true"
         aria-label="Loading your recently viewed listings"
       >
-        <PropertyGridSkeleton count={6} columns="three" />
+        <PropertyGridSkeleton count={6} columns="three" variant="carousel" />
       </section>
     );
   }
@@ -40,7 +40,9 @@ export default function BecauseYouViewedSection() {
   const pid = String(first._id || first.id);
   const label =
     first.title?.trim() ||
-    [first.location?.address, first.location?.city].filter(Boolean).join(", ") ||
+    [first.location?.address, first.location?.city]
+      .filter(Boolean)
+      .join(", ") ||
     "this listing";
 
   return (
@@ -63,7 +65,11 @@ export default function BecauseYouViewedSection() {
       <p className="mb-4 text-sm text-gray-500">
         Listings you recently opened — continue browsing from here.
       </p>
-      <PropertyGrid properties={recent.slice(0, 6)} columns="three" />
+      <PropertyGrid
+        properties={recent.slice(0, 6)}
+        columns="three"
+        variant="carousel"
+      />
     </section>
   );
 }

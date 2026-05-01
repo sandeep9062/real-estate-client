@@ -9,6 +9,7 @@ interface PropertyGridProps {
   selectedId?: string | null;
   /** @default `three` — 3 cards per row from `lg` up. `two` — 2 per row from `sm` up. `default` — legacy layout. */
   columns?: PropertyGridColumns;
+  variant?: "default" | "carousel";
 }
 
 const gridClassByColumns: Record<PropertyGridColumns, string> = {
@@ -23,6 +24,7 @@ export default function PropertyGrid({
   properties,
   selectedId,
   columns = "three",
+  variant = "carousel",
 }: PropertyGridProps) {
   if (!properties || properties.length === 0) {
     return (
@@ -38,10 +40,19 @@ export default function PropertyGrid({
       {properties.map((card: any) => {
         const pid = card.id || card._id;
         return (
-          <div key={pid} data-property-id={pid}>
+          <div
+            key={pid}
+            data-property-id={pid}
+            className={
+              variant === "carousel"
+                ? "mx-auto flex h-[396px] w-full max-w-full min-h-0 flex-col sm:h-[420px]"
+                : ""
+            }
+          >
             <PropertyCard
               card={card}
               isSelected={!!selectedId && selectedId === String(pid)}
+              variant={variant}
             />
           </div>
         );

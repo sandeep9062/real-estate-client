@@ -9,7 +9,10 @@ interface SearchResultsProps {
   columns?: "default" | "two" | "three";
 }
 
-export default function SearchResults({ query, columns = "three" }: SearchResultsProps) {
+export default function SearchResults({
+  query,
+  columns = "three",
+}: SearchResultsProps) {
   const { data, isLoading, isError } = useGetAllPropertiesQuery(query);
 
   if (!query || Object.keys(query).length === 0) {
@@ -24,7 +27,7 @@ export default function SearchResults({ query, columns = "three" }: SearchResult
             Searching for “{query.search || ""}”
           </h2>
         </div>
-        <PropertyGridSkeleton count={6} columns={columns} />
+        <PropertyGridSkeleton count={6} columns={columns} variant="carousel" />
       </div>
     );
   }
@@ -70,7 +73,7 @@ export default function SearchResults({ query, columns = "three" }: SearchResult
           {results.length} found
         </span>
       </div>
-      <PropertyGrid properties={results} columns={columns} />
+      <PropertyGrid properties={results} columns={columns} variant="carousel" />
     </div>
   );
 }
