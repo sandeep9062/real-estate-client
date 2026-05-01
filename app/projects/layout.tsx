@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Our Projects | Propertybulbul",
+  title: "Our Projects | PropertyBulbul",
   description:
-    "Discover the latest projects by Propertybulbul. We are committed to building the future of real estate with our innovative and sustainable projects.",
+    "Discover the latest projects by PropertyBulbul. We are committed to building the future of real estate with our innovative and sustainable projects.",
   keywords: [
     "real estate projects",
     "new developments",
@@ -11,14 +11,14 @@ export const metadata: Metadata = {
     "upcoming projects",
   ],
   openGraph: {
-    title: "Our Projects | Propertybulbul",
+    title: "Our Projects | PropertyBulbul",
     description:
-      "Discover the latest projects by Propertybulbul. We are committed to building the future of real estate.",
-    url: "https://propertybulbul.com/projects",
+      "Discover the latest projects by PropertyBulbul. We are committed to building the future of real estate.",
+    url: "https://www.propertybulbul.com/projects",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Our Real Estate Projects",
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Our Projects | Propertybulbul",
+    title: "Our Projects | PropertyBulbul",
     description:
-      "Discover the latest projects by Propertybulbul. We are committed to building the future of real estate.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+      "Discover the latest projects by PropertyBulbul. We are committed to building the future of real estate.",
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
   alternates: {
-    canonical: "https://propertybulbul.com/projects",
+    canonical: "https://www.propertybulbul.com/projects",
   },
 };
 

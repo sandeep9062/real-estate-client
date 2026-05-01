@@ -11,10 +11,10 @@ import { Toaster } from "sonner";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://propertybulbul.com"),
+  metadataBase: new URL("https://www.propertybulbul.com"),
   title: {
     default: "PropertyBulbul - Tricity's Most Helpful Real Estate Partner",
-    template: "%s | Propertybulbul",
+    template: "%s | PropertyBulbul",
   },
   icons: {
     icon: [{ url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" }],
@@ -70,11 +70,11 @@ export const metadata: Metadata = {
     title: "PropertyBulbul - Tricity's Most Helpful Real Estate Partner",
     description:
       "Search for properties to buy or rent. Find apartments, houses, and commercial properties on Propertybulbul, your trusted real estate partner.",
-    url: "https://propertybulbul.com",
-    siteName: "Propertybulbul",
+    url: "https://www.propertybulbul.com",
+    siteName: "PropertyBulbul",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
       },
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
     title: "PropertyBulbul - Tricity Real Estate",
     description:
       "Buy, sell & rent properties in Chandigarh, Mohali & Panchkula.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
 
   robots: {
@@ -103,7 +103,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://propertybulbul.com",
+    canonical: "https://www.propertybulbul.com",
   },
 };
 
@@ -113,8 +113,8 @@ function RootStructuredData() {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
     name: "PropertyBulbul",
-    url: "https://propertybulbul.com",
-    logo: "https://propertybulbul.com/propertybulbul.png",
+    url: "https://www.propertybulbul.com",
+    logo: "https://www.propertybulbul.com/propertybulbul.png",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Sector 15",

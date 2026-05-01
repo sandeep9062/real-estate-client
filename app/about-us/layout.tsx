@@ -27,12 +27,12 @@ export const metadata: Metadata = {
     title: "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner",
     description:
       "Know the story behind PropertyBulbul, Tricity's most trusted real estate partner. Meet our expert team serving Chandigarh, Panchkula, and Mohali.",
-    url: "https://propertybulbul.com/about-us",
-    siteName: "Propertybulbul",
+    url: "https://www.propertybulbul.com/about-us",
+    siteName: "PropertyBulbul",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/about-image.jpg",
+        url: "https://www.propertybulbul.com/about-image.jpg",
         width: 1200,
         height: 630,
         alt: "About PropertyBulbul - Real Estate Experts in Tricity",
@@ -44,14 +44,14 @@ export const metadata: Metadata = {
     title: "About PropertyBulbul - Tricity Real Estate Experts",
     description:
       "Discover PropertyBulbul's story and mission in Tricity. Expert real estate services in Chandigarh, Panchkula, and Mohali.",
-    images: ["https://propertybulbul.com/about-image.jpg"],
+    images: ["https://www.propertybulbul.com/about-image.jpg"],
   },
   robots: {
     index: true,
     follow: true,
   },
   alternates: {
-    canonical: "https://propertybulbul.com/about-us",
+    canonical: "https://www.propertybulbul.com/about-us",
   },
 };
 
@@ -63,7 +63,7 @@ function AboutStructuredData() {
     name: "About PropertyBulbul - Tricity Real Estate Experts",
     description:
       "Learn about PropertyBulbul, Tricity's most trusted real estate partner. Meet our team of experts serving Chandigarh, Panchkula, and Mohali.",
-    url: "https://propertybulbul.com/about-us",
+    url: "https://www.propertybulbul.com/about-us",
     mainEntity: {
       "@type": "RealEstateAgent",
       name: "PropertyBulbul",

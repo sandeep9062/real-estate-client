@@ -24,17 +24,17 @@ export const metadata: Metadata = {
     "retail shops",
   ],
   alternates: {
-    canonical: "https://propertybulbul.com/properties",
+    canonical: "https://www.propertybulbul.com/properties",
   },
   openGraph: {
-    title: "Properties for Sale & Rent in Tricity | Propertybulbul",
+    title: "Properties for Sale & Rent in Tricity | PropertyBulbul",
     description:
-      "Discover premium properties for sale and rent in Chandigarh, Panchkula, Mohali, and Kharar. Find your dream home with Propertybulbul.",
-    url: "https://propertybulbul.com/properties",
+      "Discover premium properties for sale and rent in Chandigarh, Panchkula, Mohali, and Kharar. Find your dream home with PropertyBulbul.",
+    url: "https://www.propertybulbul.com/properties",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Find Your Dream Home in Tricity Properties",
@@ -43,10 +43,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Properties for Sale & Rent in Tricity | Propertybulbul",
+    title: "Properties for Sale & Rent in Tricity | PropertyBulbul",
     description:
-      "Explore premium properties for sale and rent in Chandigarh, Panchkula, Mohali. Find your perfect home with Propertybulbul.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+      "Explore premium properties for sale and rent in Chandigarh, Panchkula, Mohali. Find your perfect home with PropertyBulbul.",
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
 };
 
@@ -69,13 +69,13 @@ export default function PropertiesLayout({
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://propertybulbul.com",
+                item: "https://www.propertybulbul.com",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Properties",
-                item: "https://propertybulbul.com/properties",
+                item: "https://www.propertybulbul.com/properties",
               },
             ],
           }),
@@ -88,18 +88,18 @@ export default function PropertiesLayout({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
-            "@id": "https://propertybulbul.com/properties",
+            "@id": "https://www.propertybulbul.com/properties",
             name: "Properties for Sale & Rent in Tricity",
             description:
               "Discover premium properties for sale and rent in Tricity including Chandigarh, Panchkula, Mohali, and Kharar.",
-            url: "https://propertybulbul.com/properties",
+            url: "https://www.propertybulbul.com/properties",
             publisher: {
               "@type": "Organization",
-              name: "Propertybulbul",
-              url: "https://propertybulbul.com",
+              name: "PropertyBulbul",
+              url: "https://www.propertybulbul.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://propertybulbul.com/propertybulbul.png",
+                url: "https://www.propertybulbul.com/propertybulbul.png",
               },
             },
             about: {

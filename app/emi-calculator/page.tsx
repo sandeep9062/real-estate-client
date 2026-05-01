@@ -24,17 +24,17 @@ export const metadata: Metadata = {
     "panchkula property loan",
   ],
   alternates: {
-    canonical: "https://propertybulbul.com/emi-calculator",
+    canonical: "https://www.propertybulbul.com/emi-calculator",
   },
   openGraph: {
     title: "Home Loan EMI Calculator | Calculate EMI Online",
     description:
       "Calculate your home loan EMI instantly. Free tool to estimate monthly payments, total interest & compare loan options.",
-    url: "https://propertybulbul.com/emi-calculator",
+    url: "https://www.propertybulbul.com/emi-calculator",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "PropertyBulbul Home Loan EMI Calculator",

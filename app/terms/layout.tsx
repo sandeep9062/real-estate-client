@@ -12,20 +12,20 @@ export const metadata: Metadata = {
     "user agreement",
   ],
   alternates: {
-    canonical: "https://propertybulbul.com/terms",
+    canonical: "https://www.propertybulbul.com/terms",
   },
   openGraph: {
-    title: "Terms & Conditions | Propertybulbul",
+    title: "Terms & Conditions | PropertyBulbul",
     description:
-      "Terms & Conditions for using Propertybulbul's real estate platform.",
-    url: "https://propertybulbul.com/terms",
+      "Terms & Conditions for using PropertyBulbul's real estate platform.",
+    url: "https://www.propertybulbul.com/terms",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
-        alt: "Propertybulbul Terms & Conditions",
+        alt: "PropertyBulbul Terms & Conditions",
       },
     ],
   },

@@ -21,18 +21,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!journal) {
     return {
-      title: "Article Not Found | Propertybulbul Journal",
+      title: "Article Not Found | PropertyBulbul Journal",
       description: "The article you're looking for could not be found.",
     };
   }
 
-  const title = `${journal.title} | Propertybulbul Journal`;
+  const title = `${journal.title} | PropertyBulbul Journal`;
   const description =
     journal.content?.replace(/<[^>]*>/g, "").substring(0, 160) ||
-    `Read ${journal.title} on Propertybulbul Journal - expert real estate insights for Tricity.`;
-  const canonicalUrl = `https://propertybulbul.com/journal/${slug}`;
+    `Read ${journal.title} on PropertyBulbul Journal - expert real estate insights for Tricity.`;
+  const canonicalUrl = `https://www.propertybulbul.com/journal/${slug}`;
   const imageUrl =
-    journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
+    journal.coverImage || "https://www.propertybulbul.com/property-tricity.jpg";
 
   return {
     title,
@@ -73,16 +73,16 @@ export default async function JournalDetailPage({ params }: Props) {
     notFound();
   }
 
-  const canonicalUrl = `https://propertybulbul.com/journal/${slug}`;
+  const canonicalUrl = `https://www.propertybulbul.com/journal/${slug}`;
   const imageUrl =
-    journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
+    journal.coverImage || "https://www.propertybulbul.com/property-tricity.jpg";
 
   // Generate all schemas
   const articleSchema = generateArticleSchema(journal, slug);
   const faqSchema = generateFAQSchema(journal.content, journal.location);
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", item: "https://propertybulbul.com" },
-    { name: "Journal", item: "https://propertybulbul.com/journal" },
+    { name: "Home", item: "https://www.propertybulbul.com" },
+    { name: "Journal", item: "https://www.propertybulbul.com/journal" },
     { name: journal.title, item: canonicalUrl },
   ]);
 

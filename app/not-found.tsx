@@ -4,9 +4,9 @@ import { Home, Search } from "lucide-react";
 import NotFoundBackButton from "./NotFoundBackButton";
 
 export const metadata: Metadata = {
-  title: "Page Not Found | Propertybulbul",
+  title: "Page Not Found | PropertyBulbul",
   description:
-    "The page you're looking for doesn't exist. Browse properties for sale and rent in Chandigarh, Panchkula, and Mohali on Propertybulbul.",
+    "The page you're looking for doesn't exist. Browse properties for sale and rent in Chandigarh, Panchkula, and Mohali on PropertyBulbul.",
   robots: {
     index: false,
     follow: true,

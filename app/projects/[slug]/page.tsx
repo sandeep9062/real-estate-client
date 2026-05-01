@@ -16,19 +16,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!project) {
     return {
-      title: "Project Not Found | Propertybulbul",
+      title: "Project Not Found | PropertyBulbul",
       description: "The project you're looking for could not be found.",
     };
   }
 
-  const title = `${project.name} in ${project.location?.city} | Propertybulbul Projects`;
+  const title = `${project.name} in ${project.location?.city} | PropertyBulbul Projects`;
   const description =
     project.description?.substring(0, 160) ||
-    `Explore ${project.name}, a ${project.projectType} project in ${project.location?.city}. Find verified units, amenities, and pricing on Propertybulbul.`;
-  const canonicalUrl = `https://propertybulbul.com/projects/${slug}`;
+    `Explore ${project.name}, a ${project.projectType} project in ${project.location?.city}. Find verified units, amenities, and pricing on PropertyBulbul.`;
+  const canonicalUrl = `https://www.propertybulbul.com/projects/${slug}`;
   const imageUrl =
     project.media?.images?.[0] ||
-    "https://propertybulbul.com/property-tricity.jpg";
+    "https://www.propertybulbul.com/property-tricity.jpg";
 
   return {
     title,
@@ -67,10 +67,10 @@ export default async function ProjectDetailPage({ params }: Props) {
     notFound();
   }
 
-  const canonicalUrl = `https://propertybulbul.com/projects/${slug}`;
+  const canonicalUrl = `https://www.propertybulbul.com/projects/${slug}`;
   const imageUrl =
     project.media?.images?.[0] ||
-    "https://propertybulbul.com/property-tricity.jpg";
+    "https://www.propertybulbul.com/property-tricity.jpg";
 
   // Project / RealEstateListing structured data
   const projectSchema = {
@@ -108,13 +108,13 @@ export default async function ProjectDetailPage({ params }: Props) {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://propertybulbul.com",
+          item: "https://www.propertybulbul.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Projects",
-          item: "https://propertybulbul.com/projects",
+          item: "https://www.propertybulbul.com/projects",
         },
         {
           "@type": "ListItem",

@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Disclaimer | Propertybulbul",
+  title: "Disclaimer | PropertyBulbul",
   description:
-    "Read the legal disclaimer for Propertybulbul. Understand the limitations of liability, accuracy of information, and third-party content on our real estate platform.",
+    "Read the legal disclaimer for PropertyBulbul. Understand the limitations of liability, accuracy of information, and third-party content on our real estate platform.",
   keywords: [
     "disclaimer",
     "legal disclaimer",
@@ -12,19 +12,19 @@ export const metadata: Metadata = {
     "platform disclaimer",
   ],
   alternates: {
-    canonical: "https://propertybulbul.com/disclaimer",
+    canonical: "https://www.propertybulbul.com/disclaimer",
   },
   openGraph: {
-    title: "Disclaimer | Propertybulbul",
-    description: "Legal disclaimer for Propertybulbul's real estate platform.",
-    url: "https://propertybulbul.com/disclaimer",
+    title: "Disclaimer | PropertyBulbul",
+    description: "Legal disclaimer for PropertyBulbul's real estate platform.",
+    url: "https://www.propertybulbul.com/disclaimer",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
-        alt: "Propertybulbul Disclaimer",
+        alt: "PropertyBulbul Disclaimer",
       },
     ],
   },

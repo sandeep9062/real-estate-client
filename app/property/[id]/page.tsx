@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) {
     return {
-      title: "Property Not Found | Propertybulbul",
+      title: "Property Not Found | PropertyBulbul",
       description: "The property you're looking for could not be found.",
     };
   }
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     data?.furnishing,
     data?.availability,
   ].filter(Boolean);
-  const canonicalUrl = `https://propertybulbul.com/property/${id}`;
+  const canonicalUrl = `https://www.propertybulbul.com/property/${id}`;
 
   // Filter out video URLs from images
   const imageUrls = (data?.image || []).filter((img: string) => {
@@ -114,15 +114,15 @@ const PropertyPage = async ({ params }: Props) => {
     data?.location?.sector || data?.location?.city,
   );
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", item: "https://propertybulbul.com" },
-    { name: "Properties", item: "https://propertybulbul.com/properties" },
+    { name: "Home", item: "https://www.propertybulbul.com" },
+    { name: "Properties", item: "https://www.propertybulbul.com/properties" },
     {
       name: data?.location?.city,
-      item: `https://propertybulbul.com/properties?city=${data?.location?.city}`,
+      item: `https://www.propertybulbul.com/properties?city=${data?.location?.city}`,
     },
     {
       name: sanitizeMetaText(data?.title || ""),
-      item: `https://propertybulbul.com/property/${id}`,
+      item: `https://www.propertybulbul.com/property/${id}`,
     },
   ]);
 

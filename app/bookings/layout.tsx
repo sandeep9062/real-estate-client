@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Your Bookings | Propertybulbul",
+  title: "Your Bookings | PropertyBulbul",
   description:
-    "View and manage your scheduled property visits on Propertybulbul. Track your booking history for properties in Chandigarh, Panchkula, and Mohali.",
+    "View and manage your scheduled property visits on PropertyBulbul. Track your booking history for properties in Chandigarh, Panchkula, and Mohali.",
   robots: {
     index: false,
     follow: false,

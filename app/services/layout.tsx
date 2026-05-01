@@ -31,12 +31,12 @@ export const metadata: Metadata = {
       "Real Estate Services - PropertyBulbul | Property Buying & Selling in Tricity",
     description:
       "Expert real estate services in Tricity. Property buying, selling, investment, legal assistance, student accommodation. Personalized solutions from PropertyBulbul.",
-    url: "https://propertybulbul.com/services",
-    siteName: "Propertybulbul",
+    url: "https://www.propertybulbul.com/services",
+    siteName: "PropertyBulbul",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Our Real Estate Services",
@@ -48,14 +48,14 @@ export const metadata: Metadata = {
     title: "Real Estate Services - PropertyBulbul | Tricity Property Experts",
     description:
       "Comprehensive real estate services in Tricity. Expert property buying, selling, investment consulting, legal assistance & student accommodation.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
   robots: {
     index: true,
     follow: true,
   },
   alternates: {
-    canonical: "https://propertybulbul.com/services",
+    canonical: "https://www.propertybulbul.com/services",
   },
 };
 
@@ -67,7 +67,7 @@ function ServicesStructuredData() {
     name: "Real Estate Services - PropertyBulbul Tricity",
     description:
       "Comprehensive real estate services in Tricity including property buying, selling, investment, legal assistance, and student accommodation.",
-    url: "https://propertybulbul.com/services",
+    url: "https://www.propertybulbul.com/services",
     mainEntity: {
       "@type": "RealEstateAgent",
       name: "PropertyBulbul",

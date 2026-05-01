@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Propertybulbul",
+  title: "Privacy Policy | PropertyBulbul",
   description:
-    "Read the privacy policy of Propertybulbul. We are committed to protecting your personal information and being transparent about how we handle it.",
+    "Read the privacy policy of PropertyBulbul. We are committed to protecting your personal information and being transparent about how we handle it.",
   keywords: [
     "privacy policy",
     "data protection",
@@ -11,14 +11,14 @@ export const metadata: Metadata = {
     "terms of service",
   ],
   openGraph: {
-    title: "Privacy Policy | Propertybulbul",
+    title: "Privacy Policy | PropertyBulbul",
     description:
-      "Learn about how we protect your data and respect your privacy at Propertybulbul.",
-    url: "https://propertybulbul.com/privacy-policy",
+      "Learn about how we protect your data and respect your privacy at PropertyBulbul.",
+    url: "https://www.propertybulbul.com/privacy-policy",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Privacy Policy",
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy | Propertybulbul",
+    title: "Privacy Policy | PropertyBulbul",
     description:
       "Our commitment to your privacy. Read our policy to understand how we handle your data.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
   alternates: {
-    canonical: "https://propertybulbul.com/privacy-policy",
+    canonical: "https://www.propertybulbul.com/privacy-policy",
   },
 };
 

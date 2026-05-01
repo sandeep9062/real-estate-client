@@ -16,19 +16,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data?.developer) {
     return {
-      title: "Developer Not Found | Propertybulbul",
+      title: "Developer Not Found | PropertyBulbul",
       description: "The developer you're looking for could not be found.",
     };
   }
 
   const developer = data.developer;
-  const title = `${developer.name} | Verified Developer on Propertybulbul`;
+  const title = `${developer.name} | Verified Developer on PropertyBulbul`;
   const description =
     developer.description?.substring(0, 160) ||
-    `Explore ${developer.name}'s projects and listings on Propertybulbul. Verified developer in Tricity.`;
-  const canonicalUrl = `https://propertybulbul.com/developers/${id}`;
+    `Explore ${developer.name}'s projects and listings on PropertyBulbul. Verified developer in Tricity.`;
+  const canonicalUrl = `https://www.propertybulbul.com/developers/${id}`;
   const imageUrl =
-    developer.logo || "https://propertybulbul.com/property-tricity.jpg";
+    developer.logo || "https://www.propertybulbul.com/property-tricity.jpg";
 
   return {
     title,
@@ -68,7 +68,7 @@ export default async function DeveloperDetailPage({ params }: Props) {
   }
 
   const developer = data.developer;
-  const canonicalUrl = `https://propertybulbul.com/developers/${id}`;
+  const canonicalUrl = `https://www.propertybulbul.com/developers/${id}`;
 
   // Developer / Organization structured data
   const developerSchema = {
@@ -87,13 +87,13 @@ export default async function DeveloperDetailPage({ params }: Props) {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://propertybulbul.com",
+          item: "https://www.propertybulbul.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Developers",
-          item: "https://propertybulbul.com/developers",
+          item: "https://www.propertybulbul.com/developers",
         },
         {
           "@type": "ListItem",

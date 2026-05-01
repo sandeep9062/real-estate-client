@@ -28,12 +28,12 @@ export const metadata: Metadata = {
     title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts",
     description:
       "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity. Contact us for property buying, selling, or renting assistance.",
-    url: "https://propertybulbul.com/contact",
-    siteName: "Propertybulbul",
+    url: "https://www.propertybulbul.com/contact",
+    siteName: "PropertyBulbul",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/contact-image.png",
+        url: "https://www.propertybulbul.com/contact-image.png",
         width: 1200,
         height: 630,
         alt: "Contact Our Real Estate Team",
@@ -45,14 +45,14 @@ export const metadata: Metadata = {
     title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts",
     description:
       "Get in touch with PropertyBulbul for all your real estate needs in Tricity. Expert assistance for buying, selling, and renting properties.",
-    images: ["https://propertybulbul.com/contact-image.png"],
+    images: ["https://www.propertybulbul.com/contact-image.png"],
   },
   robots: {
     index: true,
     follow: true,
   },
   alternates: {
-    canonical: "https://propertybulbul.com/contact",
+    canonical: "https://www.propertybulbul.com/contact",
   },
 };
 
@@ -64,7 +64,7 @@ function ContactStructuredData() {
     name: "Contact PropertyBulbul - Tricity Real Estate Experts",
     description:
       "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity for property buying, selling, and renting services.",
-    url: "https://propertybulbul.com/contact",
+    url: "https://www.propertybulbul.com/contact",
     mainEntity: {
       "@type": "RealEstateAgent",
       name: "PropertyBulbul",

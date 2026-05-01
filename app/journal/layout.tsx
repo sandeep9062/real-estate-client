@@ -17,19 +17,19 @@ export const metadata: Metadata = {
     "property buying guide",
   ],
   alternates: {
-    canonical: "https://propertybulbul.com/journal",
+    canonical: "https://www.propertybulbul.com/journal",
   },
   openGraph: {
     title: "Real Estate Journal | Market Insights for Tricity",
     description:
       "Expert analysis and property investment guides for Chandigarh, Mohali, Panchkula, and Zirakpur.",
-    url: "https://propertybulbul.com/journal",
-    siteName: "Propertybulbul",
+    url: "https://www.propertybulbul.com/journal",
+    siteName: "PropertyBulbul",
     locale: "en_IN",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "PropertyBulbul Real Estate Journal",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: "Real Estate Journal | Market Insights for Tricity",
     description:
       "Expert analysis and property investment guides for Chandigarh, Mohali, Panchkula, and Zirakpur.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
 };
 
@@ -53,14 +53,14 @@ function JournalStructuredData() {
     name: "PropertyBulbul Journal",
     description:
       "Expert analysis, market trends, and property investment guides for Tricity.",
-    url: "https://propertybulbul.com/journal",
+    url: "https://www.propertybulbul.com/journal",
     publisher: {
       "@type": "Organization",
-      name: "Propertybulbul",
-      url: "https://propertybulbul.com",
+      name: "PropertyBulbul",
+      url: "https://www.propertybulbul.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://propertybulbul.com/propertybulbul.png",
+        url: "https://www.propertybulbul.com/propertybulbul.png",
       },
     },
     breadcrumb: {
@@ -70,13 +70,13 @@ function JournalStructuredData() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://propertybulbul.com",
+          item: "https://www.propertybulbul.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Journal",
-          item: "https://propertybulbul.com/journal",
+          item: "https://www.propertybulbul.com/journal",
         },
       ],
     },

@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Post Your Property Requirement | Propertybulbul",
+  title: "Post Your Property Requirement | PropertyBulbul",
   description:
-    "Looking for a property? Post your requirements on Propertybulbul and get matched with the best properties that meet your needs. It's fast, easy, and free.",
+    "Looking for a property? Post your requirements on PropertyBulbul and get matched with the best properties that meet your needs. It's fast, easy, and free.",
   keywords: [
     "post property requirement",
     "find property",
@@ -13,14 +13,14 @@ export const metadata: Metadata = {
     "property match",
   ],
   openGraph: {
-    title: "Post Your Property Requirement | Propertybulbul",
+    title: "Post Your Property Requirement | PropertyBulbul",
     description:
-      "Tell us what you're looking for and let us find your dream property. Post your requirements now on Propertybulbul.",
-    url: "https://propertybulbul.com/post-requirement",
+      "Tell us what you're looking for and let us find your dream property. Post your requirements now on PropertyBulbul.",
+    url: "https://www.propertybulbul.com/post-requirement",
     type: "website",
     images: [
       {
-        url: "https://propertybulbul.com/property-tricity.jpg",
+        url: "https://www.propertybulbul.com/property-tricity.jpg",
         width: 1200,
         height: 630,
         alt: "Post Your Property Requirement",
@@ -29,10 +29,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Post Your Property Requirement | Propertybulbul",
+    title: "Post Your Property Requirement | PropertyBulbul",
     description:
-      "Looking for a new property? Post your needs on Propertybulbul and find the perfect match.",
-    images: ["https://propertybulbul.com/property-tricity.jpg"],
+      "Looking for a new property? Post your needs on PropertyBulbul and find the perfect match.",
+    images: ["https://www.propertybulbul.com/property-tricity.jpg"],
   },
 };
 
