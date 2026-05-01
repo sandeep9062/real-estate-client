@@ -10,9 +10,7 @@ export const metadata: Metadata = {
     "contact propertybulbul",
     "real estate support",
     "property inquiries",
-    "buy property",
-    "sell property",
-    "rent property",
+
     "chandigarh real estate contact",
     "panchkula property contact",
     "mohali real estate agents",
