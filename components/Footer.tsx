@@ -56,9 +56,9 @@ const Footer = () => {
               Information
             </h3>
 
-            <p className="text-gray-500 text-xs sm:text-sm">
+            {/* <p className="text-gray-500 text-xs sm:text-sm">
               145, Sector 15, Chandigarh, India
-            </p>
+            </p> */}
 
             <div className="flex flex-wrap gap-x-4 sm:gap-x-5 md:gap-x-6 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm font-medium text-gray-700 justify-center md:justify-start">
               {[
