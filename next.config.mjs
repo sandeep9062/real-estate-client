@@ -1,4 +1,20 @@
 const nextConfig = {
+  // 1. Permanent Redirect (non-www to www)
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "propertybulbul.com",
+          },
+        ],
+        destination: "https://www.propertybulbul.com/:path*",
+        permanent: true, // 301 Redirect: Google ko batayega ki 'www' hi asli version hai
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
