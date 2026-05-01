@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://propertybulbul.com/sitemap.xml",
+    sitemap: "https://www.propertybulbul.com/sitemap.xml",
   };
 }

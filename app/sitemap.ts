@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://propertybulbul.com";
+  const baseUrl = "https://www.propertybulbul.com";
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   let propertyUrls: MetadataRoute.Sitemap = [];
