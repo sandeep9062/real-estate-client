@@ -132,7 +132,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       className={[
         "group relative w-full max-w-full cursor-pointer overflow-hidden rounded-2xl border bg-white transition-shadow duration-300",
         carousel
-          ? "flex h-full min-h-0 max-h-full flex-col"
+          ? "flex h-[420px] flex-col"
           : "flex min-h-[460px] h-full flex-col",
         isSelected
           ? "border-slate-400/80 shadow-md ring-1 ring-slate-400/60"
@@ -144,7 +144,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <div
         className={
           carousel
-            ? "relative min-h-0 w-full flex-[1.35] basis-0 overflow-hidden"
+            ? "relative h-56 w-full shrink-0 overflow-hidden"
             : "relative min-h-[12.5rem] w-full flex-1 basis-0 overflow-hidden sm:min-h-[14rem]"
         }
       >
@@ -318,7 +318,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <div
         className={
           carousel
-            ? "flex min-h-0 flex-1 basis-0 flex-col gap-1.5 overflow-y-auto overflow-x-hidden overscroll-contain p-2.5 sm:p-3"
+            ? "flex flex-1 flex-col gap-1.5 p-2.5 sm:p-3"
             : "flex shrink-0 flex-col gap-3 p-4 pt-4 sm:p-5"
         }
       >
@@ -339,7 +339,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               className={
                 carousel
                   ? "text-lg font-semibold tracking-tight text-slate-900 sm:text-xl"
-                  : "text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.6rem]"
+                  : "text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.4rem]"
               }
             >
               {formatInr(card.price ?? 0)}
@@ -392,7 +392,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             className={
               carousel
                 ? "truncate text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#4161df]"
-                : "truncate text-base font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#4161df] sm:text-[1.05rem]"
+                : "truncate text-base font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#4161df] sm:text-[1.02rem]"
             }
           >
             {card.title}
@@ -401,7 +401,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             className={
               carousel
                 ? "flex items-center gap-1.5 rounded-md border border-slate-100 bg-slate-50/80 px-2 py-1.5"
-                : "flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/80 px-2.5 py-2"
+                : "flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/80 px-2 py-1.5"
             }
           >
             <FaMapMarkerAlt

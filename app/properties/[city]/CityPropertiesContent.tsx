@@ -8,6 +8,7 @@ import TopSearchBar from "@/components/TopSearchBar";
 import PropertiesMapExplorer from "@/components/PropertiesMapExplorer";
 import GuidedSearchDialog from "@/components/GuidedSearchDialog";
 import SaveSearchButton from "@/components/SaveSearchButton";
+import { Map, List as ListIcon } from "lucide-react";
 
 const cityMap: Record<string, string> = {
   chandigarh: "Chandigarh",
@@ -22,6 +23,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
   const router = useRouter();
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [guidedOpen, setGuidedOpen] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<"list" | "map">("list");
 
   const mergeToUrl = React.useCallback(
     (extra: Record<string, string | undefined | null>) => {
@@ -105,34 +107,63 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
   const list = data || [];
 
   return (
-    <div className="w-full pt-20 bg-gray-50">
-      <GuidedSearchDialog open={guidedOpen} onClose={() => setGuidedOpen(false)} />
-      <div className="flex flex-col items-center gap-6 max-w-full mx-auto px-4 sm:px-6 lg:px-10 py-12">
+    <div className="w-full pt-16 lg:pt-20 bg-gray-50 min-h-screen relative">
+      <GuidedSearchDialog
+        open={guidedOpen}
+        onClose={() => setGuidedOpen(false)}
+      />
+
+      {/* Mobile Floating Toggle */}
+      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1000]">
+        <button
+          onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
+          className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
+        >
+          {activeTab === "list" ? (
+            <>
+              <Map className="w-4 h-4" />
+              <span className="text-sm font-semibold">Map View</span>
+            </>
+          ) : (
+            <>
+              <ListIcon className="w-4 h-4" />
+              <span className="text-sm font-semibold">List View</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="flex flex-col items-center gap-6 max-w-full mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-12">
         <div className="w-full text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 lg:mb-4">
             Find Your Perfect Property in {displayCity}
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
             Discover homes, apartments, and commercial spaces for sale and rent
-            in {displayCity}. Use the map for clusters, draw an area, or try
-            guided search.
+            in {displayCity}.
           </p>
         </div>
-        <div className="w-full flex flex-wrap items-center justify-center gap-3">
+
+        <div className="w-full flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => setGuidedOpen(true)}
-            className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:border-[#4161df]/40"
+            className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:border-[#4161df]/40 transition-colors"
           >
             Guided search
           </button>
           <SaveSearchButton filters={query} />
         </div>
+
         <div className="w-full">
           <TopSearchBar onApply={handleApplyFilters} initialFilters={query} />
         </div>
+
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          <div className="order-2 lg:order-1 space-y-3 min-w-0">
+          {/* List Section */}
+          <div
+            className={`${activeTab === "list" ? "block" : "hidden"} lg:block order-2 lg:order-1 space-y-3 min-w-0`}
+          >
             <div className="flex items-baseline justify-between gap-2">
               <p className="text-sm font-medium text-gray-700">
                 {list.length} listing{list.length !== 1 ? "s" : ""}
@@ -144,18 +175,25 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
               columns="two"
             />
           </div>
-          <div className="order-1 lg:order-2 sticky top-20 z-10 w-full min-w-0 self-start">
+
+          {/* Map Section */}
+          <div
+            className={`${activeTab === "map" ? "block" : "hidden"} lg:block order-1 lg:order-2 lg:sticky lg:top-24 z-10 w-full min-w-0 self-start`}
+          >
             <PropertiesMapExplorer
               properties={list}
               selectedId={selectedId}
-              onSelectProperty={setSelectedId}
+              onSelectProperty={(id) => {
+                setSelectedId(id);
+                if (window.innerWidth < 1024) setActiveTab("list");
+              }}
               onSearchThisArea={(bbox) =>
                 mergeToUrl({ bbox, polygon: undefined })
               }
               onPolygonApply={(polygonJson) =>
                 mergeToUrl({ polygon: polygonJson, bbox: undefined })
               }
-              heightClass="h-[min(920px,85vh,calc(100dvh-3rem))]"
+              heightClass="h-[calc(100vh-280px)] lg:h-[min(920px,85vh,calc(100dvh-3rem))]"
             />
           </div>
         </div>
