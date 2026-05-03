@@ -7,10 +7,26 @@ import { House, Users, MapPin, Award } from "lucide-react";
 
 const AboutStats = () => {
   const stats = [
-    { icon: <House className="w-10 h-10 text-indigo-600" />, label: "Properties Sold", value: 750 },
-    { icon: <Users className="w-10 h-10 text-indigo-600" />, label: "Happy Clients", value: 2000 },
-    { icon: <MapPin className="w-10 h-10 text-indigo-600" />, label: "Cities Covered", value: 12 },
-    { icon: <Award className="w-10 h-10 text-indigo-600" />, label: "Awards Achieved", value: 15 },
+    {
+      icon: <House className="w-10 h-10 text-indigo-600" />,
+      label: "Verified Listings",
+      value: 181,
+    },
+    {
+      icon: <Users className="w-10 h-10 text-indigo-600" />,
+      label: "Major Projects",
+      value: 3,
+    },
+    {
+      icon: <MapPin className="w-10 h-10 text-indigo-600" />,
+      label: "Cities Covered",
+      value: 7,
+    },
+    {
+      icon: <Award className="w-10 h-10 text-indigo-600" />,
+      label: "Property Types",
+      value: 22,
+    },
   ];
 
   return (

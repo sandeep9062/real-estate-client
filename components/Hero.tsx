@@ -106,10 +106,10 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={798} end={900} duration={4} />+
+                  <CountUp start={100} end={181} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
-                  Premium Listings
+                  Verified Listings
                 </span>
               </div>
 
@@ -119,10 +119,10 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={150} end={200} duration={4} />+
+                  <CountUp start={1} end={3} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
-                  Happy Customers
+                  Major Projects
                 </span>
               </div>
 
@@ -132,10 +132,10 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={15} end={20} duration={4} />+
+                  <CountUp start={5} end={7} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
-                  Projects
+                  Cities Covered
                 </span>
               </div>
             </div>
