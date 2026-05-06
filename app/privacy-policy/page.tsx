@@ -181,14 +181,6 @@ const PrivacyPolicy = () => {
                 </motion.div>
               ))}
             </div>
-
-            {/* FOOTER NOTE */}
-            <div className="mt-20 pt-10 border-t border-slate-200 text-center">
-              <p className="text-slate-400 text-sm">
-                © {new Date().getFullYear()} Property Bulbul. All rights
-                reserved.
-              </p>
-            </div>
           </div>
         </div>
       </section>
