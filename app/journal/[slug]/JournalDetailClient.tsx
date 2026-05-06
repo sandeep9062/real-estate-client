@@ -62,7 +62,11 @@ export default function JournalDetailClient({
   // 2. Fetch Related Properties (using the sector/city from the journal)
   const { data: relatedProps, isLoading: propsLoading } =
     useGetAllPropertiesQuery(
-      { sector: journal?.targetSector, limit: 3 },
+      {
+        search: journal?.targetSector,
+        sector: journal?.targetSector,
+        limit: 3,
+      },
       { skip: !journal?.targetSector },
     );
 
