@@ -139,7 +139,7 @@ const Header: React.FC = () => {
             <>
               <button
                 onClick={handleAddPropertyClick}
-                className="text-gray-700 hover:text-blue-600 transition-colors px-2 py-1 rounded-md"
+                className="bg-linear-to-tr from-[#4161df] to-indigo-700 text-white px-4 py-2 rounded-full hover:from-[#3a56c8] hover:to-indigo-800 transition-all shadow-sm hover:shadow-md active:scale-[0.97]"
               >
                 Add Property
               </button>
@@ -240,7 +240,7 @@ const Header: React.FC = () => {
               toggleMenu();
               handleAddPropertyClick();
             }}
-            className="text-left hover:text-blue-600 px-2 py-1.5 sm:py-2 rounded-md text-sm sm:text-base"
+            className="w-full bg-linear-to-tr from-[#4161df] to-indigo-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full hover:from-[#3a56c8] hover:to-indigo-800 text-sm sm:text-base transition-all shadow-sm"
           >
             Add Property
           </button>

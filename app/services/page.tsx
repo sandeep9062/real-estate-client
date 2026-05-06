@@ -2,178 +2,380 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import CountUp from "react-countup";
+import { useInView } from "react-intersection-observer";
+import {
+  FaHome,
+  FaBuilding,
+  FaWarehouse,
+  FaBed,
+  FaMapMarkedAlt,
+  FaBullhorn,
+  FaHandshake,
+  FaBalanceScale,
+  FaChartLine,
+  FaShieldAlt,
+  FaHeadset,
+  FaFileContract,
+  FaUserTie,
+  FaClipboardCheck,
+  FaSearch,
+  FaCheckCircle,
+  FaArrowRight,
+} from "react-icons/fa";
 
 const ServicesPage = () => {
+  const { ref: statsRef, inView: statsInView } = useInView({
+    threshold: 0.3,
+    triggerOnce: true,
+  });
+
   return (
     <div className="w-full bg-white dark:bg-[#0F111A]">
-      {/* Hero Section */}
-      <div className="w-full pt-20 bg-gradient-to-r from-gray-100 to-blue-300 text-white py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 flex flex-col items-center text-center">
-        <h1 className="text-2xl text-black sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold">
-          Comprehensive Real Estate Services
-        </h1>
-        <p className="mt-3 sm:mt-4 text-gray-900 text-sm sm:text-base md:text-lg text-gray-300 max-w-3xl px-2">
-          From buying your dream home to making smart investments, we offer a
-          complete suite of services to cater to all your real estate needs.
-        </p>
-      </div>
+      {/* ===== HERO SECTION ===== */}
+      <section className="relative bg-background text-foreground pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 grid grid-cols-2 -space-x-52 opacity-40 dark:opacity-20"
+        >
+          <div className="blur-[106px] h-48 bg-gradient-to-br from-[#4161df] to-purple-400 dark:from-blue-700" />
+          <div className="blur-[106px] h-32 bg-gradient-to-r from-cyan-400 to-sky-300 dark:to-indigo-600" />
+        </div>
 
-      {/* Services Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16 lg:py-20">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
-          How We Can Help You
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+            <motion.h1
+              initial={{ y: "2rem", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, type: "spring" }}
+              className="font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight leading-[1.1] text-slate-900 dark:text-white"
+            >
+              Comprehensive <br className="hidden sm:block" />
+              <span className="text-[#4161df]">Real Estate</span> Services
+            </motion.h1>
+            <motion.p
+              initial={{ y: "1.5rem", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, delay: 0.2, type: "spring" }}
+              className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl"
+            >
+              From buying your dream home to smart investments, we offer a
+              complete suite of real estate services across Tricity.
+            </motion.p>
+            <motion.div
+              initial={{ y: "1.5rem", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, delay: 0.4, type: "spring" }}
+              className="mt-4 sm:mt-5 flex flex-wrap gap-3 justify-center"
+            >
+              <Link
+                href="/contact"
+                className="bg-[#4161df] text-white px-5 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-xs sm:text-sm hover:bg-[#3451c7] transition-all transform hover:scale-105 shadow-lg hover:shadow-[#4161df]/30"
+              >
+                Get Free Consultation
+              </Link>
+              <Link
+                href="/properties"
+                className="border-2 border-[#4161df] text-[#4161df] dark:text-white dark:border-white px-5 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-xs sm:text-sm hover:bg-[#4161df] hover:text-white transition-all"
+              >
+                Browse Properties
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== SERVICES SECTION ===== */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-6 sm:mb-8"
+        >
+          <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
+            What We Offer
+          </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
+            Complete Real Estate Solutions
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto mt-1">
+            From property search to legal assistance — we've got you covered.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           <ServiceCard
-            icon={<HomeIcon />}
+            icon={<FaHome />}
             title="Buy a Property"
-            desc="Find your perfect home from thousands of verified listings. Our experts guide you through every step of the buying process."
+            desc="Find your perfect home from thousands of verified listings across Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar. Our experts guide you through site visits, negotiations, and complete documentation."
           />
           <ServiceCard
-            icon={<TagIcon />}
+            icon={<FaBuilding />}
+            title="Rent a Home"
+            desc="Explore premium rental options including apartments, builder floors, and independent houses with zero brokerage. Transparent pricing and verified landlords across Tricity."
+          />
+          <ServiceCard
+            icon={<FaBullhorn />}
             title="Sell a Property"
-            desc="Get the best value for your property. We use premium marketing and connect you with a network of verified buyers."
+            desc="Get the best value for your property with premium marketing, professional photography, virtual tours, and direct connections with thousands of verified buyers."
           />
           <ServiceCard
-            icon={<TrendingUpIcon />}
+            icon={<FaChartLine />}
             title="Property Investment"
-            desc="Discover high-return investment opportunities in residential and commercial properties, curated by our market experts."
+            desc="Discover high-return opportunities in residential and commercial properties. Get data-backed insights on appreciation trends, rental yields, and emerging hotspots."
           />
           <ServiceCard
-            icon={<BriefcaseIcon />}
+            icon={<FaWarehouse />}
+            title="Commercial Properties"
+            desc="Shops, offices, and warehouses across prime locations in Chandigarh, Mohali, and Panchkula. Expert assistance for leasing, buying, and selling commercial real estate."
+          />
+          <ServiceCard
+            icon={<FaBed />}
+            title="PG & Co-Living"
+            desc="Affordable and verified PGs, rooms, and shared living spaces near colleges, IT hubs, and business districts. Safe living with all amenities included."
+            badge="POPULAR"
+          />
+          <ServiceCard
+            icon={<FaMapMarkedAlt />}
+            title="Plots & Land"
+            desc="Residential and agricultural plots in the fastest-growing sectors of Tricity. Perfect for building your dream home or making a long-term land investment."
+          />
+          <ServiceCard
+            icon={<FaHandshake />}
             title="Project Marketing"
-            desc="Comprehensive marketing solutions for builders and developers, from branding and lead generation to sales."
+            desc="End-to-end marketing solutions for builders and developers including branding, digital campaigns, lead generation, and sales closure support."
           />
           <ServiceCard
-            icon={<UsersIcon />}
-            title="Consultation & Advisory"
-            desc="Get personalized advice on property valuation, documentation, and market trends from our experienced consultants."
-          />
-          <ServiceCard
-            icon={<ShieldCheckIcon />}
+            icon={<FaBalanceScale />}
             title="Legal Assistance"
-            desc="Navigate the legal complexities with ease. We provide support for paperwork, agreements, and compliance."
-          />
-          <ServiceCard
-            icon={<AcademicCapIcon />}
-            title="Student Accommodation"
-            desc="Affordable and verified PGs, rooms, and flats for students. We make finding your next home simple and safe."
+            desc="Navigate property legalities with ease. We provide support for title verification, sale agreements, home loan processing, RERA compliance, and registration."
           />
         </div>
-      </div>
+      </section>
 
-      {/* Why Choose Us Section */}
-      <div className="w-full bg-gray-50 dark:bg-[#141824] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6">
+      {/* ===== WHY CHOOSE US ===== */}
+      <section className="w-full bg-gray-50 dark:bg-[#141824] py-8 sm:py-10 md:py-12 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
-            Why Choose Our Services?
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 text-center">
-            <Feature
-              icon={<UsersIcon />}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-6 sm:mb-8"
+          >
+            <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
+              Why PropertyBulbul
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
+              Why Choose Our Services?
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto mt-1">
+              Transparency, trust, and exceptional service — making your journey
+              smooth.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+            <WhyChooseCard
+              icon={<FaShieldAlt />}
+              title="Verified Properties"
+              desc="100% safe, legal, dispute-free deals."
+            />
+            <WhyChooseCard
+              icon={<FaUserTie />}
               title="Expert Guidance"
-              desc="Our team of experienced professionals provides personalized advice to help you make informed decisions."
+              desc="Personalized advice from experienced pros."
             />
-            <Feature
-              icon={<ShieldCheckIcon />}
-              title="Verified Listings"
-              desc="We offer a curated selection of legally verified properties to ensure a safe and transparent transaction."
-            />
-            <Feature
-              icon={<BriefcaseIcon />}
+            <WhyChooseCard
+              icon={<FaHeadset />}
               title="End-to-End Support"
-              desc="From property selection to legal paperwork, we provide comprehensive support at every step of your journey."
+              desc="From selection to paperwork, we handle it all."
             />
-            <Feature
-              icon={<TrendingUpIcon />}
-              title="Investment Insights"
-              desc="Leverage our market expertise to discover high-return investment opportunities and grow your portfolio."
+            <WhyChooseCard
+              icon={<FaChartLine />}
+              title="Market Insights"
+              desc="Data-backed Tricity real estate analytics."
+            />
+            <WhyChooseCard
+              icon={<FaClipboardCheck />}
+              title="Zero Price Manipulation"
+              desc="Transparent prices. No hidden charges."
+            />
+            <WhyChooseCard
+              icon={<FaFileContract />}
+              title="Legal & Financial Help"
+              desc="Documentation, loans, verification & more."
+            />
+            <WhyChooseCard
+              icon={<FaSearch />}
+              title="Personalized Matching"
+              desc="AI-powered recommendations for you."
+            />
+            <WhyChooseCard
+              icon={<FaCheckCircle />}
+              title="Post-Sale Support"
+              desc="Move-in, registrations & continued help."
             />
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* How It Works Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12 md:py-16 lg:py-20">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
-          Our Process
-        </h2>
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-6 sm:mb-8"
+        >
+          <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
+            Our Process
+          </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
+            How It Works
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto mt-1">
+            Simple, transparent process to find your perfect property.
+          </p>
+        </motion.div>
+
         <div className="relative">
-          <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 relative">
+          <div className="hidden lg:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-[#4161df]/40 via-[#4161df] to-[#4161df]/40"></div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 relative">
             <ProcessStep
               step="01"
               title="Consultation"
-              desc="We start with a detailed consultation to understand your needs, preferences, and financial goals."
+              desc="We understand your needs, preferences, and budget."
+              delay={0}
             />
             <ProcessStep
               step="02"
               title="Property Matching"
-              desc="Our system and experts shortlist the best properties that match your criteria from our verified database."
+              desc="AI + experts shortlist the best properties for you."
+              delay={0.15}
             />
             <ProcessStep
               step="03"
               title="Site Visits & Finalization"
-              desc="We arrange site visits and help you finalize the deal, ensuring a smooth and transparent process."
+              desc="We arrange visits and ensure a smooth closing."
+              delay={0.3}
             />
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* FAQ Section */}
-      <div className="w-full bg-white dark:bg-[#0F111A] py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center text-black dark:text-white mb-8 sm:mb-10 md:mb-12">
+      {/* ===== FAQ SECTION ===== */}
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-6 sm:mb-8"
+        >
+          <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
+            FAQ
+          </span>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
             Frequently Asked Questions
           </h2>
-          <FAQ />
-        </div>
-      </div>
+        </motion.div>
+        <FAQ />
+      </section>
 
-      {/* CTA Section */}
-      <div className="w-full bg-indigo-600 py-12 sm:py-14 md:py-16 lg:py-20 px-4 sm:px-6 flex flex-col items-center text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">
-          Ready to Get Started?
-        </h2>
-        <p className="text-indigo-100 mt-2 sm:mt-3 text-sm sm:text-base max-w-2xl px-2">
-          Whether you're buying, selling, or investing, our team is ready to
-          assist you. Contact us today for a free consultation.
-        </p>
-        <Link
-          href="/contact"
-          className="mt-6 sm:mt-8 bg-white text-indigo-600 px-8 sm:px-10 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-gray-100 transition-transform transform hover:scale-105"
-        >
-          Contact Us Now
-        </Link>
-      </div>
+      {/* ===== CTA SECTION ===== */}
+      <section className="relative py-10 sm:py-12 md:py-14 px-4 sm:px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#4161df] to-[#2d4bc7]" />
+        <div aria-hidden="true" className="absolute inset-0 opacity-20">
+          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-cyan-300 blur-3xl" />
+        </div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">
+              Ready to Get Started?
+            </h2>
+            <p className="text-blue-100 mt-2 text-xs sm:text-sm md:text-base max-w-2xl mx-auto">
+              Whether you're buying, selling, renting, or investing — get a free
+              consultation today.
+            </p>
+            <div className="mt-4 sm:mt-5 flex flex-wrap gap-3 justify-center">
+              <Link
+                href="/contact"
+                className="bg-white text-[#4161df] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
+              >
+                Contact Us Now
+              </Link>
+              <Link
+                href="/post-requirement"
+                className="border-2 border-white text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-white/10 transition-all"
+              >
+                Post Your Requirement
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 };
 
 export default ServicesPage;
 
+/* ===== SERVICE CARD ===== */
 const ServiceCard = ({
   icon,
   title,
   desc,
+  badge,
 }: {
   icon: React.ReactNode;
   title: string;
   desc: string;
+  badge?: string;
 }) => (
-  <div className="bg-gray-50 dark:bg-[#1a1f2e] rounded-xl p-5 sm:p-6 md:p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-in-out border border-gray-200/80 dark:border-gray-700">
-    <div className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full w-12 h-12 sm:w-14 md:w-16 flex items-center justify-center mb-4 sm:mb-6">
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    viewport={{ once: true }}
+    whileHover={{ y: -4 }}
+    className="group relative bg-white dark:bg-[#1a1f2e] rounded-xl p-4 sm:p-5 border border-gray-200/80 dark:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden"
+  >
+    <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity bg-gradient-to-br from-[#4161df] to-purple-600" />
+
+    {badge && (
+      <span className="absolute top-3 right-3 bg-[#4161df] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+        {badge}
+      </span>
+    )}
+
+    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-[#4161df] flex items-center justify-center text-white text-sm sm:text-base mb-3 shadow-md group-hover:scale-110 transition-transform duration-300">
       {icon}
     </div>
-    <h3 className="text-xl sm:text-2xl font-semibold text-black dark:text-white mb-2 sm:mb-3">
+
+    <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1">
       {title}
     </h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
+    <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">
       {desc}
     </p>
-  </div>
+  </motion.div>
 );
 
-const Feature = ({
+/* ===== WHY CHOOSE CARD ===== */
+const WhyChooseCard = ({
   icon,
   title,
   desc,
@@ -182,41 +384,69 @@ const Feature = ({
   title: string;
   desc: string;
 }) => (
-  <div className="bg-white dark:bg-[#1a1f2e] p-5 sm:p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-    <div className="text-indigo-600 dark:text-indigo-400 mb-3 sm:mb-4 inline-block">
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    viewport={{ once: true }}
+    whileHover={{ y: -3 }}
+    className="bg-white dark:bg-[#1a1f2e] p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 dark:border-gray-700 group"
+  >
+    <div className="w-8 h-8 rounded-md bg-[#4161df]/10 dark:bg-[#4161df]/20 flex items-center justify-center text-[#4161df] text-xs mb-2 group-hover:bg-[#4161df] group-hover:text-white transition-all duration-300">
       {icon}
     </div>
-    <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mb-1 sm:mb-2">
+    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">
       {title}
     </h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+    <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed">
       {desc}
     </p>
-  </div>
+  </motion.div>
 );
 
+/* ===== PROCESS STEP ===== */
 const ProcessStep = ({
   step,
   title,
   desc,
+  delay,
 }: {
   step: string;
   title: string;
   desc: string;
+  delay: number;
 }) => (
-  <div className="bg-white dark:bg-[#1a1f2e] p-6 sm:p-8 rounded-lg text-center relative border border-gray-100 dark:border-gray-700 shadow-sm">
-    <div className="absolute -top-5 sm:-top-6 left-1/2 -translate-x-1/2 bg-indigo-600 text-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center font-bold text-base sm:text-lg">
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay }}
+    viewport={{ once: true }}
+    className="bg-white dark:bg-[#1a1f2e] p-6 sm:p-8 rounded-xl text-center relative border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all group"
+  >
+    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 bg-gradient-to-br from-[#4161df] to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-md">
       {step}
     </div>
-    <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mt-6 sm:mt-8 mb-2 sm:mb-3">
+    <div className="mt-4 mb-3">
+      <div className="w-10 h-10 mx-auto rounded-full bg-[#4161df]/10 dark:bg-[#4161df]/20 flex items-center justify-center text-[#4161df] text-sm group-hover:bg-[#4161df] group-hover:text-white transition-all">
+        {step === "01" ? (
+          <FaUserTie />
+        ) : step === "02" ? (
+          <FaSearch />
+        ) : (
+          <FaClipboardCheck />
+        )}
+      </div>
+    </div>
+    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">
       {title}
     </h3>
-    <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+    <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">
       {desc}
     </p>
-  </div>
+  </motion.div>
 );
 
+/* ===== FAQ COMPONENT ===== */
 const FAQ = () => {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
@@ -224,22 +454,32 @@ const FAQ = () => {
     {
       question: "What types of properties do you deal with?",
       answer:
-        "We deal with a wide range of properties, including residential apartments, independent houses, commercial spaces, and plots of land.",
+        "Residential apartments, villas, commercial spaces, plots, and PG accommodations across Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar.",
     },
     {
-      question: "Are the listings on your platform verified?",
+      question: "Are listings on your platform verified?",
       answer:
-        "Yes, every property listed on our platform goes through a rigorous verification process to ensure its authenticity and legal clearance.",
+        "Yes, every property goes through rigorous verification for authenticity, legal clearance, and accurate documentation.",
     },
     {
       question: "Do you provide legal and financial assistance?",
       answer:
-        "Absolutely. We have a dedicated team of legal and financial experts to assist you with paperwork, home loans, and other related services.",
+        "Yes, our legal and financial experts assist with title verification, paperwork, home loans, and compliance.",
     },
     {
-      question: "What are your brokerage or commission charges?",
+      question: "What are your service charges?",
       answer:
-        "Our commission rates are transparent and competitive. They vary depending on the type of service and property. Please contact us for detailed information.",
+        "Our charges are transparent and competitive with no hidden costs. Contact us for a detailed quote.",
+    },
+    {
+      question: "How fast can I find a property?",
+      answer:
+        "Our AI-powered system shortlists properties within 24-48 hours. Site visits and finalization within a week.",
+    },
+    {
+      question: "Do you offer post-purchase support?",
+      answer:
+        "Yes, including property management, tenant sourcing, rent collection, and maintenance coordination.",
     },
   ];
 
@@ -248,187 +488,63 @@ const FAQ = () => {
   };
 
   return (
-    <div className="space-y-3 sm:space-y-4">
+    <div className="space-y-2 sm:space-y-3">
       {faqs.map((faq, index) => (
-        <div
+        <motion.div
           key={index}
-          className="border border-gray-200 dark:border-gray-700 rounded-lg"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.05 }}
+          viewport={{ once: true }}
+          className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-[#1a1f2e]"
         >
           <button
             onClick={() => toggleFAQ(index)}
-            className="w-full flex justify-between items-center p-4 sm:p-5 text-left"
+            className={`w-full flex justify-between items-center p-3 sm:p-4 text-left transition-colors ${
+              activeIndex === index ? "bg-[#4161df]/5 dark:bg-[#4161df]/10" : ""
+            }`}
           >
-            <span className="font-semibold text-base sm:text-lg text-black dark:text-white pr-4">
+            <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white pr-3">
               {faq.question}
             </span>
-            <span className="text-indigo-600 dark:text-indigo-400 flex-shrink-0">
-              {activeIndex === index ? <MinusIcon /> : <PlusIcon />}
-            </span>
-          </button>
-          {activeIndex === index && (
-            <div className="p-4 sm:p-5 pt-0 text-gray-600 dark:text-gray-300 text-sm sm:text-base">
-              <p>{faq.answer}</p>
+            <div
+              className={`flex-shrink-0 w-6 h-6 rounded-full bg-[#4161df]/10 dark:bg-[#4161df]/20 flex items-center justify-center transition-transform duration-300 ${
+                activeIndex === index ? "rotate-45" : ""
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-3 w-3 text-[#4161df]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
             </div>
-          )}
-        </div>
+          </button>
+          <motion.div
+            initial={false}
+            animate={{
+              height: activeIndex === index ? "auto" : 0,
+              opacity: activeIndex === index ? 1 : 0,
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
       ))}
     </div>
   );
 };
-
-// SVG Icon Components
-
-const PlusIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5 sm:h-6 sm:w-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-    />
-  </svg>
-);
-
-const MinusIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5 sm:h-6 sm:w-6"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M18 12H6"
-    />
-  </svg>
-);
-
-const HomeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-    />
-  </svg>
-);
-
-const TagIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M7 7h.01M7 3h5a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm0 0v18"
-    />
-  </svg>
-);
-
-const TrendingUpIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-    />
-  </svg>
-);
-
-const BriefcaseIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-    />
-  </svg>
-);
-
-const UsersIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-    />
-  </svg>
-);
-
-const ShieldCheckIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.944a11.955 11.955 0 0118-8.944c0-1.22-.195-2.403-.568-3.544z"
-    />
-  </svg>
-);
-
-const AcademicCapIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-5.998 12.083 12.083 0 01.665-6.479L12 14z" />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"
-    />
-  </svg>
-);

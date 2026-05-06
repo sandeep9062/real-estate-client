@@ -1,125 +1,220 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
+import {
+  Shield,
+  Lock,
+  Database,
+  Cookie,
+  Share2,
+  UserCheck,
+  Mail,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const PrivacyPolicy = () => {
+  const router = useRouter();
+
+  const sections = [
+    {
+      icon: Database,
+      title: "1 — What Data We Collect",
+      content:
+        "We may collect personal data when you register, submit enquiries, fill forms, or interact with our website.",
+      items: [
+        "Basic profile information (name, email, phone number)",
+        "Property preferences, budgets, and requirement details",
+        "Usage activity, device info, browser type, IP address",
+        "Cookies & tracking data for analytics and UX improvements",
+      ],
+    },
+    {
+      icon: Lock,
+      title: "2 — How We Use Your Data",
+      content:
+        "We only use your data to provide and improve our platform and services.",
+      items: [
+        "Respond to enquiries and provide requested information",
+        "Recommend properties and personalize your experience",
+        "Improve website performance and user experience",
+        "Communicate updates, offers, and promotional content",
+      ],
+    },
+    {
+      icon: Cookie,
+      title: "3 — Cookies & Tracking",
+      content:
+        "We use cookies to store small pieces of information which help improve website performance. You may disable cookies in your browser settings — however, some features may not function properly.",
+      items: [],
+    },
+    {
+      icon: Share2,
+      title: "4 — Data Sharing",
+      content:
+        "We DO NOT sell your personal data to any third party or advertiser. We may share your data only in the following cases:",
+      items: [
+        "To comply with legal obligations or government requests",
+        "With trusted service providers (ex: email notifications, hosting)",
+      ],
+    },
+    {
+      icon: UserCheck,
+      title: "5 — Your Rights",
+      content:
+        "You have full rights under applicable Indian data protection laws:",
+      items: [
+        "Right to access your data",
+        "Right to request data deletion",
+        "Right to withdraw consent anytime",
+      ],
+    },
+    {
+      icon: Mail,
+      title: "6 — Contact Us",
+      content:
+        "If you have any questions regarding this Privacy Policy or want to request data changes, please contact us:",
+      items: [],
+      email: "propertybulbul@gmail.com",
+    },
+  ];
+
   return (
-    <div className="bg-gray-50 mt-20 pt-20 min-h-screen py-8 sm:py-10 md:py-12">
-      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-sm px-4 sm:px-6 md:px-12 py-6 sm:py-8 md:py-12">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mb-4 sm:mb-6 tracking-tight">
-          Privacy Policy
-        </h1>
+    <main className="relative min-h-screen bg-white">
+      {/* HERO HEADER */}
+      <section className="bg-gradient-to-r from-gray-100 to-blue-300 pt-30 py-20 text-black relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none">
+          <Shield size={400} strokeWidth={0.5} />
+        </div>
 
-        <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-10">
-          Last updated: November 8, 2025
-        </p>
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-3xl"
+          >
+            <div className="flex items-center gap-2 text-blue-900 font-bold uppercase tracking-widest text-sm mb-4">
+              <AlertTriangle size={18} />
+              Privacy & Security
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
+              Privacy Policy
+            </h1>
+            <p className="text-gray-900 text-lg leading-relaxed">
+              At <strong>Property Bulbul</strong>, your privacy is extremely
+              important to us. This Privacy Policy explains how we collect, use,
+              and safeguard your personal data when you interact with our
+              platform, services, and any other offerings managed by us.
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-        <p className="text-sm sm:text-base text-gray-700 leading-relaxed mb-6 sm:mb-8">
-          At Real Estate, your privacy is extremely important to us. This
-          Privacy Policy explains how we collect, use, and safeguard your
-          personal data when you interact with our platform, services, and any
-          other offerings managed by us.
-        </p>
-
-        {/* SECTION */}
-        <section className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-            1 — What Data We Collect
-          </h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            We may collect personal data when you register, submit enquiries,
-            fill forms, or interact with our website.
+      {/* LAST UPDATED */}
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-gray-400 text-sm mt-6 mb-2">
+            Last updated: November 8, 2025
           </p>
-
-          <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-sm sm:text-base text-gray-700">
-            <li>Basic profile information (name, email, phone number)</li>
-            <li>Property preferences, budgets, and requirement details</li>
-            <li>Usage activity, device info, browser type, IP address</li>
-            <li>Cookies & tracking data for analytics and UX improvements</li>
-          </ul>
-        </section>
-
-        {/* SECTION */}
-        <section className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-            2 — How We Use Your Data
-          </h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            We only use your data to provide and improve our platform and
-            services.
-          </p>
-
-          <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-sm sm:text-base text-gray-700">
-            <li>Respond to enquiries and provide requested information</li>
-            <li>Recommend properties and personalize your experience</li>
-            <li>Improve website performance and user experience</li>
-            <li>Communicate updates, offers, and promotional content</li>
-          </ul>
-        </section>
-
-        {/* SECTION */}
-        <section className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-            3 — Cookies & Tracking
-          </h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            We use cookies to store small pieces of information which help
-            improve website performance. You may disable cookies in your browser
-            settings — however, some features may not function properly.
-          </p>
-        </section>
-
-        {/* SECTION */}
-        <section className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-            4 — Data Sharing
-          </h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            We DO NOT sell your personal data to any third party or advertiser.
-            We may share your data only in the following cases:
-          </p>
-          <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-sm sm:text-base text-gray-700">
-            <li>To comply with legal obligations or government requests</li>
-            <li>
-              With trusted service providers (ex: email notifications, hosting)
-            </li>
-          </ul>
-        </section>
-
-        {/* SECTION */}
-        <section className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-            5 — Your Rights
-          </h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            You have full rights under applicable Indian data protection laws:
-          </p>
-          <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-sm sm:text-base text-gray-700">
-            <li>Right to access your data</li>
-            <li>Right to request data deletion</li>
-            <li>Right to withdraw consent anytime</li>
-          </ul>
-        </section>
-
-        {/* SECTION */}
-        <section className="space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-            6 — Contact Us
-          </h2>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-            If you have any questions regarding this Privacy Policy or want to
-            request data changes, please contact us:
-          </p>
-          <p className="text-sm sm:text-base text-gray-900 font-medium">
-            Email: propertybulbul@gmail.com
-          </p>
-        </section>
-
-        <p className="text-gray-500 text-xs sm:text-sm">
-          By using our website, you consent to our Privacy Policy.
-        </p>
+        </div>
       </div>
-    </div>
+
+      {/* MAIN CONTENT */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            {/* INTRO BOX */}
+            <div className="bg-blue-50 border-l-4 border-[#4161df] p-6 mb-12 rounded-r-xl shadow-sm">
+              <div className="flex gap-4">
+                <Info className="text-[#4161df] shrink-0" />
+                <p className="text-slate-700 text-sm md:text-base italic">
+                  By using our website, you consent to our Privacy Policy.
+                  Please read the following information carefully to understand
+                  our views and practices regarding your personal data.
+                </p>
+              </div>
+            </div>
+
+            {/* SECTIONS */}
+            <div className="space-y-14">
+              {sections.map((section, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group"
+                >
+                  <div className="flex items-start gap-5">
+                    <span className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-500 shrink-0 group-hover:bg-[#4161df] group-hover:text-white transition-all duration-300">
+                      <section.icon size={22} />
+                    </span>
+                    <div className="flex-1">
+                      <h2 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[#4161df] transition-colors">
+                        {section.title}
+                      </h2>
+                      <p className="text-slate-600 leading-relaxed text-base md:text-lg mb-3">
+                        {section.content}
+                      </p>
+
+                      {section.items.length > 0 && (
+                        <ul className="list-disc pl-5 sm:pl-6 space-y-1.5 sm:space-y-2 text-slate-600 text-base md:text-lg">
+                          {section.items.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {section.email && (
+                        <p className="text-slate-900 font-semibold text-base md:text-lg mt-2">
+                          Email:{" "}
+                          <span className="text-[#4161df]">
+                            {section.email}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* FOOTER NOTE */}
+            <div className="mt-20 pt-10 border-t border-slate-200 text-center">
+              <p className="text-slate-400 text-sm">
+                © {new Date().getFullYear()} Property Bulbul. All rights
+                reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HELP CALLOUT */}
+      <section className="container mx-auto px-4 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-[#4161df] rounded-2xl p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                Have questions about your privacy?
+              </h2>
+              <p className="text-blue-100 opacity-90">
+                Our team is here to help with any concerns or clarifications.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/contact")}
+              className="bg-white text-[#4161df] px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-all whitespace-nowrap shadow-lg"
+            >
+              Contact Us
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 };
 
