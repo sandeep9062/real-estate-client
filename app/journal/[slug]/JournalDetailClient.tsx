@@ -12,7 +12,6 @@ import {
   Divider,
   Skeleton,
   Button,
-  Box,
   Paper,
 } from "@mantine/core";
 import { useGetJournalBySlugQuery } from "@/services/journalApi";
@@ -27,6 +26,13 @@ import Link from "next/link";
 
 interface JournalDetailClientProps {
   slug: string;
+}
+
+// Ensure blank lines between markdown block elements (headers, lists, paragraphs)
+function ensureMarkdownSpacing(content: string): string {
+  return content
+    .replace(/\n(#{1,6} .+)/g, "\n\n$1")
+    .replace(/(#{1,6} .+)\n(?!\n)/g, "$1\n\n");
 }
 
 export default function JournalDetailClient({
@@ -107,14 +113,16 @@ export default function JournalDetailClient({
         />
 
         {/* Render journal content as markdown with Tailwind Typography */}
-        <Box className="prose prose-blue prose-lg max-w-none" mt="xl">
-          <ReactMarkdown>{journal.content}</ReactMarkdown>
-        </Box>
+        <div className="prose prose-blue prose-lg max-w-none mt-8">
+          <ReactMarkdown>
+            {ensureMarkdownSpacing(journal.content)}
+          </ReactMarkdown>
+        </div>
 
         <Divider my={50} label="Related Listings" labelPosition="center" />
 
         {/* Real-time Properties from the same Sector */}
-        <Box>
+        <div>
           <Title order={2} mb="xl" ta="center">
             Properties in {journal.targetSector || "this area"}
           </Title>
@@ -147,7 +155,7 @@ export default function JournalDetailClient({
               </Text>
             )}
           </Stack>
-        </Box>
+        </div>
 
         <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
           <IconHome size={40} color="#4161df" />
