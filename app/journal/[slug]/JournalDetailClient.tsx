@@ -29,10 +29,26 @@ interface JournalDetailClientProps {
 }
 
 // Ensure blank lines between markdown block elements (headers, lists, paragraphs)
+// Markdown requires \n\n (double newline) to recognize block-level elements
 function ensureMarkdownSpacing(content: string): string {
-  return content
-    .replace(/\n(#{1,6} .+)/g, "\n\n$1")
-    .replace(/(#{1,6} .+)\n(?!\n)/g, "$1\n\n");
+  return (
+    content
+      // Ensure double newline BEFORE any heading line
+      .replace(/\n(#{1,6} .+)/g, "\n\n$1")
+      // Ensure double newline AFTER any heading line
+      .replace(/(#{1,6} .+)\n(?!\n)/g, "$1\n\n")
+      // Ensure double newline BEFORE any list item (starts with -, *, or number.)
+      .replace(/\n((?:[-*]|\d+\.) .+)/g, "\n\n$1")
+      // Ensure double newline AFTER any list item if next line is NOT also a list item
+      .replace(
+        /((?:[-*]|\d+\.) .+)\n(?!\n)(?!(?:\s*(?:[-*]|\d+\.) ))/g,
+        "$1\n\n",
+      )
+      // Normalize triple+ newlines to just double newlines
+      .replace(/\n{3,}/g, "\n\n")
+      // Trim leading/trailing whitespace
+      .trim()
+  );
 }
 
 export default function JournalDetailClient({
@@ -113,7 +129,9 @@ export default function JournalDetailClient({
         />
 
         {/* Render journal content as markdown with Tailwind Typography */}
-        <div className="prose prose-blue prose-lg max-w-none mt-8">
+        {/* prose-slate = color theme, max-w-none = prevent width restriction */}
+        {/* prose-headings:font-bold ensures bold headings, prose-p:my-4 ensures paragraph spacing, prose-li:my-2 ensures list item spacing */}
+        <div className="prose prose-slate max-w-none prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4 prose-p:my-4 prose-li:my-2 prose-ul:my-4 prose-ol:my-4 prose-strong:font-bold prose-strong:text-gray-900">
           <ReactMarkdown>
             {ensureMarkdownSpacing(journal.content)}
           </ReactMarkdown>
