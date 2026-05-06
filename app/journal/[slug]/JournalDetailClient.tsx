@@ -128,11 +128,33 @@ export default function JournalDetailClient({
           h={400}
         />
 
-        {/* Render journal content as markdown with Tailwind Typography */}
-        {/* prose-slate = color theme, max-w-none = prevent width restriction */}
-        {/* prose-headings:font-bold ensures bold headings, prose-p:my-4 ensures paragraph spacing, prose-li:my-2 ensures list item spacing */}
-        <div className="prose prose-slate max-w-none prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4 prose-p:my-4 prose-li:my-2 prose-ul:my-4 prose-ol:my-4 prose-strong:font-bold prose-strong:text-gray-900">
-          <ReactMarkdown>
+        {/* Render journal content as markdown with direct Tailwind styling on each element */}
+        <div className="w-full max-w-none">
+          <ReactMarkdown
+            components={{
+              h1: ({ node, ...props }) => (
+                <h1 className="text-4xl font-extrabold my-6" {...props} />
+              ),
+              h2: ({ node, ...props }) => (
+                <h2
+                  className="text-3xl font-bold my-5 border-b pb-2"
+                  {...props}
+                />
+              ),
+              h3: ({ node, ...props }) => (
+                <h3 className="text-2xl font-semibold my-4" {...props} />
+              ),
+              p: ({ node, ...props }) => (
+                <p className="text-gray-700 leading-relaxed my-4" {...props} />
+              ),
+              ul: ({ node, ...props }) => (
+                <ul className="list-disc ml-6 my-4 space-y-2" {...props} />
+              ),
+              li: ({ node, ...props }) => (
+                <li className="text-gray-700" {...props} />
+              ),
+            }}
+          >
             {ensureMarkdownSpacing(journal.content)}
           </ReactMarkdown>
         </div>
