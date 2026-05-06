@@ -64,7 +64,6 @@ export default function JournalDetailClient({
     useGetAllPropertiesQuery(
       {
         search: journal?.targetSector,
-        sector: journal?.targetSector,
         limit: 3,
       },
       { skip: !journal?.targetSector },
