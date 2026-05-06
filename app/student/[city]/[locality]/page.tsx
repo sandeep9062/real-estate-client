@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import { Metadata } from "next";
 
 export async function generateMetadata({
@@ -36,10 +37,9 @@ export default async function LocalityGuidePage({
         Student Rental Guide – {locality}, {city}
       </h1>
 
-      <div
-        className="prose prose-lg"
-        dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, "<br/>") }}
-      />
+      <div className="prose prose-lg">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </div>
     </article>
   );
 }
