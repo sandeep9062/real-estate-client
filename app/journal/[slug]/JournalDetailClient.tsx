@@ -15,13 +15,14 @@ import {
   Paper,
 } from "@mantine/core";
 import { useGetJournalBySlugQuery } from "@/services/journalApi";
-import { useGetProjectsQuery } from "@/services/projectsApi";
+import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import {
   IconCalendar,
   IconUser,
   IconArrowLeft,
   IconHome,
 } from "@tabler/icons-react";
+import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
 
 interface JournalDetailClientProps {
@@ -59,10 +60,11 @@ export default function JournalDetailClient({
     useGetJournalBySlugQuery(slug);
 
   // 2. Fetch Related Properties (using the sector/city from the journal)
-  const { data: relatedProps, isLoading: propsLoading } = useGetProjectsQuery(
-    { sector: journal?.targetSector, limit: 3 },
-    { skip: !journal?.targetSector },
-  );
+  const { data: relatedProps, isLoading: propsLoading } =
+    useGetAllPropertiesQuery(
+      { sector: journal?.targetSector, limit: 3 },
+      { skip: !journal?.targetSector },
+    );
 
   if (journalLoading)
     return (
@@ -166,35 +168,18 @@ export default function JournalDetailClient({
           <Title order={2} mb="xl" ta="center">
             Properties in {journal.targetSector || "this area"}
           </Title>
-          <Stack gap="md">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {relatedProps?.map((prop: any) => (
-              <Paper key={prop._id} withBorder p="md" radius="md">
-                <Group justify="space-between">
-                  <Stack gap={0}>
-                    <Text fw={700} size="lg">
-                      {prop.title}
-                    </Text>
-                    <Text size="sm" c="dimmed">
-                      {prop.location.address}
-                    </Text>
-                  </Stack>
-                  <Button
-                    variant="light"
-                    component={Link}
-                    color="#4161df"
-                    href={`/projects/${prop.slug}`}
-                  >
-                    View Details
-                  </Button>
-                </Group>
-              </Paper>
+              <PropertyCard key={prop._id} card={prop} />
             ))}
             {!propsLoading && relatedProps?.length === 0 && (
-              <Text ta="center" c="dimmed">
-                No active listings in this sector currently.
-              </Text>
+              <div className="col-span-full">
+                <Text ta="center" c="dimmed">
+                  No active listings in this sector currently.
+                </Text>
+              </div>
             )}
-          </Stack>
+          </div>
         </div>
 
         <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
