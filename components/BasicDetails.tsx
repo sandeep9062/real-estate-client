@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   TextInput,
   Box,
@@ -16,6 +16,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { validateString } from "@/lib/utils";
+import { slugify } from "@/lib/slugify";
 import FloorPlanUploadSection from "@/components/FloorPlanUploadSection";
 
 function splitLines(s: string) {
@@ -75,6 +76,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
   const form = useForm({
     initialValues: {
       title: propertyDetails.title,
+      slug: propertyDetails.slug || "",
       description: propertyDetails.description,
       price: propertyDetails.price,
       deal: propertyDetails.deal,
@@ -91,9 +93,9 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
       listingAvailability: propertyDetails.listingAvailability || "Available",
       virtualTourUrl: propertyDetails.virtualTourUrl || "",
       schoolsText: (propertyDetails.nearbyPlaces?.schools || []).join("\n"),
-      metroStationsText: (propertyDetails.nearbyPlaces?.metroStations || []).join(
-        "\n",
-      ),
+      metroStationsText: (
+        propertyDetails.nearbyPlaces?.metroStations || []
+      ).join("\n"),
       hospitalsText: (propertyDetails.nearbyPlaces?.hospitals || []).join("\n"),
       mallsText: (propertyDetails.nearbyPlaces?.malls || []).join("\n"),
       reraNumber: propertyDetails.reraNumber || "",
@@ -121,8 +123,18 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
     },
   });
 
+  // Auto-generate slug from title
+  useEffect(() => {
+    const titleValue = form.values.title;
+    if (titleValue && titleValue.trim()) {
+      const generated = slugify(titleValue);
+      form.setFieldValue("slug", generated);
+    }
+  }, [form.values.title]);
+
   const {
     title,
+    slug,
     description,
     price,
     deal,
@@ -166,6 +178,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
       setPropertyDetails((prev: any) => ({
         ...prev,
         title,
+        slug,
         description,
         price,
         deal,
@@ -211,6 +224,15 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
           placeholder="Property Name"
           {...form.getInputProps("title")}
           classNames={{ input: "border-gray-300" }}
+        />
+
+        <TextInput
+          label="Slug"
+          description="Auto-generated from title. Used in the property URL."
+          placeholder="auto-generated-slug"
+          {...form.getInputProps("slug")}
+          classNames={{ input: "border-gray-300 bg-gray-50" }}
+          readOnly
         />
 
         <Textarea
@@ -357,11 +379,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
           styles={{ dropdown: { zIndex: 1300 } }}
         />
 
-        <Divider
-          label="Pricing & terms"
-          labelPosition="center"
-          my="sm"
-        />
+        <Divider label="Pricing & terms" labelPosition="center" my="sm" />
 
         <Text size="sm" c="dimmed">
           {deal === "Rent"

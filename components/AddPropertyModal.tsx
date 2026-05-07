@@ -29,6 +29,7 @@ const AddPropertyModal = ({
 
   const defaultPropertyDetails = {
     title: "",
+    slug: "",
     description: "",
     price: 0,
     deal: "Rent",
@@ -211,7 +212,11 @@ const AddPropertyModal = ({
 
           <Stepper.Step label="Basics">
             <BasicDetails
-              key={editingProperty?._id ? String(editingProperty._id) : "new-property"}
+              key={
+                editingProperty?._id
+                  ? String(editingProperty._id)
+                  : "new-property"
+              }
               prevStep={prevStep}
               nextStep={nextStep}
               propertyDetails={propertyDetails}

@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const properties = await propertiesRes.json();
         propertyUrls =
           properties?.map((property: any) => ({
-            url: `${baseUrl}/property/${property._id}`,
+            url: `${baseUrl}/property/${property.slug || property._id}`,
             lastModified: new Date(property.updatedAt || Date.now()),
           })) ?? [];
       }

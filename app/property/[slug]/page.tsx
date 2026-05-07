@@ -1,17 +1,18 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PropertyDetails from "./PropertyDetails";
-import { getPropertyServer } from "../../../services/propertiesApi";
+import { getPropertyBySlugServer } from "../../../services/propertiesApi";
 import {
   generateRealEstateSchema,
   generateFAQSchema,
   generateBreadcrumbSchema,
   renderSchemaScript,
 } from "@/lib/schemaUtils";
+import { slugify } from "@/lib/slugify";
 
 type Props = {
   params: Promise<{
-    id: string;
+    slug: string;
   }>;
 };
 
@@ -26,8 +27,8 @@ function getBedroomLabel(bedrooms: number | undefined): string {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const data = await getPropertyServer(id);
+  const { slug } = await params;
+  const data = await getPropertyBySlugServer(slug);
 
   if (!data) {
     return {
@@ -63,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     data?.furnishing,
     data?.availability,
   ].filter(Boolean);
-  const canonicalUrl = `https://www.propertybulbul.com/property/${id}`;
+  const canonicalUrl = `https://www.propertybulbul.com/property/${data.slug || data._id}`;
 
   // Filter out video URLs from images
   const imageUrls = (data?.image || []).filter((img: string) => {
@@ -103,12 +104,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const PropertyPage = async ({ params }: Props) => {
-  const { id } = await params;
-  const data = await getPropertyServer(id);
+  const { slug } = await params;
+  const data = await getPropertyBySlugServer(slug);
   if (!data) notFound();
 
+  const urlIdentifier = data.slug || data._id;
+  const canonicalSlug = data.slug || slugify(data.title) || data._id;
+
   // Generate all schemas for property page
-  const realEstateSchema = generateRealEstateSchema(data, id);
+  const realEstateSchema = generateRealEstateSchema(data, canonicalSlug);
   const faqSchema = generateFAQSchema(
     data.description,
     data?.location?.sector || data?.location?.city,
@@ -122,7 +126,7 @@ const PropertyPage = async ({ params }: Props) => {
     },
     {
       name: sanitizeMetaText(data?.title || ""),
-      item: `https://www.propertybulbul.com/property/${id}`,
+      item: `https://www.propertybulbul.com/property/${urlIdentifier}`,
     },
   ]);
 

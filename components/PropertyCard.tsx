@@ -41,6 +41,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const router = useRouter();
   const pid = String(card._id || card.id);
+  const slug = card.slug || pid;
 
   const [inCompare, setInCompare] = React.useState(false);
   React.useEffect(() => {
@@ -113,7 +114,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     e.stopPropagation();
     if (!displayPhone) return;
 
-    const message = `Hi, I saw your property "${card.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${pid}`;
+    const message = `Hi, I saw your property "${card.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${slug}`;
     const whatsappUrl = `https://wa.me/${displayPhone}?text=${encodeURIComponent(message)}`;
 
     window.open(whatsappUrl, "_blank");
@@ -138,7 +139,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           ? "border-slate-400/80 shadow-md ring-1 ring-slate-400/60"
           : "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md",
       ].join(" ")}
-      onClick={() => router.push(`/property/${card._id}`)}
+      onClick={() => router.push(`/property/${slug}`)}
     >
       {/* Media — ~65% of card height in carousel variant */}
       <div

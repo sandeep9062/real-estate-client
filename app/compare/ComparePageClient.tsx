@@ -25,8 +25,14 @@ export default function ComparePageClient() {
   if (ids.length < 2) {
     return (
       <div className="pt-24 max-w-3xl mx-auto px-4 py-16 text-center text-gray-600">
-        <p className="mb-4">Add at least two properties from listing cards using the compare control.</p>
-        <Link href="/properties/chandigarh" className="text-[#4161df] font-semibold">
+        <p className="mb-4">
+          Add at least two properties from listing cards using the compare
+          control.
+        </p>
+        <Link
+          href="/properties/chandigarh"
+          className="text-[#4161df] font-semibold"
+        >
           Browse properties
         </Link>
       </div>
@@ -66,7 +72,11 @@ export default function ComparePageClient() {
       key: "listingAvailability",
       fmt: availLabel,
     },
-    { label: "Price (₹)", key: "price", fmt: (p: any) => p.price?.toLocaleString("en-IN") },
+    {
+      label: "Price (₹)",
+      key: "price",
+      fmt: (p: any) => p.price?.toLocaleString("en-IN"),
+    },
     {
       label: "Area",
       key: "area",
@@ -105,7 +115,9 @@ export default function ComparePageClient() {
   return (
     <div className="pt-24 min-h-screen bg-gray-50 pb-20 px-4">
       <div className="max-w-[1100px] mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Compare listings</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Compare listings
+        </h1>
         <p className="text-sm text-gray-600 mb-6">
           Side-by-side view of selected properties. Up to four listings.
         </p>
@@ -117,9 +129,12 @@ export default function ComparePageClient() {
                   Detail
                 </th>
                 {data.map((p: any) => (
-                  <th key={p._id} className="text-left p-3 font-semibold text-gray-900 min-w-[180px]">
+                  <th
+                    key={p._id}
+                    className="text-left p-3 font-semibold text-gray-900 min-w-[180px]"
+                  >
                     <Link
-                      href={`/property/${p._id}`}
+                      href={`/property/${p.slug || p._id}`}
                       className="text-[#4161df] hover:underline line-clamp-2"
                     >
                       {p.title}

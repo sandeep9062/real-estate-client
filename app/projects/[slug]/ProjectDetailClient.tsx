@@ -183,7 +183,10 @@ export default function ProjectDetailClient({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {properties?.length > 0 ? (
                 properties.map((prop: any) => (
-                  <Link href={`/property/${prop._id}`} key={prop._id}>
+                  <Link
+                    href={`/property/${prop.slug || prop._id}`}
+                    key={prop._id}
+                  >
                     <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex gap-4">
                       <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
                         <img

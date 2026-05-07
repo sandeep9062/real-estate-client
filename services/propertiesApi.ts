@@ -60,6 +60,33 @@ export async function getPropertyServer(id: string) {
   }
 }
 
+export async function getPropertyBySlugServer(slug: string) {
+  const apiUrl = getApiUrl();
+
+  try {
+    const response = await fetch(`${apiUrl}/properties/slug/${slug}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (response.status === 404) return null;
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "Unknown error");
+      console.error(`API Error [${response.status}]: ${errorText}`);
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("getPropertyBySlugServer error:", error);
+    throw error;
+  }
+}
+
 import { baseQueryWithAuth } from "./api";
 
 export const propertiesApi = createApi({
@@ -171,7 +198,10 @@ export const propertiesApi = createApi({
         params: { ids: idsCsv },
       }),
     }),
-    getSimilarProperties: builder.query<any[], { propertyId: string; limit?: number }>({
+    getSimilarProperties: builder.query<
+      any[],
+      { propertyId: string; limit?: number }
+    >({
       query: ({ propertyId, limit = 8 }) => ({
         url: "/properties/similar",
         params: { propertyId, limit },

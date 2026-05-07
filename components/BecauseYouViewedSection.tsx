@@ -38,6 +38,7 @@ export default function BecauseYouViewedSection() {
 
   const first = recent[0];
   const pid = String(first._id || first.id);
+  const slug = first.slug || pid;
   const label =
     first.title?.trim() ||
     [first.location?.address, first.location?.city]
@@ -56,7 +57,7 @@ export default function BecauseYouViewedSection() {
       >
         Because you viewed{" "}
         <Link
-          href={`/property/${pid}`}
+          href={`/property/${slug}`}
           className="text-blue-600 hover:underline"
         >
           {label}
