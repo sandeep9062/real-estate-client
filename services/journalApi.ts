@@ -2,7 +2,9 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./api";
 import { getApiUrl } from "./propertiesApi";
 
-export async function getJournalBySlugServer(slug: string) {
+export async function getJournalBySlugServer(
+  slug: string,
+): Promise<Journal | null> {
   const apiUrl = getApiUrl();
   try {
     const response = await fetch(`${apiUrl}/v1/journals/slug/${slug}`, {
@@ -65,6 +67,8 @@ export const journalApi = createApi({
           const value = journalData[key as keyof typeof journalData];
           if (key === "coverImage" && value && (value as any) instanceof File) {
             formData.append("coverImage", value);
+          } else if (Array.isArray(value) && value !== null) {
+            formData.append(key, JSON.stringify(value));
           } else if (typeof value === "object" && value !== null) {
             formData.append(key, JSON.stringify(value));
           } else if (value !== undefined && value !== null) {
@@ -121,11 +125,14 @@ interface Journal {
   _id: string;
   title: string;
   content: string;
+  excerpt: string;
   author: string;
   date: string;
   category: string;
   targetSector: string;
   coverImage: string;
   slug: string;
+  metaTitle: string;
+  keywords: string[];
   createdAt: string;
 }
