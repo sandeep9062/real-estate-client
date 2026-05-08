@@ -7,7 +7,6 @@ import {
   Text,
   Grid,
   Card,
-  Image,
   Badge,
   Group,
   Stack,
@@ -181,125 +180,96 @@ export default function BlogListingPage() {
                     radius="20px"
                     p={0}
                     style={{
-                      height: "100%",
+                      height:
+                        isFeatured || isMedium
+                          ? "clamp(300px, 46vh, 450px)"
+                          : 360,
                       border: "1px solid #f1f3f5",
                       overflow: "hidden",
+                      position: "relative",
+                      backgroundImage: `url(${
+                        post.coverImage ||
+                        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=800"
+                      })`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
                     }}
                   >
-                    <Box
-                      pos="relative"
+                    <Overlay
                       style={{
-                        height:
-                          isFeatured || isMedium
-                            ? "clamp(280px, 40vh, 450px)"
-                            : 240,
-                        overflow: "hidden",
+                        background:
+                          "linear-gradient(180deg, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.85) 100%)",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-end",
                       }}
+                      zIndex={1}
+                      p={{ base: "lg", sm: "xl" }}
                     >
-                      <Image
-                        src={
-                          post.coverImage ||
-                          "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=800"
-                        }
-                        alt={post.title}
-                        style={{ height: "100%", objectFit: "cover" }}
-                      />
-                      {(isFeatured || isMedium) && (
-                        <Overlay
-                          // Move the gradient to the style prop to satisfy TypeScript
-                          style={{
-                            background:
-                              "linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,0.9) 100%)",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "flex-end",
-                          }}
-                          zIndex={1}
-                          p={{ base: "lg", sm: "xl" }}
-                        >
-                          <Badge
-                            color="blue"
-                            variant="filled"
-                            mb="xs"
-                            radius="sm"
-                            size="sm"
-                          >
-                            {post.category || "Insight"}
-                          </Badge>
-                          <Title
-                            c="white"
-                            order={2}
-                            size={
-                              isFeatured
-                                ? "clamp(1.4rem, 4vw, 1.8rem)"
-                                : "1.3rem"
-                            }
-                            fw={800}
-                            lh={1.2}
-                            mb="xs"
-                          >
-                            {post.title}
-                          </Title>
-                          <Group gap="sm">
-                            <Group gap={4}>
-                              <IconCalendar size={14} color="white" />
-                              <Text size="xs" c="white" opacity={0.8}>
-                                {new Date(post.createdAt).toLocaleDateString(
-                                  "en-IN",
-                                  { month: "short", year: "numeric" },
-                                )}
-                              </Text>
-                            </Group>
-                            <Group gap={4}>
-                              <IconClock size={14} color="white" />
-                              <Text size="xs" c="white" opacity={0.8}>
-                                5 min read
-                              </Text>
-                            </Group>
-                          </Group>
-                        </Overlay>
-                      )}
-                    </Box>
-
-                    {!isFeatured && !isMedium && (
-                      <Stack
-                        p="md"
-                        gap={8}
-                        justify="space-between"
-                        style={{ height: "100%" }}
+                      <Badge
+                        color="blue"
+                        variant="filled"
+                        mb="xs"
+                        radius="sm"
+                        size="sm"
+                        style={{ alignSelf: "flex-start" }}
                       >
-                        <Box>
-                          <Text
-                            fw={700}
-                            size="xs"
-                            tt="uppercase"
-                            c="blue"
-                            mb={4}
-                          >
-                            {post.category || "Guide"}
+                        {post.category || "Insight"}
+                      </Badge>
+                      <Title
+                        c="white"
+                        order={2}
+                        size={
+                          isFeatured
+                            ? "clamp(1.4rem, 4vw, 1.8rem)"
+                            : isMedium
+                              ? "1.3rem"
+                              : "1.1rem"
+                        }
+                        fw={800}
+                        lh={1.2}
+                        mb="xs"
+                      >
+                        {post.title}
+                      </Title>
+                      {!isFeatured && !isMedium && (
+                        <Text
+                          c="white"
+                          size="xs"
+                          opacity={0.75}
+                          lineClamp={2}
+                          mb="sm"
+                        >
+                          {post.excerpt ||
+                            post.description?.substring(0, 60) + "..."}
+                        </Text>
+                      )}
+                      <Group gap="sm">
+                        <Group gap={4}>
+                          <IconCalendar size={14} color="white" />
+                          <Text size="xs" c="white" opacity={0.8}>
+                            {new Date(post.createdAt).toLocaleDateString(
+                              "en-IN",
+                              { month: "short", year: "numeric" },
+                            )}
                           </Text>
-                          <Title
-                            order={3}
-                            size="1.1rem"
-                            fw={800}
-                            lh={1.3}
-                            mb={8}
-                          >
-                            {post.title}
-                          </Title>
-                          <Text c="dimmed" size="xs" lineClamp={2}>
-                            {post.excerpt ||
-                              post.description?.substring(0, 80) + "..."}
-                          </Text>
-                        </Box>
-                        <Group justify="space-between" mt="md">
-                          <Text fw={700} c="#4161df" size="xs">
-                            Read Full Analysis
-                          </Text>
-                          <IconArrowRight size={16} color="#4161df" />
                         </Group>
-                      </Stack>
-                    )}
+                        <Group gap={4}>
+                          <IconClock size={14} color="white" />
+                          <Text size="xs" c="white" opacity={0.8}>
+                            5 min read
+                          </Text>
+                        </Group>
+                        {!isFeatured && !isMedium && (
+                          <Group gap={4} ml="auto">
+                            <Text fw={600} size="xs" c="white">
+                              Read More
+                            </Text>
+                            <IconArrowRight size={14} color="white" />
+                          </Group>
+                        )}
+                      </Group>
+                    </Overlay>
                   </Card>
                 </Grid.Col>
               );

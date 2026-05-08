@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 const DEAL_OPTIONS = ["Sale", "Rent"];
+const SEARCH_DELAY = 400;
 const TYPE_OPTIONS = [
   "Residential",
   "Commercial",
@@ -57,7 +59,10 @@ function buildSearchPayload(filters: Record<string, unknown>) {
 
 export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [searchInput, setSearchInput] = useState(initialFilters.search || "");
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [filters, setFilters] = useState({
+    search: initialFilters.search || "",
     deal: initialFilters.deal || "",
     type: initialFilters.type || "",
     propertyCategory: initialFilters.propertyCategory || "",
@@ -84,8 +89,30 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
     setFilters((prev) => ({ ...prev, ...definedFilters }));
   }, [initialFilters]);
 
+  // Sync searchInput when initialFilters.search changes externally
+  useEffect(() => {
+    setSearchInput(initialFilters.search || "");
+  }, [initialFilters.search]);
+
+  // Debounced search – auto-apply after user stops typing
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: value }));
+    }, SEARCH_DELAY);
+  };
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
+  }, []);
+
   const clearFilters = () => {
     const cleared = {
+      search: "",
       deal: "",
       type: "",
       propertyCategory: "",
@@ -102,21 +129,16 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
       bbox: "",
       polygon: "",
     };
+    setSearchInput("");
     setFilters(cleared);
     onApply({});
   };
 
-  const activeFiltersCount =
-    Object.entries(filters).filter(([key, v]) => {
-      if (key === "bbox" || key === "polygon")
-        return typeof v === "string" && v.length > 0;
-      return (
-        v !== "" &&
-        v !== 0 &&
-        v !== 1000000000 &&
-        v !== 100000
-      );
-    }).length;
+  const activeFiltersCount = Object.entries(filters).filter(([key, v]) => {
+    if (key === "bbox" || key === "polygon")
+      return typeof v === "string" && v.length > 0;
+    return v !== "" && v !== 0 && v !== 1000000000 && v !== 100000;
+  }).length;
 
   const formatPrice = (price: number) => {
     if (price >= 10000000) {
@@ -181,6 +203,29 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
 
       {/* FILTERS CONTAINER */}
       <div className={`${isExpanded ? "block" : "hidden"} md:block p-4`}>
+        {/* KEYWORD SEARCH BAR */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <Input
+            placeholder="Search by property name, location, city, sector…"
+            className="w-full h-10 pl-9 pr-9 text-sm bg-white border-gray-200 rounded-lg focus:ring-1 focus:ring-[#4161df]/20 focus:border-[#4161df]"
+            value={searchInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+          {searchInput && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchInput("");
+                setFilters((prev) => ({ ...prev, search: "" }));
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="w-3.5 h-3.5 text-gray-400" />
+            </button>
+          )}
+        </div>
+
         {/* PRIMARY FILTERS ROW */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5 mb-4">
           {/* Deal Type */}
@@ -271,7 +316,9 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
               {filters.sector && (
                 <button
                   type="button"
-                  onClick={() => setFilters((prev) => ({ ...prev, sector: "" }))}
+                  onClick={() =>
+                    setFilters((prev) => ({ ...prev, sector: "" }))
+                  }
                   className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <X className="w-3 h-3 text-gray-400" />
