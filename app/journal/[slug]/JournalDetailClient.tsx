@@ -181,27 +181,6 @@ export default function JournalDetailClient({
           </ReactMarkdown>
         </div>
 
-        {/* Keywords / Tags */}
-        {journal.keywords && journal.keywords.length > 0 && (
-          <>
-            <Divider my={30} label="Keywords" labelPosition="center" />
-            <Group gap="xs" justify="center" wrap="wrap">
-              {journal.keywords.map((keyword: string, idx: number) => (
-                <Badge
-                  key={idx}
-                  size="lg"
-                  variant="light"
-                  color="#4161df"
-                  radius="xl"
-                  styles={{ root: { padding: "8px 16px", fontSize: "14px" } }}
-                >
-                  {keyword}
-                </Badge>
-              ))}
-            </Group>
-          </>
-        )}
-
         <Divider my={50} label="Related Listings" labelPosition="center" />
 
         {/* Real-time Properties from the same Sector */}
@@ -262,6 +241,27 @@ export default function JournalDetailClient({
                 </Paper>
               ))}
             </Stack>
+          </>
+        )}
+
+        {/* Keywords / Tags */}
+        {journal.keywords && journal.keywords.length > 0 && (
+          <>
+            <Divider my={30} label="Keywords" labelPosition="center" />
+            <Group gap="xs" justify="center" wrap="wrap">
+              {journal.keywords.map((keyword: string, idx: number) => (
+                <Badge
+                  key={idx}
+                  size="lg"
+                  variant="light"
+                  color="#4161df"
+                  radius="xl"
+                  styles={{ root: { padding: "6px 14px", fontSize: "12px" } }}
+                >
+                  #{keyword}
+                </Badge>
+              ))}
+            </Group>
           </>
         )}
         <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
