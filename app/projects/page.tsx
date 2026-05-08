@@ -33,9 +33,26 @@ export default function ProjectsPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-gray-200 h-80 rounded-xl" />
+            <div
+              key={i}
+              className="bg-white rounded-xl overflow-hidden border border-gray-100 animate-pulse"
+            >
+              <div className="aspect-video bg-gray-200" />
+              <div className="p-4 space-y-3">
+                <div className="h-3 w-1/3 bg-gray-200 rounded" />
+                <div className="h-5 w-3/4 bg-gray-200 rounded" />
+                <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                <div className="border-t pt-4 mt-4 flex justify-between items-center">
+                  <div className="space-y-1">
+                    <div className="h-3 w-16 bg-gray-200 rounded" />
+                    <div className="h-5 w-24 bg-gray-200 rounded" />
+                  </div>
+                  <div className="h-10 w-28 bg-gray-200 rounded-lg" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (

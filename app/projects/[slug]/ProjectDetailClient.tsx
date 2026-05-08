@@ -2,6 +2,8 @@
 import { useParams } from "next/navigation";
 import { useGetProjectBySlugQuery } from "@/services/projectsApi";
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
+import Image from "next/image";
+import Link from "next/link";
 import {
   MapPin,
   ShieldCheck,
@@ -10,10 +12,56 @@ import {
   Building2,
   ArrowRight,
 } from "lucide-react";
-import Link from "next/link";
 
 interface ProjectDetailClientProps {
   slug: string;
+}
+
+/** Skeleton for project detail page */
+function ProjectDetailSkeleton() {
+  return (
+    <div className="bg-gray-50 min-h-screen pt-20 pb-20">
+      {/* Hero skeleton */}
+      <div className="h-[60vh] bg-gray-200 animate-pulse" />
+      <div className="max-w-7xl mx-auto px-4 mt-[-80px] relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 animate-pulse">
+            <div className="h-6 w-24 bg-gray-200 rounded-full mb-4" />
+            <div className="h-8 w-3/4 bg-gray-200 rounded mb-6" />
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-gray-200 rounded" />
+              <div className="h-4 w-5/6 bg-gray-200 rounded" />
+              <div className="h-4 w-4/6 bg-gray-200 rounded" />
+            </div>
+          </div>
+          <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 animate-pulse">
+            <div className="h-6 w-48 bg-gray-200 rounded mb-6" />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-12 bg-gray-200 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="lg:col-span-1">
+          <div className="bg-white p-8 rounded-3xl shadow-2xl shadow-blue-100 border border-blue-50 sticky top-24 animate-pulse">
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-20 h-20 bg-gray-200 rounded-xl" />
+              <div className="space-y-2 flex-1">
+                <div className="h-4 w-24 bg-gray-200 rounded" />
+                <div className="h-6 w-32 bg-gray-200 rounded" />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="h-14 bg-gray-200 rounded-2xl" />
+              <div className="h-14 bg-gray-200 rounded-2xl" />
+            </div>
+            <div className="h-14 bg-gray-200 rounded-2xl mt-6" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ProjectDetailClient({
@@ -32,17 +80,7 @@ export default function ProjectDetailClient({
       { skip: !project?._id },
     );
 
-  if (projectLoading)
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-pulse flex flex-col items-center">
-          <Building2 size={48} className="text-blue-200 mb-4" />
-          <p className="text-gray-500 font-medium">
-            Loading Project Details...
-          </p>
-        </div>
-      </div>
-    );
+  if (projectLoading) return <ProjectDetailSkeleton />;
 
   // Handle 404 error
   if (error) {
@@ -95,11 +133,20 @@ export default function ProjectDetailClient({
     <div className="bg-gray-50 min-h-screen pt-20 pb-20">
       {/* Hero Gallery */}
       <div className="h-[60vh] bg-gray-900 relative overflow-hidden">
-        <img
-          src={project?.media?.images[0] || "/placeholder-project.jpg"}
-          className="w-full h-full object-cover opacity-70 transform hover:scale-105 transition-transform duration-700"
-          alt={project?.name}
-        />
+        {project?.media?.images[0] ? (
+          <Image
+            src={project.media.images[0]}
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover opacity-70 hover:scale-105 transition-transform duration-700"
+            alt={project?.name}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-800">
+            <Building2 className="w-24 h-24 text-gray-600" />
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
         <div className="absolute inset-0 flex items-center justify-center flex-col text-white px-4 text-center">
           <div className="bg-[#4161df] text-[10px] uppercase tracking-widest font-bold px-4 py-1 rounded-full mb-4">
@@ -181,17 +228,33 @@ export default function ProjectDetailClient({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {properties?.length > 0 ? (
+              {propsLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-4 animate-pulse"
+                  >
+                    <div className="w-24 h-24 rounded-xl bg-gray-200 flex-shrink-0" />
+                    <div className="flex flex-col justify-center flex-1 space-y-2">
+                      <div className="h-4 w-3/4 bg-gray-200 rounded" />
+                      <div className="h-3 w-1/2 bg-gray-200 rounded" />
+                      <div className="h-4 w-1/3 bg-gray-200 rounded" />
+                    </div>
+                  </div>
+                ))
+              ) : properties?.length > 0 ? (
                 properties.map((prop: any) => (
                   <Link
                     href={`/property/${prop.slug || prop._id}`}
                     key={prop._id}
                   >
                     <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex gap-4">
-                      <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
-                        <img
+                      <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 relative">
+                        <Image
                           src={prop.image?.[0] || "/placeholder-property.jpg"}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="96px"
                           alt={prop.title}
                         />
                       </div>
@@ -225,12 +288,20 @@ export default function ProjectDetailClient({
         <div className="lg:col-span-1">
           <div className="bg-white p-8 rounded-3xl shadow-2xl shadow-blue-100 border border-blue-50 sticky top-24">
             <div className="flex items-center gap-5 mb-8 pb-8 border-b border-gray-100">
-              <div className="p-2 bg-gray-50 rounded-xl border">
-                <img
-                  src={project?.developer?.logo || "/placeholder-logo.jpg"}
-                  className="w-16 h-16 rounded-lg object-contain"
-                  alt={project?.developer?.name || "Developer"}
-                />
+              <div className="p-2 bg-gray-50 rounded-xl border relative w-20 h-20">
+                {project?.developer?.logo ? (
+                  <Image
+                    src={project.developer.logo}
+                    fill
+                    className="object-contain rounded-lg"
+                    sizes="80px"
+                    alt={project?.developer?.name || "Developer"}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Building2 className="w-8 h-8 text-gray-400" />
+                  </div>
+                )}
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">

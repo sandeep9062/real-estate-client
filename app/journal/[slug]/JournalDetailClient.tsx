@@ -88,8 +88,29 @@ export default function JournalDetailClient({
 
   if (journalLoading)
     return (
-      <Container size="xl" py={100} px={{ base: 8, md: 12, lg: 16 }}>
-        <Skeleton height={400} radius="md" />
+      <Container size="xl" py={80} px={{ base: 8, md: 12, lg: 16 }}>
+        <Stack gap="lg">
+          <Skeleton height={36} width={120} radius="xl" />
+          <Skeleton height={48} width="80%" radius="md" />
+          <Group gap="xl">
+            <Skeleton height={20} width={160} radius="md" />
+            <Skeleton height={20} width={160} radius="md" />
+          </Group>
+          <Skeleton height={400} radius="md" />
+          <Stack gap="sm">
+            <Skeleton height={16} width="100%" radius="md" />
+            <Skeleton height={16} width="90%" radius="md" />
+            <Skeleton height={16} width="85%" radius="md" />
+            <Skeleton height={16} width="95%" radius="md" />
+            <Skeleton height={16} width="70%" radius="md" />
+          </Stack>
+          <Skeleton height={48} width="100%" radius="md" />
+          <Stack gap="sm">
+            <Skeleton height={80} radius="md" />
+            <Skeleton height={80} radius="md" />
+            <Skeleton height={80} radius="md" />
+          </Stack>
+        </Stack>
       </Container>
     );
 

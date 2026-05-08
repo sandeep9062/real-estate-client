@@ -1,5 +1,7 @@
+"use client";
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Building2, CheckCircle2 } from "lucide-react";
 
 export const ProjectCard = ({ project }: { project: any }) => {
@@ -7,9 +9,11 @@ export const ProjectCard = ({ project }: { project: any }) => {
     <Link href={`/projects/${project.slug}`} className="group">
       <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-gray-100">
         <div className="relative aspect-video">
-          <img
+          <Image
             src={project.media?.images[0] || "/placeholder-project.jpg"}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
             alt={project.name}
           />
           <div className="absolute top-3 left-3 flex gap-2">

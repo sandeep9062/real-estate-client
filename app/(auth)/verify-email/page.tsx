@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Image from "next/image";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 const VerifyEmailContent = () => {
@@ -40,10 +41,13 @@ const VerifyEmailContent = () => {
         <CardHeader className="text-center px-4 sm:px-6 pt-4 sm:pt-6">
           {/* Logo */}
           <div className="flex justify-center mb-4">
-            <img
+            <Image
               src="/propertybulbul.png"
               alt="Property Bulbul"
+              width={144}
+              height={48}
               className="object-contain w-28 sm:w-32 md:w-36"
+              priority
             />
           </div>
           <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -134,10 +138,13 @@ const VerifyEmailPage = () => {
           <Card className="w-full max-w-sm sm:max-w-md shadow-xl">
             <CardHeader className="text-center px-4 sm:px-6 pt-4 sm:pt-6">
               <div className="flex justify-center mb-4">
-                <img
+                <Image
                   src="/propertybulbul.png"
                   alt="Property Bulbul"
+                  width={144}
+                  height={48}
                   className="object-contain w-28 sm:w-32 md:w-36"
+                  priority
                 />
               </div>
               <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900">
