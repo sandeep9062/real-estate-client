@@ -143,7 +143,12 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={0} end={display.properties} duration={4} />+
+                  <CountUp
+                    start={display.properties - 100}
+                    end={display.properties}
+                    duration={4}
+                  />
+                  +
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Verified Listings
@@ -156,12 +161,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp
-                    start={display.projects - 27}
-                    end={display.projects}
-                    duration={4}
-                  />
-                  +
+                  <CountUp start={0} end={display.projects} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Major Projects
