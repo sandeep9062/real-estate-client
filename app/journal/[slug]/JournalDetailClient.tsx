@@ -14,16 +14,21 @@ import {
   Button,
   Paper,
 } from "@mantine/core";
-import { useGetJournalBySlugQuery } from "@/services/journalApi";
+import {
+  useGetJournalBySlugQuery,
+  useGetJournalsQuery,
+} from "@/services/journalApi";
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import {
   IconCalendar,
   IconUser,
   IconArrowLeft,
   IconHome,
+  IconChevronRight,
 } from "@tabler/icons-react";
 import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
+import { useMemo } from "react";
 
 interface JournalDetailClientProps {
   slug: string;
@@ -59,7 +64,19 @@ export default function JournalDetailClient({
   const { data: journal, isLoading: journalLoading } =
     useGetJournalBySlugQuery(slug);
 
-  // 2. Fetch Related Properties (using the sector/city from the journal)
+  // 2. Fetch Related Journals (same category, excluding current)
+  const { data: allJournals } = useGetJournalsQuery({});
+
+  const relatedJournals = useMemo(() => {
+    if (!allJournals || !journal) return [];
+    return allJournals
+      .filter(
+        (j: any) => j._id !== journal._id && j.category === journal.category,
+      )
+      .slice(0, 3);
+  }, [allJournals, journal]);
+
+  // 3. Fetch Related Properties (using the sector/city from the journal)
   const { data: relatedProps, isLoading: propsLoading } =
     useGetAllPropertiesQuery(
       {
@@ -205,7 +222,48 @@ export default function JournalDetailClient({
             )}
           </div>
         </div>
-
+        {/* Related Journals */}
+        {relatedJournals.length > 0 && (
+          <>
+            <Divider my={40} label="Related Articles" labelPosition="center" />
+            <Stack gap="sm">
+              {relatedJournals.map((j: any) => (
+                <Paper
+                  key={j._id}
+                  component={Link}
+                  href={`/journal/${j.slug}`}
+                  p="md"
+                  radius="md"
+                  style={{
+                    border: "1px solid #f1f3f5",
+                    textDecoration: "none",
+                    transition: "background 0.2s",
+                  }}
+                >
+                  <Group justify="space-between" wrap="nowrap">
+                    <Stack gap={4} style={{ flex: 1 }}>
+                      <Text fw={600} size="sm" c="dark" lineClamp={1}>
+                        {j.title}
+                      </Text>
+                      <Group gap="xs">
+                        <Badge size="sm" variant="light" color="#4161df">
+                          {j.category}
+                        </Badge>
+                        <Text size="xs" c="dimmed">
+                          {new Date(j.createdAt).toLocaleDateString("en-IN", {
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </Text>
+                      </Group>
+                    </Stack>
+                    <IconChevronRight size={18} color="#4161df" />
+                  </Group>
+                </Paper>
+              ))}
+            </Stack>
+          </>
+        )}
         <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
           <IconHome size={40} color="#4161df" />
           <Title order={3} mt="md">
