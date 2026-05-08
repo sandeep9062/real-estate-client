@@ -1,28 +1,65 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
 import SearchBar, { SearchFilters } from "./SearchBar";
 import Link from "next/link";
 import Image from "next/image";
+import { getApiUrl } from "../services/propertiesApi";
 
 interface HeroProps {
   setFilter: React.Dispatch<React.SetStateAction<SearchFilters>>;
 }
 
-// Reduce animation complexity for better performance
-const heroVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
+interface HeroStats {
+  properties: number;
+  projects: number;
+  cities: number;
+}
 
-const imageVariants = {
-  hidden: { opacity: 0, x: 20 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.5 } },
-};
+async function fetchHeroStats(): Promise<HeroStats> {
+  const apiUrl = getApiUrl();
+  const response = await fetch(`${apiUrl}/properties/stats/hero`, {
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch hero stats");
+  }
+  const result = await response.json();
+  return result.data;
+}
 
 const Hero: React.FC<HeroProps> = ({ setFilter }) => {
+  const [stats, setStats] = useState<HeroStats | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        const data = await fetchHeroStats();
+        if (!mounted) return;
+        setStats(data);
+      } catch {
+        // silently fail – keep static fallback values
+      }
+    };
+
+    load();
+
+    // Re-fetch every 60 seconds for real-time updates
+    intervalRef.current = setInterval(load, 60_000);
+
+    return () => {
+      mounted = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const display = stats || { properties: 181, projects: 3, cities: 7 };
+
   // Memoize the search handler to prevent unnecessary re-renders
   const handleSearch = useCallback(
     (filters: SearchFilters) => {
@@ -106,7 +143,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={100} end={181} duration={4} />+
+                  <CountUp start={0} end={display.properties} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Verified Listings
@@ -119,7 +156,12 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={1} end={3} duration={4} />+
+                  <CountUp
+                    start={display.projects - 27}
+                    end={display.projects}
+                    duration={4}
+                  />
+                  +
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Major Projects
@@ -132,7 +174,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               {/* ITEM */}
               <div className="flex flex-col items-center">
                 <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={5} end={7} duration={4} />+
+                  <CountUp start={0} end={display.cities} duration={4} />+
                 </span>
                 <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
                   Cities Covered
