@@ -35,14 +35,19 @@ export default function BlogListingPage() {
 
   const filteredJournals = useMemo(() => {
     if (!journals) return [];
-    return journals.filter((post: any) => {
-      const matchesSearch =
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        activeCategory === "All" || post.category === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
+    return journals
+      .filter((post: any) => {
+        const matchesSearch =
+          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          post.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory =
+          activeCategory === "All" || post.category === activeCategory;
+        return matchesSearch && matchesCategory;
+      })
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
   }, [journals, searchQuery, activeCategory]);
 
   const categories = useMemo(() => {
