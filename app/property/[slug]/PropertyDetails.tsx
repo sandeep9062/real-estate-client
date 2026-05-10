@@ -51,7 +51,7 @@ import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 const PropertyDetails = ({ data }: { data: any }) => {
   const params = useParams();
   const router = useRouter();
-  const id = params?.id as string;
+  const id = data?._id as string;
   const [modalOpened, setModalOpened] = useState(false);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
