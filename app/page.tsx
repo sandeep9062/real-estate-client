@@ -1,10 +1,12 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { SearchFilters } from "@/components/SearchBar";
 import Hero from "@/components/Hero";
+import { useInfiniteProperties } from "@/hooks/useInfiniteProperties";
+import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
+import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 
-import { useGetAllPropertiesQuery } from "../services/propertiesApi";
 import Testimonial from "@/components/Testimonial";
 import GetStarted from "@/components/GetStarted";
 import WhyPropertyBulbul from "@/components/WhyPropertyBulbul";
@@ -34,110 +36,86 @@ const BecauseYouViewedSection = dynamic(
   { ssr: false },
 );
 
+/** Convert homepage SearchFilters into the query format expected by useInfiniteProperties */
+function filtersToQuery(filters: SearchFilters): Record<string, string> {
+  const query: Record<string, string> = {};
+  if (filters.query) query.search = filters.query;
+  if (filters.bedrooms) query.bedrooms = String(filters.bedrooms);
+  if (filters.deal) query.deal = filters.deal;
+  if (filters.type) query.type = filters.type;
+  if (filters.propertyCategory)
+    query.propertyCategory = filters.propertyCategory;
+  if (filters.minPrice != null) query.priceMin = String(filters.minPrice);
+  if (filters.maxPrice != null) query.priceMax = String(filters.maxPrice);
+  if (filters.city) query.city = filters.city;
+  if (filters.state) query.state = filters.state;
+  if (filters.country) query.country = filters.country;
+  return query;
+}
+
+/** Check if at least one filter is active */
+function hasActiveFilter(filter: SearchFilters): boolean {
+  return !!(
+    filter.query ||
+    filter.bedrooms ||
+    filter.deal ||
+    filter.type ||
+    filter.propertyCategory ||
+    filter.maxPrice ||
+    filter.minPrice ||
+    filter.city ||
+    filter.state ||
+    filter.country
+  );
+}
+
 export default function Home() {
   const [filter, setFilter] = useState<SearchFilters>({ query: "" });
 
-  // Single API call - data is cached by RTK Query
-  const { data } = useGetAllPropertiesQuery(undefined);
+  const hasFilters = hasActiveFilter(filter);
+  const query = useMemo(() => filtersToQuery(filter), [filter]);
 
-  // Memoized filter logic to prevent recalculation on every render
-  const filteredData = useMemo(() => {
-    if (!data) return [];
-
-    return data.filter((p: any) => {
-      const hasSpecificFilters =
-        filter.bedrooms ||
-        filter.deal ||
-        filter.type ||
-        filter.propertyCategory ||
-        filter.maxPrice ||
-        filter.minPrice ||
-        filter.city ||
-        filter.state ||
-        filter.country;
-
-      if (hasSpecificFilters) {
-        if (filter.bedrooms && p.facilities?.bedrooms !== filter.bedrooms)
-          return false;
-        if (filter.deal && p.deal !== filter.deal) return false;
-        if (filter.type && p.type !== filter.type) return false;
-        if (
-          filter.propertyCategory &&
-          p.propertyCategory !== filter.propertyCategory
-        )
-          return false;
-        if (filter.maxPrice && p.price > filter.maxPrice) return false;
-        if (filter.minPrice && p.price < filter.minPrice) return false;
-        if (filter.city && p.location?.city?.toLowerCase() !== filter.city)
-          return false;
-        if (filter.state && p.location?.state?.toLowerCase() !== filter.state)
-          return false;
-        if (
-          filter.country &&
-          p.location?.country?.toLowerCase() !== filter.country
-        )
-          return false;
-        return true;
-      } else {
-        const query = filter.query.toLowerCase();
-        return (
-          p.title?.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query) ||
-          p.location?.city?.toLowerCase().includes(query) ||
-          p.location?.state?.toLowerCase().includes(query) ||
-          p.location?.country?.toLowerCase().includes(query) ||
-          p.location?.address?.toLowerCase().includes(query)
-        );
-      }
-    });
-  }, [data, filter]);
-
-  // Check if any filters are active
-  const hasActiveFilters = useMemo(() => {
-    return !!(
-      filter.query ||
-      filter.bedrooms ||
-      filter.deal ||
-      filter.type ||
-      filter.propertyCategory ||
-      filter.maxPrice ||
-      filter.minPrice ||
-      filter.city ||
-      filter.state ||
-      filter.country
-    );
-  }, [filter]);
+  const { properties, hasMore, initialLoading, loadingMore, error, loadMore } =
+    useInfiniteProperties(query);
 
   return (
     <main>
-      {/* className="relative"*/}
-
-      {/* <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div className="absolute left-1/2 top-[-8rem] h-72 w-72 -translate-x-1/2 rounded-full bg-blue-200/40 blur-3xl" />
-        <div className="absolute right-[-4rem] top-24 h-64 w-64 rounded-full bg-indigo-200/30 blur-3xl" />
-        <div className="absolute left-[-6rem] bottom-24 h-64 w-64 rounded-full bg-cyan-200/30 blur-3xl" />
-      </div> */}
-
       {/* hero search bar will set filter */}
-
       <Hero setFilter={setFilter} />
 
       {/* show search results only when filter has content */}
-      {(filter.query ||
-        filter.bedrooms ||
-        filter.deal ||
-        filter.type ||
-        filter.propertyCategory ||
-        filter.maxPrice ||
-        filter.minPrice ||
-        filter.city ||
-        filter.state ||
-        filter.country) && (
-        <section className="container mx-auto px-4">
-          <PropertyGrid properties={filteredData} />
+      {hasFilters && (
+        <section className="container mx-auto px-4 py-8">
+          {error ? (
+            <div className="w-full flex justify-center items-center py-12 text-red-500">
+              Error loading results: {error}
+            </div>
+          ) : initialLoading ? (
+            <PropertyGridSkeleton
+              count={6}
+              columns="three"
+              variant="carousel"
+            />
+          ) : properties.length === 0 ? (
+            <div className="w-full flex flex-col gap-2 justify-center items-center py-12 text-gray-600">
+              <span>No properties found.</span>
+              <span className="text-sm">Try adjusting your search.</span>
+            </div>
+          ) : (
+            <>
+              <PropertyGrid properties={properties} variant="carousel" />
+              <InfiniteScrollLoader
+                onIntersect={loadMore}
+                loading={loadingMore}
+                hasMore={hasMore}
+              />
+              {!hasMore && properties.length > 0 && (
+                <div className="w-full text-center py-6 text-sm text-gray-400">
+                  Showing all {properties.length} properties
+                </div>
+              )}
+            </>
+          )}
         </section>
       )}
 
@@ -149,10 +127,6 @@ export default function Home() {
         <Companies />
       </section>
 
-      {/* <section>
-        <PropertyCarousel />
-      </section> */}
-
       <section>
         <Residencies />
       </section>
@@ -163,23 +137,11 @@ export default function Home() {
         <Value />
       </section>
 
-      {/* <section className="container mx-auto px-4 bg-white/60">
-        <AdvertiserTypeCard />
-      </section> */}
-      {/* 
-      <section className="container mx-auto px-4 bg-white/60">
-        <ExploreServices />
-      </section> */}
-
       <WhyPropertyBulbul />
 
       <section className="container mx-auto px-4 bg-white/60">
         <PostPropertyCTA />
       </section>
-
-      {/* <section className="container mx-auto px-4 bg-white/60">
-        <Contact />
-      </section> */}
 
       <section className=" bg-white/60 relative z-10">
         <Testimonial />
@@ -187,8 +149,6 @@ export default function Home() {
       <section className="bg-white/60 relative z-10">
         <GetStarted />
       </section>
-
-      {/* <TestimonialGetStartedWrapper /> */}
     </main>
   );
 }

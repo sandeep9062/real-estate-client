@@ -71,7 +71,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const areaUnit = card.area?.unit ?? "sqft";
   const isRent = card.deal === "Rent";
   const displayPhone =
-    card.agent?.phone || card.user?.phone?.replace(/\D/g, "").slice(-10);
+    card.agent?.phone ||
+    card.user?.phone?.replace(/\D/g, "").slice(-10) ||
+    (card.contactNumber?.[0]
+      ? card.contactNumber[0].replace(/\D/g, "").slice(-10)
+      : null);
 
   const locationLine = [card.location?.address, card.location?.city]
     .filter(Boolean)

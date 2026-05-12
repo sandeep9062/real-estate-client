@@ -17,9 +17,13 @@ type Journal = {
 };
 
 export default function GuidesPageClient() {
-  const { data: journals = [], isLoading, isError } = useGetJournalsQuery(
-    undefined,
-  );
+  const {
+    data: journalsData,
+    isLoading,
+    isError,
+  } = useGetJournalsQuery(undefined);
+
+  const journals = journalsData?.journals ?? [];
 
   const bySector = useMemo(() => {
     const map = new Map<string, Journal[]>();

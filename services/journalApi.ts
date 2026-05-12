@@ -23,21 +23,61 @@ export async function getJournalBySlugServer(
   }
 }
 
+export interface PaginatedJournalsResponse {
+  journals: Journal[];
+  currentPage: number;
+  totalPages: number;
+  total: number;
+  hasNextPage: boolean;
+}
+
 export const journalApi = createApi({
   reducerPath: "journalApi",
   baseQuery: baseQueryWithAuth,
   tagTypes: ["Journal"],
   endpoints: (builder) => ({
-    // Fetch all journals with optional filtering (category, sector, etc.)
-    getJournals: builder.query<Journal[], Record<string, any> | undefined>({
+    // Fetch all journals with optional filtering (category, sector, etc.) and pagination
+    getJournals: builder.query<
+      PaginatedJournalsResponse,
+      Record<string, any> | undefined
+    >({
       query: (params) => ({
         url: "/v1/journals",
-        params, // Handles ?category=Locality Guide&sector=Sector 115
+        params: {
+          ...params,
+          page: params?.page || 1,
+          limit: params?.limit || 12,
+        },
       }),
       providesTags: (result) =>
-        result
+        result?.journals
           ? [
-              ...result.map(({ _id }: { _id: string }) => ({
+              ...result.journals.map(({ _id }: { _id: string }) => ({
+                type: "Journal" as const,
+                id: _id,
+              })),
+              { type: "Journal", id: "LIST" },
+            ]
+          : [{ type: "Journal", id: "LIST" }],
+    }),
+
+    // Lazy query for fetching additional pages (infinite scroll)
+    getJournalsPage: builder.query<
+      PaginatedJournalsResponse,
+      Record<string, any> | undefined
+    >({
+      query: (params) => ({
+        url: "/v1/journals",
+        params: {
+          ...params,
+          page: params?.page || 1,
+          limit: params?.limit || 12,
+        },
+      }),
+      providesTags: (result) =>
+        result?.journals
+          ? [
+              ...result.journals.map(({ _id }: { _id: string }) => ({
                 type: "Journal" as const,
                 id: _id,
               })),
@@ -114,6 +154,8 @@ export const journalApi = createApi({
 
 export const {
   useGetJournalsQuery,
+  useGetJournalsPageQuery,
+  useLazyGetJournalsPageQuery,
   useGetJournalByIdQuery,
   useGetJournalBySlugQuery,
   useCreateJournalMutation,

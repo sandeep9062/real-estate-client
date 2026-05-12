@@ -1,10 +1,7 @@
 "use client";
 import React, { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useGetAllPropertiesQuery } from "../../services/propertiesApi";
 import SearchResults from "@/components/SearchResults";
-import PropertyGrid from "@/components/PropertyGrid";
-import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
 import TopSearchBar from "@/components/TopSearchBar";
 
 const PropertiesContent = () => {
@@ -30,30 +27,6 @@ const PropertiesContent = () => {
     return params;
   }, [searchParams]);
 
-  const { data, isError, isLoading } = useGetAllPropertiesQuery(query);
-
-  if (isError) {
-    return (
-      <div className="w-full flex justify-center items-center py-20">
-        <span className="text-red-500 font-medium">
-          Error while fetching data
-        </span>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="w-full pt-20 bg-gray-50">
-        <div className="flex flex-col items-center gap-6 max-w-full mx-auto px-4 sm:px-6 md:px-10 py-8">
-          <div className="h-8 w-2/3 max-w-lg animate-pulse rounded-lg bg-slate-200" />
-          <div className="h-12 w-full max-w-3xl animate-pulse rounded-xl bg-slate-200" />
-          <PropertyGridSkeleton count={9} columns="three" variant="default" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full pt-20 bg-gray-50">
       <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 max-w-full mx-auto px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12">
@@ -69,12 +42,9 @@ const PropertiesContent = () => {
         <div className="w-full">
           <TopSearchBar onApply={handleApplyFilters} initialFilters={query} />
         </div>
-        {/* Properties Listing */}
-        {Object.keys(query).length > 0 ? (
-          <SearchResults query={query as any} />
-        ) : (
-          <PropertyGrid properties={data || []} variant="default" />
-        )}
+
+        {/* Properties Listing with Infinite Scroll */}
+        <SearchResults query={query as any} columns="three" />
       </div>
     </div>
   );

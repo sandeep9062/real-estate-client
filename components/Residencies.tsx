@@ -34,7 +34,7 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
   const { data, isError, isLoading } = useGetAllPropertiesQuery(
     {
       ...filter,
-      isFeatured: true,
+      isFeatured: "true",
     },
     {
       refetchOnMountOrArgChange: false,
@@ -45,7 +45,10 @@ const Residencies: React.FC<ResidenciesProps> = ({ filter = {} }) => {
 
   const displayProperties = useMemo(() => {
     if (!data) return [];
-    return data.filter((property: any) => property.isFeatured === true);
+    // The backend now returns a paginated response: { success, count, total, pagination, data: [...] }
+    // Support both the new shape (data.data) and the legacy array format (data)
+    const list = Array.isArray(data) ? data : (data?.data ?? []);
+    return list;
   }, [data]);
 
   const count = displayProperties.length;

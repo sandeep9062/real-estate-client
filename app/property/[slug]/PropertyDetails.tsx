@@ -491,7 +491,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                     More in {data?.location?.city}
                   </Link>
                 </div>
-                <div className="grid grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                   {similar.slice(0, 4).map((p: any) => (
                     <PropertyCard key={p._id || p.id} card={p} />
                   ))}
@@ -504,7 +504,7 @@ const PropertyDetails = ({ data }: { data: any }) => {
                 <h3 className="text-xl font-bold text-slate-900">
                   Recently viewed
                 </h3>
-                <div className="grid grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
                   {recentList.map((p: any) => (
                     <PropertyCard key={p._id || p.id} card={p} />
                   ))}

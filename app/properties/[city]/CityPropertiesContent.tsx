@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useGetAllPropertiesQuery } from "../../../services/propertiesApi";
+import { useInfiniteProperties } from "../../../hooks/useInfiniteProperties";
 import PropertyGrid from "@/components/PropertyGrid";
+import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 import { PuffLoader } from "react-spinners";
 import TopSearchBar from "@/components/TopSearchBar";
 import PropertiesMapExplorer from "@/components/PropertiesMapExplorer";
@@ -77,25 +78,26 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
     return params;
   }, [searchParams, city]);
 
-  const { data, isError, isLoading } = useGetAllPropertiesQuery(query);
+  const { properties, hasMore, initialLoading, loadingMore, error, loadMore } =
+    useInfiniteProperties(query);
 
   React.useEffect(() => {
     if (!selectedId) return;
     const el = document.querySelector(`[data-property-id="${selectedId}"]`);
     el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [selectedId, data]);
+  }, [selectedId, properties]);
 
-  if (isError) {
+  if (error) {
     return (
       <div className="w-full flex justify-center items-center py-20">
         <span className="text-red-500 font-medium">
-          Error while fetching data
+          Error while fetching data: {error}
         </span>
       </div>
     );
   }
 
-  if (isLoading) {
+  if (initialLoading) {
     return (
       <div className="w-full flex justify-center items-center h-[60vh]">
         <PuffLoader size={80} aria-label="puff-loading" />
@@ -104,7 +106,6 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
   }
 
   const displayCity = cityMap[city] || "Tricity";
-  const list = data || [];
 
   return (
     <div className="w-full pt-16 lg:pt-20 bg-gray-50 min-h-screen relative">
@@ -166,13 +167,18 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
           >
             <div className="flex items-baseline justify-between gap-2">
               <p className="text-sm font-medium text-gray-700">
-                {list.length} listing{list.length !== 1 ? "s" : ""}
+                {properties.length} listing{properties.length !== 1 ? "s" : ""}
               </p>
             </div>
             <PropertyGrid
-              properties={list}
+              properties={properties}
               selectedId={selectedId}
               columns="two"
+            />
+            <InfiniteScrollLoader
+              onIntersect={loadMore}
+              loading={loadingMore}
+              hasMore={hasMore}
             />
           </div>
 
@@ -181,7 +187,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
             className={`${activeTab === "map" ? "block" : "hidden"} lg:block order-1 lg:order-2 lg:sticky lg:top-24 z-10 w-full min-w-0 self-start`}
           >
             <PropertiesMapExplorer
-              properties={list}
+              properties={properties}
               selectedId={selectedId}
               onSelectProperty={(id) => {
                 setSelectedId(id);

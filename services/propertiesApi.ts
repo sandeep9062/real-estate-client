@@ -288,6 +288,7 @@ export const propertiesApi = createApi({
 
 export const {
   useGetAllPropertiesQuery,
+  useLazyGetAllPropertiesQuery,
   useGetPropertyQuery,
   useGetOwnedPropertiesQuery,
   useCreatePropertyMutation,

@@ -65,10 +65,12 @@ export default function JournalDetailClient({
     useGetJournalBySlugQuery(slug);
 
   // 2. Fetch Related Journals (same category, excluding current)
-  const { data: allJournals } = useGetJournalsQuery({});
+  const { data: allJournalsData } = useGetJournalsQuery({});
+
+  const allJournals = allJournalsData?.journals ?? [];
 
   const relatedJournals = useMemo(() => {
-    if (!allJournals || !journal) return [];
+    if (!allJournals.length || !journal) return [];
     return allJournals
       .filter(
         (j: any) => j._id !== journal._id && j.category === journal.category,
@@ -85,6 +87,10 @@ export default function JournalDetailClient({
       },
       { skip: !journal?.targetSector },
     );
+
+  // The backend now returns a paginated response: { success, count, total, pagination, data: [...] }
+  // Support both the new shape (relatedProps.data) and the legacy array format (relatedProps)
+  const relatedProperties = relatedProps?.data ?? relatedProps ?? [];
 
   if (journalLoading)
     return (
@@ -127,7 +133,11 @@ export default function JournalDetailClient({
     );
 
   return (
-    <Container size="xl" py={80} px={{ base: 8, md: 12, lg: 16 }}>
+    <Container
+      size="xl"
+      py={{ base: 40, sm: 80 }}
+      px={{ base: 12, md: 16, lg: 24 }}
+    >
       <Button
         component={Link}
         href="/journal"
@@ -135,28 +145,40 @@ export default function JournalDetailClient({
         variant="subtle"
         leftSection={<IconArrowLeft size={16} />}
         mb="xl"
+        size="sm"
+        className="sm:size-md"
       >
         Back to Insights
       </Button>
 
       <Stack gap="lg">
-        <Badge size="lg" variant="filled" color="#4161df">
+        <Badge
+          size="md"
+          variant="filled"
+          color="#4161df"
+          className="sm:size-lg"
+        >
           {journal.category}
         </Badge>
 
-        <Title order={1} size="42px" fw={900} style={{ lineHeight: 1.1 }}>
+        <Title
+          order={1}
+          fw={900}
+          style={{ lineHeight: 1.1 }}
+          className="text-[26px] sm:text-[34px] md:text-[42px]"
+        >
           {journal.title}
         </Title>
 
         <Group gap="xl" c="dimmed">
-          <Group gap={5}>
-            <IconCalendar size={18} />
+          <Group gap={5} wrap="nowrap">
+            <IconCalendar size={16} />
             <Text size="sm">
               {new Date(journal.createdAt).toLocaleDateString("en-IN")}
             </Text>
           </Group>
-          <Group gap={5}>
-            <IconUser size={18} />
+          <Group gap={5} wrap="nowrap">
+            <IconUser size={16} />
             <Text size="sm">PropertyBulbul Editorial</Text>
           </Group>
         </Group>
@@ -168,33 +190,45 @@ export default function JournalDetailClient({
           }
           radius="md"
           alt={journal.title}
-          h={400}
+          className="h-[200px] sm:h-[300px] md:h-[400px] w-full object-cover"
         />
 
-        {/* Render journal content as markdown with direct Tailwind styling on each element */}
+        {/* Render journal content as markdown with responsive Tailwind styling */}
         <div className="w-full max-w-none">
           <ReactMarkdown
             components={{
               h1: ({ node, ...props }) => (
-                <h1 className="text-4xl font-extrabold my-6" {...props} />
+                <h1
+                  className="text-2xl sm:text-3xl md:text-4xl font-extrabold my-4 sm:my-6"
+                  {...props}
+                />
               ),
               h2: ({ node, ...props }) => (
                 <h2
-                  className="text-3xl font-bold my-5 border-b pb-2"
+                  className="text-xl sm:text-2xl md:text-3xl font-bold my-3 sm:my-5 border-b pb-2"
                   {...props}
                 />
               ),
               h3: ({ node, ...props }) => (
-                <h3 className="text-2xl font-semibold my-4" {...props} />
+                <h3
+                  className="text-lg sm:text-xl md:text-2xl font-semibold my-3 sm:my-4"
+                  {...props}
+                />
               ),
               p: ({ node, ...props }) => (
-                <p className="text-gray-700 leading-relaxed my-4" {...props} />
+                <p
+                  className="text-sm sm:text-base text-gray-700 leading-relaxed my-3 sm:my-4"
+                  {...props}
+                />
               ),
               ul: ({ node, ...props }) => (
-                <ul className="list-disc ml-6 my-4 space-y-2" {...props} />
+                <ul
+                  className="list-disc ml-4 sm:ml-6 my-3 sm:my-4 space-y-1 sm:space-y-2"
+                  {...props}
+                />
               ),
               li: ({ node, ...props }) => (
-                <li className="text-gray-700" {...props} />
+                <li className="text-sm sm:text-base text-gray-700" {...props} />
               ),
             }}
           >
@@ -206,14 +240,14 @@ export default function JournalDetailClient({
 
         {/* Real-time Properties from the same Sector */}
         <div>
-          <Title order={2} mb="xl" ta="center">
+          <Title order={2} mb="xl" ta="center" className="text-xl sm:text-2xl">
             Properties in {journal.targetSector || "this area"}
           </Title>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {relatedProps?.map((prop: any) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {relatedProperties?.map((prop: any) => (
               <PropertyCard key={prop._id} card={prop} />
             ))}
-            {!propsLoading && relatedProps?.length === 0 && (
+            {!propsLoading && relatedProperties?.length === 0 && (
               <div className="col-span-full">
                 <Text ta="center" c="dimmed">
                   No active listings in this sector currently.
@@ -241,11 +275,11 @@ export default function JournalDetailClient({
                   }}
                 >
                   <Group justify="space-between" wrap="nowrap">
-                    <Stack gap={4} style={{ flex: 1 }}>
+                    <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
                       <Text fw={600} size="sm" c="dark" lineClamp={1}>
                         {j.title}
                       </Text>
-                      <Group gap="xs">
+                      <Group gap="xs" wrap="wrap">
                         <Badge size="sm" variant="light" color="#4161df">
                           {j.category}
                         </Badge>
@@ -257,7 +291,7 @@ export default function JournalDetailClient({
                         </Text>
                       </Group>
                     </Stack>
-                    <IconChevronRight size={18} color="#4161df" />
+                    <IconChevronRight size={16} color="#4161df" />
                   </Group>
                 </Paper>
               ))}
@@ -277,7 +311,7 @@ export default function JournalDetailClient({
                   variant="light"
                   color="#4161df"
                   radius="xl"
-                  styles={{ root: { padding: "6px 14px", fontSize: "12px" } }}
+                  className="px-[10px] py-[4px] text-[11px] sm:px-[14px] sm:py-[6px] sm:text-[12px]"
                 >
                   #{keyword}
                 </Badge>
@@ -286,19 +320,20 @@ export default function JournalDetailClient({
           </>
         )}
         <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
-          <IconHome size={40} color="#4161df" />
-          <Title order={3} mt="md">
+          <IconHome size={32} color="#4161df" />
+          <Title order={3} mt="md" className="text-lg sm:text-xl">
             Ready to move to {journal.targetSector}?
           </Title>
-          <Text mb="xl">
+          <Text mb="xl" size="sm" className="sm:text-base">
             Browse our full list of verified properties in this locality.
           </Text>
           <Button
-            size="lg"
+            size="md"
             radius="md"
             color="#4161df"
             component={Link}
             href={`/properties?sector=${journal.targetSector}`}
+            className="w-full sm:w-auto"
           >
             Explore All Listings
           </Button>

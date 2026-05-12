@@ -1,8 +1,10 @@
 "use client";
 
-import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
+import React from "react";
+import { useInfiniteProperties } from "../hooks/useInfiniteProperties";
 import PropertyGrid from "./PropertyGrid";
 import PropertyGridSkeleton from "./PropertyGridSkeleton";
+import InfiniteScrollLoader from "./InfiniteScrollLoader";
 
 interface SearchResultsProps {
   query: { [key: string]: string };
@@ -13,18 +15,32 @@ export default function SearchResults({
   query,
   columns = "three",
 }: SearchResultsProps) {
-  const { data, isLoading, isError } = useGetAllPropertiesQuery(query);
+  const {
+    properties,
+    hasMore,
+    total,
+    initialLoading,
+    loadingMore,
+    error,
+    loadMore,
+  } = useInfiniteProperties(query);
 
-  if (!query || Object.keys(query).length === 0) {
-    return null;
+  if (error) {
+    return (
+      <div className="w-full flex justify-center items-center py-20 text-red-500">
+        Failed to load results: {error}
+      </div>
+    );
   }
 
-  if (isLoading) {
+  if (initialLoading) {
     return (
       <div className="w-full">
         <div className="flex items-baseline justify-between mb-4">
           <h2 className="text-xl font-semibold">
-            Searching for “{query.search || ""}”
+            {Object.keys(query).length > 0
+              ? `Searching for "${query.search || Object.values(query).filter(Boolean).join(", ")}"`
+              : "Loading properties..."}
           </h2>
         </div>
         <PropertyGridSkeleton count={6} columns={columns} variant="carousel" />
@@ -32,48 +48,59 @@ export default function SearchResults({
     );
   }
 
-  if (isError) {
-    return (
-      <div className="w-full flex justify-center items-center py-12 text-red-500">
-        Failed to load results.
-      </div>
-    );
-  }
-
-  const results = data || [];
-
-  const generateQueryString = (query: { [key: string]: string }) => {
+  const generateQueryString = (q: { [key: string]: string }) => {
     const descriptions = [];
-    if (query.deal) descriptions.push(`Deal: ${query.deal}`);
-    if (query.type) descriptions.push(`Type: ${query.type}`);
-    if (query.propertyCategory)
-      descriptions.push(`Category: ${query.propertyCategory}`);
-    if (query.city) descriptions.push(`City: ${query.city}`);
-    if (query.bedrooms) descriptions.push(`Bedrooms: ${query.bedrooms}`);
-    if (query.furnishing) descriptions.push(`Furnishing: ${query.furnishing}`);
-    if (query.availability)
-      descriptions.push(`Availability: ${query.availability}`);
-    if (query.postedBy) descriptions.push(`Posted By: ${query.postedBy}`);
-    if (query.priceMin && query.priceMax) {
-      descriptions.push(`Price: ₹${query.priceMin} - ₹${query.priceMax}`);
+    if (q.deal) descriptions.push(`Deal: ${q.deal}`);
+    if (q.type) descriptions.push(`Type: ${q.type}`);
+    if (q.propertyCategory)
+      descriptions.push(`Category: ${q.propertyCategory}`);
+    if (q.city) descriptions.push(`City: ${q.city}`);
+    if (q.bedrooms) descriptions.push(`Bedrooms: ${q.bedrooms}`);
+    if (q.furnishing) descriptions.push(`Furnishing: ${q.furnishing}`);
+    if (q.availability) descriptions.push(`Availability: ${q.availability}`);
+    if (q.postedBy) descriptions.push(`Posted By: ${q.postedBy}`);
+    if (q.priceMin && q.priceMax) {
+      descriptions.push(`Price: ₹${q.priceMin} - ₹${q.priceMax}`);
     }
-    if (query.areaMin && query.areaMax) {
-      descriptions.push(`Area: ${query.areaMin} - ${query.areaMax} sqft`);
+    if (q.areaMin && q.areaMax) {
+      descriptions.push(`Area: ${q.areaMin} - ${q.areaMax} sqft`);
     }
     return descriptions.join(", ");
   };
 
+  const hasFilters = Object.keys(query).length > 0;
+
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-3 sm:mb-4 gap-1 sm:gap-0">
-        <h2 className="text-base sm:text-lg md:text-xl font-semibold">
-          Results for "{generateQueryString(query) || "All Properties"}"
-        </h2>
-        <span className="text-xs sm:text-sm text-gray-500">
-          {results.length} found
-        </span>
-      </div>
-      <PropertyGrid properties={results} columns={columns} variant="carousel" />
+      {hasFilters && (
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-3 sm:mb-4 gap-1 sm:gap-0">
+          <h2 className="text-base sm:text-lg md:text-xl font-semibold">
+            Results for &ldquo;
+            {generateQueryString(query) || "All Properties"}
+            &rdquo;
+          </h2>
+          <span className="text-xs sm:text-sm text-gray-500">
+            {total} {total === 1 ? "result" : "results"} found
+          </span>
+        </div>
+      )}
+      <PropertyGrid
+        properties={properties}
+        columns={columns}
+        variant="carousel"
+      />
+      <InfiniteScrollLoader
+        onIntersect={loadMore}
+        loading={loadingMore}
+        hasMore={hasMore}
+      />
+      {!hasMore && properties.length > 0 && (
+        <div className="w-full text-center py-6 text-sm text-gray-400">
+          {total > 0
+            ? `Showing all ${total} properties`
+            : "No more properties to load"}
+        </div>
+      )}
     </div>
   );
 }

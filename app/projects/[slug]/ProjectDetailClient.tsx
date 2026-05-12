@@ -80,6 +80,10 @@ export default function ProjectDetailClient({
       { skip: !project?._id },
     );
 
+  // The backend now returns a paginated response: { success, count, total, pagination, data: [...] }
+  // Support both the new shape (properties.data) and the legacy array format (properties)
+  const propertyList = properties?.data ?? properties ?? [];
+
   if (projectLoading) return <ProjectDetailSkeleton />;
 
   // Handle 404 error
@@ -223,7 +227,7 @@ export default function ProjectDetailClient({
                 </p>
               </div>
               <div className="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-lg">
-                {properties?.length || 0} Total
+                {propertyList?.length || 0} Total
               </div>
             </div>
 
@@ -242,8 +246,8 @@ export default function ProjectDetailClient({
                     </div>
                   </div>
                 ))
-              ) : properties?.length > 0 ? (
-                properties.map((prop: any) => (
+              ) : propertyList?.length > 0 ? (
+                propertyList.map((prop: any) => (
                   <Link
                     href={`/property/${prop.slug || prop._id}`}
                     key={prop._id}
