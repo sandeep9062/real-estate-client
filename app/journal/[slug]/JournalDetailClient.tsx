@@ -143,8 +143,9 @@ export default function JournalDetailClient({
         href="/journal"
         color="#4161df"
         variant="subtle"
-        leftSection={<IconArrowLeft size={16} />}
-        mb="xl"
+        radius={100}
+        leftSection={<IconArrowLeft size={10} />}
+        mb="sm"
         size="sm"
         className="sm:size-md"
       >
@@ -190,7 +191,7 @@ export default function JournalDetailClient({
           }
           radius="md"
           alt={journal.title}
-          className="h-[200px] sm:h-[300px] md:h-[400px] w-full object-cover"
+          className="h-[250px] sm:h-[350px] md:h-[550px] w-full object-cover"
         />
 
         {/* Render journal content as markdown with responsive Tailwind styling */}
