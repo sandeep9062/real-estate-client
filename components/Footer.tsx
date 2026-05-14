@@ -60,6 +60,16 @@ const Footer = () => {
               145, Sector 15, Chandigarh, India
             </p> */}
 
+            {/* <p className="text-gray-500 text-xs sm:text-sm">
+              Email us :{" "}
+              <a
+                href="mailto:info@propertybulbul.com"
+                className="hover:text-[#4161df] transition"
+              >
+                bulbulproperty@gmail.com
+              </a>
+            </p> */}
+
             <div className="flex flex-wrap gap-x-4 sm:gap-x-5 md:gap-x-6 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm font-medium text-gray-700 justify-center md:justify-start">
               {[
                 ["Properties", "/properties"],

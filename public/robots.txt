@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap link (Zaroori hai)
+Sitemap: https://www.propertybulbul.com/sitemap.xml
+
+# In pages ko index mat hone dena (Private pages)
+Disallow: /dashboard/
+Disallow: /api/
