@@ -19,6 +19,7 @@ import {
 import {
   useGetJournalsQuery,
   useLazyGetJournalsPageQuery,
+  useGetJournalCategoriesQuery,
 } from "@/services/journalApi";
 import Link from "next/link";
 import {
@@ -235,6 +236,9 @@ export default function BlogListingPage() {
   const [page, setPage] = useState(1);
   const [allJournals, setAllJournals] = useState<any[]>([]);
 
+  // Fetch all distinct categories from server (stable, not dependent on loaded data)
+  const { data: categoriesData } = useGetJournalCategoriesQuery();
+
   // Fetch initial page
   const {
     data: initialData,
@@ -309,13 +313,12 @@ export default function BlogListingPage() {
     );
   }, [allJournals, searchQuery]);
 
+  // Categories are fetched from the server (distinct values from DB)
+  // This ensures all categories are always available regardless of current filter
   const categories = useMemo(() => {
-    // Extract categories from all loaded journals
-    const unique = Array.from(
-      new Set(allJournals.map((j: any) => j.category).filter(Boolean)),
-    );
-    return ["All", ...unique];
-  }, [allJournals]);
+    const serverCategories = categoriesData?.categories || [];
+    return ["All", ...serverCategories];
+  }, [categoriesData]);
 
   // Build skeleton layout matching the real card layout
   const renderInitialSkeleton = () => (

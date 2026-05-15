@@ -23,6 +23,11 @@ export async function getJournalBySlugServer(
   }
 }
 
+export interface CategoriesResponse {
+  success: boolean;
+  categories: string[];
+}
+
 export interface PaginatedJournalsResponse {
   journals: Journal[];
   currentPage: number;
@@ -84,6 +89,11 @@ export const journalApi = createApi({
               { type: "Journal", id: "LIST" },
             ]
           : [{ type: "Journal", id: "LIST" }],
+    }),
+
+    // Fetch all distinct journal categories
+    getJournalCategories: builder.query<CategoriesResponse, void>({
+      query: () => "/v1/journals/categories",
     }),
 
     // Fetch single journal by ID
@@ -158,6 +168,7 @@ export const {
   useLazyGetJournalsPageQuery,
   useGetJournalByIdQuery,
   useGetJournalBySlugQuery,
+  useGetJournalCategoriesQuery,
   useCreateJournalMutation,
   useUpdateJournalMutation,
   useDeleteJournalMutation,
