@@ -15,6 +15,9 @@ type Props = {
   }>;
 };
 
+// Default fallback image constant
+const DEFAULT_IMAGE = "https://www.propertybulbul.com/property-tricity.jpg";
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const journal = await getJournalBySlugServer(slug);
@@ -29,18 +32,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = journal.metaTitle
     ? `${journal.metaTitle} | PropertyBulbul Journal`
     : `${journal.title} | PropertyBulbul Journal`;
+
   const description =
     journal.excerpt?.substring(0, 160) ||
     journal.content?.replace(/<[^>]*>/g, "").substring(0, 160) ||
     `Read ${journal.title} on PropertyBulbul Journal - expert real estate insights for Tricity.`;
+
   const canonicalUrl = `https://www.propertybulbul.com/journal/${slug}`;
-  let imageUrl =
-    journal.coverImage || "https://www.propertybulbul.com/property-tricity.jpg";
-  if (journal.coverImage) {
-    imageUrl = journal.coverImage.startsWith("http")
-      ? journal.coverImage
-      : `https://www.propertybulbul.com${journal.coverImage}`;
-  }
+
+  // Logic to handle coverImage (assuming it might be a string or array)
+  const imageUrl = Array.isArray(journal.coverImage)
+    ? journal.coverImage[0]
+    : journal.coverImage || DEFAULT_IMAGE;
+
   return {
     title,
     description,
@@ -81,8 +85,6 @@ export default async function JournalDetailPage({ params }: Props) {
   }
 
   const canonicalUrl = `https://www.propertybulbul.com/journal/${slug}`;
-  const imageUrl =
-    journal.coverImage || "https://www.propertybulbul.com/property-tricity.jpg";
 
   // Generate all schemas
   const articleSchema = generateArticleSchema(journal, slug);
@@ -95,10 +97,13 @@ export default async function JournalDetailPage({ params }: Props) {
 
   return (
     <>
+      {/* JSON-LD Schemas */}
       {renderSchemaScript("article-jsonld", articleSchema)}
       {renderSchemaScript("faq-jsonld", faqSchema)}
       {renderSchemaScript("breadcrumb-jsonld", breadcrumbSchema)}
-      <JournalDetailClient slug={slug} />
+
+      {/* Client Component for interactivity */}
+      <JournalDetailClient slug={slug} initialData={journal} />
     </>
   );
 }
