@@ -120,10 +120,8 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
         <button
           type="button"
           onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
-          className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
-          aria-label={
-            activeTab === "list" ? "Open map view" : "Open list view"
-          }
+          className="flex items-center gap-2 bg-[#4161df] text-white px-6 py-3 rounded-full shadow-2xl hover:bg-[#4161df]/90 transition-all transform active:scale-95"
+          aria-label={activeTab === "list" ? "Open map view" : "Open list view"}
         >
           {activeTab === "list" ? (
             <>
@@ -144,9 +142,11 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
         <button
           type="button"
           onClick={() => setLaptopMapOpen((o) => !o)}
-          className="flex flex-col items-center gap-1 bg-gray-900 text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
+          className="flex flex-col items-center gap-1 bg-[#4161df] text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-[#4161df]/90 transition-all transform active:scale-95"
           aria-label={
-            laptopMapOpen ? "Hide map, expand listings" : "Show map beside listings"
+            laptopMapOpen
+              ? "Hide map, expand listings"
+              : "Show map beside listings"
           }
         >
           {laptopMapOpen ? (

@@ -12,7 +12,7 @@ const PropertiesContent = () => {
   const router = useRouter();
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState<"list" | "map">("list");
-  const [laptopMapOpen, setLaptopMapOpen] = React.useState(true);
+  const [laptopMapOpen, setLaptopMapOpen] = React.useState(false);
 
   const handleApplyFilters = (filters: any) => {
     const params = new URLSearchParams();
@@ -86,7 +86,7 @@ const PropertiesContent = () => {
         <button
           type="button"
           onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
-          className="flex flex-col items-center gap-1 bg-gray-900 text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
+          className="flex flex-col items-center gap-1 bg-[#4161df] text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-[#4161df]/90 transition-all transform active:scale-95"
           aria-label={activeTab === "list" ? "Open map view" : "Open list view"}
         >
           {activeTab === "list" ? (
@@ -111,14 +111,16 @@ const PropertiesContent = () => {
         <button
           type="button"
           onClick={() => setLaptopMapOpen((o) => !o)}
-          className="flex flex-col items-center gap-1 bg-gray-900 text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
+          className="flex flex-col items-center gap-1 bg-[#4161df] text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-[#4161df]/10 transition-all transform active:scale-95"
           aria-label={
-            laptopMapOpen ? "Hide map, expand listings" : "Show map beside listings"
+            laptopMapOpen
+              ? "Hide map, expand listings"
+              : "Show map beside listings"
           }
         >
           {laptopMapOpen ? (
             <>
-              <ListIcon className="w-5 h-5" />
+              <ListIcon className="w-5 h-5 " />
               <span className="text-[10px] font-semibold leading-tight text-center max-w-16">
                 Hide
               </span>
