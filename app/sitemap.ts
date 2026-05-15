@@ -46,9 +46,17 @@ async function fetchJson(url: string): Promise<unknown> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.propertybulbul.com";
-  const apiBaseUrl =
-    process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") ||
-    "http://localhost:9000/api";
+
+  // Use the production API URLs directly for sitemap generation so that
+  // during next build (on Vercel/Render) it always fetches from the live backend,
+  // not from a potentially unavailable localhost.
+  //
+  // Properties:  /api/properties/sitemap-data  (mounted at /api/properties)
+  // Journals:    /api/v1/journals/sitemap-data (mounted at /api/v1/journals)
+  // Projects:    /api/v1/projects              (mounted at /api/v1/projects)
+  // Developers:  /api/v1/developers            (mounted at /api/v1/developers)
+  const API_BASE = "https://real-estate-server-jpd6.onrender.com/api";
+  const API_V1_BASE = "https://real-estate-server-jpd6.onrender.com/api/v1";
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -110,19 +118,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/refund`, lastModified: new Date(), priority: 0.3 },
   ];
 
-  if (!apiBaseUrl) {
-    console.warn(
-      "Sitemap: NEXT_PUBLIC_API_URL is not defined. Returning static URLs only.",
-    );
-    return staticRoutes;
-  }
-
   // --- Properties (via sitemap-data endpoint - no pagination) ---
   let propertyUrls: MetadataRoute.Sitemap = [];
   try {
-    const propertyData = await fetchJson(
-      `${apiBaseUrl}/properties/sitemap-data`,
-    );
+    const propertyData = await fetchJson(`${API_BASE}/properties/sitemap-data`);
     console.log(
       "Sitemap /api/properties/sitemap-data response structure:",
       JSON.stringify(propertyData).slice(0, 500),
@@ -131,6 +130,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const response = propertyData as ApiSitemapResponse | null;
     const rawProperties = response?.data;
     if (Array.isArray(rawProperties)) {
+      console.log(
+        `Sitemap: Fetched ${rawProperties.length} properties for sitemap`,
+      );
       propertyUrls = (rawProperties as ApiProperty[]).map((p) => ({
         url: `${baseUrl}/property/${p.slug || p._id}`,
         lastModified: new Date(p.updatedAt || Date.now()),
@@ -150,7 +152,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Journals (via sitemap-data endpoint - no pagination) ---
   let journalUrls: MetadataRoute.Sitemap = [];
   try {
-    const journalData = await fetchJson(`${apiBaseUrl}/journals/sitemap-data`);
+    const journalData = await fetchJson(`${API_V1_BASE}/journals/sitemap-data`);
     console.log(
       "Sitemap /api/journals/sitemap-data response structure:",
       JSON.stringify(journalData).slice(0, 500),
@@ -159,6 +161,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const response = journalData as ApiSitemapResponse | null;
     const rawJournals = response?.data;
     if (Array.isArray(rawJournals)) {
+      console.log(
+        `Sitemap: Fetched ${rawJournals.length} journals for sitemap`,
+      );
       journalUrls = (rawJournals as ApiJournal[]).map((j) => ({
         url: `${baseUrl}/journal/${j.slug}`,
         lastModified: new Date(j.updatedAt || j.createdAt || Date.now()),
@@ -178,7 +183,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Projects ---
   let projectUrls: MetadataRoute.Sitemap = [];
   try {
-    const projectData = await fetchJson(`${apiBaseUrl}/v1/projects`);
+    const projectData = await fetchJson(`${API_BASE}/v1/projects`);
     console.log(
       "Sitemap /api/v1/projects response structure:",
       JSON.stringify(projectData).slice(0, 500),
@@ -204,7 +209,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Developers ---
   let developerUrls: MetadataRoute.Sitemap = [];
   try {
-    const developerData = await fetchJson(`${apiBaseUrl}/v1/developers`);
+    const developerData = await fetchJson(`${API_BASE}/v1/developers`);
     console.log(
       "Sitemap /api/v1/developers response structure:",
       JSON.stringify(developerData).slice(0, 500),
@@ -234,6 +239,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch (error) {
     console.error("Sitemap: Failed to fetch developers —", error);
   }
+
+  const totalUrls =
+    staticRoutes.length +
+    propertyUrls.length +
+    journalUrls.length +
+    projectUrls.length +
+    developerUrls.length;
+  console.log(
+    `Sitemap: Total URLs generated — ${totalUrls} (static: ${staticRoutes.length}, properties: ${propertyUrls.length}, journals: ${journalUrls.length}, projects: ${projectUrls.length}, developers: ${developerUrls.length})`,
+  );
 
   return [
     ...staticRoutes,
