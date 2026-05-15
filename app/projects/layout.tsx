@@ -4,12 +4,6 @@ export const metadata: Metadata = {
   title: "Our Projects | PropertyBulbul",
   description:
     "Discover the latest projects by PropertyBulbul. We are committed to building the future of real estate with our innovative and sustainable projects.",
-  keywords: [
-    "real estate projects",
-    "new developments",
-    "property development",
-    "upcoming projects",
-  ],
   openGraph: {
     title: "Our Projects | PropertyBulbul",
     description:

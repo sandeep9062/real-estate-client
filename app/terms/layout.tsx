@@ -4,13 +4,6 @@ export const metadata: Metadata = {
   title: "Terms & Conditions | Propertybulbul",
   description:
     "Read the Terms & Conditions for using Propertybulbul's real estate platform. Understand your rights and responsibilities when buying, selling, or renting properties in Tricity.",
-  keywords: [
-    "terms and conditions",
-    "propertybulbul terms",
-    "real estate terms",
-    "property platform terms",
-    "user agreement",
-  ],
   alternates: {
     canonical: "https://www.propertybulbul.com/terms",
   },

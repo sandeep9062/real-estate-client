@@ -4,12 +4,6 @@ export const metadata: Metadata = {
   title: "Privacy Policy | PropertyBulbul",
   description:
     "Read the privacy policy of PropertyBulbul. We are committed to protecting your personal information and being transparent about how we handle it.",
-  keywords: [
-    "privacy policy",
-    "data protection",
-    "user privacy",
-    "terms of service",
-  ],
   openGraph: {
     title: "Privacy Policy | PropertyBulbul",
     description:

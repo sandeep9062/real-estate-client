@@ -5,27 +5,6 @@ export const metadata: Metadata = {
     "Real Estate Services - PropertyBulbul | Property Buying, Selling & Investment in Tricity",
   description:
     "Leading real estate services in Tricity (Chandigarh, Panchkula, Mohali). Expert property buying, selling, investment consulting, legal assistance, and student accommodation. Get personalized real estate solutions from PropertyBulbul today!",
-  keywords: [
-    "real estate services",
-    "property services in chandigarh",
-    "propertybulbul services",
-    "buy property chandigarh",
-    "sell property tricity",
-    "property investment panchkula",
-    "real estate consultation mohali",
-    "legal assistance real estate",
-    "student accommodation chandigarh",
-    "property buying services",
-    "property selling agents",
-    "real estate investment consultants",
-    "commercial property services",
-    "residential property chandigarh",
-    "apartment hunting mohali",
-    "home selling service panchkula",
-    "real estate advisors tricity",
-    "property transaction assistance",
-    "student housing zirakpur",
-  ],
   openGraph: {
     title:
       "Real Estate Services - PropertyBulbul | Property Buying & Selling in Tricity",

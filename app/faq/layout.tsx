@@ -4,18 +4,6 @@ export const metadata: Metadata = {
   title: "FAQ | PropertyBulbul - Frequently Asked Questions",
   description:
     "Find answers to frequently asked questions about buying, selling, and renting properties in Tricity (Chandigarh, Panchkula, Mohali). Learn how to list your property, schedule visits, and more.",
-  keywords: [
-    "property faq",
-    "real estate questions",
-    "property listing faq",
-    "buy property chandigarh",
-    "sell property tricity",
-    "rent house mohali",
-    "property visits",
-    "real estate inquiries",
-    "propertybulbul help",
-    "real estate support",
-  ],
   alternates: {
     canonical: "https://www.propertybulbul.com/faq",
   },

@@ -4,15 +4,6 @@ export const metadata: Metadata = {
   title: "Top Real Estate Developers in Tricity | PropertyBulbul",
   description:
     "Discover verified real estate developers in Chandigarh, Mohali, Panchkula, and Zirakpur. Explore their projects, track records, and available properties on PropertyBulbul.",
-  keywords: [
-    "real estate developers",
-    "property developers chandigarh",
-    "builders mohali",
-    "developers panchkula",
-    "verified developers tricity",
-    "top builders zirakpur",
-    "propertybulbul developers",
-  ],
   alternates: {
     canonical: "https://www.propertybulbul.com/developers",
   },

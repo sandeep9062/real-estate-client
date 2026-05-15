@@ -2,12 +2,12 @@
 
 import PropertyCard from "./PropertyCard";
 
-export type PropertyGridColumns = "default" | "two" | "three";
+export type PropertyGridColumns = "default" | "two" | "three" | "four";
 
 interface PropertyGridProps {
   properties: any[];
   selectedId?: string | null;
-  /** @default `three` — 3 cards per row from `lg` up. `two` — 2 per row from `sm` up. `default` — legacy layout. */
+  /** `two` — 2 per row (narrow list beside map). `four` — up to 4 per row on `lg+` (full-width list). `three` — same as `two`. `default` — legacy layout. */
   columns?: PropertyGridColumns;
   variant?: "default" | "carousel";
 }
@@ -17,7 +17,8 @@ const gridClassByColumns: Record<PropertyGridColumns, string> = {
     "grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6",
   two: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6",
   three:
-    "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6",
+    "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6",
+  four: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6",
 };
 
 export default function PropertyGrid({

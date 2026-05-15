@@ -4,13 +4,6 @@ export const metadata: Metadata = {
   title: "Disclaimer | PropertyBulbul",
   description:
     "Read the legal disclaimer for PropertyBulbul. Understand the limitations of liability, accuracy of information, and third-party content on our real estate platform.",
-  keywords: [
-    "disclaimer",
-    "legal disclaimer",
-    "propertybulbul disclaimer",
-    "real estate liability",
-    "platform disclaimer",
-  ],
   alternates: {
     canonical: "https://www.propertybulbul.com/disclaimer",
   },

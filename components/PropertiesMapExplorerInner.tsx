@@ -114,6 +114,8 @@ export default function PropertiesMapExplorerInner({
   const mapRef = useRef<L.Map | null>(null);
   const clusterLayerRef = useRef<L.Layer | null>(null);
   const drawLayerRef = useRef<L.Layer | null>(null);
+  /** Tracks layout size so we can refit after mobile list→map tab (Leaflet initializes at 0×0 while hidden). */
+  const mapContainerSizeRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 
   const handleAddPoint = useCallback((lng: number, lat: number) => {
     setRing((r) => [...r, [lng, lat]]);
@@ -142,11 +144,42 @@ export default function PropertiesMapExplorerInner({
 
     L.tileLayer(OSM_TILE, { attribution: OSM_ATTR }).addTo(map);
 
-    requestAnimationFrame(() => {
-      map.invalidateSize();
+    const invalidate = () => {
+      requestAnimationFrame(() => {
+        map.invalidateSize({ animate: false });
+      });
+    };
+    invalidate();
+
+    const refitMarkersIfPossible = () => {
+      const layer = clusterLayerRef.current;
+      if (!layer || !("getBounds" in layer)) return;
+      const bounds = (layer as L.FeatureGroup).getBounds();
+      if (!bounds?.isValid()) return;
+      map.fitBounds(bounds.pad(0.15));
+    };
+
+    const ro = new ResizeObserver(([entry]) => {
+      const cr = entry?.contentRect;
+      if (!cr) return;
+      const w = Math.round(cr.width);
+      const h = Math.round(cr.height);
+      const prev = mapContainerSizeRef.current;
+      const wasTiny = prev.w < 64 || prev.h < 64;
+      const nowOk = w >= 64 && h >= 64;
+      mapContainerSizeRef.current = { w, h };
+
+      requestAnimationFrame(() => {
+        map.invalidateSize({ animate: false });
+        if (wasTiny && nowOk) {
+          refitMarkersIfPossible();
+        }
+      });
     });
+    ro.observe(el);
 
     return () => {
+      ro.disconnect();
       clusterLayerRef.current = null;
       drawLayerRef.current = null;
       map.remove();

@@ -6,28 +6,6 @@ export const metadata: Metadata = {
     "Properties for Sale & Rent in Tricity (Chandigarh, Panchkula, Mohali) | Propertybulbul",
   description:
     "Discover premium properties for sale and rent in Tricity including Chandigarh, Panchkula, Mohali, and Kharar. Explore apartments, houses, villas, commercial spaces, and plots. Find your dream home with Propertybulbul's verified listings.",
-  keywords: [
-    // High-Intent Search Terms
-    "buy property in Chandigarh",
-    "flats for sale in Mohali",
-    "house for rent in Panchkula",
-    "ready to move flats in Zirakpur",
-    "commercial SCO for sale in Tricity",
-
-    // Location Specific Listing Terms
-    "plots for sale in New Chandigarh",
-    "luxury apartments Mohali",
-    "independent floors in Panchkula",
-    "industrial plots for lease Mohali",
-    "SCO for sale in Peer Muchalla",
-
-    // Category Based
-    "real estate listings Tricity",
-    "verified property dealers in Chandigarh",
-    "PropertyBulbul listings",
-    "residential properties in Kharar",
-    "investment plots near Morni Hills",
-  ],
   alternates: {
     canonical: "https://www.propertybulbul.com/properties",
   },

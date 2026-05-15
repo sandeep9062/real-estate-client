@@ -49,21 +49,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     data?.facilities?.bathrooms !== 1 ? "s" : ""
   }.`;
   const description = sanitizeMetaText(rawDescription);
-  const keywords = [
-    `${data?.type} for ${data?.deal} ${data?.location?.city}`,
-    `${data?.propertyCategory} ${data?.location?.city}`,
-    `property ${data?.location?.city}`,
-    `real estate ${data?.location?.city}`,
-    "buy property",
-    "tricity real estate",
-    "tricity property",
-    "sell property",
-    "rent property",
-    "properties for sale in chandigarh",
-    "properties for rent in mohali",
-    data?.furnishing,
-    data?.availability,
-  ].filter(Boolean);
   const canonicalUrl = `https://www.propertybulbul.com/property/${data.slug || data._id}`;
 
   // Filter out video URLs from images
@@ -79,7 +64,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    keywords,
     alternates: {
       canonical: canonicalUrl,
     },

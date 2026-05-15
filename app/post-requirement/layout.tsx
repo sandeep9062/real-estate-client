@@ -4,14 +4,6 @@ export const metadata: Metadata = {
   title: "Post Your Property Requirement | PropertyBulbul",
   description:
     "Looking for a property? Post your requirements on PropertyBulbul and get matched with the best properties that meet your needs. It's fast, easy, and free.",
-  keywords: [
-    "post property requirement",
-    "find property",
-    "real estate requirements",
-    "buy property",
-    "rent property",
-    "property match",
-  ],
   openGraph: {
     title: "Post Your Property Requirement | PropertyBulbul",
     description:

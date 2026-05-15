@@ -3,6 +3,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/agent-dashbaord",
+        destination: "/agent-dashboard",
+        permanent: true,
+      },
+      {
         source: "/:path*",
         has: [
           {

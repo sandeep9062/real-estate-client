@@ -1,40 +1,18 @@
 "use client";
-import dynamic from "next/dynamic";
 import { useState, useMemo } from "react";
 import { SearchFilters } from "@/components/SearchBar";
 import Hero from "@/components/Hero";
+import { SearchResultsView } from "@/components/SearchResults";
 import { useInfiniteProperties } from "@/hooks/useInfiniteProperties";
-import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
-import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 
+import Companies from "@/components/Companies";
+import Residencies from "@/components/Residencies";
+import Value from "@/components/Value";
+import PostPropertyCTA from "@/components/PostPropertyCTA";
+import BecauseYouViewedSection from "@/components/BecauseYouViewedSection";
 import Testimonial from "@/components/Testimonial";
 import GetStarted from "@/components/GetStarted";
 import WhyPropertyBulbul from "@/components/WhyPropertyBulbul";
-// Lazy load heavy components for better initial load
-const Companies = dynamic(() => import("@/components/Companies"), {
-  ssr: false,
-});
-const Contact = dynamic(() => import("@/components/Contact"), { ssr: false });
-const TestimonialGetStartedWrapper = dynamic(
-  () => import("@/components/TestimonialGetStartedWrapper"),
-  {
-    ssr: false,
-  },
-);
-const PropertyGrid = dynamic(() => import("@/components/PropertyGrid"), {
-  ssr: false,
-});
-const Residencies = dynamic(() => import("@/components/Residencies"), {
-  ssr: false,
-});
-const Value = dynamic(() => import("@/components/Value"), { ssr: false });
-const PostPropertyCTA = dynamic(() => import("@/components/PostPropertyCTA"), {
-  ssr: false,
-});
-const BecauseYouViewedSection = dynamic(
-  () => import("@/components/BecauseYouViewedSection"),
-  { ssr: false },
-);
 
 /** Convert homepage SearchFilters into the query format expected by useInfiniteProperties */
 function filtersToQuery(filters: SearchFilters): Record<string, string> {
@@ -75,47 +53,33 @@ export default function Home() {
   const hasFilters = hasActiveFilter(filter);
   const query = useMemo(() => filtersToQuery(filter), [filter]);
 
-  const { properties, hasMore, initialLoading, loadingMore, error, loadMore } =
-    useInfiniteProperties(query);
+  const {
+    properties,
+    hasMore,
+    total,
+    initialLoading,
+    loadingMore,
+    error,
+    loadMore,
+  } = useInfiniteProperties(query);
 
   return (
     <main>
-      {/* hero search bar will set filter */}
       <Hero setFilter={setFilter} />
 
-      {/* show search results only when filter has content */}
       {hasFilters && (
         <section className="container mx-auto px-4 py-8">
-          {error ? (
-            <div className="w-full flex justify-center items-center py-12 text-red-500">
-              Error loading results: {error}
-            </div>
-          ) : initialLoading ? (
-            <PropertyGridSkeleton
-              count={6}
-              columns="three"
-              variant="carousel"
-            />
-          ) : properties.length === 0 ? (
-            <div className="w-full flex flex-col gap-2 justify-center items-center py-12 text-gray-600">
-              <span>No properties found.</span>
-              <span className="text-sm">Try adjusting your search.</span>
-            </div>
-          ) : (
-            <>
-              <PropertyGrid properties={properties} variant="carousel" />
-              <InfiniteScrollLoader
-                onIntersect={loadMore}
-                loading={loadingMore}
-                hasMore={hasMore}
-              />
-              {!hasMore && properties.length > 0 && (
-                <div className="w-full text-center py-6 text-sm text-gray-400">
-                  Showing all {properties.length} properties
-                </div>
-              )}
-            </>
-          )}
+          <SearchResultsView
+            query={query}
+            columns="four"
+            properties={properties}
+            hasMore={hasMore}
+            total={total}
+            initialLoading={initialLoading}
+            loadingMore={loadingMore}
+            error={error}
+            loadMore={loadMore}
+          />
         </section>
       )}
 

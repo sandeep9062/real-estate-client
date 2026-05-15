@@ -27,6 +27,7 @@ import {
   Heart,
   CalendarDays,
   Home,
+  LayoutDashboard,
   LogOut,
   User as UserIcon,
   Upload,
@@ -254,6 +255,15 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
           >
             Owned Properties
           </Menu.Item>
+
+          {(user?.role === "agent" || user?.role === "admin") && (
+            <Menu.Item
+              leftSection={<LayoutDashboard size={18} />}
+              onClick={() => router.push("/agent-dashboard")}
+            >
+              Agent dashboard
+            </Menu.Item>
+          )}
 
           <Divider my="xs" />
 

@@ -1,15 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/store/authSlice";
 import { useGetRecentlyViewedQuery } from "@/services/userApi";
 import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
-
-const PropertyGrid = dynamic(() => import("@/components/PropertyGrid"), {
-  ssr: false,
-});
+import PropertyGrid from "@/components/PropertyGrid";
 
 export default function BecauseYouViewedSection() {
   const isAuth = useSelector(selectIsAuthenticated);

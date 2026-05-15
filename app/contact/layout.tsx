@@ -5,23 +5,6 @@ export const metadata: Metadata = {
     "Contact Us - PropertyBulbul | Tricity Real Estate Experts in Chandigarh, Panchkula & Mohali",
   description:
     "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity (Chandigarh, Panchkula, Mohali). Contact us for property buying, selling, or renting. Experienced agents ready to help with your real estate needs. Call +91 97299 07448 now!",
-  keywords: [
-    "contact real estate",
-    "contact propertybulbul",
-    "real estate support",
-    "property inquiries",
-
-    "chandigarh real estate contact",
-    "panchkula property contact",
-    "mohali real estate agents",
-    "tricity property experts",
-    "contact property consultants",
-    "real estate chandigarh",
-    "property chandigarh",
-    "homes for sale chandigarh",
-    "apartments panchkula",
-    "commercial property mohali",
-  ],
   openGraph: {
     title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts",
     description:

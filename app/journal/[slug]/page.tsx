@@ -40,7 +40,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    keywords: journal.keywords?.length > 0 ? journal.keywords : undefined,
     alternates: {
       canonical: canonicalUrl,
     },

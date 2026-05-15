@@ -25,6 +25,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [guidedOpen, setGuidedOpen] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<"list" | "map">("list");
+  const [laptopMapOpen, setLaptopMapOpen] = React.useState(true);
 
   const mergeToUrl = React.useCallback(
     (extra: Record<string, string | undefined | null>) => {
@@ -114,11 +115,15 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
         onClose={() => setGuidedOpen(false)}
       />
 
-      {/* Mobile Floating Toggle */}
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1000]">
+      {/* Mobile: list / map toggle */}
+      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-1000">
         <button
+          type="button"
           onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
           className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
+          aria-label={
+            activeTab === "list" ? "Open map view" : "Open list view"
+          }
         >
           {activeTab === "list" ? (
             <>
@@ -129,6 +134,34 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
             <>
               <ListIcon className="w-4 h-4" />
               <span className="text-sm font-semibold">List View</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Laptop: show / hide map column */}
+      <div className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-1000">
+        <button
+          type="button"
+          onClick={() => setLaptopMapOpen((o) => !o)}
+          className="flex flex-col items-center gap-1 bg-gray-900 text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-gray-800 transition-all transform active:scale-95"
+          aria-label={
+            laptopMapOpen ? "Hide map, expand listings" : "Show map beside listings"
+          }
+        >
+          {laptopMapOpen ? (
+            <>
+              <ListIcon className="w-5 h-5" />
+              <span className="text-[10px] font-semibold leading-tight text-center max-w-16">
+                Hide
+              </span>
+            </>
+          ) : (
+            <>
+              <Map className="w-5 h-5" />
+              <span className="text-[10px] font-semibold leading-tight text-center max-w-16">
+                Map
+              </span>
             </>
           )}
         </button>
@@ -160,7 +193,9 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
           <TopSearchBar onApply={handleApplyFilters} initialFilters={query} />
         </div>
 
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div
+          className={`w-full grid grid-cols-1 gap-6 items-start ${laptopMapOpen ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}
+        >
           {/* List Section */}
           <div
             className={`${activeTab === "list" ? "block" : "hidden"} lg:block order-2 lg:order-1 space-y-3 min-w-0`}
@@ -173,7 +208,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
             <PropertyGrid
               properties={properties}
               selectedId={selectedId}
-              columns="two"
+              columns={laptopMapOpen ? "two" : "four"}
             />
             <InfiniteScrollLoader
               onIntersect={loadMore}
@@ -184,7 +219,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
 
           {/* Map Section */}
           <div
-            className={`${activeTab === "map" ? "block" : "hidden"} lg:block order-1 lg:order-2 lg:sticky lg:top-24 z-10 w-full min-w-0 self-start`}
+            className={`${activeTab === "map" ? "block" : "hidden"} ${laptopMapOpen ? "lg:block" : "lg:hidden"} order-1 lg:order-2 lg:sticky lg:top-24 z-10 w-full min-w-0 self-start`}
           >
             <PropertiesMapExplorer
               properties={properties}
@@ -199,7 +234,7 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
               onPolygonApply={(polygonJson) =>
                 mergeToUrl({ polygon: polygonJson, bbox: undefined })
               }
-              heightClass="h-[calc(100vh-280px)] lg:h-[min(920px,85vh,calc(100dvh-3rem))]"
+              heightClass="h-[min(72dvh,calc(100dvh-13rem))] min-h-[280px] lg:min-h-0 lg:h-[min(920px,85vh,calc(100dvh-3rem))]"
             />
           </div>
         </div>

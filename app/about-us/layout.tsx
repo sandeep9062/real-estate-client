@@ -5,24 +5,6 @@ export const metadata: Metadata = {
     "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner in Chandigarh",
   description:
     "Know the story behind PropertyBulbul, Tricity's most trusted real estate partner. Established with a mission to simplify property buying, selling, and investment in Chandigarh, Panchkula, Mohali. Meet our expert team and discover why thousands trust us for their property needs.",
-  keywords: [
-    "about propertybulbul",
-    "real estate company chandigarh",
-    "propertybulbul team",
-    "tricity real estate",
-    "chandigarh property consultants",
-    "real estate experts panchkula",
-    "property brokers mohali",
-    "propertybulbul mission",
-    "real estate company profile",
-    "chandigarh property services",
-    "trusted real estate chandigarh",
-    "propertybulbul history",
-    "real estate team tricity",
-    "property consultants chandigarh panchkula mohali",
-    "about real estate company",
-    "propertybulbul company profile",
-  ],
   openGraph: {
     title: "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner",
     description:

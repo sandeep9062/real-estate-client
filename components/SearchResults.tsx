@@ -2,29 +2,36 @@
 
 import React from "react";
 import { useInfiniteProperties } from "../hooks/useInfiniteProperties";
-import PropertyGrid from "./PropertyGrid";
+import PropertyGrid, { type PropertyGridColumns } from "./PropertyGrid";
 import PropertyGridSkeleton from "./PropertyGridSkeleton";
 import InfiniteScrollLoader from "./InfiniteScrollLoader";
 
-interface SearchResultsProps {
+export interface SearchResultsViewProps {
   query: { [key: string]: string };
-  columns?: "default" | "two" | "three";
+  columns?: PropertyGridColumns;
+  selectedId?: string | null;
+  properties: any[];
+  hasMore: boolean;
+  total: number;
+  initialLoading: boolean;
+  loadingMore: boolean;
+  error: string | null;
+  loadMore: () => void;
 }
 
-export default function SearchResults({
+/** Listing + infinite scroll driven by `useInfiniteProperties` (or any compatible source). */
+export function SearchResultsView({
   query,
   columns = "three",
-}: SearchResultsProps) {
-  const {
-    properties,
-    hasMore,
-    total,
-    initialLoading,
-    loadingMore,
-    error,
-    loadMore,
-  } = useInfiniteProperties(query);
-
+  selectedId = null,
+  properties,
+  hasMore,
+  total,
+  initialLoading,
+  loadingMore,
+  error,
+  loadMore,
+}: SearchResultsViewProps) {
   if (error) {
     return (
       <div className="w-full flex justify-center items-center py-20 text-red-500">
@@ -88,6 +95,7 @@ export default function SearchResults({
         properties={properties}
         columns={columns}
         variant="carousel"
+        selectedId={selectedId}
       />
       <InfiniteScrollLoader
         onIntersect={loadMore}
@@ -102,5 +110,20 @@ export default function SearchResults({
         </div>
       )}
     </div>
+  );
+}
+
+interface SearchResultsProps {
+  query: { [key: string]: string };
+  columns?: PropertyGridColumns;
+}
+
+export default function SearchResults({
+  query,
+  columns = "three",
+}: SearchResultsProps) {
+  const hookResult = useInfiniteProperties(query);
+  return (
+    <SearchResultsView query={query} columns={columns} {...hookResult} />
   );
 }

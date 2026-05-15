@@ -22,33 +22,6 @@ export const metadata: Metadata = {
 
   description:
     "Search for properties to buy or rent. Find apartments, houses, and commercial properties on Propertybulbul, your trusted real estate partner.",
-  keywords: [
-    // Brand & Authority
-    "propertybulbul",
-    "propertybulbul journal",
-    "tricity real estate insights",
-    "property price prediction tricity",
-
-    // High Intent - Buy/Rent
-    "buy residential property in chandigarh",
-    "luxury flats for sale in mohali",
-    "commercial property for sale in panchkula",
-    "rent house in zirakpur peermuchala",
-
-    // Niche Categories
-    "kothi for sale in chandigarh",
-    "showroom for sale in zirakpur",
-    "agriculture land near panchkula",
-    "farm house in morni hills",
-    "room for students in chandigarh sector 15",
-
-    // Location Based
-    "properties in tricity",
-    "real estate mohali sector 82",
-    "new projects in kharar",
-    "plots for sale in zirakpur",
-    "commercial real estate tricity",
-  ],
   openGraph: {
     title: "PropertyBulbul - Tricity's Most Helpful Real Estate Partner",
     description:

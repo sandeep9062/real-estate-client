@@ -4,18 +4,6 @@ export const metadata: Metadata = {
   title: "Real Estate Journal | Market Insights for Tricity",
   description:
     "Expert analysis, market trends, and property investment guides for Chandigarh, Mohali, Panchkula, and Zirakpur. Read the PropertyBulbul Journal for data-driven real estate insights.",
-  keywords: [
-    "real estate journal",
-    "property market insights",
-    "tricity real estate news",
-    "chandigarh property guide",
-    "mohali investment tips",
-    "panchkula property trends",
-    "zirakpur real estate",
-    "property investment india",
-    "real estate blog",
-    "property buying guide",
-  ],
   alternates: {
     canonical: "https://www.propertybulbul.com/journal",
   },
