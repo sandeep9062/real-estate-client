@@ -2,7 +2,9 @@ import { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.propertybulbul.com";
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
+  const apiBaseUrl =
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") ||
+    "http://localhost:9000/api";
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -81,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const propertyUrls: MetadataRoute.Sitemap =
     propertiesRes.status === "fulfilled" && propertiesRes.value.ok
-      ? (await propertiesRes.value.json()).map((p: any) => ({
+      ? ((await propertiesRes.value.json()) ?? []).map((p: any) => ({
           url: `${baseUrl}/property/${p.slug || p._id}`,
           lastModified: new Date(p.updatedAt || Date.now()),
           changeFrequency: "daily",
@@ -91,7 +93,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const journalUrls: MetadataRoute.Sitemap =
     journalsRes.status === "fulfilled" && journalsRes.value.ok
-      ? (await journalsRes.value.json()).map((j: any) => ({
+      ? ((await journalsRes.value.json()) ?? []).map((j: any) => ({
           url: `${baseUrl}/journal/${j.slug}`,
           lastModified: new Date(j.updatedAt || j.createdAt || Date.now()),
           changeFrequency: "weekly",
@@ -101,7 +103,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const projectUrls: MetadataRoute.Sitemap =
     projectsRes.status === "fulfilled" && projectsRes.value.ok
-      ? (await projectsRes.value.json()).map((p: any) => ({
+      ? ((await projectsRes.value.json()) ?? []).map((p: any) => ({
           url: `${baseUrl}/projects/${p.slug}`,
           lastModified: new Date(p.updatedAt || p.createdAt || Date.now()),
           changeFrequency: "daily",
@@ -111,7 +113,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const developerUrls: MetadataRoute.Sitemap =
     developersRes.status === "fulfilled" && developersRes.value.ok
-      ? (await developersRes.value.json()).map((d: any) => ({
+      ? ((await developersRes.value.json()) ?? []).map((d: any) => ({
           url: `${baseUrl}/developers/${d._id}`,
           lastModified: new Date(d.updatedAt || d.createdAt || Date.now()),
           changeFrequency: "monthly",
