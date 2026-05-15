@@ -392,7 +392,7 @@ export default function BlogListingPage() {
               tt="uppercase"
               lts={1.5}
               size="xs"
-              c="blue"
+              c="#4161df"
               ta="center"
             >
               Insights & Intelligence
@@ -440,7 +440,7 @@ export default function BlogListingPage() {
                   data={categories}
                   radius="xl"
                   size="sm"
-                  color="blue"
+                  color="#4161df"
                   styles={{
                     root: { backgroundColor: "#f1f3f5" },
                   }}
@@ -503,7 +503,7 @@ export default function BlogListingPage() {
                         p={{ base: "lg", sm: "xl" }}
                       >
                         <Badge
-                          color="blue"
+                          color="#4161df"
                           variant="filled"
                           mb="xs"
                           radius="sm"
