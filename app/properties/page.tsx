@@ -86,7 +86,7 @@ const PropertiesContent = () => {
         <button
           type="button"
           onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
-          className="flex flex-col items-center gap-1 bg-[#4161df] text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-[#4161df]/20 transition-all transform active:scale-95"
+          className="flex flex-col items-center gap-1 bg-[#4161df] text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-[#4161df]/10 transition-all transform active:scale-95"
           aria-label={activeTab === "list" ? "Open map view" : "Open list view"}
         >
           {activeTab === "list" ? (
