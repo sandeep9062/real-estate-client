@@ -34,9 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     journal.content?.replace(/<[^>]*>/g, "").substring(0, 160) ||
     `Read ${journal.title} on PropertyBulbul Journal - expert real estate insights for Tricity.`;
   const canonicalUrl = `https://www.propertybulbul.com/journal/${slug}`;
-  const imageUrl =
+  let imageUrl =
     journal.coverImage || "https://www.propertybulbul.com/property-tricity.jpg";
-
+  if (journal.coverImage) {
+    imageUrl = journal.coverImage.startsWith("http")
+      ? journal.coverImage
+      : `https://www.propertybulbul.com${journal.coverImage}`;
+  }
   return {
     title,
     description,
