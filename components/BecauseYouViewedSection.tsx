@@ -25,7 +25,7 @@ export default function BecauseYouViewedSection() {
         aria-busy="true"
         aria-label="Loading your recently viewed listings"
       >
-        <PropertyGridSkeleton count={6} columns="three" variant="carousel" />
+        <PropertyGridSkeleton count={6} columns="four" variant="carousel" />
       </section>
     );
   }
@@ -64,7 +64,7 @@ export default function BecauseYouViewedSection() {
       </p>
       <PropertyGrid
         properties={recent.slice(0, 6)}
-        columns="three"
+        columns="four"
         variant="carousel"
       />
     </section>
