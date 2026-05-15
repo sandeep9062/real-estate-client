@@ -9,14 +9,13 @@ type MediaGalleryProps = {
   alt?: string;
   virtualTourUrl?: string | null;
   floorPlans?: string[] | undefined | null;
+  priority?: boolean;
 };
 
 function isVideo(src: string): boolean {
   const lower = src.toLowerCase();
   return (
-    lower.endsWith(".mp4") ||
-    lower.endsWith(".webm") ||
-    lower.endsWith(".ogg")
+    lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".ogg")
   );
 }
 
@@ -25,6 +24,7 @@ export default function MediaGallery({
   alt = "property media",
   virtualTourUrl,
   floorPlans,
+  priority = false,
 }: MediaGalleryProps) {
   const media = useMemo(
     () => (Array.isArray(sources) ? sources.filter(Boolean) : []),
@@ -47,8 +47,7 @@ export default function MediaGallery({
 
   const goPrev = () =>
     setCurrent((i) => (i === 0 ? Math.max(media.length - 1, 0) : i - 1));
-  const goNext = () =>
-    setCurrent((i) => (i >= media.length - 1 ? 0 : i + 1));
+  const goNext = () => setCurrent((i) => (i >= media.length - 1 ? 0 : i + 1));
 
   const Main = () =>
     media.length > 0 ? (
@@ -91,6 +90,7 @@ export default function MediaGallery({
             sizes="(max-width: 768px) 100vw, 800px"
             className="object-cover cursor-zoom-in"
             onClick={() => setLightboxOpen(true)}
+            priority={priority && current === 0}
           />
         )}
       </div>

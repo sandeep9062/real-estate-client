@@ -1,7 +1,16 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import PropertyDetails from "./PropertyDetails";
-import { getPropertyBySlugServer } from "../../../services/propertiesApi";
+import PropertyStaticContent from "./PropertyStaticContent";
+import {
+  PropertyHeaderButtons,
+  PropertySidebar,
+  PropertyMainInteractions,
+  PropertyMap,
+} from "./PropertyInteractions";
+import {
+  getPropertyBySlugServer,
+  getSimilarPropertiesServer,
+} from "../../../services/propertiesApi";
 import {
   generateRealEstateSchema,
   generateFAQSchema,
@@ -92,6 +101,9 @@ const PropertyPage = async ({ params }: Props) => {
   const data = await getPropertyBySlugServer(slug);
   if (!data) notFound();
 
+  // Fetch similar properties on server for SEO internal linking
+  const similarProperties = await getSimilarPropertiesServer(data._id, 8);
+
   const urlIdentifier = data.slug || data._id;
   const canonicalSlug = data.slug || slugify(data.title) || data._id;
 
@@ -119,7 +131,19 @@ const PropertyPage = async ({ params }: Props) => {
       {renderSchemaScript("property-jsonld", realEstateSchema)}
       {renderSchemaScript("property-faq-jsonld", faqSchema)}
       {renderSchemaScript("property-breadcrumb-jsonld", breadcrumbSchema)}
-      <PropertyDetails data={data} />
+
+      <div className="min-h-screen pt-20 bg-gray-50/50 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <PropertyStaticContent
+            data={data}
+            similarProperties={similarProperties}
+            headerButtons={<PropertyHeaderButtons data={data} />}
+            mainInteractions={<PropertyMainInteractions data={data} />}
+            sidebar={<PropertySidebar data={data} />}
+            map={<PropertyMap data={data} />}
+          />
+        </div>
+      </div>
     </>
   );
 };
