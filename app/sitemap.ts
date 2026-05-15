@@ -27,6 +27,12 @@ interface ApiDeveloper {
   createdAt?: string;
 }
 
+interface ApiSitemapResponse {
+  success: boolean;
+  data?: unknown[];
+  count?: number;
+}
+
 async function fetchJson(url: string): Promise<unknown> {
   const res = await fetch(url, { next: { revalidate: 3600 } });
   if (!res.ok) {
@@ -111,73 +117,62 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return staticRoutes;
   }
 
-  // --- Properties ---
+  // --- Properties (via sitemap-data endpoint - no pagination) ---
   let propertyUrls: MetadataRoute.Sitemap = [];
   try {
-    const propertyData = await fetchJson(`${apiBaseUrl}/properties`);
+    const propertyData = await fetchJson(
+      `${apiBaseUrl}/properties/sitemap-data`,
+    );
     console.log(
-      "Sitemap /api/properties response structure:",
+      "Sitemap /api/properties/sitemap-data response structure:",
       JSON.stringify(propertyData).slice(0, 500),
     );
-    // The API returns { success: true, count, total, pagination, data: [...] }
-    const rawProperties =
-      propertyData &&
-      typeof propertyData === "object" &&
-      "data" in (propertyData as Record<string, unknown>)
-        ? (propertyData as Record<string, unknown>).data
-        : propertyData;
+    // Response: { success: true, count, data: [...] }
+    const response = propertyData as ApiSitemapResponse | null;
+    const rawProperties = response?.data;
     if (Array.isArray(rawProperties)) {
       propertyUrls = (rawProperties as ApiProperty[]).map((p) => ({
         url: `${baseUrl}/property/${p.slug || p._id}`,
         lastModified: new Date(p.updatedAt || Date.now()),
-        changeFrequency: "daily" as const,
+        changeFrequency: "weekly" as const,
         priority: 0.8,
       }));
     } else {
       console.warn(
-        "Sitemap: properties data is not an array. Type:",
+        "Sitemap: properties sitemap-data is not an array. Type:",
         typeof rawProperties,
-        rawProperties
-          ? Array.isArray(rawProperties)
-            ? "array"
-            : "object"
-          : "null",
       );
     }
   } catch (error) {
-    console.error("Sitemap: Failed to fetch properties —", error);
+    console.error("Sitemap: Failed to fetch properties sitemap-data —", error);
   }
 
-  // --- Journals ---
+  // --- Journals (via sitemap-data endpoint - no pagination) ---
   let journalUrls: MetadataRoute.Sitemap = [];
   try {
-    const journalData = await fetchJson(`${apiBaseUrl}/v1/journals`);
+    const journalData = await fetchJson(`${apiBaseUrl}/journals/sitemap-data`);
     console.log(
-      "Sitemap /api/v1/journals response structure:",
+      "Sitemap /api/journals/sitemap-data response structure:",
       JSON.stringify(journalData).slice(0, 500),
     );
-    // The API returns { journals: [...], currentPage, totalPages, total, hasNextPage }
-    const rawJournals =
-      journalData &&
-      typeof journalData === "object" &&
-      "journals" in (journalData as Record<string, unknown>)
-        ? (journalData as Record<string, unknown>).journals
-        : journalData;
+    // Response: { success: true, data: [...] }
+    const response = journalData as ApiSitemapResponse | null;
+    const rawJournals = response?.data;
     if (Array.isArray(rawJournals)) {
       journalUrls = (rawJournals as ApiJournal[]).map((j) => ({
         url: `${baseUrl}/journal/${j.slug}`,
         lastModified: new Date(j.updatedAt || j.createdAt || Date.now()),
-        changeFrequency: "weekly" as const,
+        changeFrequency: "monthly" as const,
         priority: 0.7,
       }));
     } else {
       console.warn(
-        "Sitemap: journals data is not an array. Type:",
+        "Sitemap: journals sitemap-data is not an array. Type:",
         typeof rawJournals,
       );
     }
   } catch (error) {
-    console.error("Sitemap: Failed to fetch journals —", error);
+    console.error("Sitemap: Failed to fetch journals sitemap-data —", error);
   }
 
   // --- Projects ---
