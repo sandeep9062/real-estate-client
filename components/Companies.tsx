@@ -3,40 +3,47 @@ import React from "react";
 import Image from "next/image";
 
 const Companies = () => {
+  // Tricity ke relevant builders aur standard trusted banking partners
   const logos = [
-    { src: "/prologis.png", alt: "Prologis" },
-    { src: "/tower.png", alt: "Tower" },
-    { src: "/equinix.png", alt: "Equinix" },
-    { src: "/realty.png", alt: "Realty" },
-    { src: "/prologis.png", alt: "Prologis" },
-    { src: "/tower.png", alt: "Tower" },
-    { src: "/equinix.png", alt: "Equinix" },
-    { src: "/realty.png", alt: "Realty" },
+    { src: "/logos/dlf.png", alt: "DLF Homes" },
+    { src: "/logos/omaxe.png", alt: "Omaxe India" },
+    { src: "/logos/godrej.png", alt: "Godrej Properties" },
+    { src: "/logos/hdfc.png", alt: "HDFC Bank Loans" },
+    { src: "/logos/sbi.png", alt: "SBI Home Loans" },
+    { src: "/logos/hero-realty.png", alt: "Hero Realty" },
+    { src: "/logos/sushma.png", alt: "Sushma Buildtech" }, // Major player in Zirakpur/Mohali
+    { src: "/logos/icici.png", alt: "ICICI Bank" },
   ];
 
   return (
-    <section className="w-full py-4 sm:py-6 md:py-8 lg:py-10 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-        <div className="relative w-full overflow-hidden">
-          {/* LEFT GRADIENT */}
-          <div className="absolute left-0 top-0 h-full w-12 sm:w-16 md:w-20 lg:w-24 bg-gradient-to-r from-gray-50 to-transparent z-20"></div>
+    <section className="w-full py-4 sm:py-6 md:py-8 bg-gray-50 border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8">
+        {/* Subtle heading to add authority */}
+        {/* <p className="text-center text-xs font-semibold uppercase tracking-wider text-gray-400 mb-6 font-sans">
+          Trusted by Top Developers & Banking Partners
+        </p> */}
 
-          {/* RIGHT GRADIENT */}
-          <div className="absolute right-0 top-0 h-full w-12 sm:w-16 md:w-20 lg:w-24 bg-gradient-to-l from-gray-50 to-transparent z-20"></div>
+        <div className="relative w-full overflow-hidden">
+          {/* LEFT GRADIENT FADE */}
+          <div className="absolute left-0 top-0 h-full w-16 sm:w-24 bg-gradient-to-r from-gray-50 to-transparent z-20 pointer-events-none"></div>
+          {/* RIGHT GRADIENT FADE */}
+          <div className="absolute right-0 top-0 h-full w-16 sm:w-24 bg-gradient-to-l from-gray-50 to-transparent z-20 pointer-events-none"></div>
 
           {/* Slider Track */}
-          <div className="flex items-center gap-6 sm:gap-8 md:gap-10 animate-scroll whitespace-nowrap">
-            {[...logos, ...logos].map((logo, index) => (
+          <div className="flex items-center gap-8 md:gap-12 animate-scroll whitespace-nowrap">
+            {/* Doubling the array to make the loop infinite and smooth */}
+            {[...logos, ...logos, ...logos].map((logo, index) => (
               <div
                 key={index}
-                className="flex items-center justify-center h-14 sm:h-16 md:h-20 lg:h-24 w-24 sm:w-28 md:w-32 lg:w-40 flex-shrink-0 opacity-90 hover:opacity-100 transition"
+                className="flex items-center justify-center h-16 w-28 sm:w-36 md:w-40 flex-shrink-0 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
               >
                 <Image
                   src={logo.src}
                   alt={logo.alt}
-                  width={160}
-                  height={80}
-                  className="w-16 sm:w-20 md:w-24 lg:w-32 object-contain transition-transform duration-300 hover:scale-110"
+                  width={140}
+                  height={60}
+                  className="max-h-10 sm:max-h-12 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                  priority={index < 8} // Preload first set for faster LCP score
                 />
               </div>
             ))}
@@ -44,19 +51,23 @@ const Companies = () => {
         </div>
       </div>
 
-      {/* Animation Style */}
-      <style>
-        {`
-          .animate-scroll {
-            animation: scroll 20s linear infinite;
-          }
-
-          @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-        `}
-      </style>
+      {/* Global CSS bypass if you haven't added custom animation in tailwind.config.js yet */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        .animate-scroll {
+          animation: marquee 25s linear infinite;
+        }
+        .animate-scroll:hover {
+          animation-play-state: paused; /* User hover karega toh smooth pause hoga, professional behavior */
+        }
+      `,
+        }}
+      />
     </section>
   );
 };
