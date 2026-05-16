@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import {
-  FaStar,
-  FaQuoteLeft,
-  FaChevronLeft,
-  FaChevronRight,
-} from "react-icons/fa";
+import { FaStar, FaQuoteLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface TestimonialItem {
   id: number;
@@ -129,10 +124,7 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
   return (
     <div className="bg-white border border-gray-100 h-full p-5 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col relative">
       {/* Quote icon */}
-      <FaQuoteLeft
-        className="text-indigo-100 w-8 h-8 absolute top-5 right-5"
-        aria-hidden="true"
-      />
+      <FaQuoteLeft className="text-indigo-100 w-8 h-8 absolute top-5 right-5" aria-hidden="true" />
 
       {/* Rating */}
       <div className="mb-3">
@@ -149,12 +141,8 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
         <div className="flex items-center gap-3 min-w-0">
           <Avatar testimonial={testimonial} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 truncate">
-              {testimonial.name}
-            </p>
-            <p className="text-xs text-indigo-500 font-medium truncate">
-              {testimonial.role}
-            </p>
+            <p className="text-sm font-semibold text-gray-800 truncate">{testimonial.name}</p>
+            <p className="text-xs text-indigo-500 font-medium truncate">{testimonial.role}</p>
           </div>
         </div>
         {/* Verified badge */}
@@ -221,6 +209,7 @@ const Testimonial: React.FC = () => {
       aria-label="Client testimonials"
     >
       <div className="max-w-6xl mx-auto">
+
         {/* Header */}
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <p className="text-indigo-600 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-2">
@@ -287,11 +276,7 @@ const Testimonial: React.FC = () => {
         </div>
 
         {/* Pagination dots */}
-        <div
-          className="flex justify-center mt-6 gap-2"
-          role="tablist"
-          aria-label="Testimonial pages"
-        >
+        <div className="flex justify-center mt-6 gap-2" role="tablist" aria-label="Testimonial pages">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
@@ -307,6 +292,7 @@ const Testimonial: React.FC = () => {
             />
           ))}
         </div>
+
       </div>
     </section>
   );
