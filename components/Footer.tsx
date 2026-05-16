@@ -73,11 +73,14 @@ const Footer = () => {
             <div className="flex flex-wrap gap-x-4 sm:gap-x-5 md:gap-x-6 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm font-medium text-gray-700 justify-center md:justify-start">
               {[
                 ["Properties", "/properties"],
-                ["Contact", "/contact"],
-                ["Services", "/services"],
-                ["Journals", "/journal"],
-                ["About Us", "/about-us"],
                 ["Projects", "/projects"],
+
+                ["Services", "/services"],
+                ["Pricing", "/pricing"],
+                ["Journals", "/journal"],
+                ["Contact", "/contact"],
+                ["About Us", "/about-us"],
+
                 ["FAQ", "/faq"],
                 ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
