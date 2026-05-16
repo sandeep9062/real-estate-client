@@ -13,6 +13,12 @@ interface UseInfinitePropertiesResult {
   loadMore: () => void;
 }
 
+export interface UseInfinitePropertiesOptions {
+  limit?: number;
+  initialData?: any[];
+  initialTotal?: number;
+}
+
 /**
  * Custom hook for infinite-scroll paginated property fetching.
  *
@@ -22,19 +28,28 @@ interface UseInfinitePropertiesResult {
  */
 export function useInfiniteProperties(
   filters: Record<string, string>,
-  limit = 10,
+  options: UseInfinitePropertiesOptions | number = 10,
 ): UseInfinitePropertiesResult {
+  const limit = typeof options === "number" ? options : (options.limit ?? 10);
+  const initialData =
+    typeof options === "object" ? options.initialData : undefined;
+  const initialTotal =
+    typeof options === "object" ? options.initialTotal : undefined;
+
   const [page, setPage] = useState(1);
-  const [allProperties, setAllProperties] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(false);
-  const [total, setTotal] = useState(0);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [allProperties, setAllProperties] = useState<any[]>(initialData ?? []);
+  const [hasMore, setHasMore] = useState(
+    initialData && initialTotal ? initialData.length < initialTotal : false,
+  );
+  const [total, setTotal] = useState(initialTotal ?? 0);
+  const [initialLoading, setInitialLoading] = useState(!initialData);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Serialise filters so we can detect changes
   const filterKey = JSON.stringify(filters);
   const filterKeyRef = useRef(filterKey);
+  const isFirstRender = useRef(true);
 
   // Reset everything when filters change
   useEffect(() => {
@@ -53,6 +68,12 @@ export function useInfiniteProperties(
   const [trigger] = useLazyGetAllPropertiesQuery();
 
   useEffect(() => {
+    if (isFirstRender.current && initialData) {
+      isFirstRender.current = false;
+      return;
+    }
+    isFirstRender.current = false;
+
     let cancelled = false;
 
     const fetchPage = async () => {

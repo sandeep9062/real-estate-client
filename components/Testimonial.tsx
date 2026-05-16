@@ -1,26 +1,27 @@
-// Testimonial.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
-import Image from "next/image";
-import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import {
+  FaStar,
+  FaQuoteLeft,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 
 interface TestimonialItem {
   id: number;
   name: string;
   role: string;
-  image: string;
+  image?: string;
   text: string;
   rating: number;
 }
 
-// Static data moved outside component to prevent recreation
 const testimonials: TestimonialItem[] = [
   {
     id: 1,
     name: "Rajat Sharma",
     role: "Home Buyer",
-    image: "/construction.jpg",
     text: "Propertybulbul made my home-buying journey incredibly simple. The platform helped me explore the right localities, compare properties, and connect with a trusted agent. Finally bought the perfect home for my family!",
     rating: 5,
   },
@@ -28,7 +29,6 @@ const testimonials: TestimonialItem[] = [
     id: 2,
     name: "Mandeep Singh",
     role: "Commercial Buyer",
-    image: "/hut.jpg",
     text: "I found exactly the commercial space I was looking for through Propertybulbul. Smooth communication, verified listings, and excellent support made the entire process effortless.",
     rating: 5,
   },
@@ -36,15 +36,13 @@ const testimonials: TestimonialItem[] = [
     id: 3,
     name: "Priya Patel",
     role: "Real Estate Investor",
-    image: "/haveli.jpg",
     text: "Propertybulbul helped me identify high-return investment properties faster than ever. Their data-driven insights and professional service truly stand out in the market.",
     rating: 5,
   },
   {
     id: 4,
     name: "Anil Kumar",
-    role: "Seller",
-    image: "/myhome.jpg",
+    role: "Property Seller",
     text: "Listing my property on Propertybulbul brought in genuine buyers within days. Their agent network, transparency, and marketing support helped me get a great offer quickly.",
     rating: 4,
   },
@@ -52,7 +50,6 @@ const testimonials: TestimonialItem[] = [
     id: 5,
     name: "Jasmine Kaur",
     role: "First-Time Buyer",
-    image: "/signup.jpg",
     text: "Being a first-time buyer, I had many doubts. Propertybulbul provided clear guidance, expert assistance, and verified listings that helped me purchase confidently and stress-free.",
     rating: 5,
   },
@@ -60,32 +57,132 @@ const testimonials: TestimonialItem[] = [
     id: 6,
     name: "Vikram Reddy",
     role: "Luxury Property Buyer",
-    image: "/mountain.jpg",
     text: "Propertybulbul offers an exceptional luxury property experience. Their curated listings, premium service, and attention to detail truly match the expectations of high-end buyers like me.",
     rating: 5,
   },
 ];
 
+// Consistent color per person based on their name
+const AVATAR_COLORS = [
+  "bg-indigo-500",
+  "bg-violet-500",
+  "bg-blue-500",
+  "bg-sky-500",
+  "bg-purple-500",
+  "bg-fuchsia-500",
+];
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function getAvatarColor(id: number): string {
+  return AVATAR_COLORS[(id - 1) % AVATAR_COLORS.length];
+}
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }, (_, i) => (
+        <FaStar
+          key={i}
+          className={`w-3.5 h-3.5 ${i < rating ? "text-yellow-400" : "text-gray-200"}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+function Avatar({ testimonial }: { testimonial: TestimonialItem }) {
+  const [imgError, setImgError] = useState(false);
+  const showInitials = !testimonial.image || imgError;
+
+  return (
+    <div
+      className={`w-11 h-11 md:w-12 md:h-12 rounded-full shrink-0 border-2 border-indigo-200 shadow-sm overflow-hidden flex items-center justify-center ${
+        showInitials ? getAvatarColor(testimonial.id) : ""
+      }`}
+    >
+      {showInitials ? (
+        <span className="text-white font-semibold text-sm">
+          {getInitials(testimonial.name)}
+        </span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={testimonial.image}
+          alt={testimonial.name}
+          className="w-full h-full object-cover"
+          onError={() => setImgError(true)}
+        />
+      )}
+    </div>
+  );
+}
+
+function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
+  return (
+    <div className="bg-white border border-gray-100 h-full p-5 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col relative">
+      {/* Quote icon */}
+      <FaQuoteLeft
+        className="text-indigo-100 w-8 h-8 absolute top-5 right-5"
+        aria-hidden="true"
+      />
+
+      {/* Rating */}
+      <div className="mb-3">
+        <StarRating rating={testimonial.rating} />
+      </div>
+
+      {/* Text */}
+      <p className="text-gray-600 text-sm sm:text-base leading-relaxed grow">
+        {testimonial.text}
+      </p>
+
+      {/* Divider */}
+      <div className="border-t border-gray-100 mt-4 pt-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <Avatar testimonial={testimonial} />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-800 truncate">
+              {testimonial.name}
+            </p>
+            <p className="text-xs text-indigo-500 font-medium truncate">
+              {testimonial.role}
+            </p>
+          </div>
+        </div>
+        {/* Verified badge */}
+        <span className="shrink-0 text-xs bg-green-50 text-green-600 border border-green-100 px-2 py-0.5 rounded-full font-medium">
+          Verified
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const Testimonial: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(1); // Default to 1 for mobile-first
+  const [itemsPerView, setItemsPerView] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  // Determine items per view based on screen size
   useEffect(() => {
     const handleResize = () => {
-      // Tailwind's 'md' breakpoint is 768px
       setItemsPerView(window.innerWidth >= 768 ? 2 : 1);
     };
-
-    handleResize(); // Set initial value
+    handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize); // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const totalItems = testimonials.length;
-  const totalPages = Math.ceil(totalItems / itemsPerView);
+  const totalPages = Math.ceil(testimonials.length / itemsPerView);
 
-  // --- Carousel Navigation Logic ---
   const handleNext = useCallback(() => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
   }, [totalPages]);
@@ -94,140 +191,124 @@ const Testimonial: React.FC = () => {
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
   }, [totalPages]);
 
-  // Auto-play functionality
+  // Auto-play — pauses on hover/focus
   useEffect(() => {
-    const interval = setInterval(handleNext, 3000); // Change testimonial every 3 seconds
-    return () => clearInterval(interval); // Cleanup on component unmount
-  }, [handleNext]);
+    if (isPaused) return;
+    const interval = setInterval(handleNext, 4000);
+    return () => clearInterval(interval);
+  }, [handleNext, isPaused]);
 
-  // Reset to the first page if totalPages changes to avoid an out-of-bounds page
+  // Clamp page index when itemsPerView changes
   useEffect(() => {
-    if (currentPage >= totalPages) {
-      setCurrentPage(0);
-    }
+    if (currentPage >= totalPages) setCurrentPage(0);
   }, [totalPages, currentPage]);
 
-  // Calculate the percentage to translate (shift) the inner carousel container
-  // Each page shift is 100% of the visible container width
-
-  const translateXValue = currentPage * 100;
-
-  // --- UI Helpers ---
-  // Memoized star rating renderer
-  const renderStars = useCallback((rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <FaStar
-        key={i}
-        className={`w-4 h-4 ${i < rating ? "text-yellow-500" : "text-gray-300"}`}
-      />
-    ));
-  }, []);
+  // Keyboard navigation
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
+    };
+    el.addEventListener("keydown", onKey);
+    return () => el.removeEventListener("keydown", onKey);
+  }, [handleNext, handlePrev]);
 
   return (
-    <div className="w-full  py-8 sm:py-10 md:py-12 px-3 sm:px-4 md:px-6 lg:px-8 font-sans">
+    <section
+      className="w-full py-10 sm:py-14 md:py-16 px-4 sm:px-6 lg:px-8 font-sans"
+      aria-label="Client testimonials"
+    >
       <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-center">
-          <p className="text-indigo-600 font-semibold mb-1 sm:mb-2 text-xs sm:text-sm md:text-base lg:text-lg uppercase tracking-wider">
+        {/* Header */}
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
+          <p className="text-indigo-600 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-2">
             Client Stories
           </p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
-            <span className="bg-clip-text text-transparent bg-gray-900">
-              FOLKS WHO LOVE US!
-            </span>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+            Folks Who Love Us
           </h2>
-          <p className="text-gray-600 mt-2 sm:mt-3 max-w-2xl mx-auto text-sm sm:text-base">
-            See why our clients trust us to find their perfect property.
+          <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm sm:text-base">
+            Real experiences from buyers, sellers, and investors across Tricity.
           </p>
         </div>
 
-        {/* Carousel Container */}
-        <div className="relative">
-          {/* Inner Track (Viewport) */}
-          <div className="overflow-hidden sm:p-4 md:p-6 lg:p-8">
+        {/* Carousel */}
+        <div
+          ref={trackRef}
+          className="relative focus:outline-none"
+          tabIndex={0}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
+        >
+          {/* Viewport */}
+          <div className="overflow-hidden rounded-2xl">
             <div
               className="flex transition-transform duration-700 ease-in-out"
-              style={{ transform: `translateX(-${translateXValue}%)` }}
+              style={{ transform: `translateX(-${currentPage * 100}%)` }}
+              aria-live="polite"
             >
-              {testimonials.map((testimonial) => (
+              {testimonials.map((t) => (
                 <div
-                  key={testimonial.id}
-                  // Card sizing: Always takes full width on mobile, and half the width on desktop (md)
-                  className="w-full shrink-0 md:w-1/2 p-2 sm:p-3 md:p-4"
+                  key={t.id}
+                  className="w-full shrink-0 md:w-1/2 p-2 sm:p-3"
+                  aria-hidden={
+                    Math.floor(t.id / itemsPerView) !== currentPage
+                      ? "true"
+                      : undefined
+                  }
                 >
-                  <div className="bg-white border border-gray-200 h-full p-4 sm:p-5 md:p-6 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                    {/* User Info and Quote */}
-                    <p className="text-gray-700 text-sm sm:text-base mb-4 sm:mb-5 md:mb-6 italic leading-relaxed grow">
-                      "{testimonial.text}"
-                    </p>
-
-                    <div className="pt-3 sm:pt-4 border-t border-gray-200 flex items-center justify-between gap-2">
-                      <div className="flex items-center min-w-0">
-                        <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full overflow-hidden shrink-0 border-2 border-indigo-500 shadow-sm">
-                          <Image
-                            src={testimonial.image}
-                            alt={testimonial.name}
-                            width={48}
-                            height={48}
-                            className="object-cover w-full h-full"
-                            sizes="48px"
-                            priority={true}
-                            unoptimized={true} // Use this for placeholder URLs
-                          />
-                        </div>
-                        <div className="ml-2 sm:ml-3 md:ml-4 min-w-0">
-                          <h3 className="text-sm sm:text-base md:text-md font-bold text-gray-800 truncate">
-                            {testimonial.name}
-                          </h3>
-                          <p className="text-xs text-indigo-500 font-medium truncate">
-                            {testimonial.role}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex text-xs sm:text-sm flex-shrink-0">
-                        {renderStars(testimonial.rating)}
-                      </div>
-                    </div>
-                  </div>
+                  <TestimonialCard testimonial={t} />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Navigation Buttons (Absolute Positioning) */}
+          {/* Prev button */}
           <button
             onClick={handlePrev}
-            className="absolute top-1/2 left-0 sm:-left-2 md:-left-4 lg:-left-8 transform -translate-y-1/2 bg-white text-gray-700 p-2 sm:p-3 rounded-full shadow-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 z-10 hidden sm:flex items-center justify-center"
-            aria-label="Previous testimonial"
+            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 bg-white border border-gray-200 text-gray-500 p-2.5 rounded-full shadow hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            aria-label="Previous testimonials"
           >
-            <FaChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <FaChevronLeft className="w-4 h-4" />
           </button>
+
+          {/* Next button */}
           <button
             onClick={handleNext}
-            className="absolute top-1/2 right-0 sm:-right-2 md:-right-4 lg:-right-8 transform -translate-y-1/2 bg-white text-gray-700 p-2 sm:p-3 rounded-full shadow-lg hover:bg-indigo-500 hover:text-white transition-all duration-300 z-10 hidden sm:flex items-center justify-center"
-            aria-label="Next testimonial"
+            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 bg-white border border-gray-200 text-gray-500 p-2.5 rounded-full shadow hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            aria-label="Next testimonials"
           >
-            <FaChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            <FaChevronRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Pagination Dots (Mobile and Desktop) */}
-        <div className="flex justify-center mt-3 sm:mt-4 space-x-2 sm:space-x-3 md:space-x-4">
-          {Array.from({ length: totalPages }).map((_, index) => (
+        {/* Pagination dots */}
+        <div
+          className="flex justify-center mt-6 gap-2"
+          role="tablist"
+          aria-label="Testimonial pages"
+        >
+          {Array.from({ length: totalPages }).map((_, i) => (
             <button
-              key={index}
-              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                index === currentPage
-                  ? "bg-indigo-600 transform scale-125"
-                  : "bg-gray-300 hover:bg-gray-400"
+              key={i}
+              role="tab"
+              aria-selected={i === currentPage}
+              aria-label={`Page ${i + 1}`}
+              onClick={() => setCurrentPage(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === currentPage
+                  ? "bg-indigo-600 w-6 h-3"
+                  : "bg-gray-300 hover:bg-gray-400 w-3 h-3"
               }`}
-              onClick={() => setCurrentPage(index)}
-              aria-label={`Go to testimonial page ${index + 1}`}
             />
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
