@@ -170,22 +170,22 @@ const plans = {
       badge: "Best Value",
     },
   ],
-};
+} as const;
 
 const tabs = [
   { key: "seekers", label: "Students & Employees", emoji: "🎓" },
   { key: "agents", label: "Agents", emoji: "🤝" },
   { key: "landlords", label: "Landlords", emoji: "🏠" },
-];
+] as const;
 
 const colorMap = {
   "#4161df": { bg: "#eef1fd", border: "#c7d0f9", badge: "#4161df" },
   "#059669": { bg: "#ecfdf5", border: "#a7f3d0", badge: "#059669" },
   "#d97706": { bg: "#fffbeb", border: "#fde68a", badge: "#d97706" },
-};
+} as const;
 
 export default function PricingPage() {
-  const [activeTab, setActiveTab] = useState("agents");
+  const [activeTab, setActiveTab] = useState<keyof typeof plans>("agents");
 
   const currentPlans = plans[activeTab];
 
