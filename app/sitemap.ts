@@ -55,8 +55,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Journals:    /api/v1/journals/sitemap-data (mounted at /api/v1/journals)
   // Projects:    /api/v1/projects              (mounted at /api/v1/projects)
   // Developers:  /api/v1/developers            (mounted at /api/v1/developers)
-  const API_BASE = "https://real-estate-server-jpd6.onrender.com/api";
-  const API_V1_BASE = "https://real-estate-server-jpd6.onrender.com/api/v1";
+  const API_BASE = "https://api.propertybulbul.com/api";
+  const API_V1_BASE = "https://api.propertybulbul.com/api/v1";
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

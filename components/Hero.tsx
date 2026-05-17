@@ -195,7 +195,8 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
                 src="/hero-image.png"
                 alt="Modern house"
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority
+                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 40vw"
                 className="object-cover"
               />
             </motion.div>
