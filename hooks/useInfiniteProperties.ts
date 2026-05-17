@@ -19,6 +19,8 @@ interface UseInfinitePropertiesResult {
  * - Resets to page 1 when `filters` change.
  * - Appends new pages to the accumulated list.
  * - Tracks `hasMore` from backend pagination metadata.
+ * - Prefetches the next page immediately after the current page loads,
+ *   so scrolling feels instant.
  */
 export function useInfiniteProperties(
   filters: Record<string, string>,
@@ -35,6 +37,8 @@ export function useInfiniteProperties(
   // Serialise filters so we can detect changes
   const filterKey = JSON.stringify(filters);
   const filterKeyRef = useRef(filterKey);
+  // Track which pages have been prefetched to avoid duplicate requests
+  const prefetchedUpToRef = useRef<number>(0);
 
   // Reset everything when filters change
   useEffect(() => {
@@ -47,6 +51,7 @@ export function useInfiniteProperties(
       setInitialLoading(true);
       setLoadingMore(false);
       setError(null);
+      prefetchedUpToRef.current = 0;
     }
   }, [filterKey]);
 
@@ -74,7 +79,6 @@ export function useInfiniteProperties(
 
         if (cancelled) return;
 
-        // The backend now returns { success, count, total, pagination, data }
         const dataArray = result?.data ?? result ?? [];
         const pagination = result?.pagination;
 
@@ -91,10 +95,28 @@ export function useInfiniteProperties(
         }
 
         if (pagination) {
-          setHasMore(Boolean(pagination.hasNextPage));
+          const nextHasMore = Boolean(pagination.hasNextPage);
+          setHasMore(nextHasMore);
           setTotal(pagination.total ?? result?.total ?? 0);
+
+          // ─── Prefetch the next page immediately after current page loads ───
+          if (nextHasMore && !cancelled) {
+            const nextPage = page + 1;
+            // Only prefetch if we haven't already done so
+            if (prefetchedUpToRef.current < nextPage) {
+              prefetchedUpToRef.current = nextPage;
+              // Fire-and-forget prefetch — loads silently into RTK cache
+              trigger(
+                {
+                  ...filters,
+                  page: String(nextPage),
+                  limit: String(limit),
+                },
+                true, // preferCacheValue — use cached if already fetched
+              );
+            }
+          }
         } else {
-          // Fallback if backend hasn't been updated yet
           setHasMore(false);
           setTotal(dataArray.length);
         }

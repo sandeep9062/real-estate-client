@@ -38,7 +38,7 @@ export default function PropertyGrid({
 
   return (
     <div className={`w-full grid ${gridClassByColumns[columns]}`}>
-      {properties.map((card: any) => {
+      {properties.map((card: any, index: number) => {
         const pid = card.id || card._id;
         return (
           <div
@@ -46,9 +46,10 @@ export default function PropertyGrid({
             data-property-id={pid}
             className={
               variant === "carousel"
-                ? "mx-auto flex h-[396px] w-full max-w-full min-h-0 flex-col sm:h-[420px]"
-                : ""
+                ? "mx-auto flex h-[396px] w-full max-w-full min-h-0 flex-col sm:h-[420px] animate-fade-in-up"
+                : "animate-fade-in-up"
             }
+            style={{ animationDelay: `${(index % 12) * 50}ms` }}
           >
             <PropertyCard
               card={card}

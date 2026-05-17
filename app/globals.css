@@ -159,6 +159,17 @@
     }
   }
 
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .animate-in {
     animation-name: fadeIn;
     animation-duration: 0.3s;
@@ -173,5 +184,12 @@
   .slide-in-from-top-2 {
     animation-name: slideInFromTop;
     animation-duration: 0.3s;
+  }
+
+  .animate-fade-in-up {
+    animation-name: fadeInUp;
+    animation-duration: 0.4s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: backwards;
   }
 }

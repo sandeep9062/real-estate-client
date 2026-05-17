@@ -104,6 +104,8 @@ function PropertiesClientInner({
   const [clientLoading, setClientLoading] = useState(false);
   const [clientError, setClientError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  // Track whether we're loading MORE (page > 1) vs loading fresh (page 1)
+  const [isAppending, setIsAppending] = useState(false);
 
   // Ref for the "key" of the current query to detect filter changes client-side
   const filterKeyRef = useRef(JSON.stringify(query));
@@ -111,6 +113,8 @@ function PropertiesClientInner({
   const fetchingPageRef = useRef<number>(0);
   // Ref to track whether we've seeded from static data (page 1 already loaded)
   const seededRef = useRef(false);
+  // Ref to track whether the next page is already being prefetched
+  const prefetchingRef = useRef<number>(0);
 
   useEffect(() => {
     if (isStaticData) return;
@@ -126,6 +130,7 @@ function PropertiesClientInner({
       setClientError(null);
       seededRef.current = false;
       fetchingPageRef.current = 0;
+      prefetchingRef.current = 0;
     }
 
     // Prevent double-fetching the same page
@@ -139,7 +144,14 @@ function PropertiesClientInner({
 
     const fetchPage = async () => {
       try {
-        setClientLoading(true);
+        // Only show loading spinner full-screen on initial page load (page 1)
+        // For append (page > 1), keep existing cards visible
+        if (page === 1) {
+          setClientLoading(true);
+          setIsAppending(false);
+        } else {
+          setIsAppending(true);
+        }
         setClientError(null);
 
         const params: Record<string, string> = {
@@ -168,8 +180,27 @@ function PropertiesClientInner({
         }
 
         if (pagination) {
-          setClientHasMore(Boolean(pagination.hasNextPage));
+          const nextHasMore = Boolean(pagination.hasNextPage);
+          setClientHasMore(nextHasMore);
           setClientTotal(pagination.total ?? result?.total ?? 0);
+
+          // ─── Prefetch the next page immediately after current page loads ───
+          if (nextHasMore && !cancelled) {
+            const nextPage = page + 1;
+            // Only prefetch if we haven't already requested it
+            if (prefetchingRef.current < nextPage) {
+              prefetchingRef.current = nextPage;
+              // Fire-and-forget prefetch — load silently into RTK cache
+              trigger(
+                {
+                  ...query,
+                  page: String(nextPage),
+                  limit: "10",
+                },
+                true, // preferCacheValue — use cached if already fetched
+              );
+            }
+          }
         } else {
           setClientHasMore(false);
           setClientTotal(dataArray.length);
@@ -181,7 +212,10 @@ function PropertiesClientInner({
           );
         }
       } finally {
-        if (!cancelled) setClientLoading(false);
+        if (!cancelled) {
+          setClientLoading(false);
+          setIsAppending(false);
+        }
       }
     };
 
@@ -225,10 +259,16 @@ function PropertiesClientInner({
       }
       return;
     }
-    if (!loading && hasMore) {
+    if (!clientLoading && hasMore) {
       setPage((p) => p + 1);
     }
-  }, [loading, hasMore, isStaticData, initialHasMore, transitionToClientFetch]);
+  }, [
+    clientLoading,
+    hasMore,
+    isStaticData,
+    initialHasMore,
+    transitionToClientFetch,
+  ]);
 
   useEffect(() => {
     if (!selectedId) return;
