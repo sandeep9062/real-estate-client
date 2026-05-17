@@ -21,6 +21,35 @@ export async function getProjectBySlugServer(slug: string) {
   }
 }
 
+/**
+ * Fetch all projects at build time (SSG) or on ISR revalidation.
+ * Uses `next: { revalidate }` so the build and subsequent ISR fetches
+ * are cached by Next.js.
+ */
+export async function fetchProjectsServer() {
+  const apiUrl = getApiUrl();
+
+  try {
+    const response = await fetch(`${apiUrl}/v1/projects`, {
+      next: { revalidate: 3600 }, // ISR — rebuild static page every hour
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      console.error(
+        `[projectsApi] fetchProjectsServer failed with ${response.status}`,
+      );
+      return [];
+    }
+
+    const json = await response.json();
+    return json?.data ?? json ?? [];
+  } catch (error) {
+    console.error("fetchProjectsServer error:", error);
+    return [];
+  }
+}
+
 export const projectsApi = createApi({
   reducerPath: "projectsApi",
   baseQuery: baseQueryWithAuth,

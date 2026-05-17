@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { FaStar, FaQuoteLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaStar,
+  FaQuoteLeft,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 
 interface TestimonialItem {
   id: number;
@@ -17,42 +22,42 @@ const testimonials: TestimonialItem[] = [
     id: 1,
     name: "Rajat Sharma",
     role: "Home Buyer",
-    text: "Propertybulbul made my home-buying journey incredibly simple. The platform helped me explore the right localities, compare properties, and connect with a trusted agent. Finally bought the perfect home for my family!",
+    text: "PropertyBulbul made my home-buying journey incredibly simple. The platform helped me explore the right localities, compare properties, and connect with a trusted agent. Finally bought the perfect home for my family!",
     rating: 5,
   },
   {
     id: 2,
     name: "Mandeep Singh",
     role: "Commercial Buyer",
-    text: "I found exactly the commercial space I was looking for through Propertybulbul. Smooth communication, verified listings, and excellent support made the entire process effortless.",
+    text: "I found exactly the commercial space I was looking for through PropertyBulbul. Smooth communication, verified listings, and excellent support made the entire process effortless.",
     rating: 5,
   },
   {
     id: 3,
     name: "Priya Patel",
     role: "Real Estate Investor",
-    text: "Propertybulbul helped me identify high-return investment properties faster than ever. Their data-driven insights and professional service truly stand out in the market.",
+    text: "PropertyBulbul helped me identify high-return investment properties faster than ever. Their data-driven insights and professional service truly stand out in the market.",
     rating: 5,
   },
   {
     id: 4,
     name: "Anil Kumar",
     role: "Property Seller",
-    text: "Listing my property on Propertybulbul brought in genuine buyers within days. Their agent network, transparency, and marketing support helped me get a great offer quickly.",
+    text: "Listing my property on PropertyBulbul brought in genuine buyers within days. Their agent network, transparency, and marketing support helped me get a great offer quickly.",
     rating: 4,
   },
   {
     id: 5,
     name: "Jasmine Kaur",
     role: "First-Time Buyer",
-    text: "Being a first-time buyer, I had many doubts. Propertybulbul provided clear guidance, expert assistance, and verified listings that helped me purchase confidently and stress-free.",
+    text: "Being a first-time buyer, I had many doubts. PropertyBulbul provided clear guidance, expert assistance, and verified listings that helped me purchase confidently and stress-free.",
     rating: 5,
   },
   {
     id: 6,
     name: "Vikram Reddy",
     role: "Luxury Property Buyer",
-    text: "Propertybulbul offers an exceptional luxury property experience. Their curated listings, premium service, and attention to detail truly match the expectations of high-end buyers like me.",
+    text: "PropertyBulbul offers an exceptional luxury property experience. Their curated listings, premium service, and attention to detail truly match the expectations of high-end buyers like me.",
     rating: 5,
   },
 ];
@@ -124,7 +129,10 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
   return (
     <div className="bg-white border border-gray-100 h-full p-5 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col relative">
       {/* Quote icon */}
-      <FaQuoteLeft className="text-indigo-100 w-8 h-8 absolute top-5 right-5" aria-hidden="true" />
+      <FaQuoteLeft
+        className="text-indigo-100 w-8 h-8 absolute top-5 right-5"
+        aria-hidden="true"
+      />
 
       {/* Rating */}
       <div className="mb-3">
@@ -141,8 +149,12 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
         <div className="flex items-center gap-3 min-w-0">
           <Avatar testimonial={testimonial} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 truncate">{testimonial.name}</p>
-            <p className="text-xs text-indigo-500 font-medium truncate">{testimonial.role}</p>
+            <p className="text-sm font-semibold text-gray-800 truncate">
+              {testimonial.name}
+            </p>
+            <p className="text-xs text-indigo-500 font-medium truncate">
+              {testimonial.role}
+            </p>
           </div>
         </div>
         {/* Verified badge */}
@@ -209,7 +221,6 @@ const Testimonial: React.FC = () => {
       aria-label="Client testimonials"
     >
       <div className="max-w-6xl mx-auto">
-
         {/* Header */}
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <p className="text-indigo-600 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-2">
@@ -276,7 +287,11 @@ const Testimonial: React.FC = () => {
         </div>
 
         {/* Pagination dots */}
-        <div className="flex justify-center mt-6 gap-2" role="tablist" aria-label="Testimonial pages">
+        <div
+          className="flex justify-center mt-6 gap-2"
+          role="tablist"
+          aria-label="Testimonial pages"
+        >
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
@@ -292,7 +307,6 @@ const Testimonial: React.FC = () => {
             />
           ))}
         </div>
-
       </div>
     </section>
   );

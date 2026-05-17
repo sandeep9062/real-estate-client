@@ -87,6 +87,57 @@ export async function getPropertyBySlugServer(slug: string) {
   }
 }
 
+export interface FetchPropertiesServerResult {
+  properties: any[];
+  total: number;
+  hasMore: boolean;
+}
+
+/**
+ * Fetch the first page of properties at build time (SSG) or on ISR revalidation.
+ * Uses `next: { revalidate }` so the build and subsequent ISR fetches are cached by Next.js.
+ */
+export async function fetchPropertiesServer(
+  params?: Record<string, string>,
+  limit = 10,
+): Promise<FetchPropertiesServerResult> {
+  const apiUrl = getApiUrl();
+  const url = new URL(`${apiUrl}/properties`);
+
+  // Always fetch page 1 with the requested limit
+  url.searchParams.set("page", "1");
+  url.searchParams.set("limit", String(limit));
+
+  if (params) {
+    Object.entries(params).forEach(([key, val]) => {
+      if (val) url.searchParams.set(key, val);
+    });
+  }
+
+  const res = await fetch(url.toString(), {
+    next: { revalidate: 3600 }, // ISR — rebuild static page every hour
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    // Fallback to empty state so the build doesn't hard-fail on transient API errors
+    console.error(
+      `[propertiesApi] fetchPropertiesServer failed with ${res.status}`,
+    );
+    return { properties: [], total: 0, hasMore: false };
+  }
+
+  const json = await res.json();
+  const dataArray: any[] = json?.data ?? json ?? [];
+  const pagination = json?.pagination;
+
+  return {
+    properties: dataArray,
+    total: pagination?.total ?? json?.total ?? dataArray.length,
+    hasMore: pagination?.hasNextPage ?? false,
+  };
+}
+
 export async function getSimilarPropertiesServer(
   propertyId: string,
   limit: number = 8,

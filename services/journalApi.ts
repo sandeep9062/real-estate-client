@@ -23,6 +23,73 @@ export async function getJournalBySlugServer(
   }
 }
 
+/**
+ * Interface matching the backend's PaginatedJournalsResponse.
+ */
+export interface FetchJournalsServerResult {
+  journals: Journal[];
+  currentPage: number;
+  totalPages: number;
+  total: number;
+  hasNextPage: boolean;
+}
+
+/**
+ * Fetch journal posts at build time (SSG) or on ISR revalidation.
+ * Uses `next: { revalidate }` so subsequent ISR fetches are cached by Next.js.
+ */
+export async function fetchJournalsServer(
+  page = 1,
+  limit = 12,
+  category?: string,
+): Promise<FetchJournalsServerResult> {
+  const apiUrl = getApiUrl();
+  const url = new URL(`${apiUrl}/v1/journals`);
+
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("limit", String(limit));
+  if (category) url.searchParams.set("category", category);
+
+  const res = await fetch(url.toString(), {
+    next: { revalidate: 3600 },
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    console.error(`[fetchJournalsServer] failed with ${res.status}`);
+    return {
+      journals: [],
+      currentPage: 1,
+      totalPages: 0,
+      total: 0,
+      hasNextPage: false,
+    };
+  }
+
+  return await res.json();
+}
+
+/**
+ * Fetch all distinct journal categories at build time (SSG).
+ * Cached with ISR revalidation (1 hour).
+ */
+export async function fetchJournalCategoriesServer(): Promise<CategoriesResponse> {
+  const apiUrl = getApiUrl();
+  const url = new URL(`${apiUrl}/v1/journals/categories`);
+
+  const res = await fetch(url.toString(), {
+    next: { revalidate: 3600 },
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    console.error(`[fetchJournalCategoriesServer] failed with ${res.status}`);
+    return { success: false, categories: [] };
+  }
+
+  return await res.json();
+}
+
 export interface CategoriesResponse {
   success: boolean;
   categories: string[];

@@ -21,6 +21,35 @@ export async function getDeveloperByIdServer(id: string) {
   }
 }
 
+/**
+ * Fetch all developers at build time (SSG) or on ISR revalidation.
+ * Uses `next: { revalidate }` so the build and subsequent ISR fetches
+ * are cached by Next.js.
+ */
+export async function fetchDevelopersServer() {
+  const apiUrl = getApiUrl();
+
+  try {
+    const response = await fetch(`${apiUrl}/v1/developers`, {
+      next: { revalidate: 3600 }, // ISR — rebuild static page every hour
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      console.error(
+        `[developersApi] fetchDevelopersServer failed with ${response.status}`,
+      );
+      return [];
+    }
+
+    const json = await response.json();
+    return json?.data ?? json ?? [];
+  } catch (error) {
+    console.error("fetchDevelopersServer error:", error);
+    return [];
+  }
+}
+
 export const developersApi = createApi({
   reducerPath: "developersApi",
   baseQuery: baseQueryWithAuth,
