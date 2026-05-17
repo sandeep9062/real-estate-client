@@ -100,12 +100,10 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
       </section>
 
       <div className="mx-auto h-px w-[90%] max-w-7xl bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
-
+      <WhyPropertyBulbul />
       <section className="container mx-auto px-4">
         <Value />
       </section>
-
-      <WhyPropertyBulbul />
 
       <section className="container mx-auto px-4 bg-white/60">
         <PostPropertyCTA />

@@ -121,7 +121,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
       shadow-sm transition-colors hover:bg-[#3456df]
     "
               >
-                Explore Properties
+                Browse Verified Properties
               </Link>
 
               <Link

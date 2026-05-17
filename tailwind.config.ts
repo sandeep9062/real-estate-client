@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: "475px",
+      },
       animation: {
         scroll: "scroll 40s linear infinite",
       },
