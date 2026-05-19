@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const journal = await getJournalBySlugServer(slug);
 
-  console.log(journal, "journalaa-data");
+  //console.log(journal, "journalaa-data");
 
   if (!journal) {
     return {
