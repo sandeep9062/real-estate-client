@@ -104,7 +104,7 @@ const Header: React.FC = () => {
         </div> */}
 
         {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-8 font-medium">
+        <nav className="hidden md:flex text-[12px] sm:text-[15px]  items-center gap-2 lg:gap-3 font-medium">
           <Link
             href="/compare"
             className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"
