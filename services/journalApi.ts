@@ -50,13 +50,26 @@ export async function fetchJournalsServer(
   url.searchParams.set("limit", String(limit));
   if (category) url.searchParams.set("category", category);
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 },
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
+      headers: { "Content-Type": "application/json" },
+    });
 
-  if (!res.ok) {
-    console.error(`[fetchJournalsServer] failed with ${res.status}`);
+    if (!res.ok) {
+      console.error(`[fetchJournalsServer] failed with ${res.status}`);
+      return {
+        journals: [],
+        currentPage: 1,
+        totalPages: 0,
+        total: 0,
+        hasNextPage: false,
+      };
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("[fetchJournalsServer] network error:", error);
     return {
       journals: [],
       currentPage: 1,
@@ -65,8 +78,6 @@ export async function fetchJournalsServer(
       hasNextPage: false,
     };
   }
-
-  return await res.json();
 }
 
 /**
@@ -77,17 +88,22 @@ export async function fetchJournalCategoriesServer(): Promise<CategoriesResponse
   const apiUrl = getApiUrl();
   const url = new URL(`${apiUrl}/v1/journals/categories`);
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 },
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
+      headers: { "Content-Type": "application/json" },
+    });
 
-  if (!res.ok) {
-    console.error(`[fetchJournalCategoriesServer] failed with ${res.status}`);
+    if (!res.ok) {
+      console.error(`[fetchJournalCategoriesServer] failed with ${res.status}`);
+      return { success: false, categories: [] };
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("[fetchJournalCategoriesServer] network error:", error);
     return { success: false, categories: [] };
   }
-
-  return await res.json();
 }
 
 export interface CategoriesResponse {

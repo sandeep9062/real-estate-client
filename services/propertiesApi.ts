@@ -114,28 +114,33 @@ export async function fetchPropertiesServer(
     });
   }
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 }, // ISR — rebuild static page every hour
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 3600 }, // ISR — rebuild static page every hour
+      headers: { "Content-Type": "application/json" },
+    });
 
-  if (!res.ok) {
-    // Fallback to empty state so the build doesn't hard-fail on transient API errors
-    console.error(
-      `[propertiesApi] fetchPropertiesServer failed with ${res.status}`,
-    );
+    if (!res.ok) {
+      // Fallback to empty state so the build doesn't hard-fail on transient API errors
+      console.error(
+        `[propertiesApi] fetchPropertiesServer failed with ${res.status}`,
+      );
+      return { properties: [], total: 0, hasMore: false };
+    }
+
+    const json = await res.json();
+    const dataArray: any[] = json?.data ?? json ?? [];
+    const pagination = json?.pagination;
+
+    return {
+      properties: dataArray,
+      total: pagination?.total ?? json?.total ?? dataArray.length,
+      hasMore: pagination?.hasNextPage ?? false,
+    };
+  } catch (error) {
+    console.error("[fetchPropertiesServer] network error:", error);
     return { properties: [], total: 0, hasMore: false };
   }
-
-  const json = await res.json();
-  const dataArray: any[] = json?.data ?? json ?? [];
-  const pagination = json?.pagination;
-
-  return {
-    properties: dataArray,
-    total: pagination?.total ?? json?.total ?? dataArray.length,
-    hasMore: pagination?.hasNextPage ?? false,
-  };
 }
 
 export async function getSimilarPropertiesServer(
