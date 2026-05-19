@@ -30,7 +30,7 @@ const plans = {
     {
       name: "Pro Seeker",
       tag: "Serious Buyers & Tenants",
-      price: 299, // Raised slightly from 199 for better scaling math
+      price: 299,
       period: "month",
       color: "#4161df",
       highlight: true,
@@ -82,14 +82,14 @@ const plans = {
     {
       name: "Pro Agent",
       tag: "Active Agents",
-      price: 1499, // Scaled up from 499 (SaaS standards for premium listing features)
+      price: 1499,
       period: "month",
       color: "#059669",
       highlight: false,
       description:
         "For agents serious about growing their client base in Tricity.",
       features: [
-        { text: "List up to 50 property listings", included: true }, // Added cap so they upgrade to Power Agent
+        { text: "List up to 50 property listings", included: true },
         { text: "Featured in search results", included: true },
         { text: "Professional agent profile", included: true },
         { text: "PDF brochure for every listing", included: true },
@@ -104,16 +104,16 @@ const plans = {
     {
       name: "Power Agent",
       tag: "Top Performers",
-      price: 3499, // Scaled up from 999 (This is your main monetization tier with the Meta/LinkedIn social engine)
+      price: 3499,
       period: "month",
       color: "#059669",
-      highlight: true, // Switched highlight here because this brings the maximum revenue
+      highlight: true,
       description:
         "Maximum visibility and automated marketing engine for top performers.",
       features: [
         { text: "Unlimited property listings", included: true },
         { text: "Top of search results & high visibility", included: true },
-        { text: "Social media auto-posting (Meta & LinkedIn)", included: true }, // Hero automation value
+        { text: "Social media auto-posting (Meta & LinkedIn)", included: true },
         { text: "AI-generated listing descriptions", included: true },
         { text: "Hot lead scoring & immediate alerts", included: true },
         { text: "Verified Agent trust badge", included: true },
@@ -150,7 +150,7 @@ const plans = {
     {
       name: "Pro Landlord",
       tag: "Multiple Property Owners",
-      price: 599, // Scaled up from 299 to justify Rent Agreement Builder & Premium WhatsApp alerts
+      price: 599,
       period: "month",
       color: "#d97706",
       highlight: true,
@@ -198,8 +198,95 @@ export default function PricingPage() {
         padding: "0 0 80px",
       }}
     >
+      {/* Mobile responsive styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .pricing-grid {
+            grid-template-columns: 1fr !important;
+            max-width: 480px !important;
+          }
+          .pricing-card-highlight {
+            transform: none !important;
+          }
+          .pricing-header {
+            padding: 48px 20px 64px !important;
+          }
+          .pricing-badge-tag {
+            font-size: 11px !important;
+            padding: 5px 14px !important;
+          }
+          .pricing-tab-btn {
+            padding: 10px 18px !important;
+            font-size: 13px !important;
+          }
+          .pricing-bottom-banner {
+            border-radius: 16px !important;
+            padding: 16px 20px !important;
+            gap: 14px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .pricing-header {
+            padding: 40px 16px 56px !important;
+          }
+          .pricing-header h1 {
+            font-size: 24px !important;
+          }
+          .pricing-header p {
+            font-size: 14px !important;
+          }
+          .pricing-grid {
+            padding: 0 16px !important;
+            margin-top: 36px !important;
+          }
+          .pricing-tab-btn {
+            padding: 8px 14px !important;
+            font-size: 12px !important;
+          }
+          .pricing-card-header {
+            padding: 20px 20px 18px !important;
+          }
+          .pricing-card-body {
+            padding: 18px 20px !important;
+          }
+          .pricing-card-price {
+            font-size: 30px !important;
+          }
+          .pricing-feature-text {
+            font-size: 12px !important;
+          }
+          .pricing-cta-btn {
+            font-size: 13px !important;
+            padding: 12px 16px !important;
+          }
+          .pricing-badge-tag {
+            font-size: 10px !important;
+            padding: 4px 10px !important;
+          }
+          .pricing-bottom-banner {
+            padding: 14px 16px !important;
+            gap: 12px !important;
+          }
+          .pricing-usps {
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+          }
+          .pricing-tabs-wrap {
+            gap: 6px !important;
+            padding: 0 16px !important;
+            margin-top: -24px !important;
+          }
+          .pricing-deco-circle {
+            display: none !important;
+          }
+        }
+      `}</style>
+
       {/* Header */}
       <div
+        className="pricing-header"
         style={{
           background: "linear-gradient(135deg, #1e3a5f 0%, #4161df 100%)",
           padding: "64px 24px 80px",
@@ -216,6 +303,7 @@ export default function PricingPage() {
         ].map((c, i) => (
           <div
             key={i}
+            className={c.size >= 200 ? "" : "pricing-deco-circle"}
             style={{
               position: "absolute",
               width: c.size,
@@ -280,6 +368,7 @@ export default function PricingPage() {
 
       {/* Tab Switcher */}
       <div
+        className="pricing-tabs-wrap"
         style={{
           display: "flex",
           justifyContent: "center",
@@ -294,6 +383,7 @@ export default function PricingPage() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
+            className="pricing-tab-btn"
             onClick={() => setActiveTab(tab.key)}
             style={{
               padding: "12px 24px",
@@ -326,6 +416,7 @@ export default function PricingPage() {
 
       {/* Plans Grid */}
       <div
+        className="pricing-grid"
         style={{
           maxWidth: 1100,
           margin: "48px auto 0",
@@ -340,6 +431,7 @@ export default function PricingPage() {
           return (
             <div
               key={plan.name}
+              className={plan.highlight ? "pricing-card-highlight" : ""}
               style={{
                 background: "white",
                 borderRadius: 20,
@@ -358,6 +450,7 @@ export default function PricingPage() {
               {/* Badge */}
               {plan.badge && (
                 <div
+                  className="pricing-badge-tag"
                   style={{
                     position: "absolute",
                     top: 16,
@@ -379,6 +472,7 @@ export default function PricingPage() {
 
               {/* Plan header */}
               <div
+                className="pricing-card-header"
                 style={{
                   padding: "28px 28px 24px",
                   background: plan.highlight ? `${plan.color}08` : "white",
@@ -386,6 +480,7 @@ export default function PricingPage() {
                 }}
               >
                 <div
+                  className="pricing-badge-tag"
                   style={{
                     display: "inline-block",
                     background: colors.bg,
@@ -433,6 +528,7 @@ export default function PricingPage() {
                 >
                   {plan.price === 0 ? (
                     <span
+                      className="pricing-card-price"
                       style={{
                         fontSize: 38,
                         fontWeight: 700,
@@ -455,6 +551,7 @@ export default function PricingPage() {
                         ₹
                       </span>
                       <span
+                        className="pricing-card-price"
                         style={{
                           fontSize: 38,
                           fontWeight: 700,
@@ -492,7 +589,10 @@ export default function PricingPage() {
               </div>
 
               {/* Features */}
-              <div style={{ padding: "24px 28px" }}>
+              <div
+                className="pricing-card-body"
+                style={{ padding: "24px 28px" }}
+              >
                 <div
                   style={{
                     fontSize: 11,
@@ -561,6 +661,7 @@ export default function PricingPage() {
                         )}
                       </div>
                       <span
+                        className="pricing-feature-text"
                         style={{
                           fontSize: 13,
                           fontFamily: "'Arial', sans-serif",
@@ -576,6 +677,7 @@ export default function PricingPage() {
 
                 {/* CTA */}
                 <button
+                  className="pricing-cta-btn"
                   style={{
                     width: "100%",
                     marginTop: 28,
@@ -614,6 +716,7 @@ export default function PricingPage() {
         }}
       >
         <div
+          className="pricing-bottom-banner"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -635,6 +738,7 @@ export default function PricingPage() {
           ].map((item, i) => (
             <div
               key={i}
+              className="pricing-usps"
               style={{
                 display: "flex",
                 alignItems: "center",

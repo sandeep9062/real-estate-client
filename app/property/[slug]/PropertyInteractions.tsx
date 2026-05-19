@@ -25,6 +25,7 @@ import Heart from "@/components/Heart";
 import BookingModal from "@/components/BookingModal";
 import BrochureDownloadButton from "@/components/BrochureDownloadButton";
 import EMICalculator from "@/components/EMICalculator";
+import SectorBenchmark from "@/components/SectorBenchmark";
 import { toast } from "@/hooks/use-toast";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { isVisitDateOnOrBeforeToday } from "@/lib/bookingDate";
@@ -200,6 +201,18 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
               )}
             </div>
           </div>
+
+          {/* Sector benchmark widget */}
+          {data?.location?.sector && data?.propertyCategory && (
+            <div className="mb-6">
+              <SectorBenchmark
+                sector={data.location.sector}
+                propertyType={data.propertyCategory}
+                listingPrice={data.price}
+                listingType={data.deal === "Rent" ? "rent" : "sale"}
+              />
+            </div>
+          )}
 
           <div className="space-y-4">
             <BrochureDownloadButton

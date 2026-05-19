@@ -11,6 +11,7 @@ import { aiBasedApi } from "@/services/aiBasedApi";
 
 import { journalApi } from "@/services/journalApi";
 import { savedSearchesApi } from "@/services/savedSearchesApi";
+import { marketIndexApi } from "@/services/marketIndexApi";
 
 const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ const store = configureStore({
     [projectsApi.reducerPath]: projectsApi.reducer,
     [developersApi.reducerPath]: developersApi.reducer,
     [journalApi.reducerPath]: journalApi.reducer, // Add journalApi reducer
+    [marketIndexApi.reducerPath]: marketIndexApi.reducer,
     auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -35,6 +37,7 @@ const store = configureStore({
       aiBasedApi.middleware,
       userApi.middleware,
       journalApi.middleware, // Add journalApi middleware
+      marketIndexApi.middleware,
       savedSearchesApi.middleware,
     ),
   devTools: process.env.NODE_ENV !== "production", // ✅ enable Redux DevTools in development
