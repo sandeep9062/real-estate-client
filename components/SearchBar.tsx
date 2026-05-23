@@ -127,7 +127,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
       <div className="flex w-full max-w-2xl py-2 sm:py-3 md:py-4 items-center gap-2 sm:gap-3 rounded-full border border-border bg-white/70 p-2 sm:p-3 md:p-4 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200">
         <HiLocationMarker className="text-[#4161df] w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 flex-shrink-0" />
         <input
-          placeholder="Search properties..."
+          placeholder="2BHK near IT Park Mohali under ₹20,000..."
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}

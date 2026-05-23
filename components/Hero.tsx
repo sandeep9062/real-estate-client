@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useCallback, useState, useEffect, useRef } from "react";
-import CountUp from "react-countup";
+
 import { motion } from "framer-motion";
 import SearchBar, { SearchFilters } from "./SearchBar";
 import Link from "next/link";
 import Image from "next/image";
 import { getApiUrl } from "../services/propertiesApi";
-
+import AddPropertyModal from "./AddPropertyModal";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 interface HeroProps {
   setFilter: React.Dispatch<React.SetStateAction<SearchFilters>>;
 }
@@ -59,7 +62,10 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
   }, []);
 
   const display = stats || { properties: 181, projects: 3, cities: 5 };
+  const router = useRouter();
+  const [modalOpened, setModalOpened] = useState(false);
 
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   // Memoize the search handler to prevent unnecessary re-renders
   const handleSearch = useCallback(
     (filters: SearchFilters) => {
@@ -68,6 +74,13 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
     [setFilter],
   );
 
+  const handleAddPropertyClick = () => {
+    if (isAuthenticated) {
+      setModalOpened(true);
+    } else {
+      router.push("/login");
+    }
+  };
   return (
     <section className="relative bg-background text-foreground pt-22 sm:pt-26 md:pt-36 pb-6 sm:pb-10 md:pb-16 lg:pb-20 overflow-hidden">
       {/* BACKGROUND BLOB EFFECT */}
@@ -88,24 +101,24 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               initial={{ y: "2rem", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 1.2, type: "spring" }}
-              className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-7xl tracking-tighter leading-[1.1] text-slate-900"
+              className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter leading-[1.1] text-slate-900"
             >
-              Discover <br className="hidden sm:block" />
-              Your Perfect{" "}
-              <span className="text-[#4161df]">Home in Tricity</span>
+              Tricity's
+              <br className="hidden sm:block" /> Most Trusted
+              <br className="hidden sm:block" />
+              <span className="text-[#4161df]"> Property Platform</span>
             </motion.h1>
-
             {/* SUBTEXT */}
-            <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-full mb-3 sm:mb-4 mx-auto md:mx-0 px-2 sm:px-0">
-              From luxury apartments to independent houses — discover homes that
-              truly match your lifestyle across Chandigarh, Mohali & Panchkula.
+            <p className="text-muted-foreground  text-sm sm:text-base md:text-lg max-w-full mb-5 sm:mb-5 mx-auto md:mx-0 px-2 sm:px-0">
+              Stop chasing stale posts and bait listings. Access a curated
+              marketplace of fresh, active properties across the entire Tricity
+              region with zero hidden fees and no spam.
             </p>
 
             {/* SEARCH BAR */}
             <div className="w-full flex justify-center md:justify-start">
               <SearchBar onSearch={handleSearch} />
             </div>
-
             {/* BUTTONS */}
             <div
               className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3"
@@ -124,61 +137,95 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
                 Browse Verified Properties
               </Link>
 
-              <Link
-                href="/contact"
+              <button
+                onClick={handleAddPropertyClick}
                 className="
       inline-flex items-center justify-center rounded-full
       border border-border text-foreground
-      text-xs px-3 py-2 
-      sm:text-sm sm:px-6 sm:py-3 
+      text-xs px-2.5 py-1.5 
+      sm:text-sm sm:px-5.5 sm:py-2.5 
       transition-colors hover:bg-muted
     "
               >
-                Contact us
-              </Link>
+                List Your Property
+              </button>
             </div>
 
-            {/* STATS */}
-            <div className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 mt-4 sm:mt-6 flex-nowrap">
-              {/* ITEM */}
-              <div className="flex flex-col items-center">
-                <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp
-                    start={display.properties - 100}
-                    end={display.properties}
-                    duration={4}
-                  />
-                  +
-                </span>
-                <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
-                  Verified Listings
-                </span>
-              </div>
+            {/* ── HERO STRIPS ───────────── */}
+            <div className="mt-6 sm:mt-8 space-y-4">
+              {/* Row 1 — seeker benefits */}
+              <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-blue-100 rounded-2xl px-3 py-2 shadow-sm min-w-[140px]">
+                  <div className="w-1 self-stretch rounded-full bg-blue-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-blue-900 leading-tight">
+                      AI Property Match
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      Exact fit for your needs
+                    </p>
+                  </div>
+                </div>
 
-              {/* Divider */}
-              <div className="h-6 sm:h-8 w-px bg-border" />
+                {/* <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-green-100 rounded-2xl px-3 py-2 shadow-sm min-w-[150px]">
+                  <div className="w-1 self-stretch rounded-full bg-green-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-green-900 leading-tight">
+                      Commute Time Filter
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      Filter by commute distance
+                    </p>
+                  </div>
+                </div> */}
 
-              {/* ITEM */}
-              <div className="flex flex-col items-center">
-                <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={0} end={display.projects} duration={4} />+
-                </span>
-                <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
-                  Major Projects
-                </span>
-              </div>
+                {/* <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-purple-100 rounded-2xl px-3 py-2 shadow-sm min-w-[150px]">
+                  <div className="w-1 self-stretch rounded-full bg-purple-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-purple-900 leading-tight">
+                      Roommate Matching
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      Compatible profiles only
+                    </p>
+                  </div>
+                </div> */}
 
-              {/* Divider */}
-              <div className="h-6 sm:h-8 w-px bg-border" />
+                <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-blue-100 rounded-2xl px-3 py-2 shadow-sm min-w-[148px]">
+                  <div className="w-1 self-stretch rounded-full bg-blue-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-blue-900 leading-tight">
+                      Verified Listings Only
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      No fake or expired posts
+                    </p>
+                  </div>
+                </div>
 
-              {/* ITEM */}
-              <div className="flex flex-col items-center">
-                <span className="text-xs sm:text-base md:text-xl lg:text-3xl font-semibold text-gray-500 leading-none">
-                  <CountUp start={0} end={display.cities} duration={4} />+
-                </span>
-                <span className="text-muted-foreground text-[9px] sm:text-xs md:text-sm lg:text-base leading-none mt-1">
-                  Cities Covered
-                </span>
+                <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-green-100 rounded-2xl px-3 py-2 shadow-sm min-w-[148px]">
+                  <div className="w-1 self-stretch rounded-full bg-green-600 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-green-900 leading-tight">
+                      No Hidden Charges
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      Transparent pricing, no surprises
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-orange-100 rounded-2xl px-3 py-2 shadow-sm min-w-[148px]">
+                  <div className="w-1 self-stretch rounded-full bg-orange-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-orange-900 leading-tight">
+                      Instant PDF Brochure
+                    </p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">
+                      One click, share anywhere
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -193,7 +240,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
             >
               <Image
                 src="/hero-image.png"
-                alt="Modern house"
+                alt="tricity property platform"
                 fill
                 priority
                 sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 40vw"

@@ -128,12 +128,6 @@ const Header: React.FC = () => {
           >
             Properties
           </Link>
-          <Link
-            href="/contact"
-            className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"
-          >
-            Contact
-          </Link>
 
           {mounted && (
             <>
