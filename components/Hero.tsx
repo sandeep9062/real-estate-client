@@ -58,7 +58,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
     };
   }, []);
 
-  const display = stats || { properties: 181, projects: 3, cities: 7 };
+  const display = stats || { properties: 181, projects: 3, cities: 5 };
 
   // Memoize the search handler to prevent unnecessary re-renders
   const handleSearch = useCallback(
