@@ -51,6 +51,15 @@ const plans = {
         { text: "Zero brokerage properties only", included: true },
         { text: "WhatsApp directly to property owner", included: true },
         { text: "Priority support", included: true },
+
+        {
+          text: "Filter 'Flat Ready' 48-Hour Guaranteed Move-In Listings",
+          included: true,
+        },
+        {
+          text: "Instant WhatsApp Notification Alerts for Price Drops",
+          included: true,
+        },
       ],
       cta: "Get Pro Access",
       badge: "Most Popular",
@@ -116,6 +125,14 @@ const plans = {
         { text: "Social media auto-posting (Meta & LinkedIn)", included: true },
         { text: "AI-generated listing descriptions", included: true },
         { text: "Hot lead scoring & immediate alerts", included: true },
+        {
+          text: "Direct Routing of High-Intent Yield Investors & NRI Leads",
+          included: true,
+        },
+        {
+          text: "Priority Placement in Mega-Project (Trident Hills/Omaxe) Landing Pages",
+          included: true,
+        },
         { text: "Verified Agent trust badge", included: true },
         { text: "Monthly performance report", included: true },
         { text: "1-on-1 growth consultation", included: true },
@@ -163,7 +180,19 @@ const plans = {
         { text: "Verified Landlord badge", included: true },
         { text: "Lead analytics & view counts", included: true },
         { text: "Rent agreement builder access", included: true },
-        { text: "WhatsApp lead alerts", included: true },
+        { text: "WhatsApp lead alerts", included: true }, // Pro Landlord features validation:
+        {
+          text: "Zero-Call Privacy Shield (Force WhatsApp Seeker Screening)",
+          included: true,
+        },
+        {
+          text: "Automated Monthly Rent Tracker Ledger & WhatsApp Reminders",
+          included: true,
+        },
+        {
+          text: "One-Click Standard Digital Lease Agreement Framework",
+          included: true,
+        }, // Substituted generic secure placeholder
         { text: "Priority support", included: true },
       ],
       cta: "Manage My Properties",
