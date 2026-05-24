@@ -154,6 +154,42 @@ const rows: RowConfig[] = [
         : "—",
   },
   {
+    label: "Carpet Area",
+    key: "carpetArea",
+    icon: <Maximize2 className="w-4 h-4" />,
+    fmt: (p: any) =>
+      p.area?.carpetArea?.value != null
+        ? `${p.area.carpetArea.value.toLocaleString("en-IN")} ${p.area.carpetArea.unit || p.area.unit || "sqft"}`
+        : "—",
+  },
+  {
+    label: "Super Built-up",
+    key: "superBuiltUpArea",
+    icon: <Maximize2 className="w-4 h-4" />,
+    fmt: (p: any) =>
+      p.area?.superBuiltUpArea?.value != null
+        ? `${p.area.superBuiltUpArea.value.toLocaleString("en-IN")} ${p.area.superBuiltUpArea.unit || p.area.unit || "sqft"}`
+        : "—",
+  },
+  {
+    label: "Construction",
+    key: "constructionStatus",
+    icon: <CalendarClock className="w-4 h-4" />,
+    fmt: (p: any) => {
+      if (p.availability !== "Under Construction") return "Ready to Move";
+      const parts: string[] = [];
+      if (p.constructionStatus?.percentageComplete != null)
+        parts.push(`${p.constructionStatus.percentageComplete}%`);
+      if (p.constructionStatus?.currentPhase)
+        parts.push(p.constructionStatus.currentPhase);
+      if (p.constructionStatus?.expectedOCDate)
+        parts.push(
+          `OC: ${new Date(p.constructionStatus.expectedOCDate).toLocaleDateString("en-IN")}`,
+        );
+      return parts.length ? parts.join(" · ") : "Under Construction";
+    },
+  },
+  {
     label: "Floor",
     key: "floor",
     icon: <Building2 className="w-4 h-4" />,

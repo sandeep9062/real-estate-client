@@ -67,8 +67,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   const hasValidMedia = firstMedia && String(firstMedia).trim() !== "";
 
-  const areaValue = card.area?.value;
-  const areaUnit = card.area?.unit ?? "sqft";
+  const areaValue = card.area?.superBuiltUpArea?.value || card.area?.value;
+  const areaUnit =
+    card.area?.superBuiltUpArea?.unit || card.area?.unit || "sqft";
+  const carpetValue = card.area?.carpetArea?.value;
+  const carpetUnit = card.area?.carpetArea?.unit || card.area?.unit || "sqft";
   const isRent = card.deal === "Rent";
   const displayPhone =
     card.agent?.phone ||

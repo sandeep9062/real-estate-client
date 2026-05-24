@@ -35,25 +35,34 @@ function mergeAiIntoPropertyDetails(
     ? { lat: loc.coordinates.lat, lng: loc.coordinates.lng }
     : prev.location?.coordinates;
 
-  const np = ai.nearbyPlaces && typeof ai.nearbyPlaces === "object" ? ai.nearbyPlaces : null;
+  const np =
+    ai.nearbyPlaces && typeof ai.nearbyPlaces === "object"
+      ? ai.nearbyPlaces
+      : null;
   const nearbyPlaces = np
     ? {
-        schools: np.schools?.length ? np.schools : prev.nearbyPlaces?.schools ?? [],
+        schools: np.schools?.length
+          ? np.schools
+          : (prev.nearbyPlaces?.schools ?? []),
         metroStations: np.metroStations?.length
           ? np.metroStations
-          : prev.nearbyPlaces?.metroStations ?? [],
-        hospitals: np.hospitals?.length ? np.hospitals : prev.nearbyPlaces?.hospitals ?? [],
-        malls: np.malls?.length ? np.malls : prev.nearbyPlaces?.malls ?? [],
+          : (prev.nearbyPlaces?.metroStations ?? []),
+        hospitals: np.hospitals?.length
+          ? np.hospitals
+          : (prev.nearbyPlaces?.hospitals ?? []),
+        malls: np.malls?.length ? np.malls : (prev.nearbyPlaces?.malls ?? []),
       }
     : prev.nearbyPlaces;
 
-  const fac = ai.facilities && typeof ai.facilities === "object" ? ai.facilities : null;
+  const fac =
+    ai.facilities && typeof ai.facilities === "object" ? ai.facilities : null;
 
   const merged: Record<string, any> = {
     ...prev,
     title: (typeof ai.title === "string" && ai.title.trim()) || prev.title,
     description:
-      (typeof ai.description === "string" && ai.description.trim()) || prev.description,
+      (typeof ai.description === "string" && ai.description.trim()) ||
+      prev.description,
     price:
       typeof ai.price === "number" && Number.isFinite(ai.price) && ai.price > 0
         ? ai.price
@@ -77,15 +86,16 @@ function mergeAiIntoPropertyDetails(
       ...prev.location,
       ...loc,
       country: normalizeCountry(
-        (typeof loc.country === "string" && loc.country) || prev.location?.country || "",
+        (typeof loc.country === "string" && loc.country) ||
+          prev.location?.country ||
+          "",
       ),
       coordinates: coords ?? prev.location?.coordinates,
     },
-    facilities: fac
-      ? { ...prev.facilities, ...fac }
-      : prev.facilities,
+    facilities: fac ? { ...prev.facilities, ...fac } : prev.facilities,
     reraNumber:
-      (typeof ai.reraNumber === "string" && ai.reraNumber.trim()) || prev.reraNumber,
+      (typeof ai.reraNumber === "string" && ai.reraNumber.trim()) ||
+      prev.reraNumber,
     virtualTourUrl:
       (typeof ai.virtualTourUrl === "string" && ai.virtualTourUrl.trim()) ||
       prev.virtualTourUrl,
@@ -93,7 +103,8 @@ function mergeAiIntoPropertyDetails(
       (typeof ai.videoUrl === "string" && ai.videoUrl.trim()) || prev.videoUrl,
     nearbyPlaces,
     commercialPropertyTypes:
-      Array.isArray(ai.commercialPropertyTypes) && ai.commercialPropertyTypes.length
+      Array.isArray(ai.commercialPropertyTypes) &&
+      ai.commercialPropertyTypes.length
         ? ai.commercialPropertyTypes
         : prev.commercialPropertyTypes,
     investmentOptions:
@@ -102,16 +113,29 @@ function mergeAiIntoPropertyDetails(
         : prev.investmentOptions,
   };
 
-  if (ai.maintenanceCharge != null) merged.maintenanceCharge = ai.maintenanceCharge;
+  if (ai.maintenanceCharge != null)
+    merged.maintenanceCharge = ai.maintenanceCharge;
   if (ai.securityDeposit != null) merged.securityDeposit = ai.securityDeposit;
   if (ai.lockInMonths != null) merged.lockInMonths = ai.lockInMonths;
-  if (ai.noticePeriodDays != null) merged.noticePeriodDays = ai.noticePeriodDays;
+  if (ai.noticePeriodDays != null)
+    merged.noticePeriodDays = ai.noticePeriodDays;
   if (ai.ageOfProperty != null) merged.ageOfProperty = ai.ageOfProperty;
   if (ai.pricePerSqft != null) merged.pricePerSqft = ai.pricePerSqft;
   if (typeof ai.negotiable === "boolean") merged.negotiable = ai.negotiable;
 
-  if (ai.ocStatus !== undefined && ai.ocStatus !== null && String(ai.ocStatus).trim() !== "") {
+  if (
+    ai.ocStatus !== undefined &&
+    ai.ocStatus !== null &&
+    String(ai.ocStatus).trim() !== ""
+  ) {
     merged.ocStatus = ai.ocStatus;
+  }
+
+  if (ai.constructionStatus && typeof ai.constructionStatus === "object") {
+    merged.constructionStatus = {
+      ...prev.constructionStatus,
+      ...ai.constructionStatus,
+    };
   }
 
   if (Array.isArray(ai.amenities) && ai.amenities.length > 0) {
@@ -155,7 +179,11 @@ const MagicFill = ({
         aiData.facilities &&
         typeof aiData.facilities === "object" &&
         Object.values(aiData.facilities).some(
-          (v) => v !== undefined && v !== null && v !== "" && !(typeof v === "number" && v === 0),
+          (v) =>
+            v !== undefined &&
+            v !== null &&
+            v !== "" &&
+            !(typeof v === "number" && v === 0),
         )
       ) {
         filled.push("facilities");
@@ -180,7 +208,9 @@ const MagicFill = ({
       const err = error as { data?: { message?: string }; status?: number };
       const msg =
         err?.data?.message ||
-        (error instanceof Error ? error.message : "Magic fill failed. Try again.");
+        (error instanceof Error
+          ? error.message
+          : "Magic fill failed. Try again.");
       toast.error(msg);
     }
   };
@@ -202,14 +232,27 @@ const MagicFill = ({
             </Group>
           </Group>
           <Text size="sm" c="dimmed" fw={500} mb="sm">
-            Paste rough notes, broker messages, or an old listing. We extract structured fields
-            (deal, price in INR, BHK, area, rent terms, OC, amenities, neighbourhood hints) and
-            normalize them for your form.
+            Paste rough notes, broker messages, or an old listing. We extract
+            structured fields (deal, price in INR, BHK, area, rent terms, OC,
+            amenities, neighbourhood hints) and normalize them for your form.
           </Text>
-          <List size="sm" c="dimmed" spacing={4} icon={<Wand2 size={14} className="text-blue-500" />}>
-            <List.Item>Understands lakhs / crore and monthly rent vs sale price</List.Item>
-            <List.Item>Maps BHK, parking type, maintenance, deposit, lock-in where mentioned</List.Item>
-            <List.Item>Match amenities to your listing checklist — you can still edit every step</List.Item>
+          <List
+            size="sm"
+            c="dimmed"
+            spacing={4}
+            icon={<Wand2 size={14} className="text-blue-500" />}
+          >
+            <List.Item>
+              Understands lakhs / crore and monthly rent vs sale price
+            </List.Item>
+            <List.Item>
+              Maps BHK, parking type, maintenance, deposit, lock-in where
+              mentioned
+            </List.Item>
+            <List.Item>
+              Match amenities to your listing checklist — you can still edit
+              every step
+            </List.Item>
           </List>
         </Paper>
 
@@ -240,7 +283,13 @@ const MagicFill = ({
         />
 
         <Group justify="space-between">
-          <Button variant="subtle" color="#4161df" onClick={nextStep} size="md" radius="md">
+          <Button
+            variant="subtle"
+            color="#4161df"
+            onClick={nextStep}
+            size="md"
+            radius="md"
+          >
             Skip — I’ll fill manually
           </Button>
 
@@ -258,8 +307,8 @@ const MagicFill = ({
         </Group>
 
         <Text size="xs" c="dimmed" ta="center">
-          Pin location on the map in the next steps if coordinates weren’t guessed. Photos still
-          upload separately.
+          Pin location on the map in the next steps if coordinates weren’t
+          guessed. Photos still upload separately.
         </Text>
       </Stack>
     </div>

@@ -49,8 +49,12 @@ export function generateRealEstateSchema(property: any, id: string) {
     numberOfBathrooms: property?.facilities?.bathrooms || 0,
     floorSize: {
       "@type": "QuantitativeValue",
-      value: property?.area?.value,
-      unitCode: property?.area?.unit === "sqft" ? "FTK" : "MTK",
+      value: property?.area?.superBuiltUpArea?.value || property?.area?.value,
+      unitCode:
+        (property?.area?.superBuiltUpArea?.unit || property?.area?.unit) ===
+        "sqft"
+          ? "FTK"
+          : "MTK",
     },
     image: imageUrls,
     url: `https://propertybulbul.com/property/${id}`,

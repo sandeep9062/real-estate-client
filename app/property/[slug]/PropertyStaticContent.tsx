@@ -168,6 +168,55 @@ export default function PropertyStaticContent({
                   label: "Area",
                   value: `${data?.area?.value} ${data?.area?.unit}`,
                 },
+                ...(data?.area?.carpetArea?.value
+                  ? [
+                      {
+                        label: "Carpet Area (RERA)",
+                        value: `${data?.area?.carpetArea?.value} ${data?.area?.carpetArea?.unit || data?.area?.unit}`,
+                      },
+                    ]
+                  : []),
+                ...(data?.area?.superBuiltUpArea?.value
+                  ? [
+                      {
+                        label: "Super Built-up Area",
+                        value: `${data?.area?.superBuiltUpArea?.value} ${data?.area?.superBuiltUpArea?.unit || data?.area?.unit}`,
+                      },
+                    ]
+                  : []),
+                ...(data?.availability === "Under Construction" &&
+                data?.constructionStatus?.percentageComplete != null
+                  ? [
+                      {
+                        label: "Construction Progress",
+                        value: `${data?.constructionStatus?.percentageComplete}%`,
+                      },
+                    ]
+                  : []),
+                ...(data?.availability === "Under Construction" &&
+                data?.constructionStatus?.currentPhase
+                  ? [
+                      {
+                        label: "Current Phase",
+                        value: data?.constructionStatus?.currentPhase,
+                      },
+                    ]
+                  : []),
+                ...(data?.availability === "Under Construction" &&
+                data?.constructionStatus?.expectedOCDate
+                  ? [
+                      {
+                        label: "Expected OC Date",
+                        value: new Date(
+                          data?.constructionStatus?.expectedOCDate,
+                        ).toLocaleDateString("en-IN", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }),
+                      },
+                    ]
+                  : []),
                 { label: "Availability", value: data?.availability },
                 { label: "Furnishing", value: data?.furnishing },
                 { label: "Facing", value: data?.facing },
