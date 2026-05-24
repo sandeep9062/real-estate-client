@@ -1,4 +1,7 @@
 const nextConfig = {
+  // Enforce strict no-trailing-slash policy to prevent Google Search Console redirect errors
+  trailingSlash: false,
+
   // 1. Permanent Redirect (non-www to www)
   async redirects() {
     return [
