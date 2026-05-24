@@ -81,6 +81,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
       router.push("/login");
     }
   };
+
   return (
     <section className="relative bg-background text-foreground pt-22 sm:pt-26 md:pt-36 pb-6 sm:pb-10 md:pb-16 lg:pb-20 overflow-hidden">
       {/* BACKGROUND BLOB EFFECT */}
@@ -150,7 +151,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
                 List Your Property
               </button>
             </div>
-
+            <AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />
             {/* ── HERO STRIPS ───────────── */}
             <div className="mt-6 sm:mt-8 space-y-4">
               {/* Row 1 — seeker benefits */}
