@@ -23,11 +23,21 @@ function filtersToQuery(filters: SearchFilters): Record<string, string> {
   if (filters.type) query.type = filters.type;
   if (filters.propertyCategory)
     query.propertyCategory = filters.propertyCategory;
-  if (filters.minPrice != null) query.priceMin = String(filters.minPrice);
-  if (filters.maxPrice != null) query.priceMax = String(filters.maxPrice);
+  if (filters.minPrice != null) {
+    const val = String(filters.minPrice);
+    query.minPrice = val;
+    query.priceMin = val;
+  }
+  if (filters.maxPrice != null) {
+    const val = String(filters.maxPrice);
+    // 🔥 Explicitly push maxPrice into the outbound network payload
+    query.maxPrice = val;
+    query.priceMax = val;
+  }
   if (filters.city) query.city = filters.city;
   if (filters.state) query.state = filters.state;
   if (filters.country) query.country = filters.country;
+  if (filters.landmark) query.landmark = filters.landmark;
   return query;
 }
 
@@ -54,7 +64,8 @@ interface HomeClientProps {
 export default function HomeClient({ featuredProperties }: HomeClientProps) {
   const [filter, setFilter] = useState<SearchFilters>({ query: "" });
 
-  const hasFilters = hasActiveFilter(filter);
+  // Also check landmark as an active filter
+  const hasFilters = hasActiveFilter(filter) || !!filter.landmark;
   const query = useMemo(() => filtersToQuery(filter), [filter]);
 
   const {

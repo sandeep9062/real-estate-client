@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,17 @@ import {
   ChevronUp,
   X,
   SlidersHorizontal,
+  Bath,
+  Car,
+  Sun,
+  Users,
+  Shield,
+  PawPrint,
+  Building,
+  CheckCircle,
+  Layers,
 } from "lucide-react";
+import { parseSearchQuery, SearchFilters } from "@/components/SearchBar";
 
 const DEAL_OPTIONS = ["Sale", "Rent"];
 const SEARCH_DELAY = 400;
@@ -43,6 +53,38 @@ const FURNISHING_OPTIONS = ["Furnished", "Semi Furnished", "Un-Furnished"];
 const AVAILABILITY_OPTIONS = ["Ready to Move", "Under Construction"];
 const POSTED_BY_OPTIONS = ["Owner", "Agent", "Builder"];
 const BEDROOMS_OPTIONS = [1, 2, 3, 4, 5, "5+"];
+const BATHROOMS_OPTIONS = [1, 2, 3, 4, "5+"];
+const BALCONIES_OPTIONS = [1, 2, "3+"];
+const PARKINGS_OPTIONS = [1, 2, 3, "4+"];
+const FACING_OPTIONS = [
+  "North",
+  "South",
+  "East",
+  "West",
+  "North-East",
+  "North-West",
+  "South-East",
+  "South-West",
+];
+const TENANT_PREFERENCE_OPTIONS = [
+  "Family",
+  "Bachelors",
+  "Any",
+  "Working Professionals",
+];
+const OWNERSHIP_TYPE_OPTIONS = [
+  "Freehold",
+  "Leasehold",
+  "Co-operative",
+  "Power of Attorney",
+];
+const PETS_OPTIONS = ["Yes", "No"];
+const LISTING_AVAILABILITY_OPTIONS = [
+  "Available",
+  "Fresh",
+  "Under offer",
+  "Booked",
+];
 
 function buildSearchPayload(filters: Record<string, unknown>) {
   const out: Record<string, unknown> = {};
@@ -59,6 +101,7 @@ function buildSearchPayload(filters: Record<string, unknown>) {
 
 export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [searchInput, setSearchInput] = useState(initialFilters.search || "");
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [filters, setFilters] = useState({
@@ -71,9 +114,23 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
     areaMin: initialFilters.areaMin || 0,
     areaMax: initialFilters.areaMax || 100000,
     bedrooms: initialFilters.bedrooms || "",
+    bathrooms: initialFilters.bathrooms || "",
+    balconies: initialFilters.balconies || "",
+    parkings: initialFilters.parkings || "",
     furnishing: initialFilters.furnishing || "",
     availability: initialFilters.availability || "",
     postedBy: initialFilters.postedBy || "",
+    facing: initialFilters.facing || "",
+    tenantPreference: initialFilters.tenantPreference || "",
+    ownershipType: initialFilters.ownershipType || "",
+    petsAllowed: initialFilters.petsAllowed || "",
+    floorMin: initialFilters.floorMin || "",
+    floorMax: initialFilters.floorMax || "",
+    totalFloors: initialFilters.totalFloors || "",
+    builderName: initialFilters.builderName || "",
+    projectName: initialFilters.projectName || "",
+    listingAvailability: initialFilters.listingAvailability || "",
+    isVerified: initialFilters.isVerified || "",
     city: initialFilters.city || "",
     sector: initialFilters.sector || "",
     bbox: initialFilters.bbox || "",
@@ -121,9 +178,23 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
       areaMin: 0,
       areaMax: 100000,
       bedrooms: "",
+      bathrooms: "",
+      balconies: "",
+      parkings: "",
       furnishing: "",
       availability: "",
       postedBy: "",
+      facing: "",
+      tenantPreference: "",
+      ownershipType: "",
+      petsAllowed: "",
+      floorMin: "",
+      floorMax: "",
+      totalFloors: "",
+      builderName: "",
+      projectName: "",
+      listingAvailability: "",
+      isVerified: "",
       city: "",
       sector: "",
       bbox: "",
@@ -266,6 +337,15 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
             onChange={(v) => setFilters((prev) => ({ ...prev, bedrooms: v }))}
           />
 
+          {/* Bathrooms */}
+          <FilterSelect
+            icon={<Bath className="w-4 h-4" />}
+            label="Bathrooms"
+            value={filters.bathrooms?.toString()}
+            options={BATHROOMS_OPTIONS.map((b) => b.toString())}
+            onChange={(v) => setFilters((prev) => ({ ...prev, bathrooms: v }))}
+          />
+
           {/* Furnishing */}
           <FilterSelect
             icon={<Armchair className="w-4 h-4" />}
@@ -285,7 +365,10 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
               setFilters((prev) => ({ ...prev, availability: v }))
             }
           />
+        </div>
 
+        {/* SECONDARY FILTERS ROW */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5 mb-4">
           {/* Posted By */}
           <FilterSelect
             icon={<User className="w-4 h-4" />}
@@ -294,10 +377,59 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
             options={POSTED_BY_OPTIONS}
             onChange={(v) => setFilters((prev) => ({ ...prev, postedBy: v }))}
           />
+
+          {/* Balconies */}
+          <FilterSelect
+            icon={<Home className="w-4 h-4" />}
+            label="Balconies"
+            value={filters.balconies?.toString()}
+            options={BALCONIES_OPTIONS.map((b) => b.toString())}
+            onChange={(v) => setFilters((prev) => ({ ...prev, balconies: v }))}
+          />
+
+          {/* Parkings */}
+          <FilterSelect
+            icon={<Car className="w-4 h-4" />}
+            label="Parking"
+            value={filters.parkings?.toString()}
+            options={PARKINGS_OPTIONS.map((b) => b.toString())}
+            onChange={(v) => setFilters((prev) => ({ ...prev, parkings: v }))}
+          />
+
+          {/* Facing */}
+          <FilterSelect
+            icon={<Sun className="w-4 h-4" />}
+            label="Facing"
+            value={filters.facing}
+            options={FACING_OPTIONS}
+            onChange={(v) => setFilters((prev) => ({ ...prev, facing: v }))}
+          />
+
+          {/* Tenant Preference */}
+          <FilterSelect
+            icon={<Users className="w-4 h-4" />}
+            label="Tenant Preference"
+            value={filters.tenantPreference}
+            options={TENANT_PREFERENCE_OPTIONS}
+            onChange={(v) =>
+              setFilters((prev) => ({ ...prev, tenantPreference: v }))
+            }
+          />
+
+          {/* Ownership Type */}
+          <FilterSelect
+            icon={<Shield className="w-4 h-4" />}
+            label="Ownership"
+            value={filters.ownershipType}
+            options={OWNERSHIP_TYPE_OPTIONS}
+            onChange={(v) =>
+              setFilters((prev) => ({ ...prev, ownershipType: v }))
+            }
+          />
         </div>
 
-        {/* SECONDARY ROW - Locality, city & sliders */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+        {/* LOCATION & RANGE FILTERS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
               <MapPin className="w-3 h-3" />
@@ -413,6 +545,7 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
           </div>
         </div>
 
+        {/* MAP FILTER INDICATOR */}
         {(filters.bbox || filters.polygon) && (
           <div className="flex flex-wrap items-center gap-2 px-1 py-2 border-t border-dashed border-gray-100">
             <span className="text-[11px] font-medium text-[#4161df] bg-[#4161df]/10 rounded-md px-2 py-1">
@@ -436,6 +569,164 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
           </div>
         )}
 
+        {/* ADVANCED FILTERS TOGGLE */}
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <Layers className="w-3.5 h-3.5" />
+            {showAdvanced ? "Hide" : "Show"} Advanced Filters
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform duration-150 ${
+                showAdvanced ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {showAdvanced && (
+            <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5">
+              {/* Pets Allowed */}
+              <FilterSelect
+                icon={<PawPrint className="w-4 h-4" />}
+                label="Pets Allowed"
+                value={filters.petsAllowed}
+                options={PETS_OPTIONS}
+                onChange={(v) =>
+                  setFilters((prev) => ({ ...prev, petsAllowed: v }))
+                }
+              />
+
+              {/* Listing Availability */}
+              <FilterSelect
+                icon={<CheckCircle className="w-4 h-4" />}
+                label="Listing Status"
+                value={filters.listingAvailability}
+                options={LISTING_AVAILABILITY_OPTIONS}
+                onChange={(v) =>
+                  setFilters((prev) => ({ ...prev, listingAvailability: v }))
+                }
+              />
+
+              {/* Verified Only */}
+              <FilterSelect
+                icon={<Shield className="w-4 h-4" />}
+                label="Verified Only"
+                value={filters.isVerified}
+                options={["Yes", "No"]}
+                onChange={(v) => {
+                  const val = v === "Yes" ? "true" : v === "No" ? "false" : "";
+                  setFilters((prev) => ({ ...prev, isVerified: val }));
+                }}
+              />
+
+              {/* Builder Name */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                  <Building className="w-3 h-3" />
+                  Builder Name
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Builder name"
+                    className="w-full h-8 px-2.5 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#4161df]/20 focus:border-[#4161df] transition-all placeholder:text-gray-400"
+                    value={filters.builderName}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        builderName: e.target.value,
+                      }))
+                    }
+                  />
+                  {filters.builderName && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFilters((prev) => ({ ...prev, builderName: "" }))
+                      }
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <X className="w-3 h-3 text-gray-400" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Project Name */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                  <Building2 className="w-3 h-3" />
+                  Project Name
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Project name"
+                    className="w-full h-8 px-2.5 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#4161df]/20 focus:border-[#4161df] transition-all placeholder:text-gray-400"
+                    value={filters.projectName}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        projectName: e.target.value,
+                      }))
+                    }
+                  />
+                  {filters.projectName && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFilters((prev) => ({ ...prev, projectName: "" }))
+                      }
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <X className="w-3 h-3 text-gray-400" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Floor Range */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600 flex items-center gap-1">
+                  <Layers className="w-3 h-3" />
+                  Floor Range
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Min"
+                    className="w-full h-8 px-2 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#4161df]/20 focus:border-[#4161df] transition-all placeholder:text-gray-400"
+                    value={filters.floorMin}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        floorMin: e.target.value,
+                      }))
+                    }
+                  />
+                  <span className="text-gray-400 text-xs">-</span>
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Max"
+                    className="w-full h-8 px-2 py-1.5 text-xs bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#4161df]/20 focus:border-[#4161df] transition-all placeholder:text-gray-400"
+                    value={filters.floorMax}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        floorMax: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* ACTION BUTTONS */}
         <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 mt-4 pt-3 border-t border-gray-100">
           <Button
@@ -448,7 +739,26 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
           </Button>
           <Button
             onClick={() => {
-              onApply(buildSearchPayload(filters));
+              // ── NL parse the search text and merge extracted fields ──
+              const nl = parseSearchQuery(searchInput);
+              const merged = {
+                ...buildSearchPayload(filters),
+                // Override with NL parsed values if they exist
+                ...(nl.bedrooms != null && { bedrooms: String(nl.bedrooms) }),
+                ...(nl.deal && { deal: nl.deal }),
+                ...(nl.city && { city: nl.city }),
+                ...(nl.maxPrice != null && {
+                  priceMax: String(nl.maxPrice),
+                  maxPrice: String(nl.maxPrice),
+                }),
+                ...(nl.propertyCategory && {
+                  propertyCategory: nl.propertyCategory,
+                }),
+                ...(nl.landmark && { landmark: nl.landmark }),
+                // Update search to the auto-corrected query
+                ...(nl.query && { search: nl.query }),
+              };
+              onApply(merged);
               setIsExpanded(false);
             }}
             className="h-9 sm:h-8 px-5 text-xs font-medium bg-[#4161df] hover:bg-[#3451c9] text-white w-full sm:w-auto"
@@ -477,6 +787,8 @@ function FilterSelect({
   onChange: (value: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const displayValue =
+    value === "true" ? "Yes" : value === "false" ? "No" : value;
 
   return (
     <div className="space-y-1">
@@ -493,7 +805,7 @@ function FilterSelect({
               : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
           }`}
         >
-          <span className="truncate">{value || "Select"}</span>
+          <span className="truncate">{displayValue || "Select"}</span>
           <ChevronDown
             className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-150 ${
               isOpen ? "rotate-180" : ""
@@ -531,7 +843,7 @@ function FilterSelect({
                       setIsOpen(false);
                     }}
                     className={`w-full px-2.5 py-1.5 text-left text-xs hover:bg-gray-50 transition-colors ${
-                      value === option
+                      displayValue === option
                         ? "bg-[#4161df]/5 text-[#4161df] font-medium"
                         : "text-gray-600"
                     }`}
