@@ -1,6 +1,7 @@
 "use client";
 
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Container,
   Title,
@@ -197,7 +198,16 @@ export default function JournalDetailClient({
         {/* Render journal content as markdown with responsive Tailwind styling */}
         <div className="w-full max-w-none">
           <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
+              a: ({ node, ...props }) => (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                  {...props}
+                />
+              ),
               h1: ({ node, ...props }) => (
                 <h1
                   className="text-2xl sm:text-3xl md:text-4xl font-extrabold my-4 sm:my-6"
