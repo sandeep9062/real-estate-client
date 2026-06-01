@@ -105,9 +105,9 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter leading-[1.1] text-slate-900"
             >
               Tricity's
-              <br className="hidden sm:block" /> Most Trusted
+              <br className="hidden sm:block" /> Most Helpful
               <br className="hidden sm:block" />
-              <span className="text-[#4161df]"> Property Platform</span>
+              <span className="text-[#4161df]">Real Estate Partner</span>
             </motion.h1>
             {/* SUBTEXT */}
             <p className="text-muted-foreground  text-sm sm:text-base md:text-lg max-w-full mb-5 sm:mb-5 mx-auto md:mx-0 px-2 sm:px-0">
