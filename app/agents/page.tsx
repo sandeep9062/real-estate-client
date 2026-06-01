@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Star,
@@ -16,38 +15,13 @@ import {
   ChevronDown,
   Home,
   Building2,
-  TrendingUp,
   Users,
   ArrowRight,
   Sparkles,
   Shield,
   Zap,
 } from "lucide-react";
-
-/* ══════════════════════════════════════
-   TYPES
-══════════════════════════════════════ */
-interface Agent {
-  id: number;
-  name: string;
-  title: string;
-  avatar: string;
-  initials: string;
-  avatarColor: string;
-  rating: number;
-  reviews: number;
-  experience: number;
-  deals: number;
-  locations: string[];
-  specialisations: string[];
-  languages: string[];
-  responseTime: string;
-  verified: boolean;
-  topAgent: boolean;
-  bio: string;
-  phone: string;
-  whatsapp: string;
-}
+import AgentCard, { Avatar, type Agent } from "@/components/AgentCard";
 
 /* ══════════════════════════════════════
    MOCK DATA  (replace with API)
@@ -55,6 +29,7 @@ interface Agent {
 const AGENTS: Agent[] = [
   {
     id: 1,
+    slug: "priyanka-sharma",
     name: "Priyanka Sharma",
     title: "Senior Property Advisor",
     avatar: "",
@@ -76,6 +51,7 @@ const AGENTS: Agent[] = [
   },
   {
     id: 2,
+    slug: "neha-verma",
     name: "Neha Verma",
     title: "Luxury Property Specialist",
     avatar: "",
@@ -97,6 +73,7 @@ const AGENTS: Agent[] = [
   },
   {
     id: 3,
+    slug: "amit-bhatia",
     name: "Amit Bhatia",
     title: "Commercial Real Estate Expert",
     avatar: "",
@@ -118,6 +95,7 @@ const AGENTS: Agent[] = [
   },
   {
     id: 4,
+    slug: "sunita-kapoor",
     name: "Sunita Kapoor",
     title: "Affordable Housing Advisor",
     avatar: "",
@@ -139,6 +117,7 @@ const AGENTS: Agent[] = [
   },
   {
     id: 5,
+    slug: "rajesh-malhotra",
     name: "Rajesh Malhotra",
     title: "NRI Investment Specialist",
     avatar: "",
@@ -160,6 +139,7 @@ const AGENTS: Agent[] = [
   },
   {
     id: 6,
+    slug: "ritika-anand",
     name: "Ritika Anand",
     title: "New Launches Expert",
     avatar: "",
@@ -252,19 +232,16 @@ function BookingModal({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
       style={{ background: "rgba(10,18,50,0.7)", backdropFilter: "blur(8px)" }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
-      <motion.div
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 80, opacity: 0 }}
-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+      <div
         className="w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto"
+        style={{ animation: "fadeSlideUp 0.3s ease-out" }}
       >
         {/* Modal header */}
         <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
@@ -327,10 +304,7 @@ function BookingModal({
 
             {/* Time slots */}
             {selectedDate && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+              <div>
                 <p className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5">
                   <Clock size={14} className="text-[#4161df]" /> Pick a Time
                 </p>
@@ -350,7 +324,7 @@ function BookingModal({
                     </button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Contact info */}
@@ -397,11 +371,7 @@ function BookingModal({
             </p>
           </form>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="p-10 flex flex-col items-center text-center"
-          >
+          <div className="p-10 flex flex-col items-center text-center">
             <div className="text-6xl mb-4">🎉</div>
             <h3 className="text-2xl font-black text-gray-900 mb-2">
               You're Booked!
@@ -440,230 +410,10 @@ function BookingModal({
             >
               Close
             </button>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ══════════════════════════════════════
-   AVATAR
-══════════════════════════════════════ */
-function Avatar({
-  agent,
-  size = "md",
-}: {
-  agent: Agent;
-  size?: "sm" | "md" | "lg";
-}) {
-  const s =
-    size === "lg"
-      ? "w-20 h-20 text-2xl"
-      : size === "sm"
-        ? "w-9 h-9 text-sm"
-        : "w-14 h-14 text-lg";
-  return (
-    <div
-      className={`${s} rounded-2xl flex items-center justify-center font-black text-white flex-shrink-0`}
-      style={{
-        background: `linear-gradient(135deg, ${agent.avatarColor}, ${agent.avatarColor}aa)`,
-      }}
-    >
-      {agent.initials}
+      </div>
     </div>
-  );
-}
-
-/* ══════════════════════════════════════
-   AGENT CARD
-══════════════════════════════════════ */
-function AgentCard({
-  agent,
-  onBook,
-  idx,
-}: {
-  agent: Agent;
-  onBook: (a: Agent) => void;
-  idx: number;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.45,
-        delay: idx * 0.07,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className="group bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
-    >
-      {/* Top colour bar */}
-      <div
-        className="h-1.5 w-full"
-        style={{
-          background: `linear-gradient(90deg, ${agent.avatarColor}, ${agent.avatarColor}60)`,
-        }}
-      />
-
-      {/* Card body */}
-      <div className="p-5 flex flex-col gap-4 flex-1">
-        {/* Header row */}
-        <div className="flex items-start gap-4">
-          <div className="relative">
-            <Avatar agent={agent} />
-            {agent.verified && (
-              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                <BadgeCheck
-                  size={14}
-                  className="text-[#4161df]"
-                  fill="#eef1fd"
-                />
-              </span>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h3 className="font-black text-gray-900 text-base leading-tight truncate">
-                {agent.name}
-              </h3>
-              {agent.topAgent && (
-                <span className="inline-flex items-center gap-0.5 bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0">
-                  <Sparkles size={9} /> TOP
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-gray-400 mt-0.5 truncate">
-              {agent.title}
-            </p>
-            <div className="flex items-center gap-1 mt-1.5">
-              <Star size={12} className="text-amber-400 fill-amber-400" />
-              <span className="text-sm font-bold text-gray-800">
-                {agent.rating}
-              </span>
-              <span className="text-xs text-gray-400">
-                ({agent.reviews} reviews)
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            {
-              icon: <TrendingUp size={13} />,
-              val: `${agent.deals}+`,
-              lab: "Deals",
-            },
-            {
-              icon: <Clock size={13} />,
-              val: `${agent.experience}yr`,
-              lab: "Exp.",
-            },
-            {
-              icon: <Zap size={13} />,
-              val: agent.responseTime,
-              lab: "Response",
-            },
-          ].map((s) => (
-            <div
-              key={s.lab}
-              className="flex flex-col items-center bg-gray-50 rounded-2xl py-2.5 px-1"
-            >
-              <span className="text-[#4161df] mb-0.5">{s.icon}</span>
-              <span className="text-xs font-black text-gray-800 leading-tight">
-                {s.val}
-              </span>
-              <span className="text-[9px] text-gray-400 font-medium">
-                {s.lab}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Locations */}
-        <div className="flex flex-wrap gap-1.5">
-          {agent.locations.map((l) => (
-            <span
-              key={l}
-              className="inline-flex items-center gap-1 text-[11px] font-semibold bg-[#eef1fd] text-[#4161df] px-2 py-1 rounded-full"
-            >
-              <MapPin size={9} />
-              {l}
-            </span>
-          ))}
-        </div>
-
-        {/* Specialisations */}
-        <div className="flex flex-wrap gap-1.5">
-          {agent.specialisations.map((s) => (
-            <span
-              key={s}
-              className="text-[11px] font-semibold bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
-            >
-              {s}
-            </span>
-          ))}
-        </div>
-
-        {/* Bio — expandable */}
-        <div>
-          <p
-            className={`text-xs text-gray-500 leading-relaxed transition-all ${expanded ? "" : "line-clamp-2"}`}
-          >
-            {agent.bio}
-          </p>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-[11px] font-bold text-[#4161df] mt-1 hover:underline"
-          >
-            {expanded ? "Show less ↑" : "Read more ↓"}
-          </button>
-        </div>
-
-        {/* Languages */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[11px] text-gray-400 font-semibold">
-            Speaks:
-          </span>
-          {agent.languages.map((l) => (
-            <span
-              key={l}
-              className="text-[11px] font-semibold bg-white border border-gray-200 text-gray-600 px-2 py-0.5 rounded-full"
-            >
-              {l}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA footer */}
-      <div className="px-5 pb-5 flex gap-2 mt-auto">
-        <button
-          onClick={() => onBook(agent)}
-          className="flex-1 py-3 rounded-2xl bg-[#4161df] text-white font-bold text-xs shadow-md shadow-[#4161df]/20 hover:bg-[#3456df] hover:shadow-[#4161df]/40 transition-all duration-200 flex items-center justify-center gap-1.5"
-        >
-          <Calendar size={13} /> Book Consultation
-        </button>
-        <a
-          href={`https://wa.me/${agent.whatsapp}`}
-          target="_blank"
-          rel="noreferrer"
-          className="w-11 h-11 rounded-2xl bg-[#25D366] flex items-center justify-center hover:bg-[#1ebe5d] transition-colors flex-shrink-0 shadow-md shadow-green-200"
-        >
-          <MessageCircle size={16} className="text-white" />
-        </a>
-        <a
-          href={`tel:${agent.phone}`}
-          className="w-11 h-11 rounded-2xl bg-gray-50 border-2 border-gray-100 flex items-center justify-center hover:bg-gray-100 transition-colors flex-shrink-0"
-        >
-          <Phone size={15} className="text-gray-600" />
-        </a>
-      </div>
-    </motion.div>
   );
 }
 
@@ -741,24 +491,14 @@ export default function AgentsPage() {
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           {/* Eyebrow */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex justify-center mb-5"
-          >
+          <div className="flex justify-center mb-5">
             <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full">
               <Shield size={12} className="text-[#93a8f8]" /> Verified by
               PropertyBulbul
             </span>
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[1.05] mb-4"
-          >
+          <h1 className="text-center text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[1.05] mb-4">
             Meet Tricity's{" "}
             <span className="relative">
               <span style={{ color: "#93a8f8" }}>Top Agents</span>
@@ -777,25 +517,15 @@ export default function AgentsPage() {
                 />
               </svg>
             </span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-center text-white/60 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed"
-          >
+          <p className="text-center text-white/60 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
             Every agent is background-checked, RERA-compliant, and rated by real
             buyers. Book a free consultation in seconds.
-          </motion.p>
+          </p>
 
           {/* Stats row */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-8 mb-10"
-          >
+          <div className="flex flex-wrap justify-center gap-8 mb-10">
             {[
               { icon: <Users size={18} />, val: "50+", lab: "Verified Agents" },
               { icon: <Star size={18} />, val: "4.8★", lab: "Avg. Rating" },
@@ -816,15 +546,10 @@ export default function AgentsPage() {
                 </div>
               </div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Search */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="max-w-2xl mx-auto"
-          >
+          <div className="max-w-2xl mx-auto">
             <div className="relative">
               <Search
                 size={18}
@@ -837,7 +562,7 @@ export default function AgentsPage() {
                 className="w-full pl-11 pr-4 py-4 rounded-2xl bg-white text-sm text-gray-800 shadow-xl focus:outline-none focus:ring-2 focus:ring-[#4161df]/40 placeholder-gray-400 font-medium"
               />
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Bottom wave */}
@@ -981,11 +706,9 @@ export default function AgentsPage() {
       </div>
 
       {/* ── BOOKING MODAL ── */}
-      <AnimatePresence>
-        {booking && (
-          <BookingModal agent={booking} onClose={() => setBooking(null)} />
-        )}
-      </AnimatePresence>
+      {booking && (
+        <BookingModal agent={booking} onClose={() => setBooking(null)} />
+      )}
     </div>
   );
 }
