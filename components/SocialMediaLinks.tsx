@@ -11,12 +11,12 @@ import {
 } from "react-icons/fa";
 
 const socialLinks = [
-  {
-    icon: <FaGoogle />,
-    href: "https://www.google.com/maps?cid=YOUR_GOOGLE_BUSINESS_ID",
-    label: "Google Business Profile",
-    color: "hover:text-green-700",
-  },
+  // {
+  //   icon: <FaGoogle />,
+  //   href: "https://www.google.com/maps?cid=YOUR_GOOGLE_BUSINESS_ID",
+  //   label: "Google Business Profile",
+  //   color: "hover:text-green-700",
+  // },
 
   {
     icon: <FaFacebookF />,

@@ -19,10 +19,10 @@ const GetStarted = () => {
           </span>
 
           <span className="text-white text-sm sm:text-base leading-relaxed">
-            Subscribe and find super attractive price quotes from us.
+            Get notified when new properties go live in your
             <br className="hidden sm:block" />
             <span className="sm:hidden"> </span>
-            Find your residence soon
+            preferred sector.
           </span>
 
           <a
