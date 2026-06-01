@@ -14,7 +14,7 @@ const page = () => {
 
       <SocialMediaLinks />
       <ContactForm />
-      <UniqueSection />
+      {/* <UniqueSection /> */}
     </>
   );
 };
