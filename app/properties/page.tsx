@@ -11,23 +11,45 @@ export const revalidate = 3600;
 /**
  * Static Site Generation (SSG) for /properties.
  *
- * Previously this page was `"use client"`, meaning the server only sent
- * an empty `<div>Loading...</div>` shell — Google could not index any
- * property listings, prices, or descriptions.
+ * SCALABILITY STRATEGY:
+ * ─────────────────────────────────────────────────────────────────────
+ * The SSG fetches ONLY the first page (limit=100) at build time. This
+ * keeps the build fast and the initial HTML small, regardless of how
+ * many properties exist (200, 4,000, or 40,000).
  *
- * Now the server:
- *   1. Fetches the first page of properties at BUILD TIME (SSG).
- *   2. Renders them into the static HTML sent to every visitor.
- *   3. Periodically revalidates (ISR) so the content stays fresh.
+ * Why limit=100 (not 20)?
+ *   - 100 items ≈ 2-3 viewports on a 4-column desktop grid.
+ *   - Visitor sees a meaningful chunk of listings immediately,
+ *     without waiting for a client-side fetch.
+ *   - The backend's public max limit is 100, so this is the
+ *     biggest single chunk we can ship in the initial HTML.
  *
- * The client wrapper receives the pre-fetched data and:
- *   - Shows it immediately (no loading spinner for the initial view).
- *   - Falls back to client-side fetching when the user applies filters
- *     or changes URL search params.
+ * The client then loads subsequent pages on-demand via infinite
+ * scroll, using limit=100 per page. For 4,000 properties that's
+ * only ~40 round trips total (39 after the SSG).
+ *
+ * For 200 properties: SSG ships 100, client loads 2 more pages.
+ * For 4,000 properties: SSG ships 100, client loads 39 more pages.
+ * For 40,000 properties: SSG ships 100, client loads 399 more pages.
+ *
+ * The same component code handles all of these — no per-dataset
+ * tuning required.
+ *
+ * The client wrapper handles:
+ *   - Showing the SSG seed immediately.
+ *   - Loading more pages as the user scrolls.
+ *   - Filter / search URL params (refetches with filters).
+ *   - Map / list view toggling.
+ *   - Property selection from the map.
  */
 export default async function PropertiesPage() {
-  // Fetch initial property data at build time (SSG) or on ISR revalidation
-  const { properties, total, hasMore } = await fetchPropertiesServer();
+  // Fetch the first page of properties at build time (SSG) or on ISR
+  // revalidation. With limit=100, this gives the visitor a meaningful
+  // initial set without overwhelming the HTML payload.
+  const { properties, total, hasMore } = await fetchPropertiesServer(
+    undefined,
+    100,
+  );
 
   return (
     <PropertiesClient

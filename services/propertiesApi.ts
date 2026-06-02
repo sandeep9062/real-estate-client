@@ -99,7 +99,7 @@ export interface FetchPropertiesServerResult {
  */
 export async function fetchPropertiesServer(
   params?: Record<string, string>,
-  limit = 10,
+  limit = 20,
 ): Promise<FetchPropertiesServerResult> {
   const apiUrl = getApiUrl();
   const url = new URL(`${apiUrl}/properties`);
@@ -139,6 +139,92 @@ export async function fetchPropertiesServer(
     };
   } catch (error) {
     console.error("[fetchPropertiesServer] network error:", error);
+    return { properties: [], total: 0, hasMore: false };
+  }
+}
+
+/**
+ * Fetch ALL properties (every page) at build time in parallel.
+ * Used by the SSG so the /properties page renders with the full
+ * list of properties on first paint — no client-side "load more"
+ * required for the unfiltered default view.
+ */
+export async function fetchAllPropertiesServer(
+  params?: Record<string, string>,
+  pageSize: number = 100,
+): Promise<FetchPropertiesServerResult> {
+  const apiUrl = getApiUrl();
+
+  const firstUrl = new URL(`${apiUrl}/properties`);
+  firstUrl.searchParams.set("page", "1");
+  firstUrl.searchParams.set("limit", String(pageSize));
+  if (params) {
+    Object.entries(params).forEach(([key, val]) => {
+      if (val) firstUrl.searchParams.set(key, val);
+    });
+  }
+
+  try {
+    const firstRes = await fetch(firstUrl.toString(), {
+      next: { revalidate: 3600 },
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!firstRes.ok) {
+      console.error(
+        `[propertiesApi] fetchAllPropertiesServer failed with ${firstRes.status}`,
+      );
+      return { properties: [], total: 0, hasMore: false };
+    }
+
+    const firstJson = await firstRes.json();
+    const firstPage: any[] = firstJson?.data ?? firstJson ?? [];
+    const pagination = firstJson?.pagination;
+    const total = pagination?.total ?? firstJson?.total ?? firstPage.length;
+    const totalPages = pagination?.totalPages ?? Math.ceil(total / pageSize);
+
+    if (totalPages <= 1) {
+      return { properties: firstPage, total, hasMore: false };
+    }
+
+    const remainingPageNumbers = Array.from(
+      { length: totalPages - 1 },
+      (_, i) => i + 2,
+    );
+
+    const remainingResults = await Promise.all(
+      remainingPageNumbers.map(async (p) => {
+        const url = new URL(`${apiUrl}/properties`);
+        url.searchParams.set("page", String(p));
+        url.searchParams.set("limit", String(pageSize));
+        if (params) {
+          Object.entries(params).forEach(([key, val]) => {
+            if (val) url.searchParams.set(key, val);
+          });
+        }
+        const res = await fetch(url.toString(), {
+          next: { revalidate: 3600 },
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) return [];
+        const json = await res.json();
+        return (json?.data ?? json ?? []) as any[];
+      }),
+    );
+
+    const all = [...firstPage, ...remainingResults.flat()];
+    const seen = new Set<string>();
+    const deduped: any[] = [];
+    for (const item of all) {
+      const key = item?._id || item?.id;
+      if (!key || seen.has(String(key))) continue;
+      seen.add(String(key));
+      deduped.push(item);
+    }
+
+    return { properties: deduped, total, hasMore: false };
+  } catch (error) {
+    console.error("[fetchAllPropertiesServer] network error:", error);
     return { properties: [], total: 0, hasMore: false };
   }
 }

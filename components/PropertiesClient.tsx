@@ -15,7 +15,7 @@ import PropertyGrid from "@/components/PropertyGrid";
 import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
 import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 import { useLazyGetAllPropertiesQuery } from "@/services/propertiesApi";
-import { Map, List as ListIcon } from "lucide-react";
+import { Map, List as ListIcon, Loader2 } from "lucide-react";
 
 interface PropertiesClientProps {
   /** Pre-fetched properties from SSG / ISR build-time fetch */
@@ -26,8 +26,20 @@ interface PropertiesClientProps {
 
 /**
  * Client-side wrapper for the /properties page.
- * - Uses SSG data as the initial visible content (indexable by search engines).
- * - When URL search params change, switches to client-side fetching.
+ *
+ * PAGINATION STRATEGY (simple, robust):
+ * ─────────────────────────────────────────────────────────────────────
+ * 1. The SSG provides the FIRST page (limit=20) as `initialProperties`.
+ * 2. We seed `properties` state with those items, deduped by `id/_id`.
+ * 3. A simple, sequential useEffect watches `page` and fetches one
+ *    page at a time, APPENDING new unique items to `properties`.
+ * 4. No cancellation flags, no ref-based dedup races, no SSG→client
+ *    transition shenanigans — just clean, linear pagination.
+ * 5. `loadMore` is a no-op while loading, increments `page` otherwise.
+ * 6. IntersectionObserver + a manual "Load more" button + a window
+ *    scroll safety-net all funnel into the same `loadMore` callback,
+ *    so the user is never stuck.
+ * ─────────────────────────────────────────────────────────────────────
  */
 function PropertiesClientInner({
   initialProperties,
@@ -40,10 +52,31 @@ function PropertiesClientInner({
   const [activeTab, setActiveTab] = useState<"list" | "map">("list");
   const [laptopMapOpen, setLaptopMapOpen] = useState(false);
 
-  // Track whether we're still on the initial (SSG) query
-  const initialFilterKey = useRef("");
-  const transitionedRef = useRef(false);
-  const [isStaticData, setIsStaticData] = useState(true);
+  // ─── Data state ────────────────────────────────────────────────
+  // Seeded with the SSG data so the first paint shows real content.
+  const [properties, setProperties] = useState<any[]>(initialProperties);
+  const [total, setTotal] = useState<number>(initialTotal);
+  // hasMore = false when SSG already gave us everything (default view).
+  const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // The next page to fetch. With the new SSG strategy, ALL properties are
+  const [page, setPage] = useState<number>(2);
+  // Flag to ignore the very first useEffect run after a filter change,
+  // because we want the user to see the new SSG data, not a flash of
+  // empty client state.
+  const filterKeyRef = useRef<string>("");
+  // Used by the scroll safety-net inside InfiniteScrollLoader.
+
+  // ─── URL ↔ query helpers ───────────────────────────────────────
+  const query = useMemo(() => {
+    const params: { [key: string]: string } = {};
+    searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+    return params;
+  }, [searchParams]);
 
   const handleApplyFilters = (filters: any) => {
     const params = new URLSearchParams();
@@ -77,199 +110,114 @@ function PropertiesClientInner({
     [router, searchParams],
   );
 
-  const query = useMemo(() => {
-    const params: { [key: string]: string } = {};
-    searchParams.forEach((value, key) => {
-      params[key] = value;
-    });
-    return params;
-  }, [searchParams]);
-
-  // Detect when URL search params change — switch from static to client fetching
-  useEffect(() => {
-    const currentKey = JSON.stringify(query);
-    if (initialFilterKey.current === "") {
-      initialFilterKey.current = currentKey;
-      setIsStaticData(true);
-    } else if (initialFilterKey.current !== currentKey) {
-      setIsStaticData(false);
-    }
-  }, [query]);
-
-  // ─── Client-side data fetching (RTK lazy query) ───────────────────
+  // ─── Fetch a single page and append unique items ───────────────
   const [trigger] = useLazyGetAllPropertiesQuery();
-  const [clientProperties, setClientProperties] = useState<any[]>([]);
-  const [clientTotal, setClientTotal] = useState(0);
-  const [clientHasMore, setClientHasMore] = useState(false);
-  const [clientLoading, setClientLoading] = useState(false);
-  const [clientError, setClientError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  // Track whether we're loading MORE (page > 1) vs loading fresh (page 1)
-  const [isAppending, setIsAppending] = useState(false);
-
-  // Ref for the "key" of the current query to detect filter changes client-side
-  const filterKeyRef = useRef(JSON.stringify(query));
-  // Ref to prevent double-fetching the same page
-  const fetchingPageRef = useRef<number>(0);
-  // Ref to track whether we've seeded from static data (page 1 already loaded)
-  const seededRef = useRef(false);
-  // Ref to track whether the next page is already being prefetched
-  const prefetchingRef = useRef<number>(0);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    if (isStaticData) return;
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-    const currentKey = JSON.stringify(query);
-    if (filterKeyRef.current !== currentKey) {
-      // Filters changed — reset everything
-      filterKeyRef.current = currentKey;
-      setPage(1);
-      setClientProperties([]);
-      setClientTotal(0);
-      setClientHasMore(false);
-      setClientError(null);
-      seededRef.current = false;
-      fetchingPageRef.current = 0;
-      prefetchingRef.current = 0;
-    }
+  const fetchPage = useCallback(
+    async (pageToFetch: number, currentQuery: Record<string, string>) => {
+      if (!isMountedRef.current) return;
+      setLoading(true);
+      setError(null);
 
-    // Prevent double-fetching the same page
-    if (fetchingPageRef.current === page) return;
-    fetchingPageRef.current = page;
-
-    // If page is 1 and we already seeded from static data, skip fetching page 1
-    if (page === 1 && seededRef.current) return;
-
-    let cancelled = false;
-
-    const fetchPage = async () => {
       try {
-        // Only show loading spinner full-screen on initial page load (page 1)
-        // For append (page > 1), keep existing cards visible
-        if (page === 1) {
-          setClientLoading(true);
-          setIsAppending(false);
-        } else {
-          setIsAppending(true);
-        }
-        setClientError(null);
+        const result = await trigger({
+          ...currentQuery,
+          page: String(pageToFetch),
+          limit: "100",
+        }).unwrap();
 
-        const params: Record<string, string> = {
-          ...query,
-          page: String(page),
-          limit: "10",
-        };
+        if (!isMountedRef.current) return;
 
-        const result = await trigger(params).unwrap();
-        if (cancelled) return;
-
-        const dataArray = result?.data ?? result ?? [];
+        const dataArray: any[] = result?.data ?? result ?? [];
         const pagination = result?.pagination;
 
-        if (page === 1) {
-          setClientProperties(dataArray);
-          seededRef.current = true;
-        } else {
-          setClientProperties((prev) => {
-            const existingIds = new Set(prev.map((p: any) => p.id || p._id));
-            const newUnique = dataArray.filter(
-              (item: any) => !existingIds.has(item.id || item._id),
-            );
-            return [...prev, ...newUnique];
-          });
-        }
+        // Append, deduplicating by id/_id.
+        setProperties((prev) => {
+          const seen = new Set(prev.map((p) => p._id || p.id));
+          const fresh = dataArray.filter(
+            (item) => !seen.has(item._id || item.id),
+          );
+          if (fresh.length === 0) return prev;
+          return [...prev, ...fresh];
+        });
 
         if (pagination) {
-          const nextHasMore = Boolean(pagination.hasNextPage);
-          setClientHasMore(nextHasMore);
-          setClientTotal(pagination.total ?? result?.total ?? 0);
-
-          // ─── Prefetch the next page immediately after current page loads ───
-          if (nextHasMore && !cancelled) {
-            const nextPage = page + 1;
-            // Only prefetch if we haven't already requested it
-            if (prefetchingRef.current < nextPage) {
-              prefetchingRef.current = nextPage;
-              // Fire-and-forget prefetch — load silently into RTK cache
-              trigger(
-                {
-                  ...query,
-                  page: String(nextPage),
-                  limit: "10",
-                },
-                true, // preferCacheValue — use cached if already fetched
-              );
-            }
-          }
+          setTotal(pagination.total ?? result?.total ?? dataArray.length);
+          setHasMore(Boolean(pagination.hasNextPage));
         } else {
-          setClientHasMore(false);
-          setClientTotal(dataArray.length);
+          // No pagination object → assume this page is the last.
+          setHasMore(false);
+          setTotal((t) => Math.max(t, dataArray.length));
         }
       } catch (err: any) {
-        if (!cancelled) {
-          setClientError(
-            err?.data?.message || err?.message || "Failed to fetch properties",
-          );
-        }
+        if (!isMountedRef.current) return;
+        setError(
+          err?.data?.message || err?.message || "Failed to fetch properties",
+        );
       } finally {
-        if (!cancelled) {
-          setClientLoading(false);
-          setIsAppending(false);
+        if (isMountedRef.current) {
+          setLoading(false);
         }
       }
-    };
+    },
+    [trigger],
+  );
 
-    fetchPage();
+  // ─── Watch filters: reset state, refetch from page 1 via trigger ──
+  const filterKey = useMemo(() => JSON.stringify(query), [query]);
 
-    return () => {
-      cancelled = true;
-    };
-    // NOTE: intentionally exclude clientProperties.length to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, query, trigger, isStaticData]);
-
-  // Determine current data source
-  const properties = isStaticData ? initialProperties : clientProperties;
-  const total = isStaticData ? initialTotal : clientTotal;
-  const hasMore = isStaticData ? initialHasMore : clientHasMore;
-  const loading = !isStaticData && clientLoading;
-  const error = !isStaticData ? clientError : null;
-
-  /**
-   * Transition from static (SSG) data to client-side fetching on first scroll.
-   * Seeds client state with the SSG data so the user sees no flicker,
-   * then starts fetching page 2+.
-   */
-  const transitionToClientFetch = useCallback(() => {
-    if (transitionedRef.current) return;
-    transitionedRef.current = true;
-
-    setClientProperties(initialProperties);
-    setClientTotal(initialTotal);
-    setClientHasMore(initialHasMore);
-    seededRef.current = true;
-    setPage(2); // page 1 already loaded via SSG
-    setIsStaticData(false);
-  }, [initialProperties, initialTotal, initialHasMore]);
-
-  const loadMore = useCallback(() => {
-    if (isStaticData) {
-      if (initialHasMore) {
-        transitionToClientFetch();
-      }
+  useEffect(() => {
+    if (filterKeyRef.current === "") {
+      // First mount: nothing to do, the SSG seed is already in `properties`.
+      filterKeyRef.current = filterKey;
       return;
     }
-    if (!clientLoading && hasMore) {
-      setPage((p) => p + 1);
-    }
-  }, [
-    clientLoading,
-    hasMore,
-    isStaticData,
-    initialHasMore,
-    transitionToClientFetch,
-  ]);
 
+    if (filterKeyRef.current === filterKey) return;
+
+    // Filter changed — reset and refetch from page 1.
+    filterKeyRef.current = filterKey;
+    setProperties([]);
+    setTotal(0);
+    setHasMore(true);
+    setError(null);
+    setPage(1);
+    // Page 1 will be fetched by the next effect run (page=1).
+  }, [filterKey]);
+
+  // ─── Core pagination effect: when `page` changes, fetch it ─────
+  useEffect(() => {
+    // Don't fetch page 1 via this effect — page 1 is provided by SSG
+    // (or refetched fresh on filter change via a separate effect).
+    if (page === 1) return;
+    fetchPage(page, query);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, filterKey]);
+
+  // ─── Filter change → refetch page 1 ────────────────────────────
+  useEffect(() => {
+    if (filterKeyRef.current === "") return;
+    if (page !== 1) return;
+    fetchPage(1, query);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, filterKey]);
+
+  // ─── loadMore: trigger next page ───────────────────────────────
+  const loadMore = useCallback(() => {
+    if (loading) return;
+    if (!hasMore) return;
+    setPage((p) => p + 1);
+  }, [loading, hasMore]);
+
+  // ─── Scroll into view when a property is selected from the map ─
   useEffect(() => {
     if (!selectedId) return;
     const el = document.querySelector(`[data-property-id="${selectedId}"]`);
@@ -365,7 +313,7 @@ function PropertiesClientInner({
           <div
             className={`${activeTab === "list" ? "block" : "hidden"} lg:block order-2 lg:order-1 space-y-3 min-w-0`}
           >
-            {loading ? (
+            {properties.length === 0 && loading ? (
               <div className="w-full">
                 <div className="flex items-baseline justify-between mb-3 sm:mb-4 gap-1 sm:gap-0">
                   <h2 className="text-base sm:text-lg md:text-xl font-semibold">
@@ -386,9 +334,9 @@ function PropertiesClientInner({
                     {properties.length !== 1 ? "s" : ""}
                   </p>
                   <span className="text-xs sm:text-sm text-gray-500">
-                    {isStaticData
-                      ? `Showing ${properties.length} properties`
-                      : `${total} ${total === 1 ? "result" : "results"} found`}
+                    {total > 0
+                      ? `${total} ${total === 1 ? "result" : "results"} found`
+                      : `${properties.length} loaded`}
                   </span>
                 </div>
                 <PropertyGrid
@@ -398,9 +346,34 @@ function PropertiesClientInner({
                 />
                 <InfiniteScrollLoader
                   onIntersect={loadMore}
-                  loading={!isStaticData && clientLoading}
+                  loading={loading}
                   hasMore={hasMore}
                 />
+                {/* Manual "Load more" button — always visible when there is
+                    more data. This is the bulletproof fallback for the rare
+                    case where the IntersectionObserver or scroll safety-net
+                    don't fire (mobile quirks, dynamic layouts, etc.). */}
+                {hasMore && (
+                  <div className="w-full flex flex-col items-center gap-2 py-6">
+                    {loading ? (
+                      <div className="flex items-center gap-2 text-gray-500 text-sm">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Loading more properties…
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={loadMore}
+                        className="px-5 py-2.5 rounded-full bg-[#4161df] text-white text-sm font-semibold hover:bg-[#3550b8] active:scale-95 transition-all shadow-md"
+                      >
+                        Load more properties
+                      </button>
+                    )}
+                    <span className="text-xs text-gray-400">
+                      {Math.max(total - properties.length, 0)} more remaining
+                    </span>
+                  </div>
+                )}
                 {!hasMore && properties.length > 0 && (
                   <div className="w-full text-center py-6 text-sm text-gray-400">
                     {total > 0
