@@ -459,11 +459,16 @@ export default function AgentsPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#f8f9ff]"
+      className="min-h-screen bg-[#f9fafb]"
       style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
     >
       {/* ── HERO ── */}
-      <div className="relative bg-[#0d1640] overflow-hidden">
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #1e3a5f 0%, #4161df 100%)",
+        }}
+      >
         {/* Dot grid */}
         <div
           className="absolute inset-0 opacity-[0.07]"
@@ -473,28 +478,43 @@ export default function AgentsPage() {
             backgroundSize: "28px 28px",
           }}
         />
-        {/* Gradient blobs */}
-        <div
-          className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-20"
-          style={{
-            background: "radial-gradient(circle, #4161df, transparent)",
-            transform: "translate(30%,-30%)",
-          }}
-        />
-        <div
-          className="absolute bottom-0 left-0 w-60 h-60 rounded-full opacity-15"
-          style={{
-            background: "radial-gradient(circle, #7c3aed, transparent)",
-            transform: "translate(-30%,30%)",
-          }}
-        />
+        {/* Decorative circles */}
+        {[
+          { size: 300, top: -100, left: -80, op: 0.06 },
+          { size: 200, top: 20, right: -60, op: 0.08 },
+          { size: 150, bottom: -60, left: "40%", op: 0.05 },
+        ].map((c, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              width: c.size,
+              height: c.size,
+              borderRadius: "50%",
+              background: "white",
+              opacity: c.op,
+              top: c.top,
+              left: c.left,
+              right: c.right,
+              bottom: c.bottom,
+            }}
+          />
+        ))}
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
           {/* Eyebrow */}
           <div className="flex justify-center mb-5">
-            <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full">
-              <Shield size={12} className="text-[#93a8f8]" /> Verified by
-              PropertyBulbul
+            <span
+              className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                color: "rgba(255,255,255,0.9)",
+                letterSpacing: "0.1em",
+              }}
+            >
+              <Shield size={12} style={{ color: "rgba(255,255,255,0.8)" }} />{" "}
+              Verified by PropertyBulbul
             </span>
           </div>
 
@@ -519,7 +539,10 @@ export default function AgentsPage() {
             </span>
           </h1>
 
-          <p className="text-center text-white/60 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+          <p
+            className="text-center text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.8)" }}
+          >
             Every agent is background-checked, RERA-compliant, and rated by real
             buyers. Book a free consultation in seconds.
           </p>
@@ -537,12 +560,17 @@ export default function AgentsPage() {
               { icon: <Zap size={18} />, val: "< 2hr", lab: "Avg. Response" },
             ].map((s) => (
               <div key={s.lab} className="flex items-center gap-2.5">
-                <span className="text-[#93a8f8]">{s.icon}</span>
+                <span style={{ color: "rgba(255,255,255,0.8)" }}>{s.icon}</span>
                 <div>
                   <p className="text-white font-black text-lg leading-none">
                     {s.val}
                   </p>
-                  <p className="text-white/40 text-xs font-medium">{s.lab}</p>
+                  <p
+                    className="text-xs font-medium"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                  >
+                    {s.lab}
+                  </p>
                 </div>
               </div>
             ))}
@@ -570,7 +598,7 @@ export default function AgentsPage() {
           <svg
             viewBox="0 0 1440 40"
             preserveAspectRatio="none"
-            className="w-full h-8 fill-[#f8f9ff]"
+            className="w-full h-8 fill-[#f9fafb]"
           >
             <path d="M0,24 C480,40 960,8 1440,24 L1440,40 L0,40 Z" />
           </svg>
@@ -679,7 +707,12 @@ export default function AgentsPage() {
       </div>
 
       {/* ── JOIN CTA BANNER ── */}
-      <div className="bg-gradient-to-r from-[#4161df] to-[#6b87f5] py-14 px-4">
+      <div
+        className="py-14 px-4"
+        style={{
+          background: "linear-gradient(135deg, #1e3a5f 0%, #4161df 100%)",
+        }}
+      >
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">
             Are you a property agent in Tricity?
