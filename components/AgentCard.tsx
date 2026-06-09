@@ -269,10 +269,10 @@ export default function AgentCard({
           width: CARD_W,
           background: t.bgCard,
           borderRadius: 20,
-          border: `1px solid ${hovered ? t.blue : t.border}`,
+          border: `1px solid ${hovered ? "#CBD5E1" : t.border}`,
           boxShadow: hovered
-            ? `0 12px 32px rgba(15,23,42,0.12), 0 0 0 1px ${t.blue}22, inset 0 1px 0 rgba(255,255,255,0.8)`
-            : `0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.8)`,
+            ? `0 4px 6px -1px rgba(15,23,42,0.1), 0 2px 4px -2px rgba(15,23,42,0.1)`
+            : `0 1px 2px 0 rgba(15,23,42,0.05)`,
           transform: hovered ? "translateY(-4px)" : "translateY(0)",
           transition: "all 0.28s cubic-bezier(0.22,1,0.36,1)",
           overflow: "hidden",
