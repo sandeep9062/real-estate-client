@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ArrowLeft,
   Star,
@@ -26,7 +25,6 @@ import {
   Sparkles,
   Share2,
   Heart,
-  Eye,
   BedDouble,
   Bath,
   Maximize2,
@@ -277,39 +275,37 @@ function BookingModal({
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date || !time || !name || !phone) return;
-    // POST to /api/bookings
     setDone(true);
   };
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: "rgba(5,10,30,0.75)", backdropFilter: "blur(10px)" }}
+      style={{ background: "rgba(15,23,42,0.7)", backdropFilter: "blur(10px)" }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full sm:max-w-lg bg-white sm:rounded-3xl rounded-t-[2rem] shadow-2xl overflow-hidden max-h-[94vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
+      <div className="w-full sm:max-w-lg bg-white sm:rounded-xl rounded-t-2xl shadow-2xl overflow-hidden max-h-[94vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0">
           <div>
-            <h3 className="font-black text-gray-900">Book Free Consultation</h3>
-            <p className="text-xs text-gray-400">with {agent.name}</p>
+            <h3 className="font-bold text-slate-900 text-[15px]">
+              Book Free Consultation
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">with {agent.name}</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition"
+            className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"
           >
-            <X size={14} />
+            <X size={14} className="text-slate-500" />
           </button>
         </div>
-
         <div className="overflow-y-auto flex-1">
           {!done ? (
-            <form onSubmit={submit} className="p-6 flex flex-col gap-6">
-              {/* Date */}
+            <form onSubmit={submit} className="p-6 flex flex-col gap-5">
               <div>
-                <p className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-1.5">
+                <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
                   <Calendar size={14} className="text-[#4161df]" /> Select Date
                 </p>
                 <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
@@ -318,22 +314,18 @@ function BookingModal({
                       type="button"
                       key={d.iso}
                       onClick={() => setDate(d.iso)}
-                      className={`snap-start flex-shrink-0 flex flex-col items-center w-14 py-3 rounded-2xl border-2 transition-all duration-150 ${
-                        date === d.iso
-                          ? "border-[#4161df] bg-[#4161df] text-white shadow-lg shadow-[#4161df]/30"
-                          : "border-gray-100 bg-gray-50 text-gray-600 hover:border-[#4161df]/40"
-                      }`}
+                      className={`snap-start flex-shrink-0 flex flex-col items-center w-14 py-3 rounded-lg border transition-all duration-150 ${date === d.iso ? "border-[#4161df] bg-[#4161df] text-white" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[#4161df]/40"}`}
                     >
                       <span
-                        className={`text-[10px] font-semibold ${date === d.iso ? "text-blue-200" : "text-gray-400"}`}
+                        className={`text-[10px] font-medium ${date === d.iso ? "text-blue-200" : "text-slate-400"}`}
                       >
                         {d.day}
                       </span>
-                      <span className="text-xl font-black leading-tight">
+                      <span className="text-xl font-bold leading-tight">
                         {d.date}
                       </span>
                       <span
-                        className={`text-[10px] font-semibold ${date === d.iso ? "text-blue-200" : "text-gray-400"}`}
+                        className={`text-[10px] font-medium ${date === d.iso ? "text-blue-200" : "text-slate-400"}`}
                       >
                         {d.month}
                       </span>
@@ -341,11 +333,9 @@ function BookingModal({
                   ))}
                 </div>
               </div>
-
-              {/* Time */}
               {date && (
                 <div>
-                  <p className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-1.5">
+                  <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
                     <Clock size={14} className="text-[#4161df]" /> Select Time
                   </p>
                   <div className="grid grid-cols-3 gap-2">
@@ -354,11 +344,7 @@ function BookingModal({
                         type="button"
                         key={t}
                         onClick={() => setTime(t)}
-                        className={`py-2.5 rounded-xl border-2 text-xs font-bold transition-all duration-150 ${
-                          time === t
-                            ? "border-[#4161df] bg-[#eef1fd] text-[#4161df]"
-                            : "border-gray-100 bg-gray-50 text-gray-500 hover:border-[#4161df]/40"
-                        }`}
+                        className={`py-2.5 rounded-lg border text-xs font-semibold transition-all duration-150 ${time === t ? "border-[#4161df] bg-[#eef1fd] text-[#4161df]" : "border-slate-200 bg-slate-50 text-slate-500 hover:border-[#4161df]/40"}`}
                       >
                         {t}
                       </button>
@@ -366,10 +352,10 @@ function BookingModal({
                   </div>
                 </div>
               )}
-
-              {/* Contact */}
               <div className="flex flex-col gap-3">
-                <p className="text-sm font-bold text-gray-800">Your Details</p>
+                <p className="text-sm font-semibold text-slate-800">
+                  Your Details
+                </p>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -395,32 +381,28 @@ function BookingModal({
                   className={`${iCls} resize-none`}
                 />
               </div>
-
               <button
                 type="submit"
                 disabled={!date || !time || !name || !phone}
-                className="w-full py-4 rounded-2xl bg-[#4161df] text-white font-black text-sm shadow-lg shadow-[#4161df]/25 hover:bg-[#3456df] hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full py-3.5 rounded-lg bg-[#4161df] text-white font-semibold text-sm shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Confirm Booking →
+                Confirm Booking <ChevronRight size={14} className="inline" />
               </button>
-
-              <p className="text-center text-[11px] text-gray-400 flex items-center justify-center gap-1">
+              <p className="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1">
                 <Shield size={11} /> 100% free · No spam · Your details stay
                 private
               </p>
             </form>
           ) : (
             <div className="p-10 flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-4 text-4xl">
+              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4 text-3xl">
                 🎉
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-2">
-                Booked!
-              </h3>
-              <p className="text-gray-500 text-sm mb-1">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Booked!</h3>
+              <p className="text-slate-500 text-sm mb-1">
                 {agent.name} will call you on
               </p>
-              <p className="font-black text-[#4161df] text-lg mb-6">
+              <p className="font-bold text-[#4161df] text-[15px] mb-6">
                 {new Date(date).toLocaleDateString("en-IN", {
                   weekday: "long",
                   day: "numeric",
@@ -433,20 +415,20 @@ function BookingModal({
                   href={`https://wa.me/${agent.whatsapp}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-[#25D366] text-white font-bold text-sm hover:bg-[#1ebe5d] transition"
+                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-[#25D366] text-white font-semibold text-sm hover:bg-[#1ebe5d] transition"
                 >
                   <MessageCircle size={16} /> Message on WhatsApp now
                 </a>
                 <a
                   href={`tel:${agent.phone}`}
-                  className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gray-50 border-2 border-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-100 transition"
+                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition"
                 >
                   <Phone size={16} /> Call {agent.phone}
                 </a>
               </div>
               <button
                 onClick={onClose}
-                className="mt-6 text-xs text-gray-400 hover:text-gray-600 transition"
+                className="mt-6 text-xs text-slate-400 hover:text-slate-600 transition"
               >
                 Close
               </button>
@@ -459,7 +441,7 @@ function BookingModal({
 }
 
 const iCls =
-  "w-full px-4 py-3 text-sm bg-gray-50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:border-[#4161df] focus:bg-white transition placeholder-gray-400";
+  "w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-[#4161df] focus:bg-white transition placeholder-slate-400";
 
 /* ══════════════════════════════════════════════
    STAR RATING
@@ -474,7 +456,7 @@ function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
           className={
             i <= Math.round(rating)
               ? "text-amber-400 fill-amber-400"
-              : "text-gray-200 fill-gray-200"
+              : "text-slate-200 fill-slate-200"
           }
         />
       ))}
@@ -494,31 +476,30 @@ function ListingCard({ listing }: { listing: Listing }) {
   const g = gradients[listing.id % gradients.length];
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group">
-      {/* Image placeholder */}
+    <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300/50 transition-all duration-300 overflow-hidden group">
       <div
         className={`relative h-44 bg-gradient-to-br ${g} flex items-center justify-center`}
       >
-        <Building2 size={40} className="text-white/30" />
+        <Building2 size={40} className="text-white/20" />
         <span
-          className="absolute top-3 left-3 text-[11px] font-bold text-white px-2.5 py-1 rounded-full"
+          className="absolute top-3 left-3 text-[11px] font-semibold text-white px-2.5 py-1 rounded-md"
           style={{ background: listing.tagColor }}
         >
           {listing.tag}
         </span>
-        <button className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition">
+        <button className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition">
           <Heart size={13} className="text-white" />
         </button>
       </div>
       <div className="p-4">
-        <p className="font-black text-gray-900 text-sm leading-tight mb-1">
+        <p className="font-semibold text-slate-900 text-sm leading-tight mb-1">
           {listing.title}
         </p>
-        <p className="text-xs text-gray-400 flex items-center gap-1 mb-3">
+        <p className="text-xs text-slate-400 flex items-center gap-1 mb-3">
           <MapPin size={10} />
           {listing.location}
         </p>
-        <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+        <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
           <span className="flex items-center gap-1">
             <BedDouble size={11} />
             {listing.beds} Beds
@@ -533,10 +514,10 @@ function ListingCard({ listing }: { listing: Listing }) {
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="font-black text-[#4161df] text-base">
+          <span className="font-bold text-[#4161df] text-[15px]">
             {listing.price}
           </span>
-          <button className="text-[11px] font-bold text-[#4161df] hover:underline flex items-center gap-0.5">
+          <button className="text-[11px] font-semibold text-[#4161df] hover:underline flex items-center gap-0.5">
             View <ChevronRight size={12} />
           </button>
         </div>
@@ -553,9 +534,7 @@ interface PageProps {
 }
 
 export default function AgentProfilePage({ params }: PageProps) {
-  // In production: const agent = await fetchAgent(params.slug);
   const agent = MOCK_AGENT;
-
   const [booking, setBooking] = useState(false);
   const [activeTab, setActiveTab] = useState<"about" | "listings" | "reviews">(
     "about",
@@ -564,7 +543,6 @@ export default function AgentProfilePage({ params }: PageProps) {
   const [stickyCtaVisible, setStickyCtaVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
-  // Show sticky CTA after hero scrolls out
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setStickyCtaVisible(!entry.isIntersecting),
@@ -585,17 +563,14 @@ export default function AgentProfilePage({ params }: PageProps) {
   }));
 
   return (
-    <div
-      className="min-h-screen bg-[#f8f9ff] pt-[72px]"
-      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
-    >
+    <div className="min-h-screen mt-20 bg-slate-50/50">
       {/* ── STICKY TOP CTA ── */}
       {stickyCtaVisible && (
-        <div className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-md px-4 py-3">
+        <div className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm px-4 py-2.5">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-sm flex-shrink-0"
+                className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-sm flex-shrink-0 shadow-sm"
                 style={{
                   background: `linear-gradient(135deg,${agent.avatarColor},${agent.avatarColor}90)`,
                 }}
@@ -603,12 +578,12 @@ export default function AgentProfilePage({ params }: PageProps) {
                 {agent.initials}
               </div>
               <div className="hidden sm:block">
-                <p className="font-black text-gray-900 text-sm leading-none">
+                <p className="font-semibold text-slate-900 text-sm leading-none">
                   {agent.name}
                 </p>
                 <div className="flex items-center gap-1 mt-0.5">
                   <Stars rating={agent.rating} size={11} />
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-slate-400">
                     {agent.rating} ({agent.reviews})
                   </span>
                 </div>
@@ -619,13 +594,13 @@ export default function AgentProfilePage({ params }: PageProps) {
                 href={`https://wa.me/${agent.whatsapp}`}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden sm:flex items-center gap-1.5 py-2 px-4 rounded-xl bg-[#25D366] text-white text-xs font-bold hover:bg-[#1ebe5d] transition"
+                className="hidden sm:flex items-center gap-1.5 py-2 px-3.5 rounded-lg bg-[#25D366] text-white text-xs font-semibold hover:bg-[#1ebe5d] transition"
               >
                 <MessageCircle size={13} /> WhatsApp
               </a>
               <button
                 onClick={() => setBooking(true)}
-                className="flex items-center gap-1.5 py-2 px-4 rounded-xl bg-[#4161df] text-white text-xs font-bold shadow-md shadow-[#4161df]/25 hover:bg-[#3456df] transition"
+                className="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-[#4161df] text-white text-xs font-semibold shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200"
               >
                 <Calendar size={13} /> Book Free Consultation
               </button>
@@ -635,16 +610,12 @@ export default function AgentProfilePage({ params }: PageProps) {
       )}
 
       {/* ── BACK LINK ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-4">
         <Link
           href="/agents"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-[#4161df] transition group"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-[#4161df] transition-colors"
         >
-          <ArrowLeft
-            size={14}
-            className="group-hover:-translate-x-0.5 transition-transform"
-          />{" "}
-          All Agents
+          <ArrowLeft size={13} /> All Agents
         </Link>
       </div>
 
@@ -652,56 +623,49 @@ export default function AgentProfilePage({ params }: PageProps) {
           HERO PROFILE CARD
       ══════════════════════════════════════ */}
       <div ref={heroRef} className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-          {/* Cover bar */}
+        <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm overflow-hidden">
           <div
             className="relative h-28 sm:h-36 overflow-hidden"
             style={{
               background: `linear-gradient(135deg, ${agent.coverColor} 0%, #1e3080 60%, ${agent.avatarColor} 100%)`,
             }}
           >
-            {/* Dot pattern */}
             <div
-              className="absolute inset-0 opacity-10"
+              className="absolute inset-0 opacity-[0.06]"
               style={{
                 backgroundImage:
                   "radial-gradient(circle, white 1px, transparent 1px)",
                 backgroundSize: "22px 22px",
               }}
             />
-            {/* Diagonal swoosh */}
             <svg
-              className="absolute bottom-0 right-0 w-64 h-full opacity-10"
+              className="absolute bottom-0 right-0 w-64 h-full opacity-[0.08]"
               viewBox="0 0 200 100"
               fill="none"
             >
               <path d="M200 0 L200 100 L0 100 Z" fill="white" />
             </svg>
-
-            {/* Action buttons */}
             <div className="absolute top-4 right-4 flex gap-2">
               <button
                 onClick={() => setLiked(!liked)}
-                className={`w-9 h-9 rounded-full backdrop-blur-sm flex items-center justify-center transition-all border ${liked ? "bg-red-50 border-red-200" : "bg-white/20 border-white/30 hover:bg-white/30"}`}
+                className={`w-9 h-9 rounded-lg backdrop-blur-sm flex items-center justify-center transition-all border ${liked ? "bg-red-50 border-red-200" : "bg-white/20 border-white/20 hover:bg-white/30"}`}
               >
                 <Heart
                   size={15}
                   className={liked ? "text-red-500 fill-red-500" : "text-white"}
                 />
               </button>
-              <button className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center hover:bg-white/30 transition">
+              <button className="w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/30 transition">
                 <Share2 size={15} className="text-white" />
               </button>
             </div>
           </div>
 
-          {/* Profile section */}
           <div className="px-5 sm:px-8 pb-6">
-            {/* Avatar — overlaps cover */}
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10 sm:-mt-12 mb-5">
               <div className="relative flex-shrink-0">
                 <div
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center font-black text-white text-2xl sm:text-3xl border-4 border-white shadow-xl"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center font-bold text-white text-2xl sm:text-3xl border-[3px] border-white shadow-lg"
                   style={{
                     background: `linear-gradient(135deg, ${agent.avatarColor}, ${agent.avatarColor}90)`,
                   }}
@@ -709,97 +673,94 @@ export default function AgentProfilePage({ params }: PageProps) {
                   {agent.initials}
                 </div>
                 {agent.verified && (
-                  <span className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md">
+                  <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm ring-1 ring-slate-200/60">
                     <BadgeCheck
-                      size={18}
+                      size={15}
                       className="text-[#4161df]"
                       fill="#eef1fd"
                     />
                   </span>
                 )}
               </div>
-
               <div className="flex-1 pb-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
                     {agent.name}
                   </h1>
                   {agent.topAgent && (
-                    <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                      <Sparkles size={10} /> Top Agent
+                    <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200/60 text-amber-700 text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                      <Sparkles size={9} /> Top Agent
                     </span>
                   )}
                 </div>
-                <p className="text-gray-500 text-sm mt-0.5">{agent.title}</p>
+                <p className="text-slate-500 text-sm mt-0.5">{agent.title}</p>
                 <div className="flex flex-wrap items-center gap-3 mt-2">
                   <div className="flex items-center gap-1.5">
                     <Stars rating={agent.rating} size={14} />
-                    <span className="font-black text-gray-900 text-sm">
+                    <span className="font-bold text-slate-800 text-sm">
                       {agent.rating}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-slate-400">
                       ({agent.reviews} reviews)
                     </span>
                   </div>
-                  <span className="text-gray-200">·</span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500 font-semibold">
+                  <span className="text-slate-200">·</span>
+                  <span className="flex items-center gap-1 text-xs text-slate-500 font-medium">
                     <Zap size={12} className="text-[#4161df]" /> Responds{" "}
                     {agent.responseTime}
                   </span>
                 </div>
               </div>
-
-              {/* Desktop CTAs inline */}
               <div className="hidden sm:flex gap-2 pb-1 flex-shrink-0">
                 <a
                   href={`https://wa.me/${agent.whatsapp}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#25D366] text-white font-bold text-sm hover:bg-[#1ebe5d] transition shadow-sm"
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#25D366] text-white font-semibold text-sm hover:bg-[#1ebe5d] transition shadow-sm"
                 >
                   <MessageCircle size={15} /> WhatsApp
                 </a>
                 <button
                   onClick={() => setBooking(true)}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#4161df] text-white font-bold text-sm hover:bg-[#3456df] transition shadow-md shadow-[#4161df]/25"
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#4161df] text-white font-semibold text-sm shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200"
                 >
                   <Calendar size={15} /> Book Consultation
                 </button>
               </div>
             </div>
 
-            {/* Info chips row */}
+            {/* Info chips */}
             <div className="flex flex-wrap gap-2 mb-5">
               {agent.locations.map((l) => (
                 <span
                   key={l}
-                  className="inline-flex items-center gap-1 text-xs font-semibold bg-[#eef1fd] text-[#4161df] px-3 py-1.5 rounded-full border border-[#c9d4fb]"
+                  className="inline-flex items-center gap-1 text-xs font-medium bg-[#eef1fd] text-[#4161df] px-2.5 py-1 rounded-md border border-[#4161df]/10"
                 >
                   <MapPin size={10} />
                   {l}
                 </span>
               ))}
-              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">
                 <Shield size={10} className="text-green-600" /> RERA:{" "}
                 {agent.rera}
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">
                 <Languages size={10} /> {agent.languages.join(" · ")}
               </span>
             </div>
 
             {/* Stats grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
               {agent.stats.map((s) => (
                 <div
                   key={s.label}
-                  className="flex flex-col items-center bg-gray-50 rounded-2xl py-3 px-2 border border-gray-100"
+                  className="flex flex-col items-center bg-slate-50 rounded-lg py-3 px-1 border border-slate-100"
                 >
-                  <span className="text-xl mb-1">{s.icon}</span>
-                  <span className="text-sm font-black text-gray-900 leading-none">
+                  <span className="text-lg mb-1">{s.icon}</span>
+                  <span className="text-sm font-bold text-slate-800 leading-none">
                     {s.value}
                   </span>
-                  <span className="text-[10px] text-gray-400 font-medium mt-0.5 text-center leading-tight">
+                  <span className="text-[10px] text-slate-400 font-medium mt-0.5 text-center leading-tight">
                     {s.label}
                   </span>
                 </div>
@@ -810,7 +771,7 @@ export default function AgentProfilePage({ params }: PageProps) {
             <div className="flex gap-2 sm:hidden mt-5">
               <button
                 onClick={() => setBooking(true)}
-                className="flex-1 py-3 rounded-2xl bg-[#4161df] text-white font-bold text-sm flex items-center justify-center gap-1.5 shadow-md shadow-[#4161df]/25"
+                className="flex-1 py-3 rounded-lg bg-[#4161df] text-white font-semibold text-sm flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <Calendar size={14} /> Book Consultation
               </button>
@@ -818,15 +779,15 @@ export default function AgentProfilePage({ params }: PageProps) {
                 href={`https://wa.me/${agent.whatsapp}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-12 h-12 rounded-2xl bg-[#25D366] flex items-center justify-center shadow-sm"
+                className="w-12 h-12 rounded-lg bg-[#25D366] flex items-center justify-center shadow-sm"
               >
                 <MessageCircle size={18} className="text-white" />
               </a>
               <a
                 href={`tel:${agent.phone}`}
-                className="w-12 h-12 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center"
+                className="w-12 h-12 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-slate-100"
               >
-                <Phone size={16} className="text-gray-600" />
+                <Phone size={16} className="text-slate-500" />
               </a>
             </div>
           </div>
@@ -838,19 +799,15 @@ export default function AgentProfilePage({ params }: PageProps) {
       ══════════════════════════════════════ */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* ─── LEFT  (tabs) ─── */}
+          {/* ─── LEFT ─── */}
           <div className="flex-1 min-w-0">
             {/* Tab bar */}
-            <div className="flex bg-white rounded-2xl border border-gray-100 shadow-sm p-1 mb-6">
+            <div className="flex bg-white rounded-xl border border-slate-200/70 shadow-sm p-1 mb-6">
               {(["about", "listings", "reviews"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold capitalize transition-all duration-200 ${
-                    activeTab === tab
-                      ? "bg-[#4161df] text-white shadow-md shadow-[#4161df]/25"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all duration-200 ${activeTab === tab ? "bg-[#4161df] text-white shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                 >
                   {tab === "reviews"
                     ? `Reviews (${agent.reviews_data.length})`
@@ -862,19 +819,19 @@ export default function AgentProfilePage({ params }: PageProps) {
             {activeTab === "about" && (
               <div className="flex flex-col gap-5">
                 {/* Bio */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <h2 className="text-base font-black text-gray-900 mb-4">
+                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
+                  <h2 className="text-[15px] font-bold text-slate-900 mb-4">
                     About {agent.name}
                   </h2>
-                  <div className="relative pl-5 border-l-2 border-[#4161df]/20">
+                  <div className="relative pl-4 border-l-2 border-[#4161df]/20">
                     <Quote
-                      size={24}
-                      className="absolute -top-1 -left-3 text-[#4161df]/15 fill-[#4161df]/15"
+                      size={22}
+                      className="absolute -top-0.5 -left-2.5 text-[#4161df]/10 fill-[#4161df]/10"
                     />
                     {agent.longBio.split("\n\n").map((para, i) => (
                       <p
                         key={i}
-                        className="text-sm text-gray-600 leading-relaxed mb-3 last:mb-0"
+                        className="text-sm text-slate-600 leading-relaxed mb-3 last:mb-0"
                       >
                         {para}
                       </p>
@@ -883,8 +840,8 @@ export default function AgentProfilePage({ params }: PageProps) {
                 </div>
 
                 {/* Achievements */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <h2 className="text-base font-black text-gray-900 mb-4 flex items-center gap-2">
+                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
+                  <h2 className="text-[15px] font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <Award size={16} className="text-amber-500" /> Awards &
                     Achievements
                   </h2>
@@ -895,7 +852,7 @@ export default function AgentProfilePage({ params }: PageProps) {
                           size={16}
                           className="text-[#4161df] flex-shrink-0 mt-0.5"
                         />
-                        <span className="text-sm text-gray-700 font-medium">
+                        <span className="text-sm text-slate-700 font-medium">
                           {a}
                         </span>
                       </li>
@@ -904,15 +861,15 @@ export default function AgentProfilePage({ params }: PageProps) {
                 </div>
 
                 {/* Specialisations */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                  <h2 className="text-base font-black text-gray-900 mb-4">
+                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
+                  <h2 className="text-[15px] font-bold text-slate-900 mb-4">
                     Specialisations
                   </h2>
                   <div className="flex flex-wrap gap-2">
                     {agent.specialisations.map((s) => (
                       <span
                         key={s}
-                        className="inline-flex items-center gap-1.5 text-sm font-semibold bg-[#eef1fd] text-[#4161df] px-4 py-2 rounded-full border border-[#c9d4fb]"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium bg-[#eef1fd] text-[#4161df] px-3.5 py-1.5 rounded-md border border-[#4161df]/10"
                       >
                         <Home size={12} />
                         {s}
@@ -927,21 +884,19 @@ export default function AgentProfilePage({ params }: PageProps) {
             {activeTab === "listings" && (
               <div className="flex flex-col gap-5">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-black text-gray-900">
+                  <h2 className="text-[15px] font-bold text-slate-900">
                     {agent.listings.length} Active Listings
                   </h2>
                   <Link
                     href="/properties"
-                    className="text-xs font-bold text-[#4161df] hover:underline flex items-center gap-0.5"
+                    className="text-xs font-semibold text-[#4161df] hover:underline flex items-center gap-0.5"
                   >
                     View all <ChevronRight size={12} />
                   </Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {agent.listings.map((l, i) => (
-                    <div key={l.id}>
-                      <ListingCard listing={l} />
-                    </div>
+                  {agent.listings.map((l) => (
+                    <ListingCard key={l.id} listing={l} />
                   ))}
                 </div>
               </div>
@@ -950,35 +905,34 @@ export default function AgentProfilePage({ params }: PageProps) {
             {/* ── REVIEWS TAB ── */}
             {activeTab === "reviews" && (
               <div className="flex flex-col gap-5">
-                {/* Rating summary */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
                   <div className="flex gap-6 items-center">
                     <div className="text-center flex-shrink-0">
-                      <div className="text-5xl font-black text-gray-900">
+                      <div className="text-4xl font-bold text-slate-900">
                         {agent.rating}
                       </div>
-                      <Stars rating={agent.rating} size={16} />
-                      <p className="text-xs text-gray-400 mt-1">
+                      <Stars rating={agent.rating} size={14} />
+                      <p className="text-xs text-slate-400 mt-1">
                         {agent.reviews} reviews
                       </p>
                     </div>
                     <div className="flex-1 flex flex-col gap-1.5">
                       {ratingDist.map((r) => (
                         <div key={r.star} className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 w-4">
+                          <span className="text-xs text-slate-500 w-4">
                             {r.star}
                           </span>
                           <Star
                             size={10}
                             className="text-amber-400 fill-amber-400 flex-shrink-0"
                           />
-                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full bg-amber-400"
                               style={{ width: `${r.pct}%` }}
                             />
                           </div>
-                          <span className="text-xs text-gray-400 w-6 text-right">
+                          <span className="text-xs text-slate-400 w-6 text-right">
                             {r.count}
                           </span>
                         </div>
@@ -987,15 +941,14 @@ export default function AgentProfilePage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* Review cards */}
-                {agent.reviews_data.map((r, i) => (
+                {agent.reviews_data.map((r) => (
                   <div
                     key={r.id}
-                    className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+                    className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5"
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3.5">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-sm flex-shrink-0"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
                         style={{ background: r.color }}
                       >
                         {r.initials}
@@ -1004,25 +957,25 @@ export default function AgentProfilePage({ params }: PageProps) {
                         <div className="flex items-start justify-between gap-2 flex-wrap">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-gray-900 text-sm">
+                              <span className="font-semibold text-slate-900 text-sm">
                                 {r.name}
                               </span>
                               {r.verified && (
-                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full border border-green-200">
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded-md border border-green-200">
                                   <BadgeCheck size={9} /> Verified
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] text-gray-400 mt-0.5">
+                            <p className="text-[11px] text-slate-400 mt-0.5">
                               {r.propertyType} · {r.date}
                             </p>
                           </div>
                           <Stars rating={r.rating} size={12} />
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed mt-2">
+                        <p className="text-sm text-slate-600 leading-relaxed mt-2">
                           {r.text}
                         </p>
-                        <button className="mt-2 flex items-center gap-1 text-xs text-gray-400 hover:text-[#4161df] transition font-semibold">
+                        <button className="mt-2 flex items-center gap-1 text-xs text-slate-400 hover:text-[#4161df] transition font-medium">
                           <ThumbsUp size={11} /> Helpful ({r.helpful})
                         </button>
                       </div>
@@ -1033,47 +986,45 @@ export default function AgentProfilePage({ params }: PageProps) {
             )}
           </div>
 
-          {/* ─── RIGHT STICKY SIDEBAR ─── */}
+          {/* ─── RIGHT SIDEBAR ─── */}
           <div className="w-full lg:w-80 flex-shrink-0">
             <div className="sticky top-20 flex flex-col gap-4">
-              {/* Quick contact card */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="font-black text-gray-900 text-sm mb-4">
+              <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5">
+                <h3 className="font-bold text-slate-900 text-[13px] mb-4">
                   Get in Touch
                 </h3>
                 <div className="flex flex-col gap-2.5">
                   <button
                     onClick={() => setBooking(true)}
-                    className="w-full py-3.5 rounded-2xl bg-[#4161df] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-[#4161df]/25 hover:bg-[#3456df] hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full py-3 rounded-lg bg-[#4161df] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200"
                   >
-                    <Calendar size={15} /> Book Free Consultation
+                    <Calendar size={14} /> Book Free Consultation
                   </button>
                   <a
                     href={`https://wa.me/${agent.whatsapp}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3.5 rounded-2xl bg-[#25D366] text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#1ebe5d] transition"
+                    className="w-full py-3 rounded-lg bg-[#25D366] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#1ebe5d] transition"
                   >
-                    <MessageCircle size={15} /> Chat on WhatsApp
+                    <MessageCircle size={14} /> Chat on WhatsApp
                   </a>
                   <a
                     href={`tel:${agent.phone}`}
-                    className="w-full py-3.5 rounded-2xl border-2 border-gray-100 bg-gray-50 text-gray-700 font-bold text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition"
+                    className="w-full py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition"
                   >
-                    <Phone size={15} /> {agent.phone}
+                    <Phone size={14} /> {agent.phone}
                   </a>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-xs text-gray-500 font-semibold">
+                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs text-slate-500 font-medium">
                     Usually responds in {agent.responseTime}
                   </span>
                 </div>
               </div>
 
-              {/* Trust signals */}
-              <div className="bg-[#eef1fd] rounded-2xl border border-[#c9d4fb] p-5">
-                <h3 className="font-black text-[#4161df] text-sm mb-3 flex items-center gap-1.5">
+              <div className="bg-[#eef1fd] rounded-xl border border-[#c9d4fb]/60 p-5">
+                <h3 className="font-bold text-[#4161df] text-[13px] mb-3 flex items-center gap-1.5">
                   <Shield size={14} /> Why you can trust{" "}
                   {agent.name.split(" ")[0]}
                 </h3>
@@ -1099,12 +1050,11 @@ export default function AgentProfilePage({ params }: PageProps) {
                 </ul>
               </div>
 
-              {/* Similar agents teaser */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <h3 className="font-black text-gray-900 text-sm mb-3">
+              <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5">
+                <h3 className="font-bold text-slate-900 text-[13px] mb-3">
                   Other Top Agents
                 </h3>
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-1.5">
                   {[
                     {
                       n: "Neha Verma",
@@ -1124,19 +1074,19 @@ export default function AgentProfilePage({ params }: PageProps) {
                     <Link
                       key={a.n}
                       href={`/agents/${a.n.toLowerCase().replace(" ", "-")}`}
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition group"
                     >
                       <div
-                        className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white text-xs flex-shrink-0"
+                        className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-xs flex-shrink-0"
                         style={{ background: a.color }}
                       >
                         {a.initials}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-gray-900 truncate">
+                        <p className="text-xs font-semibold text-slate-900 truncate">
                           {a.n}
                         </p>
-                        <p className="text-[11px] text-gray-400 truncate">
+                        <p className="text-[11px] text-slate-400 truncate">
                           {a.t}
                         </p>
                       </div>
@@ -1145,7 +1095,7 @@ export default function AgentProfilePage({ params }: PageProps) {
                           size={10}
                           className="text-amber-400 fill-amber-400"
                         />
-                        <span className="text-xs font-bold text-gray-700">
+                        <span className="text-xs font-semibold text-slate-700">
                           {a.rating}
                         </span>
                       </div>
@@ -1154,7 +1104,7 @@ export default function AgentProfilePage({ params }: PageProps) {
                 </div>
                 <Link
                   href="/agents"
-                  className="mt-3 flex items-center justify-center gap-1 text-xs font-bold text-[#4161df] hover:underline"
+                  className="mt-3 flex items-center justify-center gap-1 text-xs font-semibold text-[#4161df] hover:underline"
                 >
                   View all agents <ChevronRight size={12} />
                 </Link>
@@ -1164,20 +1114,9 @@ export default function AgentProfilePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* ── BOOKING MODAL ── */}
       {booking && (
         <BookingModal agent={agent} onClose={() => setBooking(false)} />
       )}
     </div>
   );
 }
-
-/* ── Metadata helper (keep in a separate server component if needed) ──
-export async function generateMetadata({ params }: PageProps) {
-  const agent = await fetchAgent(params.slug);
-  return {
-    title: `${agent.name} — PropertyBulbul Agent`,
-    description: agent.bio,
-  };
-}
-*/

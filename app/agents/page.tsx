@@ -32,7 +32,8 @@ const AGENTS: Agent[] = [
     slug: "priyanka-sharma",
     name: "Priyanka Sharma",
     title: "Senior Property Advisor",
-    avatar: "",
+    avatar:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
     initials: "PS",
     avatarColor: "#4161df",
     rating: 4.9,
@@ -54,7 +55,8 @@ const AGENTS: Agent[] = [
     slug: "neha-verma",
     name: "Neha Verma",
     title: "Luxury Property Specialist",
-    avatar: "",
+    avatar:
+      "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face",
     initials: "NV",
     avatarColor: "#7c3aed",
     rating: 4.8,
@@ -76,7 +78,8 @@ const AGENTS: Agent[] = [
     slug: "amit-bhatia",
     name: "Amit Bhatia",
     title: "Commercial Real Estate Expert",
-    avatar: "",
+    avatar:
+      "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face",
     initials: "AB",
     avatarColor: "#059669",
     rating: 4.7,
@@ -98,7 +101,8 @@ const AGENTS: Agent[] = [
     slug: "sunita-kapoor",
     name: "Sunita Kapoor",
     title: "Affordable Housing Advisor",
-    avatar: "",
+    avatar:
+      "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop&crop=face",
     initials: "SK",
     avatarColor: "#dc2626",
     rating: 4.6,
@@ -120,7 +124,8 @@ const AGENTS: Agent[] = [
     slug: "rajesh-malhotra",
     name: "Rajesh Malhotra",
     title: "NRI Investment Specialist",
-    avatar: "",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
     initials: "RM",
     avatarColor: "#d97706",
     rating: 4.8,
@@ -142,7 +147,8 @@ const AGENTS: Agent[] = [
     slug: "ritika-anand",
     name: "Ritika Anand",
     title: "New Launches Expert",
-    avatar: "",
+    avatar:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
     initials: "RA",
     avatarColor: "#0891b2",
     rating: 4.5,
@@ -501,7 +507,7 @@ export default function AgentsPage() {
           />
         ))}
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div className="relative max-w-full mx-auto px-4 sm:px-6 md:px-10 py-16 sm:py-20">
           {/* Eyebrow */}
           <div className="flex justify-center mb-5">
             <span
@@ -606,7 +612,7 @@ export default function AgentsPage() {
       </div>
 
       {/* ── FILTERS ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-full mx-auto px-4 sm:px-6 md:px-10 py-6">
         <div className="flex flex-wrap gap-3 items-center">
           {/* Top agents toggle */}
           <button
@@ -670,9 +676,9 @@ export default function AgentsPage() {
       </div>
 
       {/* ── AGENT GRID ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+      <div className="max-w-full mx-auto px-4 sm:px-6 md:px-10 pb-20">
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filtered.map((agent, i) => (
               <AgentCard
                 key={agent.id}
