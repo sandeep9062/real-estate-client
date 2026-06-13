@@ -7,6 +7,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import SocialMediaLinks from "./SocialMediaLinks";
 import ScrollToTopButton from "./ScrollToTopButton";
+import { CompareProvider } from "@/store/CompareProvider";
+import CompareDrawer from "./CompareDrawer";
 
 // Lazy load the chatbot - it's heavy and not immediately needed
 const ClientChatBotWrapper = dynamic(() => import("./ClientChatBotWrapper"), {
@@ -39,12 +41,15 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   return (
     <>
-      <Header />
-      {children}
-      <SocialMediaLinks />
-      <Footer />
-      <ScrollToTopButton />
-      <ClientChatBotWrapper />
+      <CompareProvider>
+        <Header />
+        {children}
+        <SocialMediaLinks />
+        <Footer />
+        <ScrollToTopButton />
+        <ClientChatBotWrapper />
+        <CompareDrawer />
+      </CompareProvider>
     </>
   );
 }

@@ -3,6 +3,8 @@ import React, { useMemo, memo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Heart from "./Heart";
+
+import { Scale, Check } from "lucide-react";
 import { toggleCompareId, getCompareIds } from "@/lib/compareStorage";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -13,7 +15,6 @@ import {
   FaWhatsapp,
   FaHome,
 } from "react-icons/fa";
-import { GitCompare } from "lucide-react";
 import {
   PropertyTrustBadges,
   ListingAvailabilityPill,
@@ -234,6 +235,35 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               onClick={(e) => {
                 e.stopPropagation();
                 const wasIn = getCompareIds().includes(pid);
+
+                // Check if we're about to exceed the limit (4 total)
+                if (!wasIn && getCompareIds().length >= 4) {
+                  toast.error("You can compare up to 4 properties at a time");
+                  return;
+                }
+
+                // Save metadata so the drawer can show real data
+                if (!wasIn) {
+                  try {
+                    const metaKey = "pb_compare_meta";
+                    const raw = sessionStorage.getItem(metaKey);
+                    const meta = raw ? JSON.parse(raw) : {};
+                    meta[pid] = {
+                      _id: pid,
+                      title: card.title || "Property",
+                      image:
+                        (card.image?.[0] &&
+                          (typeof card.image[0] === "string"
+                            ? card.image[0]
+                            : card.image[0].url)) ||
+                        "/images/property-tricity.jpg",
+                    };
+                    sessionStorage.setItem(metaKey, JSON.stringify(meta));
+                  } catch {
+                    // ignore
+                  }
+                }
+
                 const next = toggleCompareId(pid);
                 setInCompare(next.includes(pid));
                 if (wasIn) {
@@ -246,14 +276,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 "flex items-center justify-center rounded-full border border-white/20 bg-white/95 text-slate-700 shadow-sm transition-colors",
                 carousel ? "size-8" : "size-9",
                 inCompare
-                  ? "border-[#4161df]/40 bg-[#4161df] text-white"
+                  ? "border-[#4161df]/40 bg-[#4161df] "
                   : "hover:bg-white hover:text-[#4161df]",
               ].join(" ")}
             >
-              <GitCompare
-                className={carousel ? "size-3.5" : "size-4"}
-                strokeWidth={2.25}
-              />
+              {inCompare ? (
+                <Check
+                  className={carousel ? "size-3.5" : "size-4"}
+                  strokeWidth={3.5}
+                />
+              ) : (
+                <Scale
+                  className={carousel ? "size-3.5" : "size-4"}
+                  strokeWidth={2.25}
+                />
+              )}
             </button>
             {displayPhone && (
               <button
