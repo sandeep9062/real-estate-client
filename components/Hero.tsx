@@ -11,6 +11,7 @@ import AddPropertyModal from "./AddPropertyModal";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
+import { CheckCircle2 } from "lucide-react";
 interface HeroProps {
   setFilter: React.Dispatch<React.SetStateAction<SearchFilters>>;
 }
@@ -152,8 +153,25 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               </button>
             </div>
             <AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />
+
+            <div className="mt-1 sm:mt-2 flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-1.5 sm:gap-y-2 text-[10px] xs:text-xs sm:text-sm text-gray-300 font-medium">
+              {["Chandigarh", "Panchkula", "Mohali", "Kharar", "Zirakpur"].map(
+                (city) => (
+                  <span key={city} className=" text-gray-800">
+                    <Link
+                      href={`/properties/${city.toLowerCase()}`}
+                      className="hover:text-[#4161df] flex items-center gap-1.5 transition"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
+                      {city}
+                    </Link>
+                  </span>
+                ),
+              )}
+            </div>
+
             {/* ── HERO STRIPS ───────────── */}
-            <div className="mt-6 sm:mt-8 space-y-4">
+            <div className="mt-4 sm:mt-6 space-y-4">
               {/* Row 1 — seeker benefits */}
               <div className="flex flex-wrap justify-center gap-2">
                 <div className="flex items-start gap-2 bg-white/90 backdrop-blur-sm border border-blue-100 rounded-2xl px-3 py-2 shadow-sm min-w-[140px]">

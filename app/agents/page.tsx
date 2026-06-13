@@ -729,10 +729,10 @@ export default function AgentsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="/contact"
+              href="/agents/register"
               className="inline-flex items-center justify-center gap-2 bg-white text-[#4161df] font-black text-sm px-8 py-4 rounded-2xl shadow-lg hover:bg-gray-50 hover:scale-105 transition-all duration-200"
             >
-              Apply as an Agent <ArrowRight size={16} />
+              Register as an Agent <ArrowRight size={16} />
             </a>
             <a
               href="/contact"
