@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/store/authSlice";
 import {
   User,
   Phone,
@@ -18,6 +20,7 @@ import {
   Building2,
   Sparkles,
 } from "lucide-react";
+import { useRegisterAgentMutation } from "@/services/agentsApi";
 
 /* ══════════════════════════════════════
    STATIC OPTIONS
@@ -175,10 +178,25 @@ function Toggle({
 ══════════════════════════════════════ */
 export default function AgentRegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(initialState);
+  const loggedInUser = useSelector(selectUser);
+
+  // Pre-fill name, phone, email from the logged-in user if available
+  const [form, setForm] = useState<FormState>(() => ({
+    ...initialState,
+    ...(loggedInUser
+      ? {
+          name: loggedInUser.name || "",
+          phone: loggedInUser.phone || "",
+          email: loggedInUser.email || "",
+        }
+      : {}),
+  }));
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [registerAgent] = useRegisterAgentMutation();
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -219,17 +237,47 @@ export default function AgentRegisterPage() {
     setError(null);
     setSubmitting(true);
     try {
-      // Replace with your actual API endpoint
-      // const apiUrl = getApiUrl();
-      // await fetch(`${apiUrl}/agents/register`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(form),
-      // });
-      await new Promise((res) => setTimeout(res, 900)); // simulate request
+      // Build FormData for the API (supports file upload)
+      const formData = new FormData();
+      formData.append("name", form.name.trim());
+      formData.append("title", form.title.trim());
+      formData.append("phone", form.phone.trim());
+      formData.append("whatsapp", form.whatsapp.trim());
+      formData.append("email", form.email.trim());
+      formData.append("experience", form.experience);
+      formData.append("bio", form.bio.trim());
+      formData.append("agencyName", form.agencyName.trim());
+      formData.append("reraNumber", form.reraNumber.trim());
+
+      // Attach userId if the user is logged in (skip creating a new User record)
+      if (loggedInUser?._id) {
+        formData.append("userId", loggedInUser._id);
+      }
+
+      // Arrays — send as JSON strings; backend parses them
+      formData.append("locations", JSON.stringify(form.locations));
+      formData.append("specialisations", JSON.stringify(form.specialisations));
+      formData.append("languages", JSON.stringify(form.languages));
+
+      // Attach photo if selected
+      if (photo) {
+        formData.append("photo", photo);
+      }
+
+      const result = await registerAgent(formData).unwrap();
       setSubmitted(true);
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      // RTK Query unwrap error shape: { status, data: { message } }
+      if (err && typeof err === "object" && "data" in err) {
+        const errorData = (err as { data: { message?: string } }).data;
+        setError(
+          errorData?.message || "Something went wrong. Please try again.",
+        );
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -565,17 +613,28 @@ export default function AgentRegisterPage() {
                 >
                   <Upload size={16} style={{ color: "#4161df" }} />
                 </div>
-                <p className="text-[13px] font-medium text-slate-600">
-                  Click to upload your photo
-                </p>
+                {photo ? (
+                  <p className="text-[13px] font-medium text-slate-700">
+                    {photo.name}
+                  </p>
+                ) : (
+                  <p className="text-[13px] font-medium text-slate-600">
+                    Click to upload your photo
+                  </p>
+                )}
                 <p className="text-[11px] text-slate-400">
                   PNG or JPG, up to 5MB
                 </p>
                 <input
                   id="photo-upload"
+                  ref={photoInputRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setPhoto(file);
+                  }}
                 />
               </label>
             </section>

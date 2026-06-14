@@ -105,7 +105,7 @@ const Header: React.FC = () => {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex text-[12px] sm:text-[15px]  items-center gap-2 lg:gap-3 font-medium">
-          <Link
+          {/* <Link
             href="/compare"
             className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"
           >
@@ -115,7 +115,7 @@ const Header: React.FC = () => {
                 {compareN}
               </span>
             )}
-          </Link>
+          </Link> */}
           <Link
             href="/saved-searches"
             className="relative px-2 py-1 rounded-md transition-colors hover:text-blue-600"

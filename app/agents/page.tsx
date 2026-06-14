@@ -201,6 +201,7 @@ const TIME_SLOTS = [
   "4:00 PM",
   "5:00 PM",
   "6:00 PM",
+  "7:00 PM",
 ];
 
 function BookingModal({
