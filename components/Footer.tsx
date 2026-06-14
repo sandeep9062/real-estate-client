@@ -74,7 +74,6 @@ const Footer = () => {
               {[
                 ["Properties", "/properties"],
 
-                ["Agents", "/agents"],
                 // ["Projects", "/projects"],
 
                 // will add projects later on when this platform will be more mature and we will have more projects to list down
@@ -84,8 +83,10 @@ const Footer = () => {
                 ["Journals", "/journal"],
                 ["Contact", "/contact"],
                 ["About Us", "/about-us"],
-                ["Register as Landlord", "/landlords/register"],
                 ["FAQ", "/faq"],
+                ["Register as Landlord", "/landlords/register"],
+
+                ["Agents", "/agents"],
                 ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
               ].map(([label, link]) => (
