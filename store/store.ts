@@ -9,6 +9,7 @@ import { projectsApi } from "@/services/projectsApi";
 import { developersApi } from "@/services/developersApi";
 import { aiBasedApi } from "@/services/aiBasedApi";
 import { agentsApi } from "@/services/agentsApi";
+import { landlordApi } from "@/services/landlordApi";
 
 import { journalApi } from "@/services/journalApi";
 import { savedSearchesApi } from "@/services/savedSearchesApi";
@@ -24,6 +25,7 @@ const store = configureStore({
     [projectsApi.reducerPath]: projectsApi.reducer,
     [developersApi.reducerPath]: developersApi.reducer,
     [agentsApi.reducerPath]: agentsApi.reducer,
+    [landlordApi.reducerPath]: landlordApi.reducer,
     [journalApi.reducerPath]: journalApi.reducer, // Add journalApi reducer
 
     auth: authReducer,
@@ -38,6 +40,7 @@ const store = configureStore({
       aiBasedApi.middleware,
       userApi.middleware,
       agentsApi.middleware,
+      landlordApi.middleware,
       journalApi.middleware, // Add journalApi middleware
 
       savedSearchesApi.middleware,

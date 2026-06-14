@@ -53,7 +53,7 @@ const Footer = () => {
           {/* Info */}
           <div className="flex flex-col gap-3 sm:gap-4 text-center md:text-left">
             <h3 className="text-sm sm:text-base font-semibold text-neutral-900">
-              Information
+              Quick Links
             </h3>
 
             {/* <p className="text-gray-500 text-xs sm:text-sm">
@@ -84,7 +84,7 @@ const Footer = () => {
                 ["Journals", "/journal"],
                 ["Contact", "/contact"],
                 ["About Us", "/about-us"],
-
+                ["Register as Landlord", "/landlords/register"],
                 ["FAQ", "/faq"],
                 ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
