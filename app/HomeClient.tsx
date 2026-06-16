@@ -9,6 +9,7 @@ import Companies from "@/components/Companies";
 import Residencies from "@/components/Residencies";
 import Value from "@/components/Value";
 import PostPropertyCTA from "@/components/PostPropertyCTA";
+import AgentLandlordCTA from "@/components/AgentLandlordCTA";
 import BecauseYouViewedSection from "@/components/BecauseYouViewedSection";
 import Testimonial from "@/components/Testimonial";
 import GetStarted from "@/components/GetStarted";
@@ -120,7 +121,11 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
         <PostPropertyCTA />
       </section>
 
-      <section className=" bg-white/60 relative z-10">
+      <section className="bg-white/60 relative z-10">
+        <AgentLandlordCTA />
+      </section>
+
+      <section className="bg-white/60 relative z-10">
         <Testimonial />
       </section>
       <section className="bg-white/60 relative z-10">

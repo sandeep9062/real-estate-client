@@ -598,6 +598,19 @@ export default function AgentsPage() {
               />
             </div>
           </div>
+
+          {/* Register as Agent button */}
+          <div className="flex justify-end mt-6">
+            <a
+              href="/agents/register"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold tracking-widest uppercase transition-all duration-200 hover:scale-105 bg-green-600 text-white"
+              style={{
+                boxShadow: "0 4px 16px rgba(3, 161, 61, 0.35)",
+              }}
+            >
+              <Award size={14} /> Register as Agent
+            </a>
+          </div>
         </div>
 
         {/* Bottom wave */}
