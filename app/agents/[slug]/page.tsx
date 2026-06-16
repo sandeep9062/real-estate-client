@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import PropertyCard from "@/components/PropertyCard";
 import {
   ArrowLeft,
   Star,
@@ -13,10 +15,7 @@ import {
   Clock,
   Shield,
   Award,
-  TrendingUp,
-  Users,
   Home,
-  Building2,
   ChevronRight,
   Quote,
   Zap,
@@ -25,13 +24,8 @@ import {
   Sparkles,
   Share2,
   Heart,
-  BedDouble,
-  Bath,
-  Maximize2,
-  IndianRupee,
   Languages,
   ThumbsUp,
-  ChevronLeft,
 } from "lucide-react";
 
 /* ══════════════════════════════════════════════
@@ -68,6 +62,7 @@ interface AgentData {
   slug: string;
   name: string;
   title: string;
+  avatar: string; // Profile image URL
   initials: string;
   avatarColor: string;
   coverColor: string;
@@ -102,6 +97,8 @@ const MOCK_AGENT: AgentData = {
   slug: "priyanka-sharma",
   name: "Priyanka Sharma",
   title: "Senior Property Advisor",
+  avatar:
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
   initials: "PS",
   avatarColor: "#4161df",
   coverColor: "#0d1640",
@@ -233,6 +230,18 @@ const MOCK_AGENT: AgentData = {
 };
 
 /* ══════════════════════════════════════════════
+   SHARED STYLE TOKENS
+══════════════════════════════════════════════ */
+const cardStyle = {
+  background: "#fff",
+  border: "1px solid #e8eaf0",
+  boxShadow: "0 2px 12px rgba(15,23,42,.05)",
+};
+const serif = { fontFamily: "'Instrument Serif', serif" };
+const inputCls =
+  "w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#4161df] focus:bg-white transition placeholder-slate-400";
+
+/* ══════════════════════════════════════════════
    BOOKING MODAL
 ══════════════════════════════════════════════ */
 const TIME_SLOTS = [
@@ -286,10 +295,10 @@ function BookingModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full sm:max-w-lg bg-white sm:rounded-xl rounded-t-2xl shadow-2xl overflow-hidden max-h-[94vh] flex flex-col">
+      <div className="w-full sm:max-w-lg bg-white sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[94vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0">
           <div>
-            <h3 className="font-bold text-slate-900 text-[15px]">
+            <h3 className="text-[17px] text-slate-900" style={serif}>
               Book Free Consultation
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">with {agent.name}</p>
@@ -305,8 +314,9 @@ function BookingModal({
           {!done ? (
             <form onSubmit={submit} className="p-6 flex flex-col gap-5">
               <div>
-                <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
-                  <Calendar size={14} className="text-[#4161df]" /> Select Date
+                <p className="text-[13px] font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
+                  <Calendar size={14} style={{ color: "#4161df" }} /> Select
+                  date
                 </p>
                 <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
                   {dates.map((d) => (
@@ -314,10 +324,26 @@ function BookingModal({
                       type="button"
                       key={d.iso}
                       onClick={() => setDate(d.iso)}
-                      className={`snap-start flex-shrink-0 flex flex-col items-center w-14 py-3 rounded-lg border transition-all duration-150 ${date === d.iso ? "border-[#4161df] bg-[#4161df] text-white" : "border-slate-200 bg-slate-50 text-slate-600 hover:border-[#4161df]/40"}`}
+                      className="snap-start flex-shrink-0 flex flex-col items-center w-14 py-3 rounded-xl border transition-all duration-150"
+                      style={
+                        date === d.iso
+                          ? {
+                              borderColor: "#4161df",
+                              background: "#4161df",
+                              color: "#fff",
+                            }
+                          : {
+                              borderColor: "#e2e8f0",
+                              background: "#f8fafc",
+                              color: "#475569",
+                            }
+                      }
                     >
                       <span
-                        className={`text-[10px] font-medium ${date === d.iso ? "text-blue-200" : "text-slate-400"}`}
+                        className="text-[10px] font-medium"
+                        style={{
+                          color: date === d.iso ? "#c7d4f9" : "#94a3b8",
+                        }}
                       >
                         {d.day}
                       </span>
@@ -325,7 +351,10 @@ function BookingModal({
                         {d.date}
                       </span>
                       <span
-                        className={`text-[10px] font-medium ${date === d.iso ? "text-blue-200" : "text-slate-400"}`}
+                        className="text-[10px] font-medium"
+                        style={{
+                          color: date === d.iso ? "#c7d4f9" : "#94a3b8",
+                        }}
                       >
                         {d.month}
                       </span>
@@ -335,8 +364,8 @@ function BookingModal({
               </div>
               {date && (
                 <div>
-                  <p className="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
-                    <Clock size={14} className="text-[#4161df]" /> Select Time
+                  <p className="text-[13px] font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
+                    <Clock size={14} style={{ color: "#4161df" }} /> Select time
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     {TIME_SLOTS.map((t) => (
@@ -344,7 +373,20 @@ function BookingModal({
                         type="button"
                         key={t}
                         onClick={() => setTime(t)}
-                        className={`py-2.5 rounded-lg border text-xs font-semibold transition-all duration-150 ${time === t ? "border-[#4161df] bg-[#eef1fd] text-[#4161df]" : "border-slate-200 bg-slate-50 text-slate-500 hover:border-[#4161df]/40"}`}
+                        className="py-2.5 rounded-xl border text-xs font-semibold transition-all duration-150"
+                        style={
+                          time === t
+                            ? {
+                                borderColor: "#4161df",
+                                background: "rgba(65,97,223,.08)",
+                                color: "#4161df",
+                              }
+                            : {
+                                borderColor: "#e2e8f0",
+                                background: "#f8fafc",
+                                color: "#64748b",
+                              }
+                        }
                       >
                         {t}
                       </button>
@@ -353,15 +395,15 @@ function BookingModal({
                 </div>
               )}
               <div className="flex flex-col gap-3">
-                <p className="text-sm font-semibold text-slate-800">
-                  Your Details
+                <p className="text-[13px] font-semibold text-slate-800">
+                  Your details
                 </p>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="Full name"
-                  className={iCls}
+                  className={inputCls}
                 />
                 <input
                   value={phone}
@@ -371,22 +413,23 @@ function BookingModal({
                   required
                   placeholder="Mobile number"
                   inputMode="numeric"
-                  className={iCls}
+                  className={inputCls}
                 />
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
                   placeholder="What are you looking for? (optional)"
-                  className={`${iCls} resize-none`}
+                  className={`${inputCls} resize-none`}
                 />
               </div>
               <button
                 type="submit"
                 disabled={!date || !time || !name || !phone}
-                className="w-full py-3.5 rounded-lg bg-[#4161df] text-white font-semibold text-sm shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full py-3.5 rounded-xl text-white font-semibold text-sm shadow-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                style={{ background: "#0f172a" }}
               >
-                Confirm Booking <ChevronRight size={14} className="inline" />
+                Confirm booking <ChevronRight size={14} className="inline" />
               </button>
               <p className="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1">
                 <Shield size={11} /> 100% free · No spam · Your details stay
@@ -395,14 +438,22 @@ function BookingModal({
             </form>
           ) : (
             <div className="p-10 flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4 text-3xl">
-                🎉
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                style={{ background: "rgba(22,163,74,.10)" }}
+              >
+                <CheckCircle2 size={28} style={{ color: "#16a34a" }} />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Booked!</h3>
+              <h3 className="text-[22px] text-slate-900 mb-2" style={serif}>
+                Booked!
+              </h3>
               <p className="text-slate-500 text-sm mb-1">
                 {agent.name} will call you on
               </p>
-              <p className="font-bold text-[#4161df] text-[15px] mb-6">
+              <p
+                className="font-semibold text-[15px] mb-6"
+                style={{ color: "#4161df" }}
+              >
                 {new Date(date).toLocaleDateString("en-IN", {
                   weekday: "long",
                   day: "numeric",
@@ -415,13 +466,14 @@ function BookingModal({
                   href={`https://wa.me/${agent.whatsapp}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-[#25D366] text-white font-semibold text-sm hover:bg-[#1ebe5d] transition"
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold text-sm transition"
+                  style={{ background: "#25D366" }}
                 >
                   <MessageCircle size={16} /> Message on WhatsApp now
                 </a>
                 <a
                   href={`tel:${agent.phone}`}
-                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition"
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition"
                 >
                   <Phone size={16} /> Call {agent.phone}
                 </a>
@@ -439,9 +491,6 @@ function BookingModal({
     </div>
   );
 }
-
-const iCls =
-  "w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-[#4161df] focus:bg-white transition placeholder-slate-400";
 
 /* ══════════════════════════════════════════════
    STAR RATING
@@ -465,69 +514,44 @@ function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
 }
 
 /* ══════════════════════════════════════════════
-   LISTING CARD
+   HELPER: transform mock listing → PropertyCard card prop
 ══════════════════════════════════════════════ */
-function ListingCard({ listing }: { listing: Listing }) {
-  const gradients = [
-    "from-[#1a2a6c] to-[#4161df]",
-    "from-[#2d1b6b] to-[#7c3aed]",
-    "from-[#064e3b] to-[#059669]",
-  ];
-  const g = gradients[listing.id % gradients.length];
+const parsePrice = (s: string): number => {
+  const num = parseFloat(s.replace(/[₹,LakhsCrore]/g, "").trim());
+  if (s.includes("Crore")) return num * 1e7;
+  if (s.includes("Lakh")) return num * 1e5;
+  return num;
+};
 
-  return (
-    <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm hover:shadow-md hover:border-slate-300/50 transition-all duration-300 overflow-hidden group">
-      <div
-        className={`relative h-44 bg-gradient-to-br ${g} flex items-center justify-center`}
-      >
-        <Building2 size={40} className="text-white/20" />
-        <span
-          className="absolute top-3 left-3 text-[11px] font-semibold text-white px-2.5 py-1 rounded-md"
-          style={{ background: listing.tagColor }}
-        >
-          {listing.tag}
-        </span>
-        <button className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition">
-          <Heart size={13} className="text-white" />
-        </button>
-      </div>
-      <div className="p-4">
-        <p className="font-semibold text-slate-900 text-sm leading-tight mb-1">
-          {listing.title}
-        </p>
-        <p className="text-xs text-slate-400 flex items-center gap-1 mb-3">
-          <MapPin size={10} />
-          {listing.location}
-        </p>
-        <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
-          <span className="flex items-center gap-1">
-            <BedDouble size={11} />
-            {listing.beds} Beds
-          </span>
-          <span className="flex items-center gap-1">
-            <Bath size={11} />
-            {listing.baths} Baths
-          </span>
-          <span className="flex items-center gap-1">
-            <Maximize2 size={11} />
-            {listing.area}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-[#4161df] text-[15px]">
-            {listing.price}
-          </span>
-          <button className="text-[11px] font-semibold text-[#4161df] hover:underline flex items-center gap-0.5">
-            View <ChevronRight size={12} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+function toPropertyCard(listing: Listing) {
+  return {
+    _id: String(listing.id),
+    slug: `property-${listing.id}`,
+    title: listing.title,
+    price: parsePrice(listing.price),
+    image: listing.image ? [listing.image] : [],
+    deal: "Sale" as const,
+    type: listing.tag,
+    facilities: {
+      bedrooms: listing.beds,
+      bathrooms: listing.baths,
+    },
+    location: {
+      address: listing.location,
+      city: listing.location.split(",")[0] || listing.location,
+      state: "",
+    },
+    area: {
+      value: listing.area,
+      unit: "sqft",
+    },
+    listingAvailability: "Available" as const,
+    isFeatured: false,
+  };
 }
 
 /* ══════════════════════════════════════════════
-   PAGE  — `params.slug` injected by Next.js
+   PAGE
 ══════════════════════════════════════════════ */
 interface PageProps {
   params: { slug: string };
@@ -563,560 +587,710 @@ export default function AgentProfilePage({ params }: PageProps) {
   }));
 
   return (
-    <div className="min-h-screen mt-20 bg-slate-50/50">
-      {/* ── STICKY TOP CTA ── */}
-      {stickyCtaVisible && (
-        <div className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm px-4 py-2.5">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-sm flex-shrink-0 shadow-sm"
-                style={{
-                  background: `linear-gradient(135deg,${agent.avatarColor},${agent.avatarColor}90)`,
-                }}
-              >
-                {agent.initials}
-              </div>
-              <div className="hidden sm:block">
-                <p className="font-semibold text-slate-900 text-sm leading-none">
-                  {agent.name}
-                </p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <Stars rating={agent.rating} size={11} />
-                  <span className="text-xs text-slate-400">
-                    {agent.rating} ({agent.reviews})
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 items-center">
-              <a
-                href={`https://wa.me/${agent.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="hidden sm:flex items-center gap-1.5 py-2 px-3.5 rounded-lg bg-[#25D366] text-white text-xs font-semibold hover:bg-[#1ebe5d] transition"
-              >
-                <MessageCircle size={13} /> WhatsApp
-              </a>
-              <button
-                onClick={() => setBooking(true)}
-                className="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-[#4161df] text-white text-xs font-semibold shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200"
-              >
-                <Calendar size={13} /> Book Free Consultation
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    <>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');`}</style>
 
-      {/* ── BACK LINK ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-4">
-        <Link
-          href="/agents"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-[#4161df] transition-colors"
-        >
-          <ArrowLeft size={13} /> All Agents
-        </Link>
-      </div>
-
-      {/* ══════════════════════════════════════
-          HERO PROFILE CARD
-      ══════════════════════════════════════ */}
-      <div ref={heroRef} className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
-        <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm overflow-hidden">
+      <div className="min-h-screen mt-20" style={{ background: "#f7f5f0" }}>
+        {/* ── STICKY TOP CTA ── */}
+        {stickyCtaVisible && (
           <div
-            className="relative h-28 sm:h-36 overflow-hidden"
+            className="fixed top-0 left-0 right-0 z-40 backdrop-blur-md border-b px-4 py-2.5"
             style={{
-              background: `linear-gradient(135deg, ${agent.coverColor} 0%, #1e3080 60%, ${agent.avatarColor} 100%)`,
+              background: "rgba(255,255,255,.96)",
+              borderColor: "#e8eaf0",
             }}
           >
-            <div
-              className="absolute inset-0 opacity-[0.06]"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle, white 1px, transparent 1px)",
-                backgroundSize: "22px 22px",
-              }}
-            />
-            <svg
-              className="absolute bottom-0 right-0 w-64 h-full opacity-[0.08]"
-              viewBox="0 0 200 100"
-              fill="none"
-            >
-              <path d="M200 0 L200 100 L0 100 Z" fill="white" />
-            </svg>
-            <div className="absolute top-4 right-4 flex gap-2">
-              <button
-                onClick={() => setLiked(!liked)}
-                className={`w-9 h-9 rounded-lg backdrop-blur-sm flex items-center justify-center transition-all border ${liked ? "bg-red-50 border-red-200" : "bg-white/20 border-white/20 hover:bg-white/30"}`}
-              >
-                <Heart
-                  size={15}
-                  className={liked ? "text-red-500 fill-red-500" : "text-white"}
-                />
-              </button>
-              <button className="w-9 h-9 rounded-lg bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/30 transition">
-                <Share2 size={15} className="text-white" />
-              </button>
-            </div>
-          </div>
-
-          <div className="px-5 sm:px-8 pb-6">
-            <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-10 sm:-mt-12 mb-5">
-              <div className="relative flex-shrink-0">
-                <div
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center font-bold text-white text-2xl sm:text-3xl border-[3px] border-white shadow-lg"
-                  style={{
-                    background: `linear-gradient(135deg, ${agent.avatarColor}, ${agent.avatarColor}90)`,
-                  }}
-                >
-                  {agent.initials}
-                </div>
-                {agent.verified && (
-                  <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm ring-1 ring-slate-200/60">
-                    <BadgeCheck
-                      size={15}
-                      className="text-[#4161df]"
-                      fill="#eef1fd"
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {/* Sticky avatar */}
+                {agent.avatar ? (
+                  <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 relative">
+                    <Image
+                      src={agent.avatar}
+                      alt={agent.name}
+                      fill
+                      sizes="36px"
+                      style={{ objectFit: "cover" }}
                     />
-                  </span>
+                  </div>
+                ) : (
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg,${agent.avatarColor},${agent.avatarColor}90)`,
+                    }}
+                  >
+                    {agent.initials}
+                  </div>
                 )}
-              </div>
-              <div className="flex-1 pb-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
+                <div className="hidden sm:block">
+                  <p className="font-semibold text-slate-900 text-sm leading-none">
                     {agent.name}
-                  </h1>
-                  {agent.topAgent && (
-                    <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200/60 text-amber-700 text-[10px] font-semibold px-2 py-0.5 rounded-md">
-                      <Sparkles size={9} /> Top Agent
-                    </span>
-                  )}
-                </div>
-                <p className="text-slate-500 text-sm mt-0.5">{agent.title}</p>
-                <div className="flex flex-wrap items-center gap-3 mt-2">
-                  <div className="flex items-center gap-1.5">
-                    <Stars rating={agent.rating} size={14} />
-                    <span className="font-bold text-slate-800 text-sm">
-                      {agent.rating}
-                    </span>
+                  </p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Stars rating={agent.rating} size={11} />
                     <span className="text-xs text-slate-400">
-                      ({agent.reviews} reviews)
+                      {agent.rating} ({agent.reviews})
                     </span>
                   </div>
-                  <span className="text-slate-200">·</span>
-                  <span className="flex items-center gap-1 text-xs text-slate-500 font-medium">
-                    <Zap size={12} className="text-[#4161df]" /> Responds{" "}
-                    {agent.responseTime}
-                  </span>
                 </div>
               </div>
-              <div className="hidden sm:flex gap-2 pb-1 flex-shrink-0">
+              <div className="flex gap-2 items-center">
                 <a
                   href={`https://wa.me/${agent.whatsapp}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#25D366] text-white font-semibold text-sm hover:bg-[#1ebe5d] transition shadow-sm"
+                  className="hidden sm:flex items-center gap-1.5 py-2 px-3.5 rounded-xl text-white text-xs font-semibold transition"
+                  style={{ background: "#25D366" }}
                 >
-                  <MessageCircle size={15} /> WhatsApp
+                  <MessageCircle size={13} /> WhatsApp
                 </a>
                 <button
                   onClick={() => setBooking(true)}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#4161df] text-white font-semibold text-sm shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200"
+                  className="flex items-center gap-1.5 py-2 px-4 rounded-xl text-white text-xs font-semibold shadow-sm transition-all duration-200 active:scale-[0.98]"
+                  style={{ background: "#0f172a" }}
                 >
-                  <Calendar size={15} /> Book Consultation
+                  <Calendar size={13} /> Book Free Consultation
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── BACK LINK ── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-4">
+          <Link
+            href="/agents"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 transition-colors hover:text-[#4161df]"
+          >
+            <ArrowLeft size={13} /> All agents
+          </Link>
+        </div>
+
+        {/* ══════════ HERO PROFILE CARD ══════════ */}
+        <div ref={heroRef} className="max-w-7xl mx-auto px-4 sm:px-6 pb-6">
+          <div className="rounded-2xl overflow-hidden" style={cardStyle}>
+            <div
+              className="relative h-28 sm:h-36 overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, ${agent.coverColor} 0%, #1e3080 60%, ${agent.avatarColor} 100%)`,
+              }}
+            >
+              <div
+                className="absolute inset-0 opacity-[0.06]"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(circle, white 1px, transparent 1px)",
+                  backgroundSize: "22px 22px",
+                }}
+              />
+              <div className="absolute top-4 right-4 flex gap-2">
+                <button
+                  onClick={() => setLiked(!liked)}
+                  className="w-9 h-9 rounded-xl backdrop-blur-sm flex items-center justify-center transition-all border"
+                  style={
+                    liked
+                      ? {
+                          background: "rgba(254,242,242,.95)",
+                          borderColor: "rgba(254,202,202,.6)",
+                        }
+                      : {
+                          background: "rgba(255,255,255,.18)",
+                          borderColor: "rgba(255,255,255,.2)",
+                        }
+                  }
+                >
+                  <Heart
+                    size={15}
+                    className={
+                      liked ? "text-red-500 fill-red-500" : "text-white"
+                    }
+                  />
+                </button>
+                <button
+                  className="w-9 h-9 rounded-xl backdrop-blur-sm border flex items-center justify-center transition"
+                  style={{
+                    background: "rgba(255,255,255,.18)",
+                    borderColor: "rgba(255,255,255,.2)",
+                  }}
+                >
+                  <Share2 size={15} className="text-white" />
                 </button>
               </div>
             </div>
 
-            {/* Info chips */}
-            <div className="flex flex-wrap gap-2 mb-5">
-              {agent.locations.map((l) => (
-                <span
-                  key={l}
-                  className="inline-flex items-center gap-1 text-xs font-medium bg-[#eef1fd] text-[#4161df] px-2.5 py-1 rounded-md border border-[#4161df]/10"
-                >
-                  <MapPin size={10} />
-                  {l}
-                </span>
-              ))}
-              <span className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">
-                <Shield size={10} className="text-green-600" /> RERA:{" "}
-                {agent.rera}
-              </span>
-              <span className="inline-flex items-center gap-1 text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md">
-                <Languages size={10} /> {agent.languages.join(" · ")}
-              </span>
-            </div>
-
-            {/* Stats grid */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
-              {agent.stats.map((s) => (
-                <div
-                  key={s.label}
-                  className="flex flex-col items-center bg-slate-50 rounded-lg py-3 px-1 border border-slate-100"
-                >
-                  <span className="text-lg mb-1">{s.icon}</span>
-                  <span className="text-sm font-bold text-slate-800 leading-none">
-                    {s.value}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium mt-0.5 text-center leading-tight">
-                    {s.label}
-                  </span>
+            <div className="px-5 sm:px-8 pb-6">
+              <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-16 sm:-mt-24 mb-5">
+                {/* Avatar - image or initials */}
+                <div className="relative flex-shrink-0">
+                  {agent.avatar ? (
+                    <>
+                      <div
+                        className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl overflow-hidden border-[4px] border-white shadow-lg relative"
+                        style={{ borderRadius: "1.25rem" }}
+                      >
+                        <Image
+                          src={agent.avatar}
+                          alt={agent.name}
+                          fill
+                          sizes="192px"
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                      {agent.verified && (
+                        <span
+                          className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md"
+                          style={{ boxShadow: "0 0 0 2px #e2e8f0" }}
+                        >
+                          <BadgeCheck
+                            size={20}
+                            style={{ color: "#4161df" }}
+                            fill="#eef1fd"
+                          />
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className="w-40 h-40 sm:w-48 sm:h-48 rounded-3xl flex items-center justify-center font-bold text-white text-4xl sm:text-5xl border-[4px] border-white shadow-lg"
+                        style={{
+                          background: `linear-gradient(135deg, ${agent.avatarColor}, ${agent.avatarColor}90)`,
+                        }}
+                      >
+                        {agent.initials}
+                      </div>
+                      {agent.verified && (
+                        <span
+                          className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md"
+                          style={{ boxShadow: "0 0 0 2px #e2e8f0" }}
+                        >
+                          <BadgeCheck
+                            size={20}
+                            style={{ color: "#4161df" }}
+                            fill="#eef1fd"
+                          />
+                        </span>
+                      )}
+                    </>
+                  )}
                 </div>
-              ))}
-            </div>
+                <div className="flex-1 pb-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1
+                      className="text-[28px] sm:text-[34px] text-slate-900 leading-tight"
+                      style={serif}
+                    >
+                      {agent.name}
+                    </h1>
+                    {agent.topAgent && (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                        style={{
+                          background: "rgba(251,191,36,.12)",
+                          border: "1px solid rgba(251,191,36,.35)",
+                          color: "#b45309",
+                        }}
+                      >
+                        <Sparkles size={9} /> Top Agent
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-slate-500 text-sm mt-0.5">{agent.title}</p>
+                  <div className="flex flex-wrap items-center gap-3 mt-2">
+                    <div className="flex items-center gap-1.5">
+                      <Stars rating={agent.rating} size={14} />
+                      <span className="font-semibold text-slate-800 text-sm">
+                        {agent.rating}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        ({agent.reviews} reviews)
+                      </span>
+                    </div>
+                    <span className="text-slate-200">·</span>
+                    <span className="flex items-center gap-1 text-xs text-slate-500 font-medium">
+                      <Zap size={12} style={{ color: "#4161df" }} /> Responds{" "}
+                      {agent.responseTime}
+                    </span>
+                  </div>
+                </div>
+                <div className="hidden sm:flex gap-2 pb-1 flex-shrink-0">
+                  <a
+                    href={`https://wa.me/${agent.whatsapp}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-white font-semibold text-sm shadow-sm transition"
+                    style={{ background: "#25D366" }}
+                  >
+                    <MessageCircle size={15} /> WhatsApp
+                  </a>
+                  <button
+                    onClick={() => setBooking(true)}
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-white font-semibold text-sm shadow-sm transition-all duration-200 active:scale-[0.98]"
+                    style={{ background: "#0f172a" }}
+                  >
+                    <Calendar size={15} /> Book Consultation
+                  </button>
+                </div>
+              </div>
 
-            {/* Mobile CTAs */}
-            <div className="flex gap-2 sm:hidden mt-5">
-              <button
-                onClick={() => setBooking(true)}
-                className="flex-1 py-3 rounded-lg bg-[#4161df] text-white font-semibold text-sm flex items-center justify-center gap-1.5 shadow-sm"
-              >
-                <Calendar size={14} /> Book Consultation
-              </button>
-              <a
-                href={`https://wa.me/${agent.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-12 h-12 rounded-lg bg-[#25D366] flex items-center justify-center shadow-sm"
-              >
-                <MessageCircle size={18} className="text-white" />
-              </a>
-              <a
-                href={`tel:${agent.phone}`}
-                className="w-12 h-12 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center hover:bg-slate-100"
-              >
-                <Phone size={16} className="text-slate-500" />
-              </a>
+              {/* Info chips */}
+              <div className="flex flex-wrap gap-2 mb-5">
+                {agent.locations.map((l) => (
+                  <span
+                    key={l}
+                    className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg"
+                    style={{
+                      background: "rgba(65,97,223,.08)",
+                      color: "#4161df",
+                      border: "1px solid rgba(65,97,223,.15)",
+                    }}
+                  >
+                    <MapPin size={10} />
+                    {l}
+                  </span>
+                ))}
+                <span
+                  className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 px-2.5 py-1 rounded-lg"
+                  style={{ background: "#f4f6f9", border: "1px solid #eaecf0" }}
+                >
+                  <Shield size={10} className="text-green-600" /> RERA:{" "}
+                  {agent.rera}
+                </span>
+                <span
+                  className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 px-2.5 py-1 rounded-lg"
+                  style={{ background: "#f4f6f9", border: "1px solid #eaecf0" }}
+                >
+                  <Languages size={10} /> {agent.languages.join(" · ")}
+                </span>
+              </div>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+                {agent.stats.map((s) => (
+                  <div
+                    key={s.label}
+                    className="flex flex-col items-center rounded-xl py-3 px-1"
+                    style={{
+                      background: "#f8fafc",
+                      border: "1px solid #f1f5f9",
+                    }}
+                  >
+                    <span className="text-lg mb-1">{s.icon}</span>
+                    <span className="text-sm font-semibold text-slate-800 leading-none">
+                      {s.value}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium mt-0.5 text-center leading-tight">
+                      {s.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Mobile CTAs */}
+              <div className="flex gap-2 sm:hidden mt-5">
+                <button
+                  onClick={() => setBooking(true)}
+                  className="flex-1 py-3 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-1.5 shadow-sm"
+                  style={{ background: "#0f172a" }}
+                >
+                  <Calendar size={14} /> Book Consultation
+                </button>
+                <a
+                  href={`https://wa.me/${agent.whatsapp}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
+                  style={{ background: "#25D366" }}
+                >
+                  <MessageCircle size={18} className="text-white" />
+                </a>
+                <a
+                  href={`tel:${agent.phone}`}
+                  className="w-12 h-12 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center hover:bg-slate-100"
+                >
+                  <Phone size={16} className="text-slate-500" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ══════════════════════════════════════
-          MAIN CONTENT  (two-col on desktop)
-      ══════════════════════════════════════ */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* ─── LEFT ─── */}
-          <div className="flex-1 min-w-0">
-            {/* Tab bar */}
-            <div className="flex bg-white rounded-xl border border-slate-200/70 shadow-sm p-1 mb-6">
-              {(["about", "listings", "reviews"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-semibold capitalize transition-all duration-200 ${activeTab === tab ? "bg-[#4161df] text-white shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                >
-                  {tab === "reviews"
-                    ? `Reviews (${agent.reviews_data.length})`
-                    : tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </div>
+        {/* ══════════ MAIN CONTENT ══════════ */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* ─── LEFT ─── */}
+            <div className="flex-1 min-w-0">
+              {/* Tab bar */}
+              <div className="flex rounded-2xl p-1 mb-6" style={cardStyle}>
+                {(["about", "listings", "reviews"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold capitalize transition-all duration-200"
+                    style={
+                      activeTab === tab
+                        ? { background: "#4161df", color: "#fff" }
+                        : { color: "#64748b" }
+                    }
+                  >
+                    {tab === "reviews"
+                      ? `Reviews (${agent.reviews_data.length})`
+                      : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
 
-            {activeTab === "about" && (
-              <div className="flex flex-col gap-5">
-                {/* Bio */}
-                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
-                  <h2 className="text-[15px] font-bold text-slate-900 mb-4">
-                    About {agent.name}
-                  </h2>
-                  <div className="relative pl-4 border-l-2 border-[#4161df]/20">
-                    <Quote
-                      size={22}
-                      className="absolute -top-0.5 -left-2.5 text-[#4161df]/10 fill-[#4161df]/10"
-                    />
-                    {agent.longBio.split("\n\n").map((para, i) => (
-                      <p
-                        key={i}
-                        className="text-sm text-slate-600 leading-relaxed mb-3 last:mb-0"
-                      >
-                        {para}
-                      </p>
+              {activeTab === "about" && (
+                <div className="flex flex-col gap-5">
+                  {/* Bio */}
+                  <div className="rounded-2xl p-5 sm:p-6" style={cardStyle}>
+                    <h2
+                      className="text-[19px] text-slate-900 mb-4"
+                      style={serif}
+                    >
+                      About {agent.name}
+                    </h2>
+                    <div
+                      className="relative pl-4"
+                      style={{ borderLeft: "2px solid rgba(65,97,223,.18)" }}
+                    >
+                      <Quote
+                        size={22}
+                        className="absolute -top-0.5 -left-2.5"
+                        style={{ color: "rgba(65,97,223,.10)" }}
+                      />
+                      {agent.longBio.split("\n\n").map((para, i) => (
+                        <p
+                          key={i}
+                          className="text-[13.5px] text-slate-600 leading-relaxed mb-3 last:mb-0"
+                        >
+                          {para}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Achievements */}
+                  <div className="rounded-2xl p-5 sm:p-6" style={cardStyle}>
+                    <h2
+                      className="text-[19px] text-slate-900 mb-4 flex items-center gap-2"
+                      style={serif}
+                    >
+                      <Award size={17} className="text-amber-500" /> Awards &
+                      achievements
+                    </h2>
+                    <ul className="flex flex-col gap-2.5">
+                      {agent.achievements.map((a, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <CheckCircle2
+                            size={16}
+                            className="flex-shrink-0 mt-0.5"
+                            style={{ color: "#4161df" }}
+                          />
+                          <span className="text-[13.5px] text-slate-700 font-medium">
+                            {a}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Specialisations */}
+                  <div className="rounded-2xl p-5 sm:p-6" style={cardStyle}>
+                    <h2
+                      className="text-[19px] text-slate-900 mb-4"
+                      style={serif}
+                    >
+                      Specialisations
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {agent.specialisations.map((s) => (
+                        <span
+                          key={s}
+                          className="inline-flex items-center gap-1.5 text-[13px] font-medium px-3.5 py-1.5 rounded-lg"
+                          style={{
+                            background: "rgba(65,97,223,.08)",
+                            color: "#4161df",
+                            border: "1px solid rgba(65,97,223,.15)",
+                          }}
+                        >
+                          <Home size={12} />
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* LISTINGS TAB */}
+              {activeTab === "listings" && (
+                <div className="flex flex-col gap-5">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-[19px] text-slate-900" style={serif}>
+                      {agent.listings.length} active listings
+                    </h2>
+                    <Link
+                      href="/properties"
+                      className="text-xs font-semibold flex items-center gap-0.5 hover:underline"
+                      style={{ color: "#4161df" }}
+                    >
+                      View all <ChevronRight size={12} />
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {agent.listings.map((l) => (
+                      <PropertyCard key={l.id} card={toPropertyCard(l)} />
                     ))}
                   </div>
                 </div>
+              )}
 
-                {/* Achievements */}
-                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
-                  <h2 className="text-[15px] font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <Award size={16} className="text-amber-500" /> Awards &
-                    Achievements
-                  </h2>
-                  <ul className="flex flex-col gap-2.5">
-                    {agent.achievements.map((a, i) => (
-                      <li key={i} className="flex items-start gap-3">
+              {/* REVIEWS TAB */}
+              {activeTab === "reviews" && (
+                <div className="flex flex-col gap-5">
+                  <div className="rounded-2xl p-5 sm:p-6" style={cardStyle}>
+                    <div className="flex gap-6 items-center">
+                      <div className="text-center flex-shrink-0">
+                        <div
+                          className="text-[34px] text-slate-900"
+                          style={serif}
+                        >
+                          {agent.rating}
+                        </div>
+                        <Stars rating={agent.rating} size={14} />
+                        <p className="text-xs text-slate-400 mt-1">
+                          {agent.reviews} reviews
+                        </p>
+                      </div>
+                      <div className="flex-1 flex flex-col gap-1.5">
+                        {ratingDist.map((r) => (
+                          <div key={r.star} className="flex items-center gap-2">
+                            <span className="text-xs text-slate-500 w-4">
+                              {r.star}
+                            </span>
+                            <Star
+                              size={10}
+                              className="text-amber-400 fill-amber-400 flex-shrink-0"
+                            />
+                            <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-amber-400"
+                                style={{ width: `${r.pct}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-slate-400 w-6 text-right">
+                              {r.count}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {agent.reviews_data.map((r) => (
+                    <div
+                      key={r.id}
+                      className="rounded-2xl p-5"
+                      style={cardStyle}
+                    >
+                      <div className="flex items-start gap-3.5">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
+                          style={{ background: r.color }}
+                        >
+                          {r.initials}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 flex-wrap">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-slate-900 text-sm">
+                                  {r.name}
+                                </span>
+                                {r.verified && (
+                                  <span
+                                    className="inline-flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md"
+                                    style={{
+                                      color: "#16a34a",
+                                      background: "rgba(22,163,74,.08)",
+                                      border: "1px solid rgba(22,163,74,.2)",
+                                    }}
+                                  >
+                                    <BadgeCheck size={9} /> Verified
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 mt-0.5">
+                                {r.propertyType} · {r.date}
+                              </p>
+                            </div>
+                            <Stars rating={r.rating} size={12} />
+                          </div>
+                          <p className="text-sm text-slate-600 leading-relaxed mt-2">
+                            {r.text}
+                          </p>
+                          <button className="mt-2 flex items-center gap-1 text-xs text-slate-400 font-medium transition hover:text-[#4161df]">
+                            <ThumbsUp size={11} /> Helpful ({r.helpful})
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ─── RIGHT SIDEBAR ─── */}
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <div className="sticky top-20 flex flex-col gap-4">
+                <div className="rounded-2xl p-5" style={cardStyle}>
+                  <h3 className="text-[15px] text-slate-900 mb-4" style={serif}>
+                    Get in touch
+                  </h3>
+                  <div className="flex flex-col gap-2.5">
+                    <button
+                      onClick={() => setBooking(true)}
+                      className="w-full py-3 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all duration-200 active:scale-[0.98]"
+                      style={{ background: "#0f172a" }}
+                    >
+                      <Calendar size={14} /> Book free consultation
+                    </button>
+                    <a
+                      href={`https://wa.me/${agent.whatsapp}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full py-3 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 transition"
+                      style={{ background: "#25D366" }}
+                    >
+                      <MessageCircle size={14} /> Chat on WhatsApp
+                    </a>
+                    <a
+                      href={`tel:${agent.phone}`}
+                      className="w-full py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition"
+                    >
+                      <Phone size={14} /> {agent.phone}
+                    </a>
+                  </div>
+                  <div
+                    className="mt-4 pt-4 flex items-center gap-2"
+                    style={{ borderTop: "1px solid #f1f5f9" }}
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-xs text-slate-500 font-medium">
+                      Usually responds in {agent.responseTime}
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-2xl p-5"
+                  style={{
+                    background: "rgba(65,97,223,.06)",
+                    border: "1px solid rgba(65,97,223,.16)",
+                  }}
+                >
+                  <h3
+                    className="text-[15px] mb-3 flex items-center gap-1.5"
+                    style={{ ...serif, color: "#2a3ebf" }}
+                  >
+                    <Shield size={15} /> Why you can trust{" "}
+                    {agent.name.split(" ")[0]}
+                  </h3>
+                  <ul className="flex flex-col gap-2">
+                    {[
+                      "Identity verified by PropertyBulbul",
+                      "RERA certified — " + agent.rera,
+                      "Background checked",
+                      "All reviews from real clients",
+                      "Zero commission from buyer",
+                    ].map((t) => (
+                      <li
+                        key={t}
+                        className="flex items-start gap-2 text-xs font-medium leading-snug"
+                        style={{ color: "#2a4bc4" }}
+                      >
                         <CheckCircle2
-                          size={16}
-                          className="text-[#4161df] flex-shrink-0 mt-0.5"
+                          size={13}
+                          className="flex-shrink-0 mt-0.5"
+                          style={{ color: "#4161df" }}
                         />
-                        <span className="text-sm text-slate-700 font-medium">
-                          {a}
-                        </span>
+                        {t}
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Specialisations */}
-                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
-                  <h2 className="text-[15px] font-bold text-slate-900 mb-4">
-                    Specialisations
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {agent.specialisations.map((s) => (
-                      <span
-                        key={s}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium bg-[#eef1fd] text-[#4161df] px-3.5 py-1.5 rounded-md border border-[#4161df]/10"
+                <div className="rounded-2xl p-5" style={cardStyle}>
+                  <h3 className="text-[15px] text-slate-900 mb-3" style={serif}>
+                    Other top agents
+                  </h3>
+                  <div className="flex flex-col gap-1.5">
+                    {[
+                      {
+                        n: "Neha Verma",
+                        t: "Luxury Specialist",
+                        rating: 4.8,
+                        color: "#7c3aed",
+                        initials: "NV",
+                      },
+                      {
+                        n: "Rajesh Malhotra",
+                        t: "NRI Investments",
+                        rating: 4.8,
+                        color: "#d97706",
+                        initials: "RM",
+                      },
+                    ].map((a) => (
+                      <Link
+                        key={a.n}
+                        href={`/agents/${a.n.toLowerCase().replace(" ", "-")}`}
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition group"
                       >
-                        <Home size={12} />
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ── LISTINGS TAB ── */}
-            {activeTab === "listings" && (
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-[15px] font-bold text-slate-900">
-                    {agent.listings.length} Active Listings
-                  </h2>
-                  <Link
-                    href="/properties"
-                    className="text-xs font-semibold text-[#4161df] hover:underline flex items-center gap-0.5"
-                  >
-                    View all <ChevronRight size={12} />
-                  </Link>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {agent.listings.map((l) => (
-                    <ListingCard key={l.id} listing={l} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ── REVIEWS TAB ── */}
-            {activeTab === "reviews" && (
-              <div className="flex flex-col gap-5">
-                <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5 sm:p-6">
-                  <div className="flex gap-6 items-center">
-                    <div className="text-center flex-shrink-0">
-                      <div className="text-4xl font-bold text-slate-900">
-                        {agent.rating}
-                      </div>
-                      <Stars rating={agent.rating} size={14} />
-                      <p className="text-xs text-slate-400 mt-1">
-                        {agent.reviews} reviews
-                      </p>
-                    </div>
-                    <div className="flex-1 flex flex-col gap-1.5">
-                      {ratingDist.map((r) => (
-                        <div key={r.star} className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500 w-4">
-                            {r.star}
-                          </span>
+                        <div
+                          className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-xs flex-shrink-0"
+                          style={{ background: a.color }}
+                        >
+                          {a.initials}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-slate-900 truncate">
+                            {a.n}
+                          </p>
+                          <p className="text-[11px] text-slate-400 truncate">
+                            {a.t}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-0.5">
                           <Star
                             size={10}
-                            className="text-amber-400 fill-amber-400 flex-shrink-0"
+                            className="text-amber-400 fill-amber-400"
                           />
-                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-amber-400"
-                              style={{ width: `${r.pct}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-slate-400 w-6 text-right">
-                            {r.count}
+                          <span className="text-xs font-semibold text-slate-700">
+                            {a.rating}
                           </span>
                         </div>
-                      ))}
-                    </div>
+                      </Link>
+                    ))}
                   </div>
-                </div>
-
-                {agent.reviews_data.map((r) => (
-                  <div
-                    key={r.id}
-                    className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5"
+                  <Link
+                    href="/agents"
+                    className="mt-3 flex items-center justify-center gap-1 text-xs font-semibold hover:underline"
+                    style={{ color: "#4161df" }}
                   >
-                    <div className="flex items-start gap-3.5">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
-                        style={{ background: r.color }}
-                      >
-                        {r.initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 flex-wrap">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold text-slate-900 text-sm">
-                                {r.name}
-                              </span>
-                              {r.verified && (
-                                <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded-md border border-green-200">
-                                  <BadgeCheck size={9} /> Verified
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] text-slate-400 mt-0.5">
-                              {r.propertyType} · {r.date}
-                            </p>
-                          </div>
-                          <Stars rating={r.rating} size={12} />
-                        </div>
-                        <p className="text-sm text-slate-600 leading-relaxed mt-2">
-                          {r.text}
-                        </p>
-                        <button className="mt-2 flex items-center gap-1 text-xs text-slate-400 hover:text-[#4161df] transition font-medium">
-                          <ThumbsUp size={11} /> Helpful ({r.helpful})
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* ─── RIGHT SIDEBAR ─── */}
-          <div className="w-full lg:w-80 flex-shrink-0">
-            <div className="sticky top-20 flex flex-col gap-4">
-              <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5">
-                <h3 className="font-bold text-slate-900 text-[13px] mb-4">
-                  Get in Touch
-                </h3>
-                <div className="flex flex-col gap-2.5">
-                  <button
-                    onClick={() => setBooking(true)}
-                    className="w-full py-3 rounded-lg bg-[#4161df] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-[#3456df] active:scale-[0.98] transition-all duration-200"
-                  >
-                    <Calendar size={14} /> Book Free Consultation
-                  </button>
-                  <a
-                    href={`https://wa.me/${agent.whatsapp}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full py-3 rounded-lg bg-[#25D366] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#1ebe5d] transition"
-                  >
-                    <MessageCircle size={14} /> Chat on WhatsApp
-                  </a>
-                  <a
-                    href={`tel:${agent.phone}`}
-                    className="w-full py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 font-semibold text-sm flex items-center justify-center gap-2 hover:bg-slate-100 transition"
-                  >
-                    <Phone size={14} /> {agent.phone}
-                  </a>
+                    View all agents <ChevronRight size={12} />
+                  </Link>
                 </div>
-                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-xs text-slate-500 font-medium">
-                    Usually responds in {agent.responseTime}
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#eef1fd] rounded-xl border border-[#c9d4fb]/60 p-5">
-                <h3 className="font-bold text-[#4161df] text-[13px] mb-3 flex items-center gap-1.5">
-                  <Shield size={14} /> Why you can trust{" "}
-                  {agent.name.split(" ")[0]}
-                </h3>
-                <ul className="flex flex-col gap-2">
-                  {[
-                    "Identity verified by PropertyBulbul",
-                    "RERA certified — " + agent.rera,
-                    "Background checked ✓",
-                    "All reviews from real clients",
-                    "Zero commission from buyer",
-                  ].map((t) => (
-                    <li
-                      key={t}
-                      className="flex items-start gap-2 text-xs text-[#2a4bc4] font-medium leading-snug"
-                    >
-                      <CheckCircle2
-                        size={13}
-                        className="flex-shrink-0 mt-0.5 text-[#4161df]"
-                      />
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-5">
-                <h3 className="font-bold text-slate-900 text-[13px] mb-3">
-                  Other Top Agents
-                </h3>
-                <div className="flex flex-col gap-1.5">
-                  {[
-                    {
-                      n: "Neha Verma",
-                      t: "Luxury Specialist",
-                      rating: 4.8,
-                      color: "#7c3aed",
-                      initials: "NV",
-                    },
-                    {
-                      n: "Rajesh Malhotra",
-                      t: "NRI Investments",
-                      rating: 4.8,
-                      color: "#d97706",
-                      initials: "RM",
-                    },
-                  ].map((a) => (
-                    <Link
-                      key={a.n}
-                      href={`/agents/${a.n.toLowerCase().replace(" ", "-")}`}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition group"
-                    >
-                      <div
-                        className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-white text-xs flex-shrink-0"
-                        style={{ background: a.color }}
-                      >
-                        {a.initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-900 truncate">
-                          {a.n}
-                        </p>
-                        <p className="text-[11px] text-slate-400 truncate">
-                          {a.t}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-0.5">
-                        <Star
-                          size={10}
-                          className="text-amber-400 fill-amber-400"
-                        />
-                        <span className="text-xs font-semibold text-slate-700">
-                          {a.rating}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-                <Link
-                  href="/agents"
-                  className="mt-3 flex items-center justify-center gap-1 text-xs font-semibold text-[#4161df] hover:underline"
-                >
-                  View all agents <ChevronRight size={12} />
-                </Link>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {booking && (
-        <BookingModal agent={agent} onClose={() => setBooking(false)} />
-      )}
-    </div>
+        {booking && (
+          <BookingModal agent={agent} onClose={() => setBooking(false)} />
+        )}
+      </div>
+    </>
   );
 }
