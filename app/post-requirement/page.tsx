@@ -131,8 +131,12 @@ const CSS = `
   --sh:0 4px 20px rgba(14,27,77,.10);--sh-lg:0 12px 40px rgba(14,27,77,.14);
 }
 .pb{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:var(--ink);}
-.pb-hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 55%,#2D4BC4 100%);padding:3rem 1.5rem 5.5rem;text-align:center;position:relative;overflow:hidden;}
+.pb-hero{background:linear-gradient(135deg,#1e3a5f 0%,#4161df 100%);padding:3rem 1.5rem 5.5rem;text-align:center;position:relative;overflow:hidden;}
 .pb-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(65,97,223,.25) 0%,transparent 70%);}
+.pb-hero-dots{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
+.pb-hero-circle{position:absolute;border-radius:50%;background:white;pointer-events:none;}
+.pb-hero-wave{position:absolute;bottom:0;left:0;width:100%;overflow:hidden;line-height:0;pointer-events:none;}
+.pb-hero-wave svg{fill:var(--bg);}
 .pb-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:1.75rem;position:relative;}
 .pb-logo-icon{width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
 .pb-logo-text{font-size:1.2rem;font-weight:700;color:#fff;}
@@ -347,6 +351,40 @@ export default function DreamHomeEnquiry() {
       <div className="pb">
         {/* Hero */}
         <div className="pb-hero">
+          {/* Dot grid */}
+          <div className="pb-hero-dots" />
+          {/* Decorative circles */}
+          <div
+            className="pb-hero-circle"
+            style={{
+              width: 300,
+              height: 300,
+              top: -100,
+              left: -80,
+              opacity: 0.06,
+            }}
+          />
+          <div
+            className="pb-hero-circle"
+            style={{
+              width: 200,
+              height: 200,
+              top: 20,
+              right: -60,
+              opacity: 0.08,
+            }}
+          />
+          <div
+            className="pb-hero-circle"
+            style={{
+              width: 150,
+              height: 150,
+              bottom: -60,
+              left: "40%",
+              opacity: 0.05,
+            }}
+          />
+
           <div className="pb-hero-tag mt-2">
             🏆 Tricity's Most Trusted Platform
           </div>
@@ -359,6 +397,17 @@ export default function DreamHomeEnquiry() {
             No hidden charges · No spam calls · Verified listings · Zero
             brokerage surprises
           </p>
+
+          {/* Bottom wave */}
+          <div className="pb-hero-wave">
+            <svg
+              viewBox="0 0 1440 40"
+              preserveAspectRatio="none"
+              className="w-full h-8"
+            >
+              <path d="M0,24 C480,40 960,8 1440,24 L1440,40 L0,40 Z" />
+            </svg>
+          </div>
         </div>
 
         <div className="pb-wrap">
