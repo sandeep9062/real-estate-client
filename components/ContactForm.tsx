@@ -74,26 +74,6 @@ export default function ContactPage() {
             Have questions about buying, renting, or investing? Our dedicated
             team is here to provide guidance and support.
           </p>
-
-          <div className="space-y-5">
-            {[
-              { icon: Phone, text: "+91 97299 07448" },
-              { icon: Mail, text: "bulbulproperty@gmail.com" },
-              { icon: Clock, text: "Mon - Sat, 9 AM - 7 PM" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 group">
-                <div className="bg-slate-100 group-hover:bg-[#4161df] transition-colors duration-300 p-3 rounded-full flex items-center justify-center flex-shrink-0">
-                  <item.icon
-                    className="text-slate-500 group-hover:text-white transition-colors duration-300"
-                    size={18}
-                  />
-                </div>
-                <span className="text-slate-700 text-base sm:text-lg">
-                  {item.text}
-                </span>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* RIGHT FORM */}
