@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   UserCheck,
   Building2,
@@ -14,20 +13,6 @@ import {
   Sparkles,
   BadgeCheck,
 } from "lucide-react";
-
-const fadeUp = {
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-};
-
-const cardVariants = {
-  initial: { opacity: 0, y: 36 },
-  animate: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.12 * i, duration: 0.55, ease: "easeOut" as const },
-  }),
-};
 
 const agentBenefits = [
   { icon: TrendingUp, text: "Increase property visibility" },
@@ -52,18 +37,9 @@ const stats = [
 export default function AgentLandlordCTA() {
   return (
     <section className="w-full px-3 sm:px-4 py-12 sm:py-16 md:py-20">
-      <motion.div
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true, margin: "-60px" }}
-        className="mx-auto max-w-6xl"
-      >
+      <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <motion.div
-          variants={fadeUp}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-14"
-        >
+        <div className="text-center mb-10 sm:mb-14">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#4161df]/10 border border-[#4161df]/20 px-4 py-1.5 text-[11px] sm:text-xs font-semibold tracking-widest uppercase text-[#4161df] mb-5">
             <Sparkles size={12} />
             Grow with PropertyBulbul
@@ -105,17 +81,12 @@ export default function AgentLandlordCTA() {
               </React.Fragment>
             ))}
           </div> */}
-        </motion.div>
+        </div>
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
           {/* ─── Agent Card ─── */}
-          <motion.div
-            custom={1}
-            variants={cardVariants}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            className="group relative"
-          >
+          <div className="group relative">
             {/* Glow ring */}
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-[#4161df] to-[#7b93f0] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-300" />
 
@@ -173,15 +144,10 @@ export default function AgentLandlordCTA() {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* ─── Landlord Card ─── */}
-          <motion.div
-            custom={2}
-            variants={cardVariants}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            className="group relative"
-          >
+          <div className="group relative">
             {/* Glow ring */}
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-br from-slate-700 to-slate-900 opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-300" />
 
@@ -240,19 +206,15 @@ export default function AgentLandlordCTA() {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Footer trust note */}
-        <motion.p
-          variants={fadeUp}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center text-xs text-slate-400 dark:text-slate-500 mt-7 flex items-center justify-center gap-1.5"
-        >
+        <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-7 flex items-center justify-center gap-1.5">
           <ShieldCheck size={13} className="text-green-500" />
           Free to register · No credit card required · Verified profiles only
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     </section>
   );
 }

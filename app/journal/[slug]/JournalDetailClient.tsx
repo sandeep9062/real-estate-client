@@ -185,15 +185,16 @@ export default function JournalDetailClient({
           </Group>
         </Group>
 
-        <Image
-          src={
-            journal.coverImage ||
-            "https://images.unsplash.com/photo-1590066305974-26999a08ec40?q=80&w=1200"
-          }
-          radius="md"
-          alt={journal.title}
-          className="h-[250px] sm:h-[350px] md:h-[550px] w-full object-cover"
-        />
+        <div className="w-full rounded-md overflow-hidden">
+          <img
+            src={
+              journal.coverImage ||
+              "https://images.unsplash.com/photo-1590066305974-26999a08ec40?q=80&w=1200"
+            }
+            alt={journal.title}
+            className="w-full h-auto block"
+          />
+        </div>
 
         {/* Render journal content as markdown with responsive Tailwind styling */}
         <div className="w-full max-w-none">
