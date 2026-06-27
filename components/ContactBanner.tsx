@@ -9,8 +9,8 @@ interface ContactBannerProps {
 }
 
 const ContactBanner: React.FC<ContactBannerProps> = ({
-  title = "Get in Touch",
-  subtitle = "We are here to help you with your property needs.",
+  title = "Connect With Tricity Property Experts",
+  subtitle = "Whether you are buying your first home, selling a property, or exploring investment opportunities — get the local insights you need to make confident decisions.",
   image = "/contact-banner.jpg",
 }) => {
   return (

@@ -2,13 +2,13 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-    "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner in Chandigarh",
+    "About PropertyBulbul - Tricity's Property Intelligence Platform",
   description:
-    "Know the story behind PropertyBulbul, Tricity's most trusted real estate partner. Established with a mission to simplify property buying, selling, and investment in Chandigarh, Panchkula, Mohali. Meet our expert team and discover why thousands trust us for their property needs.",
+    "PropertyBulbul is a technology-driven property intelligence platform serving Chandigarh, Mohali, Panchkula, Zirakpur, Kharar & New Chandigarh. We combine hyperlocal data, verified listings, and smart tools to help buyers, sellers, investors & NRIs make confident property decisions.",
   openGraph: {
-    title: "About PropertyBulbul - Tricity's Most Helpful Real Estate Partner",
+    title: "About PropertyBulbul - Tricity's Property Intelligence Platform",
     description:
-      "Know the story behind PropertyBulbul, Tricity's most trusted real estate partner. Meet our expert team serving Chandigarh, Panchkula, and Mohali.",
+      "Discover how PropertyBulbul is transforming property decisions in Tricity with data, transparency, and hyperlocal intelligence — not brokerage.",
     url: "https://www.propertybulbul.com/about-us",
     siteName: "PropertyBulbul",
     type: "website",
@@ -17,15 +17,15 @@ export const metadata: Metadata = {
         url: "https://www.propertybulbul.com/about-image.jpg",
         width: 1200,
         height: 630,
-        alt: "About PropertyBulbul - Real Estate Experts in Tricity",
+        alt: "About PropertyBulbul - Property Intelligence Platform for Tricity",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About PropertyBulbul - Tricity Real Estate Experts",
+    title: "About PropertyBulbul - Tricity Property Intelligence Platform",
     description:
-      "Discover PropertyBulbul's story and mission in Tricity. Expert real estate services in Chandigarh, Panchkula, and Mohali.",
+      "PropertyBulbul combines hyperlocal expertise, verified data, and technology to help you make smarter property decisions across Tricity.",
     images: ["https://www.propertybulbul.com/about-image.jpg"],
   },
   robots: {
@@ -37,20 +37,21 @@ export const metadata: Metadata = {
   },
 };
 
-// About Page Structured Data Component
 function AboutStructuredData() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    name: "About PropertyBulbul - Tricity Real Estate Experts",
+    name: "About PropertyBulbul - Property Intelligence Platform",
     description:
-      "Learn about PropertyBulbul, Tricity's most trusted real estate partner. Meet our team of experts serving Chandigarh, Panchkula, and Mohali.",
+      "Learn about PropertyBulbul, Tricity's property intelligence platform. Technology-driven property decisions for Chandigarh, Mohali, Panchkula, and more.",
     url: "https://www.propertybulbul.com/about-us",
     mainEntity: {
-      "@type": "RealEstateAgent",
+      "@type": "SoftwareApplication",
       name: "PropertyBulbul",
+      applicationCategory: "RealEstateApplication",
+      operatingSystem: "Web",
       description:
-        "Tricity's most helpful real estate partner with expert guidance in buying, selling, and investing in properties across Chandigarh, Panchkula, and Mohali.",
+        "Tricity's Property Intelligence Platform — combining hyperlocal data, verified listings, and smart tools to help buyers, sellers, investors, and NRIs make transparent and confident property decisions in Chandigarh, Mohali, Panchkula, Zirakpur, Kharar, and New Chandigarh.",
       foundingDate: "2024",
       founder: {
         "@type": "Person",
@@ -75,88 +76,35 @@ function AboutStructuredData() {
             "@type": "OpeningHoursSpecification",
             opens: "09:00",
             closes: "19:00",
-            dayOfWeek: [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-            ],
+            dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
           },
         },
       ],
       areaServed: [
-        {
-          "@type": "Place",
-          name: "Chandigarh",
-        },
-        {
-          "@type": "Place",
-          name: "Mohali",
-        },
-        {
-          "@type": "Place",
-          name: "Panchkula",
-        },
-        {
-          "@type": "Place",
-          name: "Zirakpur",
-        },
+        { "@type": "Place", name: "Chandigarh" },
+        { "@type": "Place", name: "Mohali" },
+        { "@type": "Place", name: "Panchkula" },
+        { "@type": "Place", name: "Zirakpur" },
+        { "@type": "Place", name: "Kharar" },
+        { "@type": "Place", name: "New Chandigarh" },
       ],
       knowsAbout: [
-        "Real Estate in Tricity",
-        "Property Buying Chandigarh",
-        "Property Selling Mohali",
-        "Investment Properties Panchkula",
-        "Legal Assistance Real Estate",
-        "Student Accommodation",
-        "Commercial Properties",
+        "Property Intelligence Tricity",
+        "Real Estate Data Chandigarh",
+        "Verified Property Listings Mohali",
+        "Property Market Insights Panchkula",
+        "Hyperlocal Property Analytics",
+        "NRI Property Investment Tricity",
+        "Property Price Trends Chandigarh Tricity",
       ],
-      hasOfferCatalog: {
-        "@type": "OfferCatalog",
-        name: "Real Estate Services",
-        itemListElement: [
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Property Buying Services",
-              description:
-                "Expert assistance in buying residential and commercial properties.",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Property Selling Services",
-              description:
-                "Premium marketing and sales support for property sellers.",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Investment Consulting",
-              description:
-                "Market analysis and guidance for property investments.",
-            },
-          },
-        ],
+      offers: {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Property Intelligence Platform",
+          description: "Data-driven property discovery, market intelligence, and verified listings platform for Tricity.",
+        },
       },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.8",
-        bestRating: "5",
-        ratingCount: "500",
-      },
-      priceRange: "$$",
-      sameAs: [
-        "https://www.facebook.com/propertybulbul",
-        "https://www.instagram.com/propertybulbul",
-      ],
     },
   };
 
@@ -168,11 +116,7 @@ function AboutStructuredData() {
   );
 }
 
-export default function AboutUsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AboutUsLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <AboutStructuredData />

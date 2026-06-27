@@ -14,33 +14,33 @@ import React from "react";
 const points = [
   {
     icon: Home,
-    title: "Vast Property Selection",
-    desc: "Explore thousands of verified listings, from cozy apartments to luxury estates.",
+    title: "Local Market Expertise",
+    desc: "Deep understanding of Chandigarh, Mohali, Panchkula, Zirakpur, Kharar, and New Chandigarh — so you get advice that is relevant to your neighborhood.",
   },
   {
     icon: Filter,
-    title: "Advanced Search Filters",
-    desc: "Find your dream home with powerful filters for location, price, amenities, and more.",
+    title: "Verified Opportunities",
+    desc: "Every listing on our platform is checked for authenticity. No duplicates, no outdated posts — just real properties you can trust.",
   },
   {
     icon: BrainCircuit,
-    title: "AI-Powered Recommendations",
-    desc: "Our smart algorithm suggests properties tailored to your unique preferences.",
+    title: "Personalized Recommendations",
+    desc: "Tell us your preferences and budget. We will handpick options that match your needs — saving you time and effort.",
   },
   {
     icon: BadgeCheck,
-    title: "Verified Agents & Listings",
-    desc: "We ensure every agent and property is legitimate for your peace of mind.",
+    title: "Buyer & Investor Support",
+    desc: "From property evaluation to paperwork guidance, we support you at every stage of your journey with clarity and confidence.",
   },
   {
     icon: Video,
-    title: "Seamless Virtual Tours",
-    desc: "Experience properties from home with our high-quality 360° virtual tours.",
+    title: "Market Insights You Can Use",
+    desc: "Stay ahead with up-to-date pricing trends, neighborhood analysis, and data-driven insights from the Tricity real estate market.",
   },
   {
     icon: BarChart,
-    title: "Expert Market Insights",
-    desc: "Stay informed with the latest market trends and data-driven insights.",
+    title: "Quick & Responsive Support",
+    desc: "Have a question? Expect a prompt, helpful response from our team — because we know the market moves fast.",
   },
 ];
 
@@ -51,13 +51,13 @@ const UniqueSection = () => {
         {/* HEADER */}
         <div className="text-center mb-12 sm:mb-14 lg:mb-18">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
-            Why Choose Us for{" "}
-            <span className="text-[#4161df]">Your Next Home?</span>
+            Why Reach Out to{" "}
+            <span className="text-[#4161df]">PropertyBulbul?</span>
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto">
-            Discover a smarter, simpler, and more transparent way to find your
-            perfect property. We are committed to making your real estate
-            journey a success.
+            We are more than a property listing platform. Think of us as your
+            local Tricity partner — here to help you make smarter, more informed
+            real estate decisions with confidence.
           </p>
         </div>
 

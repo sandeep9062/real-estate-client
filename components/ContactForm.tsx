@@ -67,12 +67,15 @@ export default function ContactPage() {
         {/* LEFT SIDE INFO */}
         <div className="flex flex-col justify-center space-y-6 sm:space-y-8 order-2 lg:order-1">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900">
-            Contact Our{" "}
-            <span className="text-[#4161df]">Real-Estate Experts</span>
+            Get Personalized{" "}
+            <span className="text-[#4161df]">Property Guidance</span>
           </h2>
           <p className="text-slate-600 text-base sm:text-lg lg:text-xl leading-relaxed">
-            Have questions about buying, renting, or investing? Our dedicated
-            team is here to provide guidance and support.
+            Looking for the right property in Chandigarh, Mohali, or Panchkula?
+            Whether you are a homebuyer, seller, or investor, our team combines
+            deep local market knowledge with verified opportunities to help you
+            find the perfect match. Reach out by phone, email, or drop by — we
+            are here to make your property journey smooth and informed.
           </p>
         </div>
 
@@ -80,10 +83,11 @@ export default function ContactPage() {
         <div className="bg-white p-6 sm:p-10 lg:p-12 rounded-2xl lg:rounded-3xl shadow-xl border border-slate-100 flex flex-col justify-center space-y-6 sm:space-y-8 order-1 lg:order-2">
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900">
-              Send us a Message
+              Let's Find the Right Opportunity Together
             </h2>
             <p className="text-slate-500 text-sm sm:text-base mt-2">
-              We'll get back to you within 24 hours
+              Tell us your requirements and our team will get back to you with
+              personalized options — usually within a few hours.
             </p>
           </div>
 

@@ -4,11 +4,11 @@ export const metadata: Metadata = {
   title:
     "Contact Us - PropertyBulbul | Tricity Real Estate Experts in Chandigarh, Panchkula & Mohali",
   description:
-    "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity (Chandigarh, Panchkula, Mohali). Contact us for property buying, selling, or renting. Experienced agents ready to help with your real estate needs. Call +91 97299 07448 now!",
+    "Connect with PropertyBulbul — your Tricity property intelligence platform serving Chandigarh, Mohali, Panchkula, Zirakpur, Kharar, and New Chandigarh. Get personalized guidance, verified listings, and local market insights for smarter real estate decisions. Call +91 97299 07448.",
   openGraph: {
-    title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts",
+    title: "Contact Us - PropertyBulbul | Tricity Property Intelligence Platform",
     description:
-      "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity. Contact us for property buying, selling, or renting assistance.",
+      "Connect with PropertyBulbul for trusted property insights across Chandigarh, Mohali, Panchkula, Zirakpur, Kharar, and New Chandigarh. Get personalized guidance, verified listings, and expert local market knowledge.",
     url: "https://www.propertybulbul.com/contact",
     siteName: "PropertyBulbul",
     type: "website",
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact Us - PropertyBulbul | Tricity Real Estate Experts",
+    title: "Contact Us - PropertyBulbul | Tricity Property Intelligence Platform",
     description:
-      "Get in touch with PropertyBulbul for all your real estate needs in Tricity. Expert assistance for buying, selling, and renting properties.",
+      "Connect with PropertyBulbul for trusted property insights across Tricity. Get personalized guidance, verified listings, and expert local market knowledge for smarter real estate decisions.",
     images: ["https://www.propertybulbul.com/contact-image.png"],
   },
   robots: {
@@ -42,9 +42,9 @@ function ContactStructuredData() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    name: "Contact PropertyBulbul - Tricity Real Estate Experts",
+    name: "Contact PropertyBulbul - Tricity Property Intelligence Platform",
     description:
-      "Get in touch with PropertyBulbul, your trusted real estate partner in Tricity for property buying, selling, and renting services.",
+      "Connect with PropertyBulbul for trusted property insights across Chandigarh, Mohali, Panchkula, Zirakpur, Kharar, and New Chandigarh. Get personalized guidance, verified listings, and expert local market knowledge.",
     url: "https://www.propertybulbul.com/contact",
     mainEntity: {
       "@type": "RealEstateAgent",
