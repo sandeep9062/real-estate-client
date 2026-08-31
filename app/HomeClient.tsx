@@ -111,7 +111,7 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
         <Companies />
       </section>
 
-      <section>
+      {/* <section>
         <AppDownloadBanner />
       </section>
       <section>
@@ -119,7 +119,7 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
       </section>
       <section>
         <RoommateBanner />
-      </section>
+      </section> */}
 
       <section>
         <Residencies featuredProperties={featuredProperties} />
