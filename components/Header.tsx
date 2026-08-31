@@ -70,10 +70,10 @@ const Header: React.FC = () => {
           <Image
             src="/bulbul-icon.png"
             alt="Property bulbul logo"
-            width={36}
-            height={36}
+            width={38}
+            height={38}
             priority
-            className="w-8 h-8 sm:w-9 sm:h-9 md:w-9 md:h-9 transition-transform duration-300 group-hover:scale-[1.03]"
+            className="w-12 h-12 sm:w-10 sm:h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-[1.03]"
           />
 
           <div className="hidden md:flex flex-col leading-tight">

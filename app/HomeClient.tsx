@@ -16,6 +16,8 @@ import GetStarted from "@/components/GetStarted";
 import WhyPropertyBulbul from "@/components/WhyPropertyBulbul";
 
 import AppDownloadBanner from "@/components/home/AppDownloadBanner";
+import TrendingLocalities from "@/components/home/TrendingLocalities";
+import RoommateBanner from "@/components/home/RoommateBanner";
 
 /** Convert homepage SearchFilters into the query format expected by useInfiniteProperties */
 function filtersToQuery(filters: SearchFilters): Record<string, string> {
@@ -109,9 +111,15 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
         <Companies />
       </section>
 
-      {/* <section>
+      <section>
         <AppDownloadBanner />
-      </section> */}
+      </section>
+      <section>
+        <TrendingLocalities />
+      </section>
+      <section>
+        <RoommateBanner />
+      </section>
 
       <section>
         <Residencies featuredProperties={featuredProperties} />
