@@ -73,7 +73,7 @@ const Header: React.FC = () => {
             width={38}
             height={38}
             priority
-            className="w-12 h-12 sm:w-10 sm:h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-[1.03]"
+            className="w-12 h-12 sm:w-10 sm:h-10 md:w-14 md:h-14 transition-transform duration-300 group-hover:scale-[1.04]"
           />
 
           <div className="hidden md:flex flex-col leading-tight">
