@@ -415,7 +415,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 {card.propertyCategory}
               </span>
             )}
-            {areaValue != null && areaValue !== "" && (
+            {areaValue != null && areaValue !== "" && Number(areaValue) > 0 && (
               <span
                 className={
                   carousel
