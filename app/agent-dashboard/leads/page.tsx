@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import {
   LEAD_STATUSES,
+  firstImageUrl,
   useGetLeadsQuery,
   useGetLeadStatsQuery,
   useUpdateLeadMutation,
@@ -211,14 +212,16 @@ function PropertyCell({ lead }: { lead: Lead }) {
   const property = lead.property;
   const href = property?.slug ? `/property/${property.slug}` : null;
   const price = formatPrice(property?.price);
+  // `image` is an array of URLs (or comma-joined) — render only the first one.
+  const imageUrl = firstImageUrl(property?.image);
 
   const content = (
     <div className="flex items-center gap-3">
-      {property?.image ? (
+      {imageUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={property.image}
-          alt=""
+          src={imageUrl}
+          alt={property?.title ?? ""}
           className="h-10 w-14 shrink-0 rounded-lg border border-gray-100 object-cover"
           loading="lazy"
         />
@@ -346,19 +349,25 @@ export default function AgentDashboardLeadsPage() {
       <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard
           label="Leads this week"
-          value={stats?.totalThisWeek ?? "—"}
+          value={typeof stats?.totalThisWeek === "number" ? stats.totalThisWeek : "—"}
           hint="Since Monday"
           icon={CalendarClock}
         />
         <StatCard
           label="Total leads"
-          value={stats?.total ?? "—"}
-          hint={`${stats?.closed ?? 0} closed`}
+          value={typeof stats?.total === "number" ? stats.total : "—"}
+          hint={
+            typeof stats?.closed === "number" ? `${stats.closed} closed` : undefined
+          }
           icon={Users}
         />
         <StatCard
           label="Conversion rate"
-          value={stats ? `${Math.round(stats.conversionRate * 10) / 10}%` : "—"}
+          value={
+            typeof stats?.conversionRate === "number"
+              ? `${Math.round(stats.conversionRate * 10) / 10}%`
+              : "—"
+          }
           hint="Closed ÷ total leads"
           icon={TrendingUp}
         />

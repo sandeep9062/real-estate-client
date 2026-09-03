@@ -20,10 +20,28 @@ export interface LeadProperty {
   id?: string;
   title?: string;
   slug?: string;
-  image?: string;
+  /** Property model stores an array of image URLs (may also arrive comma-joined). */
+  image?: string | string[];
   deal?: string;
   price?: number;
   status?: string;
+}
+
+/** Pick the first usable image URL from a property image field. */
+export function firstImageUrl(
+  image: string | string[] | null | undefined,
+): string | null {
+  const candidates =
+    typeof image === "string"
+      ? image.split(",")
+      : Array.isArray(image)
+        ? image
+        : [];
+  for (const candidate of candidates) {
+    const url = typeof candidate === "string" ? candidate.trim() : "";
+    if (url) return url;
+  }
+  return null;
 }
 
 export interface Lead {
@@ -75,6 +93,10 @@ export const leadsApi = createApi({
     /** GET /api/leads/stats — counts for the stats bar. */
     getLeadStats: builder.query<LeadStats, void>({
       query: () => "/leads/stats",
+      // Backend wraps the payload in `{ success, data }` — unwrap it so the
+      // cache holds the LeadStats object itself (like getLeads does).
+      transformResponse: (res: { success: boolean; data: LeadStats }) =>
+        res?.data,
       providesTags: ["LeadStats"],
     }),
 
