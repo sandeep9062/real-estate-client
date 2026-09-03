@@ -41,6 +41,14 @@ interface PropertiesClientProps {
  *    so the user is never stuck.
  * ─────────────────────────────────────────────────────────────────────
  */
+// ─── Inactive guard ─────────────────────────────────────────────
+// Properties with isActive === false must never render a card on
+// /properties (list or map). The backend already filters them out
+// for non-admin users, but this client-side guard also protects
+// against stale ISR/SSG cache and edge cases. Missing `isActive`
+// (older documents) is treated as visible.
+const isPubliclyVisible = (p: any) => p?.isActive !== false;
+
 function PropertiesClientInner({
   initialProperties,
   initialTotal,
@@ -54,7 +62,9 @@ function PropertiesClientInner({
 
   // ─── Data state ────────────────────────────────────────────────
   // Seeded with the SSG data so the first paint shows real content.
-  const [properties, setProperties] = useState<any[]>(initialProperties);
+  const [properties, setProperties] = useState<any[]>(
+    initialProperties.filter(isPubliclyVisible),
+  );
   const [total, setTotal] = useState<number>(initialTotal);
   // hasMore = false when SSG already gave us everything (default view).
   const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
@@ -139,11 +149,13 @@ function PropertiesClientInner({
         const dataArray: any[] = result?.data ?? result ?? [];
         const pagination = result?.pagination;
 
-        // Append, deduplicating by id/_id.
+        // Append, deduplicating by id/_id. Inactive properties are
+        // dropped entirely so they never render a card.
         setProperties((prev) => {
           const seen = new Set(prev.map((p) => p._id || p.id));
           const fresh = dataArray.filter(
-            (item) => !seen.has(item._id || item.id),
+            (item) =>
+              isPubliclyVisible(item) && !seen.has(item._id || item.id),
           );
           if (fresh.length === 0) return prev;
           return [...prev, ...fresh];

@@ -10,7 +10,6 @@ import {
   Users,
   CalendarClock,
   ChevronDown,
-  type LucideIcon,
 } from "lucide-react";
 import {
   LEAD_STATUSES,
@@ -23,6 +22,10 @@ import {
 } from "@/services/leadsApi";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import {
+  PageHeader,
+  StatCard,
+} from "@/components/agent-dashboard/ui";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -66,35 +69,6 @@ const formatPrice = (price?: number) =>
 /* ------------------------------------------------------------------ */
 /* Small building blocks                                               */
 /* ------------------------------------------------------------------ */
-
-function StatCard({
-  label,
-  value,
-  hint,
-  icon: Icon,
-}: {
-  label: string;
-  value: string | number;
-  hint?: string;
-  icon: LucideIcon;
-}) {
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-          {label}
-        </p>
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-[#4161df]">
-          <Icon className="h-4 w-4" aria-hidden />
-        </span>
-      </div>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
-        {value}
-      </p>
-      {hint && <p className="mt-1 text-xs text-gray-500">{hint}</p>}
-    </div>
-  );
-}
 
 function StatusSelect({ lead }: { lead: Lead }) {
   const [updateLead, { isLoading }] = useUpdateLeadMutation();
@@ -332,18 +306,11 @@ export default function AgentDashboardLeadsPage() {
 
   return (
     <div className="max-w-4xl min-w-0">
-      <header className="mb-6 sm:mb-8">
-        <p className="text-xs font-medium uppercase tracking-wide text-[#4161df] sm:text-sm">
-          Leads
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
-          WhatsApp leads
-        </h1>
-        <p className="mt-2 max-w-2xl text-pretty text-sm text-gray-600 sm:text-base">
-          Every “Chat on WhatsApp” click on your listings is captured here
-          automatically. Follow up before leads go cold.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow="Leads"
+        title="WhatsApp leads"
+        description="Every “Chat on WhatsApp” click on your listings is captured here automatically. Follow up before leads go cold."
+      />
 
       {/* Stats bar */}
       <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
