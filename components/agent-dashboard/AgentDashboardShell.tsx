@@ -26,8 +26,8 @@ export default function AgentDashboardShell({
   return (
     <div className="min-h-[100dvh] w-full bg-[#f6f8fb]">
       {/* Full-width shell: intentionally NOT using the site-wide centered
-          max-w container (left-right gutters) that other pages use. */}
-      <div className="flex w-full min-w-0 gap-6 pb-[max(4rem,env(safe-area-inset-bottom))] pt-[calc(5.5rem+env(safe-area-inset-top))] sm:gap-8 sm:pt-24 md:pb-16">
+          max-w container that other pages use — only a small gutter (px-2/px-3). */}
+      <div className="flex w-full min-w-0 gap-6 px-2 pb-[max(4rem,env(safe-area-inset-bottom))] pt-[calc(5.5rem+env(safe-area-inset-top))] sm:gap-8 sm:px-3 sm:pt-24 md:pb-16">
         {/* Sidebar (desktop) */}
         <aside className="hidden w-60 shrink-0 md:block">
           <div className="sticky top-28 space-y-7">
