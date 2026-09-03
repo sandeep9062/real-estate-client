@@ -28,6 +28,7 @@ import EMICalculator from "@/components/EMICalculator";
 import { toast } from "@/hooks/use-toast";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { isVisitDateOnOrBeforeToday } from "@/lib/bookingDate";
+import { useCreateLeadMutation } from "@/services/leadsApi";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
@@ -173,13 +174,23 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
   const isBooked = !!currentBooking;
   const bookedDate = currentBooking?.date;
 
+  const [createLead] = useCreateLeadMutation();
+
   const handleWhatsAppClick = () => {
+    // Keep existing analytics behavior unchanged.
     if (typeof window !== "undefined" && (window as any).gtag) {
       (window as any).gtag("event", "generate_lead", {
         event_category: "Engagement",
         event_label: data?.title || "Unknown Property",
         value: 1,
       });
+    }
+
+    // Fire-and-forget CRM lead capture — must never block the WhatsApp redirect.
+    // agentId is derived server-side from the property owner; buyer name/phone
+    // (if the buyer is logged in) are filled in by the backend via optionalAuth.
+    if (id) {
+      createLead({ propertyId: id, source: "whatsapp_click" }).catch(() => {});
     }
   };
 
