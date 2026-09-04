@@ -31,6 +31,7 @@ import "react-phone-number-input/style.css";
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
+import PhoneCaptureModal from "@/components/PhoneCaptureModal";
 
 // Validation schema
 const formSchema = z
@@ -84,6 +85,7 @@ const SignupPage = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -160,7 +162,7 @@ const SignupPage = () => {
           }),
         );
         toast.success("Account created successfully!");
-        router.push("/");
+        router.push("/choose-role");
       } else {
         toast.error("Signup failed. Please try again.");
       }
@@ -215,7 +217,13 @@ const SignupPage = () => {
           }),
         );
         toast.success("Signed up with Google successfully!");
-        router.push("/");
+
+        // Chain: phone capture (if missing) → then role selection.
+        if (!result.user.phone) {
+          setShowPhoneModal(true);
+        } else {
+          router.push("/choose-role");
+        }
       } else {
         toast.error("Google authentication failed. Please try again.");
       }
@@ -233,8 +241,20 @@ const SignupPage = () => {
     setIsGoogleLoading(false);
   };
 
+  // Phone-capture modal callbacks — save or skip both proceed to role selection
+  const proceedToRoleSelection = () => {
+    setShowPhoneModal(false);
+    router.push("/choose-role");
+  };
+
   return (
     <div className="min-h-screen flex">
+      {showPhoneModal && (
+        <PhoneCaptureModal
+          onSave={proceedToRoleSelection}
+          onSkip={proceedToRoleSelection}
+        />
+      )}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-purple-50 to-pink-100 relative overflow-hidden">
         <Image
           src="/signup-page.jpg"

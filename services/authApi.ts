@@ -104,6 +104,25 @@ export const authApi = createApi({
       providesTags: ["User"],
     }),
     
+    // Select a role (agent/landlord) — one-time for fresh users
+    selectRole: builder.mutation<
+      {
+        success: boolean;
+        message: string;
+        user: any;
+        profile: any;
+        token?: string;
+      },
+      { role: "agent" | "landlord" }
+    >({
+      query: ({ role }) => ({
+        url: "auth/select-role",
+        method: "POST",
+        body: { role },
+      }),
+      invalidatesTags: ["User"],
+    }),
+
     // Forgot password
     forgotPassword: builder.mutation<{
       success: boolean;
@@ -179,4 +198,5 @@ export const {
   useResetPasswordMutation,
   useChangePasswordMutation,
   useUpdateProfileMutation,
+  useSelectRoleMutation,
 } = authApi;

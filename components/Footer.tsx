@@ -79,7 +79,7 @@ const Footer = () => {
                 // will add projects later on when this platform will be more mature and we will have more projects to list down
                 ["Register as Agent", "/agents/register"],
                 ["Services", "/services"],
-                ["Pricing", "/pricing"],
+                // ["Pricing", "/pricing"],
                 ["Journals", "/journal"],
                 ["Contact", "/contact"],
                 ["About Us", "/about-us"],

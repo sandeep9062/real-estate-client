@@ -25,6 +25,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/authSlice";
+import { hasSkippedRoleSelection } from "@/lib/roleSelection";
+import PhoneCaptureModal from "@/components/PhoneCaptureModal";
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
@@ -67,6 +69,8 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState("/");
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -133,7 +137,11 @@ const LoginPage = () => {
           }),
         );
         toast.success("Logged in successfully!");
-        router.push("/");
+
+        const shouldChooseRole =
+          (result.user.role || "user") === "user" &&
+          !hasSkippedRoleSelection();
+        router.push(shouldChooseRole ? "/choose-role" : "/");
       } else {
         toast.error("Login failed. Please try again.");
       }
@@ -188,7 +196,19 @@ const LoginPage = () => {
           }),
         );
         toast.success("Logged in with Google successfully!");
-        router.push("/");
+
+        const shouldChooseRole =
+          (result.user.role || "user") === "user" &&
+          !hasSkippedRoleSelection();
+        const next = shouldChooseRole ? "/choose-role" : "/";
+
+        // Chain: phone capture (if missing) → then the normal redirect logic.
+        if (!result.user.phone) {
+          setPendingRedirect(next);
+          setShowPhoneModal(true);
+        } else {
+          router.push(next);
+        }
       } else {
         toast.error("Google authentication failed. Please try again.");
       }
@@ -206,8 +226,20 @@ const LoginPage = () => {
     setIsGoogleLoading(false);
   };
 
+  // Phone-capture modal callbacks — save or skip both resume the redirect
+  const proceedAfterPhoneModal = () => {
+    setShowPhoneModal(false);
+    router.push(pendingRedirect);
+  };
+
   return (
     <div className="min-h-screen flex">
+      {showPhoneModal && (
+        <PhoneCaptureModal
+          onSave={proceedAfterPhoneModal}
+          onSkip={proceedAfterPhoneModal}
+        />
+      )}
       {/* Left side - Image */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden">
         <Image
