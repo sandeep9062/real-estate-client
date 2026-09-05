@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Upload, X } from "lucide-react";
+import { Check, Upload, X, type LucideIcon } from "lucide-react";
 
 /* ──────────────────────────────────────────────
    Field kit — mirrors the signup wizard's UI
@@ -87,6 +87,16 @@ export type ProfileFieldSpec =
       maxLength?: number; // per-item max length
     };
 
+/* A titled group of fields rendered as one card — the profile form is
+   composed of these sections (About you / Contact / etc.). */
+export type ProfileSection = {
+  id: string;
+  title: string;
+  description?: string;
+  icon?: LucideIcon;
+  fields: ProfileFieldSpec[];
+};
+
 /* ──────────────────────────────────────────────
    Value helpers — normalisation + draft init
    ────────────────────────────────────────────── */
@@ -107,13 +117,19 @@ function normaliseValue(spec: ProfileFieldSpec, v: unknown): unknown {
 }
 
 function initDraft(
-  fields: ProfileFieldSpec[],
+  sections: ProfileSection[],
   profile: Record<string, unknown>,
 ): Record<string, unknown> {
   const draft: Record<string, unknown> = {};
-  for (const spec of fields) draft[spec.key] = profile[spec.key];
+  for (const section of sections)
+    for (const spec of section.fields) draft[spec.key] = profile[spec.key];
   return draft;
 }
+
+// Short single-line inputs pair up on a two-column grid inside a section;
+// everything else (textareas, toggles, lists, pills) takes the full row.
+const isHalfWidth = (spec: ProfileFieldSpec) =>
+  spec.kind === "text" && !spec.textarea;
 
 /* ──────────────────────────────────────────────
    One field row — controlled by the parent form
@@ -300,19 +316,21 @@ function AvatarSection({
   return (
     <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
       <div className="flex items-start gap-5">
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-indigo-50">
-          {preview || avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={preview || avatar}
-              alt={`${name ?? "Profile"} avatar`}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="text-xl font-bold text-[#4161df]">
-              {(name ?? "P").charAt(0).toUpperCase()}
-            </span>
-          )}
+        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] p-[3px] shadow-md shadow-[#4161df]/20">
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[13px] bg-white">
+            {preview || avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={preview || avatar}
+                alt={`${name ?? "Profile"} avatar`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-xl font-bold text-[#4161df]">
+                {(name ?? "P").charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="min-w-0 flex-1">
@@ -356,14 +374,14 @@ function AvatarSection({
    ────────────────────────────────────────────── */
 
 export default function ProfileEditor({
-  fields,
+  sections,
   profile,
   name,
   avatar,
   saving = false,
   onSave,
 }: {
-  fields: ProfileFieldSpec[];
+  sections: ProfileSection[];
   profile: Record<string, unknown>;
   name?: string;
   avatar?: string;
@@ -374,7 +392,7 @@ export default function ProfileEditor({
   ) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Record<string, unknown>>(() =>
-    initDraft(fields, profile),
+    initDraft(sections, profile),
   );
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -382,8 +400,8 @@ export default function ProfileEditor({
 
   // Re-sync the draft when the server value changes (e.g. after refetch)
   useEffect(() => {
-    setDraft(initDraft(fields, profile));
-  }, [fields, profile]);
+    setDraft(initDraft(sections, profile));
+  }, [sections, profile]);
 
   const handlePick = (f: File | null) => {
     if (preview) URL.revokeObjectURL(preview);
@@ -391,16 +409,26 @@ export default function ProfileEditor({
     setPreview(f ? URL.createObjectURL(f) : null);
   };
 
-  const dirty =
-    photo !== null ||
-    fields.some(
-      (spec) =>
-        JSON.stringify(normaliseValue(spec, draft[spec.key])) !==
-        JSON.stringify(normaliseValue(spec, profile[spec.key])),
-    );
+  const changedCount = sections.reduce(
+    (count, section) =>
+      count +
+      section.fields.filter(
+        (spec) =>
+          JSON.stringify(normaliseValue(spec, draft[spec.key])) !==
+          JSON.stringify(normaliseValue(spec, profile[spec.key])),
+      ).length,
+    0,
+  );
+  const dirty = changedCount > 0 || photo !== null;
 
   const setFieldValue = (key: string, v: unknown) => {
     setDraft((d) => ({ ...d, [key]: v }));
+    setSaved(false);
+  };
+
+  const handleReset = () => {
+    setDraft(initDraft(sections, profile));
+    handlePick(null);
     setSaved(false);
   };
 
@@ -418,9 +446,52 @@ export default function ProfileEditor({
     }
   };
 
+  // Lay a section's fields out: short inputs pair up on a two-column grid,
+  // full-width fields break the run.
+  const renderFields = (fields: ProfileFieldSpec[]) => {
+    const nodes: React.ReactNode[] = [];
+    let run: ProfileFieldSpec[] = [];
+
+    const flushRun = () => {
+      if (run.length === 0) return;
+      const pair = run;
+      nodes.push(
+        <div key={`pair-${pair[0].key}`} className="grid gap-5 sm:grid-cols-2">
+          {pair.map((spec) => (
+            <FieldRow
+              key={spec.key}
+              spec={spec}
+              value={draft[spec.key]}
+              onChange={(v) => setFieldValue(spec.key, v)}
+            />
+          ))}
+        </div>,
+      );
+      run = [];
+    };
+
+    for (const spec of fields) {
+      if (isHalfWidth(spec)) {
+        run.push(spec);
+      } else {
+        flushRun();
+        nodes.push(
+          <FieldRow
+            key={spec.key}
+            spec={spec}
+            value={draft[spec.key]}
+            onChange={(v) => setFieldValue(spec.key, v)}
+          />,
+        );
+      }
+    }
+    flushRun();
+    return nodes;
+  };
+
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4">
+      <div className="space-y-4 sm:space-y-5">
         <AvatarSection
           avatar={avatar}
           name={name}
@@ -428,49 +499,93 @@ export default function ProfileEditor({
           preview={preview}
           onPick={handlePick}
         />
-        {fields.map((spec) => (
-          <FieldRow
-            key={spec.key}
-            spec={spec}
-            value={draft[spec.key]}
-            onChange={(v) => setFieldValue(spec.key, v)}
-          />
-        ))}
+
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <section
+              key={section.id}
+              className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm sm:p-6"
+            >
+              <header className="mb-5 flex items-start gap-3.5">
+                {Icon && (
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-[#4161df]">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                )}
+                <div className="min-w-0 pt-0.5">
+                  <h2 className="text-[15px] font-semibold text-gray-900">
+                    {section.title}
+                  </h2>
+                  {section.description && (
+                    <p className="mt-0.5 text-[13px] text-gray-500">
+                      {section.description}
+                    </p>
+                  )}
+                </div>
+              </header>
+
+              <div className="space-y-5">{renderFields(section.fields)}</div>
+            </section>
+          );
+        })}
       </div>
 
       {/* Single save bar for the whole form */}
-      <div className="sticky bottom-4 z-10 mt-4">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 pl-4 shadow-lg backdrop-blur">
-          <p
-            className={`text-[12.5px] ${
-              saved && !dirty
-                ? "text-emerald-600"
+      <div className="sticky bottom-4 z-10 mt-5">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 pl-4 shadow-lg shadow-gray-900/5 backdrop-blur">
+          <div className="min-w-0">
+            <p
+              className={`text-[13px] font-medium ${
+                saved && !dirty
+                  ? "text-emerald-600"
+                  : dirty
+                    ? "text-amber-600"
+                    : "text-slate-400"
+              }`}
+            >
+              {saved && !dirty
+                ? "All changes saved."
                 : dirty
-                  ? "text-amber-600"
-                  : "text-slate-400"
-            }`}
-          >
-            {saved && !dirty
-              ? "All changes saved."
-              : dirty
-                ? "You have unsaved changes."
-                : "No changes yet."}
-          </p>
-          <button
-            type="submit"
-            disabled={!dirty || saving}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#4161df] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#3759dd] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {saved && !dirty ? (
-              <>
-                <Check className="h-4 w-4" aria-hidden /> Saved
-              </>
-            ) : saving ? (
-              "Saving…"
-            ) : (
-              "Save changes"
+                  ? "You have unsaved changes"
+                  : "You're all caught up."}
+            </p>
+            {dirty && (
+              <p className="text-[11px] text-slate-400">
+                {changedCount > 0
+                  ? `${changedCount} field${changedCount > 1 ? "s" : ""} changed${photo ? " + photo" : ""}`
+                  : "New profile photo ready to upload"}
+              </p>
             )}
-          </button>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2">
+            {dirty && (
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={saving}
+                className="rounded-lg px-3 py-2.5 text-[13px] font-semibold text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Discard
+              </button>
+            )}
+            <button
+              type="submit"
+              disabled={!dirty || saving}
+              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#3759dd] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {saved && !dirty ? (
+                <>
+                  <Check className="h-4 w-4" aria-hidden /> Saved
+                </>
+              ) : saving ? (
+                "Saving…"
+              ) : (
+                "Save changes"
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </form>
