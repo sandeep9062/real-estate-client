@@ -127,8 +127,8 @@ function StatCard({
 
 function DashboardSkeleton() {
   return (
-    <div className="min-h-[100dvh] bg-[#f6f8fb]" aria-busy="true" aria-label="Loading dashboard">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+    <div aria-busy="true" aria-label="Loading dashboard">
+      <div className="mx-auto max-w-6xl">
         <div className="h-44 animate-pulse rounded-2xl bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 sm:h-48" />
         <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
@@ -266,8 +266,7 @@ export default function LandlordDashboardPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#f6f8fb]">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+    <div className="mx-auto max-w-6xl">
         {/* ── Hero ── */}
         <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] via-[#4f6ee6] to-[#7c93f2] p-6 text-white shadow-lg shadow-[#4161df]/20 sm:p-8">
           <div
@@ -599,13 +598,12 @@ export default function LandlordDashboardPage() {
             />
           </span>
         </Link>
-      </div>
 
-      <AddPropertyModal
-        opened={modalOpened}
-        setOpened={setModalOpened}
-        editingProperty={null}
-      />
+        <AddPropertyModal
+          opened={modalOpened}
+          setOpened={setModalOpened}
+          editingProperty={null}
+        />
     </div>
   );
 }
