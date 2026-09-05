@@ -235,10 +235,10 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               initial={{ x: "7rem", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 1.5, type: "spring" }}
-              className="relative w-36 h-44 xs:w-44 xs:h-52 sm:w-64 sm:h-72 md:w-80 md:h-96 lg:w-[26rem] lg:h-[32rem] overflow-hidden rounded-t-[5rem] xs:rounded-t-[6rem] sm:rounded-t-[10rem] md:rounded-t-[12rem] border-4 sm:border-6 md:border-8 border-border shadow-lg"
+              className="relative w-36 h-44 xs:w-44 xs:h-52 sm:w-64 sm:h-72 md:w-[21rem] md:h-[25rem] lg:w-[28rem] lg:h-[34rem] overflow-hidden rounded-t-[5rem] xs:rounded-t-[6rem] sm:rounded-t-[10rem] md:rounded-t-[12rem] border-4 sm:border-6 md:border-8 border-border shadow-lg"
             >
               <Image
-                src="/hero-image.png"
+                src="/hero1.png"
                 alt="tricity property platform"
                 fill
                 priority

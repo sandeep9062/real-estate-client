@@ -13,7 +13,7 @@ const Footer = () => {
           <div className="flex flex-col gap-3 sm:gap-4 items-center md:items-start">
             <Link href="/">
               <Image
-                src="/propertybulbul.png"
+                src="/PropertyBulbul.png"
                 alt="Property Bulbul"
                 width={160}
                 height={60}
