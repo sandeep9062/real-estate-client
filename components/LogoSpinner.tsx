@@ -9,7 +9,7 @@ const LogoSpinner = () => {
         {/* Logo */}
         <div className="relative w-28 h-28 sm:w-36 md:w-44 lg:w-52 sm:h-36 md:h-44 lg:h-52">
           <Image
-            src="/PropertyBulbul.png"
+            src="/propertybulbul.png"
             alt="Property Bulbul"
             fill
             className="object-contain"
