@@ -56,7 +56,7 @@ const SECTIONS: ProfileSection[] = [
   {
     id: "about",
     title: "About you",
-    description: "Introduce yourself — tenants see this on your listings.",
+    description: "Introduce yourself — Tenants see this on your listings.",
     icon: UserRound,
     fields: [
       {
@@ -79,7 +79,8 @@ const SECTIONS: ProfileSection[] = [
         label: "Short bio",
         textarea: true,
         maxLength: 400,
-        placeholder: "Tell tenants a little about you and the properties you offer...",
+        placeholder:
+          "Tell tenants a little about you and the properties you offer...",
       },
       {
         kind: "text",
@@ -156,14 +157,24 @@ const SECTIONS: ProfileSection[] = [
     description: "Where you operate and what you offer.",
     icon: Building2,
     fields: [
-      { kind: "toggles", key: "locations", label: "Areas you operate in", options: LOCATIONS },
+      {
+        kind: "toggles",
+        key: "locations",
+        label: "Areas you operate in",
+        options: LOCATIONS,
+      },
       {
         kind: "toggles",
         key: "propertyTypes",
         label: "Property types you offer",
         options: PROPERTY_TYPES,
       },
-      { kind: "toggles", key: "languages", label: "Languages", options: LANGUAGES },
+      {
+        kind: "toggles",
+        key: "languages",
+        label: "Languages",
+        options: LANGUAGES,
+      },
     ],
   },
   {
@@ -376,8 +387,8 @@ export default function LandlordProfilePage() {
           Something went wrong
         </h1>
         <p className="text-sm text-gray-500">
-          We couldn&apos;t load your landlord profile. Please refresh the page or
-          contact support if the problem persists.
+          We couldn&apos;t load your landlord profile. Please refresh the page
+          or contact support if the problem persists.
         </p>
         <button
           type="button"
