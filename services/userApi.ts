@@ -36,7 +36,7 @@ interface ToggleUserStatusPayload {
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["User"],
+  tagTypes: ["User", "OwnerBooking"],
   endpoints: (builder) => ({
     // ✅ Get all users
     getUsers: builder.query<User[], void>({
@@ -226,6 +226,26 @@ export const userApi = createApi({
       providesTags: ["User"],
     }),
 
+    // ✅ Visits booked on the logged-in landlord's own properties
+    getOwnerBookings: builder.query<any[], void>({
+      query: () => `/bookings/owner`,
+      providesTags: ["OwnerBooking"],
+      transformResponse: (res: any) => (Array.isArray(res) ? res : res?.data ?? []),
+    }),
+
+    // ✅ Landlord updates the status of a visit on their own property
+    updateOwnerBookingStatus: builder.mutation<
+      any,
+      { id: string; status: "Pending" | "Confirmed" | "Completed" | "Cancelled" }
+    >({
+      query: ({ id, status }) => ({
+        url: `/bookings/${id}/owner-status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["OwnerBooking"],
+    }),
+
     getRecentlyViewed: builder.query<any[], void>({
       query: () => "/users/recently-viewed",
     }),
@@ -259,6 +279,8 @@ export const {
   useToFavMutation,
   useGetFavouritesQuery,
   useGetBookingsQuery,
+  useGetOwnerBookingsQuery,
+  useUpdateOwnerBookingStatusMutation,
   useUpdateProfileMutation,
   useGetRecentlyViewedQuery,
 } = userApi;

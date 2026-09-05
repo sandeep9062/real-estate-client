@@ -517,6 +517,12 @@ export default function LandlordDashboardPage() {
                     subtitle: "Edit, update or remove listings",
                   },
                   {
+                    href: "/landlord/dashboard/visits",
+                    icon: <CalendarDays className="h-[18px] w-[18px] text-rose-600" aria-hidden />,
+                    title: "Visit requests",
+                    subtitle: "Confirm or decline site visits",
+                  },
+                  {
                     href: "/post-requirement",
                     icon: <Sparkles className="h-[18px] w-[18px] text-amber-600" aria-hidden />,
                     title: "Post a requirement",
