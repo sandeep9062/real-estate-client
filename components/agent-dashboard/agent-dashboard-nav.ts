@@ -5,6 +5,7 @@ import {
   Home,
   CalendarDays,
   Users,
+  UserPen,
 } from "lucide-react";
 
 export type AgentDashboardNavItem = {
@@ -19,4 +20,5 @@ export const AGENT_DASHBOARD_NAV: AgentDashboardNavItem[] = [
   { href: "/agent-dashboard/listings", label: "Listings", icon: Home },
   { href: "/agent-dashboard/leads", label: "Leads", icon: Users },
   { href: "/agent-dashboard/visits", label: "Visits", icon: CalendarDays },
+  { href: "/agent-dashboard/profile", label: "Profile", icon: UserPen },
 ];

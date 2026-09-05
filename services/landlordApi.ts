@@ -158,6 +158,12 @@ interface LandlordResponse {
   data: Landlord;
 }
 
+interface MyLandlordProfileResponse {
+  success: boolean;
+  message?: string;
+  data: Landlord & { profileCompleteness: number };
+}
+
 // ──────────────────────────────────────────────
 // RTK Query API slice
 // ──────────────────────────────────────────────
@@ -175,7 +181,7 @@ const publicBaseQuery = fetchBaseQuery({
 export const landlordApi = createApi({
   reducerPath: "landlordApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Landlord"],
+  tagTypes: ["Landlord", "MyLandlordProfile"],
   endpoints: (builder) => ({
     /**
      * Register a new landlord (public endpoint, supports file upload).
@@ -188,6 +194,25 @@ export const landlordApi = createApi({
         body: formData,
         // Do not set Content-Type — browser sets multipart/form-data with boundary
       }),
+    }),
+
+    // Logged-in landlord's own profile + profileCompleteness
+    getMyLandlordProfile: builder.query<MyLandlordProfileResponse, void>({
+      query: () => "/landlords/me",
+      providesTags: ["MyLandlordProfile"],
+    }),
+
+    // Partial update of the logged-in landlord's own profile (JSON or FormData)
+    updateMyLandlordProfile: builder.mutation<
+      MyLandlordProfileResponse,
+      Record<string, unknown> | FormData
+    >({
+      query: (body) => ({
+        url: "/landlords/me",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["MyLandlordProfile"],
     }),
 
     /**
@@ -359,6 +384,8 @@ export const landlordApi = createApi({
 
 export const {
   useRegisterLandlordMutation,
+  useGetMyLandlordProfileQuery,
+  useUpdateMyLandlordProfileMutation,
   useGetLandlordsQuery,
   useGetLandlordByIdQuery,
   useUpdateLandlordMutation,

@@ -6,14 +6,20 @@ import { useSelector } from "react-redux";
 import { ArrowRight, Building2, LifeBuoy, Plus } from "lucide-react";
 
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
+import { useGetMyLandlordProfileQuery } from "@/services/landlordApi";
+import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
 
 export default function LandlordDashboardPage() {
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
-
-  // Lightweight gate: only landlords (and admins) may view this dashboard.
   const canAccess = user?.role === "landlord" || user?.role === "admin";
+
+  // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
+  // visitor lands here.
+  const { data: profileData } = useGetMyLandlordProfileQuery(undefined, {
+    skip: !isAuthenticated || !canAccess,
+  });
 
   if (!isAuthenticated || !user) {
     return (
@@ -78,21 +84,14 @@ export default function LandlordDashboardPage() {
           </p>
         </section>
 
-        {/* Profile completeness placeholder — full banner lands in Part 6 */}
-        <section
-          aria-hidden
-          className="mb-6 rounded-2xl border border-dashed border-gray-300 bg-white p-5 text-sm text-gray-500 shadow-sm"
-        >
-          <p className="font-semibold text-gray-700">
-            Your profile completeness banner will appear here
-          </p>
-          <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-200">
-            <div className="h-full w-0 bg-[#4161df]" />
-          </div>
-          <p className="mt-2 text-xs text-gray-400">
-            Coming in a later update — complete profiles get more leads.
-          </p>
-        </section>
+        {/* Profile completeness banner (dismissible, non-blocking) */}
+        {profileData?.data && (
+          <ProfileCompletenessBanner
+            role="landlord"
+            percentage={profileData.data.profileCompleteness ?? 0}
+            editHref="/landlord/dashboard/profile"
+          />
+        )}
 
         {/* First property CTA */}
         <section className="grid gap-3 sm:grid-cols-2 sm:gap-4">

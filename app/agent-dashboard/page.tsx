@@ -17,6 +17,8 @@ import { useSelector } from "react-redux";
 
 import { selectUser } from "@/store/authSlice";
 import { useGetLeadStatsQuery } from "@/services/leadsApi";
+import { useGetMyAgentProfileQuery } from "@/services/agentsApi";
+import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
 import {
   PageHeader,
   StatCard,
@@ -60,6 +62,7 @@ const QUICK_ACTIONS = [
 export default function AgentDashboardOverviewPage() {
   const user = useSelector(selectUser);
   const { data: stats } = useGetLeadStatsQuery();
+  const { data: profileData } = useGetMyAgentProfileQuery();
 
   const today = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
@@ -69,6 +72,15 @@ export default function AgentDashboardOverviewPage() {
 
   return (
     <div className="min-w-0">
+      {/* Profile completeness banner (dismissible, non-blocking) */}
+      {profileData?.data && (
+        <ProfileCompletenessBanner
+          role="agent"
+          percentage={profileData.data.profileCompleteness ?? 0}
+          editHref="/agent-dashboard/profile"
+        />
+      )}
+
       {/* Hero */}
       <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] via-[#4f6ee6] to-[#7c93f2] p-6 text-white shadow-lg shadow-[#4161df]/20 sm:mb-8 sm:p-8">
         <div
