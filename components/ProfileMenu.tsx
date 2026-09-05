@@ -264,12 +264,22 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
               Agent dashboard
             </Menu.Item>
           )}
+
           {user?.role === "builder" && (
             <Menu.Item
               leftSection={<LayoutDashboard size={18} />}
               onClick={() => router.push("/builder/dashboard")}
             >
               Builder dashboard
+            </Menu.Item>
+          )}
+
+          {user?.role === "user" && (
+            <Menu.Item
+              leftSection={<LayoutDashboard size={18} />}
+              onClick={() => router.push("/user/dashboard")}
+            >
+              User dashboard
             </Menu.Item>
           )}
           {user?.role === "landlord" && (
@@ -281,14 +291,6 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ user }) => {
             </Menu.Item>
           )}
 
-          {user?.role === "student" && (
-            <Menu.Item
-              leftSection={<LayoutDashboard size={18} />}
-              onClick={() => router.push("/student/dashboard")}
-            >
-              Student dashboard
-            </Menu.Item>
-          )}
           <Divider my="xs" />
 
           <Menu.Item
