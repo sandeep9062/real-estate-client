@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Upload, X, type LucideIcon } from "lucide-react";
+import {
+  Camera,
+  Check,
+  Loader2,
+  RotateCcw,
+  Save,
+  Upload,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 
 /* ──────────────────────────────────────────────
    Field kit — mirrors the signup wizard's UI
@@ -11,11 +20,11 @@ import { Check, Upload, X, type LucideIcon } from "lucide-react";
    ────────────────────────────────────────────── */
 
 export const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13.5px] text-slate-800 placeholder:text-slate-400 outline-none transition-colors focus:border-[#4161df] focus:ring-2 focus:ring-[#4161df]/15";
+  "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13.5px] text-slate-800 placeholder:text-slate-400 outline-none transition-all duration-150 hover:border-slate-300 focus:border-[#4161df] focus:ring-4 focus:ring-[#4161df]/10";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block text-[12.5px] font-medium text-slate-600 mb-1.5">
+    <label className="mb-1.5 block text-[12.5px] font-semibold tracking-wide text-slate-600">
       {children}
     </label>
   );
@@ -34,13 +43,14 @@ function Toggle({
     <button
       type="button"
       onClick={onClick}
-      className="text-[12.5px] font-medium px-3.5 py-1.5 rounded-full transition-all duration-150 border"
-      style={
+      aria-pressed={active}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition-all duration-150 active:scale-95 ${
         active
-          ? { background: "#4161df", color: "#fff", borderColor: "#4161df" }
-          : { background: "#fff", color: "#64748b", borderColor: "#e2e8f0" }
-      }
+          ? "border-[#4161df] bg-[#4161df] text-white shadow-sm shadow-[#4161df]/30"
+          : "border-slate-200 bg-white text-slate-600 hover:border-[#4161df]/40 hover:text-[#4161df]"
+      }`}
     >
+      {active && <Check className="h-3 w-3" aria-hidden />}
       {label}
     </button>
   );
@@ -162,135 +172,132 @@ function FieldRow({
   };
 
   return (
-    <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
-      <div>
-        <div className="min-w-0 flex-1">
-          <FieldLabel>{spec.label}</FieldLabel>
+    <div>
+      <FieldLabel>{spec.label}</FieldLabel>
 
-          {spec.kind === "text" &&
-            (spec.textarea ? (
-              <textarea
-                className={`${inputClass} min-h-[96px] resize-none`}
-                placeholder={spec.placeholder}
-                value={String(value ?? "")}
-                onChange={(e) => onChange(e.target.value)}
-                maxLength={spec.maxLength}
+      {spec.kind === "text" &&
+        (spec.textarea ? (
+          <textarea
+            className={`${inputClass} min-h-[104px] resize-none`}
+            placeholder={spec.placeholder}
+            value={String(value ?? "")}
+            onChange={(e) => onChange(e.target.value)}
+            maxLength={spec.maxLength}
+          />
+        ) : (
+          <input
+            className={inputClass}
+            placeholder={spec.placeholder}
+            value={String(value ?? "")}
+            onChange={(e) => onChange(e.target.value)}
+            type={spec.type ?? "text"}
+            maxLength={spec.type === "number" ? undefined : spec.maxLength}
+          />
+        ))}
+      {spec.kind === "text" && spec.maxLength && (
+        <p className="mt-1 text-right text-[11px] text-slate-400">
+          {String(value ?? "").length}/{spec.maxLength}
+        </p>
+      )}
+
+      {spec.kind === "toggles" && (
+        <div className="flex flex-wrap gap-2">
+          {spec.options.map((opt) => {
+            const list = Array.isArray(value) ? value : [];
+            return (
+              <Toggle
+                key={opt}
+                label={opt}
+                active={list.includes(opt)}
+                onClick={() =>
+                  onChange(
+                    list.includes(opt)
+                      ? list.filter((v) => v !== opt)
+                      : [...list, opt],
+                  )
+                }
               />
-            ) : (
-              <input
-                className={inputClass}
-                placeholder={spec.placeholder}
-                value={String(value ?? "")}
-                onChange={(e) => onChange(e.target.value)}
-                type={spec.type ?? "text"}
-                maxLength={spec.type === "number" ? undefined : spec.maxLength}
-              />
-            ))}
-          {spec.kind === "text" && spec.maxLength && (
-            <p className="text-[11px] text-slate-400 mt-1 text-right">
-              {String(value ?? "").length}/{spec.maxLength}
-            </p>
-          )}
+            );
+          })}
+        </div>
+      )}
 
-          {spec.kind === "toggles" && (
-            <div className="flex flex-wrap gap-2">
-              {spec.options.map((opt) => {
-                const list = Array.isArray(value) ? value : [];
-                return (
-                  <Toggle
-                    key={opt}
-                    label={opt}
-                    active={list.includes(opt)}
-                    onClick={() =>
-                      onChange(
-                        list.includes(opt)
-                          ? list.filter((v) => v !== opt)
-                          : [...list, opt],
-                      )
-                    }
-                  />
-                );
-              })}
-            </div>
-          )}
+      {spec.kind === "select" && (
+        <div className="flex flex-wrap gap-2">
+          {spec.options.map((opt) => (
+            <Toggle
+              key={opt}
+              label={spec.labels?.[opt] ?? opt}
+              active={value === opt}
+              onClick={() => onChange(value === opt ? "" : opt)}
+            />
+          ))}
+        </div>
+      )}
 
-          {spec.kind === "select" && (
-            <div className="flex flex-wrap gap-2">
-              {spec.options.map((opt) => (
-                <Toggle
-                  key={opt}
-                  label={spec.labels?.[opt] ?? opt}
-                  active={value === opt}
-                  onClick={() => onChange(value === opt ? "" : opt)}
-                />
+      {spec.kind === "boolean" && (
+        <div className="flex flex-wrap gap-2">
+          <Toggle
+            label="Yes"
+            active={value === true}
+            onClick={() => onChange(true)}
+          />
+          <Toggle
+            label="No"
+            active={value === false}
+            onClick={() => onChange(false)}
+          />
+        </div>
+      )}
+
+      {spec.kind === "list" && (
+        <div>
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              placeholder={spec.placeholder}
+              value={listDraft}
+              onChange={(e) => setListDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addListItem();
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={addListItem}
+              disabled={!listDraft.trim()}
+              className="shrink-0 rounded-xl bg-[#4161df] px-4 text-[13px] font-semibold text-white transition hover:bg-[#3759dd] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Add
+            </button>
+          </div>
+          {Array.isArray(value) && value.length > 0 && (
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {value.map((item, i) => (
+                <span
+                  key={`${item}-${i}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/15 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-[12.5px] font-medium text-slate-700"
+                >
+                  <Check className="h-3 w-3 text-[#4161df]" aria-hidden />
+                  {item}
+                  <button
+                    type="button"
+                    onClick={() => removeListItem(i)}
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+                    aria-label={`Remove ${item}`}
+                  >
+                    <X className="h-3 w-3" aria-hidden />
+                  </button>
+                </span>
               ))}
             </div>
           )}
-
-          {spec.kind === "boolean" && (
-            <div className="flex flex-wrap gap-2">
-              <Toggle
-                label="Yes"
-                active={value === true}
-                onClick={() => onChange(true)}
-              />
-              <Toggle
-                label="No"
-                active={value === false}
-                onClick={() => onChange(false)}
-              />
-            </div>
-          )}
-
-          {spec.kind === "list" && (
-            <div>
-              <div className="flex gap-2">
-                <input
-                  className={inputClass}
-                  placeholder={spec.placeholder}
-                  value={listDraft}
-                  onChange={(e) => setListDraft(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addListItem();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={addListItem}
-                  disabled={!listDraft.trim()}
-                  className="shrink-0 rounded-xl bg-[#4161df] px-4 text-[13px] font-semibold text-white transition hover:bg-[#3759dd] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Add
-                </button>
-              </div>
-              {Array.isArray(value) && value.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {value.map((item, i) => (
-                    <span
-                      key={`${item}-${i}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1.5 text-[12.5px] text-slate-700"
-                    >
-                      {item}
-                      <button
-                        type="button"
-                        onClick={() => removeListItem(i)}
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
-                        aria-label={`Remove ${item}`}
-                      >
-                        <X className="h-3 w-3" aria-hidden />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }
 /* ──────────────────────────────────────────────
@@ -314,55 +321,80 @@ function AvatarSection({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
-      <div className="flex items-start gap-5">
-        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] p-[3px] shadow-md shadow-[#4161df]/20">
-          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[13px] bg-white">
-            {preview || avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={preview || avatar}
-                alt={`${name ?? "Profile"} avatar`}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span className="text-xl font-bold text-[#4161df]">
-                {(name ?? "P").charAt(0).toUpperCase()}
-              </span>
-            )}
+    <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm sm:p-6">
+      <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+        <div className="relative shrink-0">
+          <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#4161df] to-[#7c93f2] p-[3px] shadow-lg shadow-[#4161df]/25">
+            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white">
+              {preview || avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={preview || avatar}
+                  alt={`${name ?? "Profile"} avatar`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-2xl font-bold text-[#4161df]">
+                  {(name ?? "P").charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <FieldLabel>Profile photo</FieldLabel>
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition hover:border-[#4161df]/40 hover:text-[#4161df]"
+            aria-label="Change profile photo"
+            className="absolute -bottom-0.5 -right-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#4161df] text-white shadow-md transition hover:bg-[#3759dd] active:scale-90"
           >
-            <Upload className="h-4 w-4" aria-hidden />
-            {photo ? photo.name : "Click to upload your photo"}
+            <Camera className="h-3.5 w-3.5" aria-hidden />
           </button>
-          <p className="mt-1 text-[11px] text-slate-400">PNG or JPG, up to 5MB</p>
-          {photo && (
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] font-semibold text-gray-900">
+            {name ?? "Your profile"}
+          </p>
+          <p className="mt-0.5 text-[12.5px] text-slate-500">
+            Add a friendly, recognisable photo — tenants trust faces.
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2.5">
             <button
               type="button"
-              onClick={() => onPick(null)}
-              className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-medium text-slate-400 transition hover:text-slate-600"
+              onClick={() => inputRef.current?.click()}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 shadow-sm transition hover:border-[#4161df]/40 hover:text-[#4161df] active:scale-[0.98]"
             >
-              <X className="h-3 w-3" aria-hidden />
-              Discard selected photo
+              <Upload className="h-4 w-4" aria-hidden />
+              {photo ? "Change photo" : "Upload photo"}
             </button>
+            {photo && (
+              <button
+                type="button"
+                onClick={() => onPick(null)}
+                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-400 transition hover:bg-gray-50 hover:text-slate-600"
+              >
+                <X className="h-3.5 w-3.5" aria-hidden />
+                Discard
+              </button>
+            )}
+          </div>
+          {photo ? (
+            <p className="mt-2 max-w-full truncate text-[11.5px] text-emerald-600">
+              {photo.name} ready — save to apply
+            </p>
+          ) : (
+            <p className="mt-2 text-[11px] text-slate-400">
+              PNG or JPG, up to 5MB
+            </p>
           )}
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => onPick(e.target.files?.[0] ?? null)}
-          />
         </div>
       </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+      />
     </section>
   );
 }
@@ -500,20 +532,20 @@ export default function ProfileEditor({
           onPick={handlePick}
         />
 
-        {sections.map((section) => {
+        {sections.map((section, index) => {
           const Icon = section.icon;
           return (
             <section
               key={section.id}
-              className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm sm:p-6"
+              className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md sm:p-6"
             >
-              <header className="mb-5 flex items-start gap-3.5">
+              <header className="mb-5 flex items-start gap-3.5 border-b border-gray-100 pb-4">
                 {Icon && (
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-[#4161df]">
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df]/10 to-[#7c93f2]/20 text-[#4161df] ring-1 ring-[#4161df]/10">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
                 )}
-                <div className="min-w-0 pt-0.5">
+                <div className="min-w-0 flex-1 pt-0.5">
                   <h2 className="text-[15px] font-semibold text-gray-900">
                     {section.title}
                   </h2>
@@ -523,6 +555,12 @@ export default function ProfileEditor({
                     </p>
                   )}
                 </div>
+                <span
+                  className="pt-1 text-[11px] font-semibold tabular-nums text-gray-300"
+                  aria-hidden
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
               </header>
 
               <div className="space-y-5">{renderFields(section.fields)}</div>
@@ -533,10 +571,10 @@ export default function ProfileEditor({
 
       {/* Single save bar for the whole form */}
       <div className="sticky bottom-4 z-10 mt-5">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 pl-4 shadow-lg shadow-gray-900/5 backdrop-blur">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 pl-4 shadow-lg shadow-gray-900/10 backdrop-blur">
           <div className="min-w-0">
             <p
-              className={`text-[13px] font-medium ${
+              className={`flex items-center gap-2 text-[13px] font-semibold ${
                 saved && !dirty
                   ? "text-emerald-600"
                   : dirty
@@ -544,6 +582,16 @@ export default function ProfileEditor({
                     : "text-slate-400"
               }`}
             >
+              <span
+                className={`inline-block h-2 w-2 shrink-0 rounded-full ${
+                  saved && !dirty
+                    ? "bg-emerald-500"
+                    : dirty
+                      ? "animate-pulse bg-amber-500"
+                      : "bg-slate-300"
+                }`}
+                aria-hidden
+              />
               {saved && !dirty
                 ? "All changes saved."
                 : dirty
@@ -551,7 +599,7 @@ export default function ProfileEditor({
                   : "You're all caught up."}
             </p>
             {dirty && (
-              <p className="text-[11px] text-slate-400">
+              <p className="ml-4 text-[11px] text-slate-400">
                 {changedCount > 0
                   ? `${changedCount} field${changedCount > 1 ? "s" : ""} changed${photo ? " + photo" : ""}`
                   : "New profile photo ready to upload"}
@@ -565,24 +613,34 @@ export default function ProfileEditor({
                 type="button"
                 onClick={handleReset}
                 disabled={saving}
-                className="rounded-lg px-3 py-2.5 text-[13px] font-semibold text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
               >
+                <RotateCcw className="h-3.5 w-3.5" aria-hidden />
                 Discard
               </button>
             )}
             <button
               type="submit"
               disabled={!dirty || saving}
-              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-[13px] font-semibold text-white shadow-sm transition hover:bg-[#3759dd] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+              className={`inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl px-5 text-[13px] font-semibold text-white shadow-md transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none ${
+                saved && !dirty
+                  ? "bg-emerald-500 shadow-emerald-500/25 hover:bg-emerald-500"
+                  : "bg-gradient-to-r from-[#4161df] to-[#5570e8] shadow-[#4161df]/25 hover:from-[#3759dd] hover:to-[#4161df]"
+              }`}
             >
               {saved && !dirty ? (
                 <>
                   <Check className="h-4 w-4" aria-hidden /> Saved
                 </>
               ) : saving ? (
-                "Saving…"
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  Saving…
+                </>
               ) : (
-                "Save changes"
+                <>
+                  <Save className="h-4 w-4" aria-hidden /> Save changes
+                </>
               )}
             </button>
           </div>
