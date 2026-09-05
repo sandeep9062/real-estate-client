@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -145,50 +145,63 @@ export default function LandlordProfilePage() {
   const { data, isLoading, isError } = useGetMyLandlordProfileQuery(undefined, {
     skip: !isAuthenticated || !canAccess,
   });
-  const [updateProfile] = useUpdateMyLandlordProfileMutation();
-  const [savingPhoto, setSavingPhoto] = useState(false);
+  const [updateProfile, { isLoading: saving }] =
+    useUpdateMyLandlordProfileMutation();
 
-  const profile = (data?.data ?? {}) as Record<string, unknown>;
+  // Memoised so ProfileEditor's form draft isn't reset on every render.
+  const profile = useMemo(
+    () => (data?.data ?? {}) as Record<string, unknown>,
+    [data],
+  );
 
   // Flatten the nested `preferences` sub-doc so ProfileEditor (which reads
   // `profile[key]`) can bind to contactMethod / availableTimings / acceptsVisits.
-  const preferences = (profile.preferences ?? {}) as Record<string, unknown>;
-  const editorProfile = {
-    ...profile,
-    contactMethod: preferences.contactMethod,
-    availableTimings: preferences.availableTimings,
-    acceptsVisits: preferences.acceptsVisits,
-  };
+  const editorProfile = useMemo(() => {
+    const preferences = (profile.preferences ?? {}) as Record<string, unknown>;
+    return {
+      ...profile,
+      contactMethod: preferences.contactMethod,
+      availableTimings: preferences.availableTimings,
+      acceptsVisits: preferences.acceptsVisits,
+    };
+  }, [profile]);
 
-  const handleSaveField = async (key: string, value: unknown) => {
+  // One save for the whole form. Preference keys are re-wrapped into the
+  // nested `preferences` object; a picked photo switches the payload to
+  // multipart (non-string fields are JSON-encoded — the backend parses them).
+  const handleSave = async (
+    draft: Record<string, unknown>,
+    photo: File | null,
+  ) => {
+    const body: Record<string, unknown> = {};
+    const preferences: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(draft)) {
+      if (PREFERENCE_KEYS.has(key)) preferences[key] = value;
+      else body[key] = value;
+    }
+    if (Object.keys(preferences).length > 0) body.preferences = preferences;
+
+    let payload: Record<string, unknown> | FormData = body;
+    if (photo) {
+      const fd = new FormData();
+      fd.append("photo", photo);
+      for (const [key, value] of Object.entries(body)) {
+        fd.append(
+          key,
+          typeof value === "string" ? value : JSON.stringify(value),
+        );
+      }
+      payload = fd;
+    }
+
     try {
-      const body = PREFERENCE_KEYS.has(key)
-        ? { preferences: { [key]: value } }
-        : { [key]: value };
-      await updateProfile(body).unwrap();
-      toast.success("Saved.");
+      await updateProfile(payload).unwrap();
+      toast.success("Profile saved.");
     } catch (err) {
       toast.error(
         (err as any)?.data?.message || "Couldn't save. Please try again.",
       );
-      throw err;
-    }
-  };
-
-  const handleSavePhoto = async (file: File) => {
-    setSavingPhoto(true);
-    try {
-      const fd = new FormData();
-      fd.append("photo", file);
-      await updateProfile(fd).unwrap();
-      toast.success("Photo updated.");
-    } catch (err) {
-      toast.error(
-        (err as any)?.data?.message || "Couldn't upload photo. Please try again.",
-      );
-      throw err;
-    } finally {
-      setSavingPhoto(false);
+      throw err; // keeps the form in "dirty" state
     }
   };
 
@@ -279,13 +292,9 @@ export default function LandlordProfilePage() {
           profile={editorProfile}
           name={data.data.name}
           avatar={data.data.avatar}
-          onSaveField={handleSaveField}
-          onSavePhoto={handleSavePhoto}
+          saving={saving}
+          onSave={handleSave}
         />
-
-        {savingPhoto && (
-          <p className="mt-3 text-xs text-gray-400">Uploading photo…</p>
-        )}
       </div>
     </div>
   );

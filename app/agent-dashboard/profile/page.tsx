@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -112,37 +112,44 @@ const FIELDS: ProfileFieldSpec[] = [
 
 export default function AgentProfilePage() {
   const { data, isLoading, isError } = useGetMyAgentProfileQuery();
-  const [updateProfile] = useUpdateMyAgentProfileMutation();
-  const [savingPhoto, setSavingPhoto] = useState(false);
+  const [updateProfile, { isLoading: saving }] =
+    useUpdateMyAgentProfileMutation();
 
-  const profile = (data?.data ?? {}) as Record<string, unknown>;
+  // Memoised so ProfileEditor's form draft isn't reset on every render.
+  const profile = useMemo(
+    () => (data?.data ?? {}) as Record<string, unknown>,
+    [data],
+  );
 
-  const handleSaveField = async (key: string, value: unknown) => {
+  // One save for the whole form. A picked photo switches the payload to
+  // multipart (non-string fields are JSON-encoded — the backend parses them).
+  const handleSave = async (
+    draft: Record<string, unknown>,
+    photo: File | null,
+  ) => {
+    let payload: Record<string, unknown> | FormData;
+    if (photo) {
+      const fd = new FormData();
+      fd.append("photo", photo);
+      for (const [key, value] of Object.entries(draft)) {
+        fd.append(
+          key,
+          typeof value === "string" ? value : JSON.stringify(value),
+        );
+      }
+      payload = fd;
+    } else {
+      payload = { ...draft };
+    }
+
     try {
-      await updateProfile({ [key]: value }).unwrap();
-      toast.success("Saved.");
+      await updateProfile(payload).unwrap();
+      toast.success("Profile saved.");
     } catch (err) {
       toast.error(
         (err as any)?.data?.message || "Couldn't save. Please try again.",
       );
-      throw err; // keeps the card in "dirty" state
-    }
-  };
-
-  const handleSavePhoto = async (file: File) => {
-    setSavingPhoto(true);
-    try {
-      const fd = new FormData();
-      fd.append("photo", file);
-      await updateProfile(fd).unwrap();
-      toast.success("Photo updated.");
-    } catch (err) {
-      toast.error(
-        (err as any)?.data?.message || "Couldn't upload photo. Please try again.",
-      );
-      throw err;
-    } finally {
-      setSavingPhoto(false);
+      throw err; // keeps the form in "dirty" state
     }
   };
 
@@ -197,13 +204,9 @@ export default function AgentProfilePage() {
         profile={profile}
         name={data.data.name}
         avatar={data.data.avatar}
-        onSaveField={handleSaveField}
-        onSavePhoto={handleSavePhoto}
+        saving={saving}
+        onSave={handleSave}
       />
-
-      {savingPhoto && (
-        <p className="mt-3 text-xs text-gray-400">Uploading photo…</p>
-      )}
     </div>
   );
 }

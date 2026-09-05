@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Pencil, Upload, X } from "lucide-react";
+import { Check, Upload, X } from "lucide-react";
 
 /* ──────────────────────────────────────────────
    Field kit — mirrors the signup wizard's UI
    (FieldLabel / inputClass / Toggle) so the look
-   and validation feel stays consistent, but usable
-   independently with per-field save (no steps).
+   and validation feel stays consistent. The editor
+   renders one form with a single Save button.
    ────────────────────────────────────────────── */
 
 export const inputClass =
@@ -88,77 +88,66 @@ export type ProfileFieldSpec =
     };
 
 /* ──────────────────────────────────────────────
-   One independently-saveable field card
+   Value helpers — normalisation + draft init
    ────────────────────────────────────────────── */
 
-function FieldCard({
+// Normalise so undefined / "" / missing-array all compare equal and the form
+// isn't dirty on first render.
+function normaliseValue(spec: ProfileFieldSpec, v: unknown): unknown {
+  if (spec.kind === "toggles" || spec.kind === "list")
+    return Array.isArray(v) ? v : [];
+  if (spec.kind === "boolean") return typeof v === "boolean" ? v : null;
+  // Numeric text fields: compare as numbers so "5" (input) === 5 (server)
+  if (spec.kind === "text" && spec.type === "number") {
+    if (v === "" || v === undefined || v === null) return "";
+    const n = Number(v);
+    return Number.isFinite(n) ? n : String(v);
+  }
+  return v ?? "";
+}
+
+function initDraft(
+  fields: ProfileFieldSpec[],
+  profile: Record<string, unknown>,
+): Record<string, unknown> {
+  const draft: Record<string, unknown> = {};
+  for (const spec of fields) draft[spec.key] = profile[spec.key];
+  return draft;
+}
+
+/* ──────────────────────────────────────────────
+   One field row — controlled by the parent form
+   (no per-field save button; the form saves all)
+   ────────────────────────────────────────────── */
+
+function FieldRow({
   spec,
   value,
-  onSave,
+  onChange,
 }: {
   spec: ProfileFieldSpec;
   value: unknown;
-  onSave: (key: string, value: unknown) => Promise<void>;
+  onChange: (v: unknown) => void;
 }) {
-  const [draft, setDraft] = useState<unknown>(value);
   const [listDraft, setListDraft] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  // Re-sync draft when the server value changes (e.g. after refetch)
-  useEffect(() => {
-    setDraft(value);
-  }, [value]);
-
-  // Normalise both sides before comparing so undefined / "" / missing-array
-  // all compare equal and a card isn't dirty on first render.
-  const normalise = (v: unknown) => {
-    if (spec.kind === "toggles" || spec.kind === "list")
-      return Array.isArray(v) ? v : [];
-    if (spec.kind === "boolean") return typeof v === "boolean" ? v : null;
-    // Numeric text fields: compare as numbers so "5" (input) === 5 (server)
-    if (spec.kind === "text" && spec.type === "number") {
-      if (v === "" || v === undefined || v === null) return "";
-      const n = Number(v);
-      return Number.isFinite(n) ? n : String(v);
-    }
-    return v ?? "";
-  };
-
-  const dirty =
-    JSON.stringify(normalise(draft)) !== JSON.stringify(normalise(value));
 
   const addListItem = () => {
     if (spec.kind !== "list") return;
     const item = listDraft.trim().slice(0, spec.maxLength ?? 120);
     if (!item) return;
-    const items = Array.isArray(draft) ? draft : [];
-    if (!items.includes(item)) setDraft([...items, item]);
+    const items = Array.isArray(value) ? value : [];
+    if (!items.includes(item)) onChange([...items, item]);
     setListDraft("");
   };
 
   const removeListItem = (index: number) => {
-    if (spec.kind !== "list" || !Array.isArray(draft)) return;
-    setDraft(draft.filter((_, i) => i !== index));
-  };
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await onSave(spec.key, draft);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch {
-      // Error already surfaced (toast) by the page's onSaveField handler.
-      // Swallow here so the rejection isn't unhandled; card stays dirty.
-    } finally {
-      setSaving(false);
-    }
+    if (spec.kind !== "list" || !Array.isArray(value)) return;
+    onChange(value.filter((_, i) => i !== index));
   };
 
   return (
     <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
+      <div>
         <div className="min-w-0 flex-1">
           <FieldLabel>{spec.label}</FieldLabel>
 
@@ -167,37 +156,37 @@ function FieldCard({
               <textarea
                 className={`${inputClass} min-h-[96px] resize-none`}
                 placeholder={spec.placeholder}
-                value={String(draft ?? "")}
-                onChange={(e) => setDraft(e.target.value)}
+                value={String(value ?? "")}
+                onChange={(e) => onChange(e.target.value)}
                 maxLength={spec.maxLength}
               />
             ) : (
               <input
                 className={inputClass}
                 placeholder={spec.placeholder}
-                value={String(draft ?? "")}
-                onChange={(e) => setDraft(e.target.value)}
+                value={String(value ?? "")}
+                onChange={(e) => onChange(e.target.value)}
                 type={spec.type ?? "text"}
                 maxLength={spec.type === "number" ? undefined : spec.maxLength}
               />
             ))}
           {spec.kind === "text" && spec.maxLength && (
             <p className="text-[11px] text-slate-400 mt-1 text-right">
-              {String(draft ?? "").length}/{spec.maxLength}
+              {String(value ?? "").length}/{spec.maxLength}
             </p>
           )}
 
           {spec.kind === "toggles" && (
             <div className="flex flex-wrap gap-2">
               {spec.options.map((opt) => {
-                const list = Array.isArray(draft) ? draft : [];
+                const list = Array.isArray(value) ? value : [];
                 return (
                   <Toggle
                     key={opt}
                     label={opt}
                     active={list.includes(opt)}
                     onClick={() =>
-                      setDraft(
+                      onChange(
                         list.includes(opt)
                           ? list.filter((v) => v !== opt)
                           : [...list, opt],
@@ -215,8 +204,8 @@ function FieldCard({
                 <Toggle
                   key={opt}
                   label={spec.labels?.[opt] ?? opt}
-                  active={draft === opt}
-                  onClick={() => setDraft(draft === opt ? "" : opt)}
+                  active={value === opt}
+                  onClick={() => onChange(value === opt ? "" : opt)}
                 />
               ))}
             </div>
@@ -226,13 +215,13 @@ function FieldCard({
             <div className="flex flex-wrap gap-2">
               <Toggle
                 label="Yes"
-                active={draft === true}
-                onClick={() => setDraft(true)}
+                active={value === true}
+                onClick={() => onChange(true)}
               />
               <Toggle
                 label="No"
-                active={draft === false}
-                onClick={() => setDraft(false)}
+                active={value === false}
+                onClick={() => onChange(false)}
               />
             </div>
           )}
@@ -261,9 +250,9 @@ function FieldCard({
                   Add
                 </button>
               </div>
-              {Array.isArray(draft) && draft.length > 0 && (
+              {Array.isArray(value) && value.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {draft.map((item, i) => (
+                  {value.map((item, i) => (
                     <span
                       key={`${item}-${i}`}
                       className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1.5 text-[12.5px] text-slate-700"
@@ -284,64 +273,29 @@ function FieldCard({
             </div>
           )}
         </div>
-
-        <button
-          type="button"
-          disabled={saving || !dirty}
-          onClick={handleSave}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#4161df] px-3.5 py-2 text-[12.5px] font-semibold text-white transition hover:bg-[#3759dd] disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {saved ? (
-            <>
-              <Check className="h-3.5 w-3.5" aria-hidden /> Saved
-            </>
-          ) : (
-            <>
-              <Pencil className="h-3.5 w-3.5" aria-hidden />
-              {saving ? "Saving…" : "Save"}
-            </>
-          )}
-        </button>
       </div>
     </section>
   );
 }
 /* ──────────────────────────────────────────────
-   Avatar (photo) card
+   Avatar (photo) section — controlled by the form;
+   the picked file is submitted with the main Save.
    ────────────────────────────────────────────── */
 
-function AvatarCard({
+function AvatarSection({
   avatar,
   name,
-  onSave,
+  photo,
+  preview,
+  onPick,
 }: {
   avatar?: string;
   name?: string;
-  onSave: (file: File) => Promise<void>;
+  photo: File | null;
+  preview: string | null;
+  onPick: (file: File | null) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const handlePick = (f: File | null) => {
-    setFile(f);
-    setPreview(f ? URL.createObjectURL(f) : null);
-  };
-
-  const handleSave = async () => {
-    if (!file) return;
-    setSaving(true);
-    try {
-      await onSave(file);
-      setSaved(true);
-      setFile(null);
-      setTimeout(() => setSaved(false), 2000);
-    } finally {
-      setSaving(false);
-    }
-  };
 
   return (
     <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
@@ -369,43 +323,36 @@ function AvatarCard({
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition hover:border-[#4161df]/40 hover:text-[#4161df]"
           >
             <Upload className="h-4 w-4" aria-hidden />
-            {file ? file.name : "Click to upload your photo"}
+            {photo ? photo.name : "Click to upload your photo"}
           </button>
           <p className="mt-1 text-[11px] text-slate-400">PNG or JPG, up to 5MB</p>
+          {photo && (
+            <button
+              type="button"
+              onClick={() => onPick(null)}
+              className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-medium text-slate-400 transition hover:text-slate-600"
+            >
+              <X className="h-3 w-3" aria-hidden />
+              Discard selected photo
+            </button>
+          )}
           <input
             ref={inputRef}
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(e) => handlePick(e.target.files?.[0] ?? null)}
+            onChange={(e) => onPick(e.target.files?.[0] ?? null)}
           />
         </div>
-
-        <button
-          type="button"
-          disabled={!file || saving}
-          onClick={handleSave}
-          className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg bg-[#4161df] px-3.5 py-2 text-[12.5px] font-semibold text-white transition hover:bg-[#3759dd] disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {saved ? (
-            <>
-              <Check className="h-3.5 w-3.5" aria-hidden /> Saved
-            </>
-          ) : (
-            <>
-              <Pencil className="h-3.5 w-3.5" aria-hidden />
-              {saving ? "Saving…" : "Save"}
-            </>
-          )}
-        </button>
       </div>
     </section>
   );
 }
 
 /* ──────────────────────────────────────────────
-   Editor — all fields visible at once, each
-   independently saveable. No steps, no sequence.
+   Editor — one form, all fields visible at once,
+   a single Save button that persists everything
+   (photo included). No steps, no sequence.
    ────────────────────────────────────────────── */
 
 export default function ProfileEditor({
@@ -413,27 +360,119 @@ export default function ProfileEditor({
   profile,
   name,
   avatar,
-  onSaveField,
-  onSavePhoto,
+  saving = false,
+  onSave,
 }: {
   fields: ProfileFieldSpec[];
   profile: Record<string, unknown>;
   name?: string;
   avatar?: string;
-  onSaveField: (key: string, value: unknown) => Promise<void>;
-  onSavePhoto: (file: File) => Promise<void>;
+  saving?: boolean;
+  onSave: (
+    draft: Record<string, unknown>,
+    photo: File | null,
+  ) => Promise<void>;
 }) {
+  const [draft, setDraft] = useState<Record<string, unknown>>(() =>
+    initDraft(fields, profile),
+  );
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  // Re-sync the draft when the server value changes (e.g. after refetch)
+  useEffect(() => {
+    setDraft(initDraft(fields, profile));
+  }, [fields, profile]);
+
+  const handlePick = (f: File | null) => {
+    if (preview) URL.revokeObjectURL(preview);
+    setPhoto(f);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  };
+
+  const dirty =
+    photo !== null ||
+    fields.some(
+      (spec) =>
+        JSON.stringify(normaliseValue(spec, draft[spec.key])) !==
+        JSON.stringify(normaliseValue(spec, profile[spec.key])),
+    );
+
+  const setFieldValue = (key: string, v: unknown) => {
+    setDraft((d) => ({ ...d, [key]: v }));
+    setSaved(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dirty || saving) return;
+    try {
+      await onSave(draft, photo);
+      if (photo) handlePick(null); // clears the pending preview too
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      // Error already surfaced (toast) by the page's onSave handler.
+      // Swallow here so the rejection isn't unhandled; form stays dirty.
+    }
+  };
+
   return (
-    <div className="grid gap-4">
-      <AvatarCard avatar={avatar} name={name} onSave={onSavePhoto} />
-      {fields.map((spec) => (
-        <FieldCard
-          key={spec.key}
-          spec={spec}
-          value={profile[spec.key]}
-          onSave={onSaveField}
+    <form onSubmit={handleSubmit}>
+      <div className="grid gap-4">
+        <AvatarSection
+          avatar={avatar}
+          name={name}
+          photo={photo}
+          preview={preview}
+          onPick={handlePick}
         />
-      ))}
-    </div>
+        {fields.map((spec) => (
+          <FieldRow
+            key={spec.key}
+            spec={spec}
+            value={draft[spec.key]}
+            onChange={(v) => setFieldValue(spec.key, v)}
+          />
+        ))}
+      </div>
+
+      {/* Single save bar for the whole form */}
+      <div className="sticky bottom-4 z-10 mt-4">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 pl-4 shadow-lg backdrop-blur">
+          <p
+            className={`text-[12.5px] ${
+              saved && !dirty
+                ? "text-emerald-600"
+                : dirty
+                  ? "text-amber-600"
+                  : "text-slate-400"
+            }`}
+          >
+            {saved && !dirty
+              ? "All changes saved."
+              : dirty
+                ? "You have unsaved changes."
+                : "No changes yet."}
+          </p>
+          <button
+            type="submit"
+            disabled={!dirty || saving}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-[#4161df] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#3759dd] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {saved && !dirty ? (
+              <>
+                <Check className="h-4 w-4" aria-hidden /> Saved
+              </>
+            ) : saving ? (
+              "Saving…"
+            ) : (
+              "Save changes"
+            )}
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
