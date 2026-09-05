@@ -61,6 +61,13 @@ const SECTIONS: ProfileSection[] = [
     fields: [
       {
         kind: "text",
+        key: "name",
+        label: "Full name",
+        placeholder: "e.g. Rajesh Kumar",
+        maxLength: 80,
+      },
+      {
+        kind: "text",
         key: "title",
         label: "Title",
         placeholder: "e.g. Property Owner, Landlord",
@@ -102,6 +109,12 @@ const SECTIONS: ProfileSection[] = [
         key: "whatsapp",
         label: "WhatsApp number",
         placeholder: "Leave empty to use your phone number",
+      },
+      {
+        kind: "text",
+        key: "email",
+        label: "Email",
+        placeholder: "e.g. rajesh@example.com",
       },
     ],
   },
@@ -154,6 +167,40 @@ const SECTIONS: ProfileSection[] = [
     ],
   },
   {
+    id: "company",
+    title: "Company info",
+    description: "For corporate landlords — enable to show company details.",
+    icon: Building2,
+    fields: [
+      {
+        kind: "boolean",
+        key: "isCompany",
+        label: "This is a company/corporate profile",
+      },
+      {
+        kind: "text",
+        key: "companyName",
+        label: "Company name",
+        placeholder: "e.g. ABC Properties Pvt. Ltd.",
+        maxLength: 120,
+      },
+      {
+        kind: "text",
+        key: "gstin",
+        label: "GSTIN",
+        placeholder: "e.g. 09AABCU9603R1ZM",
+        maxLength: 20,
+      },
+      {
+        kind: "text",
+        key: "pan",
+        label: "PAN",
+        placeholder: "e.g. AABCU9603R",
+        maxLength: 12,
+      },
+    ],
+  },
+  {
     id: "preferences",
     title: "Contact preferences",
     description: "Tell tenants when and how you prefer to be contacted.",
@@ -196,23 +243,22 @@ export default function LandlordProfilePage() {
   const [updateProfile, { isLoading: saving }] =
     useUpdateMyLandlordProfileMutation();
 
-  // Memoised so ProfileEditor's form draft isn't reset on every render.
-  // data is the full API response ({ success, data }) — no transformResponse.
-  const profile = useMemo(
-    () => (data?.data ?? {}) as Record<string, unknown>,
-    [data],
-  );
+  // The landlord profile doc — data is the full API response ({ success, data }),
+  // so data.data is the actual Landlord object (no transformResponse on this query).
+  const profile = data?.data;
 
   // Flatten the nested `preferences` sub-doc so ProfileEditor (which reads
   // `profile[key]`) can bind to contactMethod / availableTimings / acceptsVisits.
   // Only expose the keys that the editor actually renders (SECTIONS) — avoids
   // carrying stale nested `preferences` or read-only fields into the draft.
   const editorProfile = useMemo(() => {
+    if (!profile) return {};
     const preferences = (profile.preferences ?? {}) as Record<string, unknown>;
     const editable: Record<string, unknown> = {};
+    const p = profile as unknown as Record<string, unknown>;
     for (const section of SECTIONS) {
       for (const field of section.fields) {
-        editable[field.key] = profile[field.key];
+        editable[field.key] = p[field.key];
       }
     }
     // Preference keys live in the nested sub-doc but render at root level.
@@ -221,6 +267,9 @@ export default function LandlordProfilePage() {
     editable.acceptsVisits = preferences.acceptsVisits;
     return editable;
   }, [profile]);
+
+  // Resolve the display name — landlord profile name, falling back to auth user name
+  const displayName = profile?.name || user?.name || "";
 
   // One save for the whole form. Preference keys are re-wrapped into the
   // nested `preferences` object; a picked photo switches the payload to
@@ -376,7 +425,7 @@ export default function LandlordProfilePage() {
               Landlord workspace
             </span>
             <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-              {profile.name ? `Hello, ${String(profile.name)}` : "Edit your profile"}
+              {displayName ? `Hello, ${displayName}` : "Edit your profile"}
             </h1>
             <p className="mt-1.5 max-w-md text-sm text-white/80 sm:text-base">
               Keep your details up to date — tenants see this on your listings.
@@ -386,15 +435,15 @@ export default function LandlordProfilePage() {
 
         <ProfileCompletenessBanner
           role="landlord"
-          percentage={Number(profile.profileCompleteness) || 0}
+          percentage={profile?.profileCompleteness ?? 0}
           editHref="/landlord/dashboard/profile"
         />
 
         <ProfileEditor
           sections={SECTIONS}
           profile={editorProfile}
-          name={profile.name ? String(profile.name) : undefined}
-          avatar={profile.avatar ? String(profile.avatar) : undefined}
+          name={displayName || undefined}
+          avatar={profile?.avatar}
           saving={saving}
           onSave={handleSave}
         />

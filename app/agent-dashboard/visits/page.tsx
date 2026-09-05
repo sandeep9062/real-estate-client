@@ -66,6 +66,13 @@ function formatVisitDate(raw: string | undefined): string {
   }
 }
 
+function formatPropertyLocation(location: { address?: string; city?: string; sector?: string } | null | undefined): string {
+  if (!location) return "Location not available";
+  const parts = [location.sector, location.city].filter(Boolean);
+  if (parts.length === 0) return location.address || "Location not available";
+  return parts.join(", ");
+}
+
 function VisitSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading visits">
@@ -299,8 +306,8 @@ export default function AgentDashboardVisitsPage() {
                       </div>
                       <Link
                         href={
-                          booking.property?._id
-                            ? `/property/${booking.property._id}`
+                          booking.property?.slug
+                            ? `/property/${booking.property.slug}`
                             : "/"
                         }
                         className="mt-1 block truncate font-semibold text-gray-900 transition hover:text-[#4161df]"
@@ -308,10 +315,7 @@ export default function AgentDashboardVisitsPage() {
                         {booking.property?.title ?? "Property listing"}
                       </Link>
                       <p className="mt-0.5 truncate text-sm text-gray-500">
-                        {booking.property?.address?.city}
-                        {booking.property?.address?.locality
-                          ? `, ${booking.property.address.locality}`
-                          : ""}
+                        {formatPropertyLocation(booking.property?.location)}
                       </p>
                     </div>
 
