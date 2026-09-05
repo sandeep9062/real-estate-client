@@ -102,6 +102,9 @@ function FieldCard({
       await onSave(spec.key, draft);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+    } catch {
+      // Error already surfaced (toast) by the page's onSaveField handler.
+      // Swallow here so the rejection isn't unhandled; card stays dirty.
     } finally {
       setSaving(false);
     }
