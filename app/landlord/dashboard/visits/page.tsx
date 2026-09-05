@@ -14,7 +14,9 @@ import {
   LogIn,
   Mail,
   Phone,
+  Search,
   ShieldCheck,
+  User as UserIcon,
   XCircle,
 } from "lucide-react";
 
@@ -70,6 +72,13 @@ function formatVisitDate(raw: string | undefined): string {
   }
 }
 
+function formatPropertyLocation(location: { address?: string; city?: string; sector?: string } | null | undefined): string {
+  if (!location) return "Location not available";
+  const parts = [location.sector, location.city].filter(Boolean);
+  if (parts.length === 0) return location.address || "Location not available";
+  return parts.join(", ");
+}
+
 function VisitSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading visits">
@@ -93,14 +102,30 @@ export default function LandlordDashboardVisitsPage() {
   const user = useSelector(selectUser);
   const canAccess = user?.role === "landlord" || user?.role === "admin";
 
+  // Search state — admins can search by userID to view other landlords' visits
+  const [searchUserId, setSearchUserId] = useState("");
+  const [activeUserId, setActiveUserId] = useState<string | undefined>(undefined);
+
   // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
   // visitor lands here.
-  const { data: bookings, isLoading } = useGetOwnerBookingsQuery(undefined, {
-    skip: !isAuthenticated || !canAccess,
-  });
+  const { data: bookings, isLoading, isFetching } = useGetOwnerBookingsQuery(
+    activeUserId ? { userID: activeUserId } : undefined,
+    { skip: !isAuthenticated || !canAccess },
+  );
   const [updateStatus, { isLoading: updating }] =
     useUpdateOwnerBookingStatusMutation();
   const [pendingId, setPendingId] = useState<string | null>(null);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = searchUserId.trim();
+    setActiveUserId(trimmed || undefined);
+  };
+
+  const clearSearch = () => {
+    setSearchUserId("");
+    setActiveUserId(undefined);
+  };
 
   const stats = useMemo(() => {
     const list = bookings ?? [];
@@ -227,6 +252,57 @@ export default function LandlordDashboardVisitsPage() {
         }
       />
 
+      {/* ── Search by UserID (admin only) ── */}
+      {user?.role === "admin" && (
+        <section className="mb-6 rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm">
+          <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label
+                htmlFor="search-userid"
+                className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500"
+              >
+                Search landlord by User ID
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden />
+                <input
+                  id="search-userid"
+                  type="text"
+                  value={searchUserId}
+                  onChange={(e) => setSearchUserId(e.target.value)}
+                  placeholder="Enter landlord's User ID..."
+                  className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#4161df] focus:outline-none focus:ring-2 focus:ring-[#4161df]/20"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={isFetching}
+                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#4161df] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#3759dd] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isFetching ? "Searching..." : "Search"}
+              </button>
+              {activeUserId && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98]"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </form>
+          {activeUserId && (
+            <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
+              <UserIcon className="h-3.5 w-3.5" aria-hidden />
+              Showing visits for landlord: <span className="font-mono font-semibold text-gray-700">{activeUserId}</span>
+            </p>
+          )}
+        </section>
+      )}
+
       {/* ── Stats ── */}
       <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
@@ -313,6 +389,9 @@ export default function LandlordDashboardVisitsPage() {
                       >
                         {booking.property?.title ?? "Property listing"}
                       </Link>
+                      <p className="mt-0.5 truncate text-xs text-gray-500">
+                        {formatPropertyLocation(booking.property?.location)}
+                      </p>
                       <p className="mt-0.5 truncate text-sm text-gray-700">
                         {booking.user?.name ?? "Visitor"}
                       </p>

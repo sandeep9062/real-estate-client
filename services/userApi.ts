@@ -227,8 +227,13 @@ export const userApi = createApi({
     }),
 
     // ✅ Visits booked on the logged-in landlord's own properties
-    getOwnerBookings: builder.query<any[], void>({
-      query: () => `/bookings/owner`,
+    getOwnerBookings: builder.query<any[], { userID?: string } | void>({
+      query: (params) => {
+        const url = params?.userID
+          ? `/bookings/owner?userID=${encodeURIComponent(params.userID)}`
+          : `/bookings/owner`;
+        return url;
+      },
       providesTags: ["OwnerBooking"],
       transformResponse: (res: any) => (Array.isArray(res) ? res : res?.data ?? []),
     }),

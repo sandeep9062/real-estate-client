@@ -6,22 +6,18 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
-  Building2,
   CalendarDays,
   CalendarX2,
   CheckCircle2,
   Clock,
-  LogIn,
-  Mail,
-  Phone,
-  ShieldCheck,
   XCircle,
 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 import { firstImageUrl } from "@/services/leadsApi";
 import {
-  useGetOwnerBookingsQuery,
-  useUpdateOwnerBookingStatusMutation,
+  useGetBookingsQuery,
+  useCancelBookingMutation,
 } from "@/services/userApi";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { PageHeader } from "@/components/agent-dashboard/ui";
@@ -87,19 +83,19 @@ function VisitSkeleton() {
 // Page
 // ──────────────────────────────────────────────
 
-export default function LandlordDashboardVisitsPage() {
+export default function AgentDashboardVisitsPage() {
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
-  const canAccess = user?.role === "landlord" || user?.role === "admin";
+  const canAccess = user?.role === "agent" || user?.role === "admin";
 
   // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
   // visitor lands here.
-  const { data: bookings, isLoading } = useGetOwnerBookingsQuery(undefined, {
+  const { data: bookings, isLoading } = useGetBookingsQuery(undefined, {
     skip: !isAuthenticated || !canAccess,
   });
-  const [updateStatus, { isLoading: updating }] =
-    useUpdateOwnerBookingStatusMutation();
+  const [cancelBooking, { isLoading: cancelling }] =
+    useCancelBookingMutation();
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   const stats = useMemo(() => {
@@ -137,12 +133,13 @@ export default function LandlordDashboardVisitsPage() {
     [bookings],
   );
 
-  const handleStatusChange = async (id: string, status: BookingStatus) => {
-    setPendingId(id);
+  const handleCancel = async (bookingId: string) => {
+    setPendingId(bookingId);
     try {
-      await updateStatus({ id, status }).unwrap();
-    } catch (err) {
-      console.error("Failed to update visit status:", err);
+      await cancelBooking(bookingId).unwrap();
+      toast.success("Visit cancelled.");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Couldn't cancel. Please try again.");
     } finally {
       setPendingId(null);
     }
@@ -156,16 +153,15 @@ export default function LandlordDashboardVisitsPage() {
           <CalendarDays className="h-8 w-8 text-[#4161df]" aria-hidden />
         </span>
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
-          Landlord visits
+          My visits
         </h1>
         <p className="max-w-[28ch] text-pretty text-sm text-gray-600 sm:text-base">
-          Sign in to see and manage visit requests on your properties.
+          Sign in to track the property visits you've booked.
         </p>
         <Link
           href="/login"
           className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4161df] to-[#5570e8] px-6 py-3 text-base font-semibold text-white shadow-md shadow-[#4161df]/25 transition hover:from-[#3759dd] hover:to-[#4161df] active:scale-[0.98]"
         >
-          <LogIn className="h-4 w-4" aria-hidden />
           Log in
         </Link>
       </div>
@@ -177,13 +173,13 @@ export default function LandlordDashboardVisitsPage() {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 ring-1 ring-gray-200">
-          <ShieldCheck className="h-8 w-8 text-gray-400" aria-hidden />
+          <CalendarDays className="h-8 w-8 text-gray-400" aria-hidden />
         </span>
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
-          Landlord visits
+          My visits
         </h1>
         <p className="max-w-[34ch] text-pretty text-sm text-gray-600 sm:text-base">
-          This area is for registered landlords. If you should have access, contact
+          This area is for registered agents. If you should have access, contact
           support.
         </p>
         <button
@@ -202,8 +198,8 @@ export default function LandlordDashboardVisitsPage() {
       <div className="max-w-4xl min-w-0">
         <PageHeader
           eyebrow="Visits"
-          title="Site visits"
-          description="Requests booked on your property listings."
+          title="My visits"
+          description="Track the property visits you've booked."
         />
         <VisitSkeleton />
       </div>
@@ -214,15 +210,14 @@ export default function LandlordDashboardVisitsPage() {
     <div className="max-w-4xl min-w-0">
       <PageHeader
         eyebrow="Visits"
-        title="Site visits"
-        description="Requests booked on your property listings. Confirm, complete or decline them — visitors are notified automatically."
+        title="My visits"
+        description="Track the property visits you've booked and their status."
         actions={
           <Link
-            href="/owned"
+            href="/"
             className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-[#4161df]/40 hover:text-[#4161df] active:scale-[0.98]"
           >
-            <Building2 className="h-4 w-4" aria-hidden />
-            My properties
+            Browse properties
           </Link>
         }
       />
@@ -230,10 +225,10 @@ export default function LandlordDashboardVisitsPage() {
       {/* ── Stats ── */}
       <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
-          { label: "Total requests", value: stats.total, accent: "text-gray-900" },
+          { label: "Total visits", value: stats.total, accent: "text-gray-900" },
           { label: "Pending", value: stats.pending, accent: "text-amber-600" },
           { label: "Confirmed", value: stats.confirmed, accent: "text-emerald-600" },
-          { label: "Completed / Declined", value: stats.closed, accent: "text-gray-500" },
+          { label: "Completed / Cancelled", value: stats.closed, accent: "text-gray-500" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -268,15 +263,14 @@ export default function LandlordDashboardVisitsPage() {
             </span>
             <p className="font-semibold text-gray-900">No upcoming visits</p>
             <p className="max-w-[40ch] text-sm text-gray-600">
-              When someone books a visit from one of your listings, the request will
-              show up here for you to confirm.
+              When you book a visit to a property, it'll show up here to track.
             </p>
           </div>
         ) : (
           <ul className="divide-y divide-gray-100">
             {upcoming.map((booking: any) => {
               const img = firstImageUrl(booking.property?.image);
-              const busy = updating && pendingId === booking._id;
+              const busy = cancelling && pendingId === booking._id;
               return (
                 <li key={booking._id} className="px-5 py-4">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -291,7 +285,7 @@ export default function LandlordDashboardVisitsPage() {
                       />
                     ) : (
                       <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df]/10 to-[#7c93f2]/20 ring-1 ring-[#4161df]/10">
-                        <Building2 className="h-6 w-6 text-[#4161df]" aria-hidden />
+                        <CalendarDays className="h-6 w-6 text-[#4161df]" aria-hidden />
                       </span>
                     )}
 
@@ -305,78 +299,32 @@ export default function LandlordDashboardVisitsPage() {
                       </div>
                       <Link
                         href={
-                          booking.property?.slug
-                            ? `/property/${booking.property.slug}`
-                            : "/owned"
+                          booking.property?._id
+                            ? `/property/${booking.property._id}`
+                            : "/"
                         }
                         className="mt-1 block truncate font-semibold text-gray-900 transition hover:text-[#4161df]"
                       >
                         {booking.property?.title ?? "Property listing"}
                       </Link>
-                      <p className="mt-0.5 truncate text-sm text-gray-700">
-                        {booking.user?.name ?? "Visitor"}
+                      <p className="mt-0.5 truncate text-sm text-gray-500">
+                        {booking.property?.address?.city}
+                        {booking.property?.address?.locality
+                          ? `, ${booking.property.address.locality}`
+                          : ""}
                       </p>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
-                        {booking.user?.email && (
-                          <span className="inline-flex items-center gap-1">
-                            <Mail className="h-3 w-3" aria-hidden />
-                            {booking.user.email}
-                          </span>
-                        )}
-                        {booking.user?.phone && (
-                          <span className="inline-flex items-center gap-1">
-                            <Phone className="h-3 w-3" aria-hidden />
-                            {booking.user.phone}
-                          </span>
-                        )}
-                      </div>
                     </div>
 
                     <div className="flex shrink-0 flex-wrap gap-2">
-                      {booking.status === "Pending" && (
-                        <>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Confirmed")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            <CheckCircle2 className="h-4 w-4" aria-hidden />
-                            Confirm
-                          </button>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Cancelled")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            <XCircle className="h-4 w-4" aria-hidden />
-                            Decline
-                          </button>
-                        </>
-                      )}
-                      {booking.status === "Confirmed" && (
-                        <>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Completed")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-[#4161df] px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#3759dd] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            <CheckCircle2 className="h-4 w-4" aria-hidden />
-                            Mark completed
-                          </button>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Cancelled")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            <XCircle className="h-4 w-4" aria-hidden />
-                            Cancel
-                          </button>
-                        </>
-                      )}
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => handleCancel(booking._id)}
+                        className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <XCircle className="h-4 w-4" aria-hidden />
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 </li>
@@ -393,21 +341,21 @@ export default function LandlordDashboardVisitsPage() {
           aria-label="Visit history"
         >
           <div className="border-b border-gray-100 px-5 py-4">
-            <h2 className="text-base font-semibold text-gray-900">History</h2>
-            <p className="text-xs text-gray-500">Completed and declined visits</p>
+            <h2 className="text-base font-semibold text-gray-900">Visit history</h2>
+            <p className="text-xs text-gray-500">Completed and cancelled visits</p>
           </div>
           <ul className="divide-y divide-gray-100">
             {history.map((booking: any) => (
               <li key={booking._id} className="flex items-center gap-4 px-5 py-3.5">
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 ring-1 ring-gray-200">
-                  <Building2 className="h-5 w-5 text-gray-400" aria-hidden />
+                  <CalendarDays className="h-5 w-5 text-gray-400" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-gray-900">
                     {booking.property?.title ?? "Property listing"}
                   </p>
                   <p className="truncate text-xs text-gray-500">
-                    {booking.user?.name ?? "Visitor"} · {formatVisitDate(booking.date)}
+                    {formatVisitDate(booking.date)}
                   </p>
                 </div>
                 <StatusBadge status={booking.status} />
