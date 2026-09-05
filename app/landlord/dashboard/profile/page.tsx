@@ -197,6 +197,7 @@ export default function LandlordProfilePage() {
     useUpdateMyLandlordProfileMutation();
 
   // Memoised so ProfileEditor's form draft isn't reset on every render.
+  // data is the full API response ({ success, data }) — no transformResponse.
   const profile = useMemo(
     () => (data?.data ?? {}) as Record<string, unknown>,
     [data],
@@ -204,14 +205,21 @@ export default function LandlordProfilePage() {
 
   // Flatten the nested `preferences` sub-doc so ProfileEditor (which reads
   // `profile[key]`) can bind to contactMethod / availableTimings / acceptsVisits.
+  // Only expose the keys that the editor actually renders (SECTIONS) — avoids
+  // carrying stale nested `preferences` or read-only fields into the draft.
   const editorProfile = useMemo(() => {
     const preferences = (profile.preferences ?? {}) as Record<string, unknown>;
-    return {
-      ...profile,
-      contactMethod: preferences.contactMethod,
-      availableTimings: preferences.availableTimings,
-      acceptsVisits: preferences.acceptsVisits,
-    };
+    const editable: Record<string, unknown> = {};
+    for (const section of SECTIONS) {
+      for (const field of section.fields) {
+        editable[field.key] = profile[field.key];
+      }
+    }
+    // Preference keys live in the nested sub-doc but render at root level.
+    editable.contactMethod = preferences.contactMethod;
+    editable.availableTimings = preferences.availableTimings;
+    editable.acceptsVisits = preferences.acceptsVisits;
+    return editable;
   }, [profile]);
 
   // One save for the whole form. Preference keys are re-wrapped into the
@@ -368,7 +376,7 @@ export default function LandlordProfilePage() {
               Landlord workspace
             </span>
             <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-              {data.data.name ? `Hello, ${data.data.name}` : "Edit your profile"}
+              {profile.name ? `Hello, ${String(profile.name)}` : "Edit your profile"}
             </h1>
             <p className="mt-1.5 max-w-md text-sm text-white/80 sm:text-base">
               Keep your details up to date — tenants see this on your listings.
@@ -378,15 +386,15 @@ export default function LandlordProfilePage() {
 
         <ProfileCompletenessBanner
           role="landlord"
-          percentage={data.data.profileCompleteness ?? 0}
+          percentage={Number(profile.profileCompleteness) || 0}
           editHref="/landlord/dashboard/profile"
         />
 
         <ProfileEditor
           sections={SECTIONS}
           profile={editorProfile}
-          name={data.data.name}
-          avatar={data.data.avatar}
+          name={profile.name ? String(profile.name) : undefined}
+          avatar={profile.avatar ? String(profile.avatar) : undefined}
           saving={saving}
           onSave={handleSave}
         />
