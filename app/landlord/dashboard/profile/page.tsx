@@ -28,8 +28,29 @@ const LOCATIONS = [
 ];
 const PROPERTY_TYPES = ["Residential", "Commercial", "Plot"];
 const LANGUAGES = ["Hindi", "English", "Punjabi"];
+const CONTACT_METHODS = ["phone", "email", "whatsapp"];
+const CONTACT_METHOD_LABELS: Record<string, string> = {
+  phone: "Phone",
+  email: "Email",
+  whatsapp: "WhatsApp",
+};
+
+// Preference keys live in the nested `preferences` sub-doc on the Landlord
+// model — flattened into the editor and re-wrapped on save.
+const PREFERENCE_KEYS = new Set([
+  "contactMethod",
+  "availableTimings",
+  "acceptsVisits",
+]);
 
 const FIELDS: ProfileFieldSpec[] = [
+  {
+    kind: "text",
+    key: "title",
+    label: "Title",
+    placeholder: "e.g. Property Owner, Landlord",
+    maxLength: 60,
+  },
   {
     kind: "text",
     key: "bio",
@@ -40,9 +61,49 @@ const FIELDS: ProfileFieldSpec[] = [
   },
   {
     kind: "text",
+    key: "longBio",
+    label: "Detailed bio",
+    textarea: true,
+    maxLength: 2000,
+    placeholder:
+      "A longer description — your properties, policies, tenant expectations...",
+  },
+  {
+    kind: "text",
+    key: "phone",
+    label: "Phone",
+    placeholder: "e.g. +91 98765 43210",
+  },
+  {
+    kind: "text",
+    key: "whatsapp",
+    label: "WhatsApp number",
+    placeholder: "Leave empty to use your phone number",
+  },
+  {
+    kind: "text",
     key: "address",
     label: "Address",
     placeholder: "e.g. 42 Palm Avenue, Sector 9",
+  },
+  {
+    kind: "text",
+    key: "city",
+    label: "City",
+    placeholder: "e.g. Chandigarh",
+  },
+  {
+    kind: "text",
+    key: "state",
+    label: "State",
+    placeholder: "e.g. Punjab",
+  },
+  {
+    kind: "text",
+    key: "pincode",
+    label: "Pincode",
+    placeholder: "e.g. 160009",
+    maxLength: 10,
   },
   { kind: "toggles", key: "locations", label: "Areas you operate in", options: LOCATIONS },
   {
@@ -52,6 +113,25 @@ const FIELDS: ProfileFieldSpec[] = [
     options: PROPERTY_TYPES,
   },
   { kind: "toggles", key: "languages", label: "Languages", options: LANGUAGES },
+  {
+    kind: "select",
+    key: "contactMethod",
+    label: "Preferred contact method",
+    options: CONTACT_METHODS,
+    labels: CONTACT_METHOD_LABELS,
+  },
+  {
+    kind: "text",
+    key: "availableTimings",
+    label: "Available timings",
+    placeholder: "e.g. 10:00 AM - 6:00 PM",
+    maxLength: 60,
+  },
+  {
+    kind: "boolean",
+    key: "acceptsVisits",
+    label: "Accepts property visits",
+  },
 ];
 
 export default function LandlordProfilePage() {
@@ -70,9 +150,22 @@ export default function LandlordProfilePage() {
 
   const profile = (data?.data ?? {}) as Record<string, unknown>;
 
+  // Flatten the nested `preferences` sub-doc so ProfileEditor (which reads
+  // `profile[key]`) can bind to contactMethod / availableTimings / acceptsVisits.
+  const preferences = (profile.preferences ?? {}) as Record<string, unknown>;
+  const editorProfile = {
+    ...profile,
+    contactMethod: preferences.contactMethod,
+    availableTimings: preferences.availableTimings,
+    acceptsVisits: preferences.acceptsVisits,
+  };
+
   const handleSaveField = async (key: string, value: unknown) => {
     try {
-      await updateProfile({ [key]: value }).unwrap();
+      const body = PREFERENCE_KEYS.has(key)
+        ? { preferences: { [key]: value } }
+        : { [key]: value };
+      await updateProfile(body).unwrap();
       toast.success("Saved.");
     } catch (err) {
       toast.error(
@@ -183,7 +276,7 @@ export default function LandlordProfilePage() {
 
         <ProfileEditor
           fields={FIELDS}
-          profile={profile}
+          profile={editorProfile}
           name={data.data.name}
           avatar={data.data.avatar}
           onSaveField={handleSaveField}

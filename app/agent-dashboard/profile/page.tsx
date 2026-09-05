@@ -38,6 +38,13 @@ const LANGUAGES = ["Hindi", "English", "Punjabi"];
 const FIELDS: ProfileFieldSpec[] = [
   {
     kind: "text",
+    key: "title",
+    label: "Title",
+    placeholder: "e.g. Senior Property Advisor",
+    maxLength: 60,
+  },
+  {
+    kind: "text",
     key: "bio",
     label: "Short bio",
     textarea: true,
@@ -47,9 +54,44 @@ const FIELDS: ProfileFieldSpec[] = [
   },
   {
     kind: "text",
+    key: "longBio",
+    label: "Detailed bio",
+    textarea: true,
+    maxLength: 2000,
+    placeholder:
+      "A longer description for your profile page — experience, approach, services...",
+  },
+  {
+    kind: "text",
+    key: "agencyName",
+    label: "Agency name",
+    placeholder: "e.g. Bulbul Realty",
+    maxLength: 80,
+  },
+  {
+    kind: "text",
     key: "rera",
     label: "RERA registration number",
     placeholder: "Optional, helps verification",
+  },
+  {
+    kind: "text",
+    key: "phone",
+    label: "Phone",
+    placeholder: "e.g. +91 98765 43210",
+  },
+  {
+    kind: "text",
+    key: "whatsapp",
+    label: "WhatsApp number",
+    placeholder: "Leave empty to use your phone number",
+  },
+  {
+    kind: "text",
+    key: "experience",
+    label: "Years of experience",
+    type: "number",
+    placeholder: "e.g. 5",
   },
   { kind: "toggles", key: "locations", label: "Areas you operate in", options: LOCATIONS },
   {
@@ -59,6 +101,13 @@ const FIELDS: ProfileFieldSpec[] = [
     options: SPECIALISATIONS,
   },
   { kind: "toggles", key: "languages", label: "Languages", options: LANGUAGES },
+  {
+    kind: "list",
+    key: "achievements",
+    label: "Achievements",
+    placeholder: "e.g. Top performer 2024 — press Enter to add",
+    maxLength: 120,
+  },
 ];
 
 export default function AgentProfilePage() {

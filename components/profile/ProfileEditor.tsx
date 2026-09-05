@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Pencil, Upload } from "lucide-react";
+import { Check, Pencil, Upload, X } from "lucide-react";
 
 /* ──────────────────────────────────────────────
    Field kit — mirrors the signup wizard's UI
@@ -58,6 +58,7 @@ export type ProfileFieldSpec =
       placeholder?: string;
       textarea?: boolean;
       maxLength?: number;
+      type?: "number"; // input type for single-line text fields
       hint?: string;
     }
   | {
@@ -65,6 +66,25 @@ export type ProfileFieldSpec =
       key: string;
       label: string;
       options: string[];
+    }
+  | {
+      kind: "select";
+      key: string;
+      label: string;
+      options: string[];
+      labels?: Record<string, string>; // display label override per value
+    }
+  | {
+      kind: "boolean";
+      key: string;
+      label: string;
+    }
+  | {
+      kind: "list"; // freeform list of strings (add/remove chips)
+      key: string;
+      label: string;
+      placeholder?: string;
+      maxLength?: number; // per-item max length
     };
 
 /* ──────────────────────────────────────────────
@@ -81,6 +101,7 @@ function FieldCard({
   onSave: (key: string, value: unknown) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<unknown>(value);
+  const [listDraft, setListDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -89,12 +110,37 @@ function FieldCard({
     setDraft(value);
   }, [value]);
 
-  const isEmpty = (v: unknown) =>
-    spec.kind === "toggles" ? !Array.isArray(v) || v.length === 0 : !v;
+  // Normalise both sides before comparing so undefined / "" / missing-array
+  // all compare equal and a card isn't dirty on first render.
+  const normalise = (v: unknown) => {
+    if (spec.kind === "toggles" || spec.kind === "list")
+      return Array.isArray(v) ? v : [];
+    if (spec.kind === "boolean") return typeof v === "boolean" ? v : null;
+    // Numeric text fields: compare as numbers so "5" (input) === 5 (server)
+    if (spec.kind === "text" && spec.type === "number") {
+      if (v === "" || v === undefined || v === null) return "";
+      const n = Number(v);
+      return Number.isFinite(n) ? n : String(v);
+    }
+    return v ?? "";
+  };
 
   const dirty =
-    JSON.stringify(draft ?? (spec.kind === "toggles" ? [] : "")) !==
-    JSON.stringify(isEmpty(value) ? (spec.kind === "toggles" ? [] : "") : value);
+    JSON.stringify(normalise(draft)) !== JSON.stringify(normalise(value));
+
+  const addListItem = () => {
+    if (spec.kind !== "list") return;
+    const item = listDraft.trim().slice(0, spec.maxLength ?? 120);
+    if (!item) return;
+    const items = Array.isArray(draft) ? draft : [];
+    if (!items.includes(item)) setDraft([...items, item]);
+    setListDraft("");
+  };
+
+  const removeListItem = (index: number) => {
+    if (spec.kind !== "list" || !Array.isArray(draft)) return;
+    setDraft(draft.filter((_, i) => i !== index));
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -131,7 +177,8 @@ function FieldCard({
                 placeholder={spec.placeholder}
                 value={String(draft ?? "")}
                 onChange={(e) => setDraft(e.target.value)}
-                maxLength={spec.maxLength}
+                type={spec.type ?? "text"}
+                maxLength={spec.type === "number" ? undefined : spec.maxLength}
               />
             ))}
           {spec.kind === "text" && spec.maxLength && (
@@ -159,6 +206,81 @@ function FieldCard({
                   />
                 );
               })}
+            </div>
+          )}
+
+          {spec.kind === "select" && (
+            <div className="flex flex-wrap gap-2">
+              {spec.options.map((opt) => (
+                <Toggle
+                  key={opt}
+                  label={spec.labels?.[opt] ?? opt}
+                  active={draft === opt}
+                  onClick={() => setDraft(draft === opt ? "" : opt)}
+                />
+              ))}
+            </div>
+          )}
+
+          {spec.kind === "boolean" && (
+            <div className="flex flex-wrap gap-2">
+              <Toggle
+                label="Yes"
+                active={draft === true}
+                onClick={() => setDraft(true)}
+              />
+              <Toggle
+                label="No"
+                active={draft === false}
+                onClick={() => setDraft(false)}
+              />
+            </div>
+          )}
+
+          {spec.kind === "list" && (
+            <div>
+              <div className="flex gap-2">
+                <input
+                  className={inputClass}
+                  placeholder={spec.placeholder}
+                  value={listDraft}
+                  onChange={(e) => setListDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addListItem();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={addListItem}
+                  disabled={!listDraft.trim()}
+                  className="shrink-0 rounded-xl bg-[#4161df] px-4 text-[13px] font-semibold text-white transition hover:bg-[#3759dd] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Add
+                </button>
+              </div>
+              {Array.isArray(draft) && draft.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {draft.map((item, i) => (
+                    <span
+                      key={`${item}-${i}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-3 pr-1.5 text-[12.5px] text-slate-700"
+                    >
+                      {item}
+                      <button
+                        type="button"
+                        onClick={() => removeListItem(i)}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+                        aria-label={`Remove ${item}`}
+                      >
+                        <X className="h-3 w-3" aria-hidden />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
