@@ -9,12 +9,12 @@ import Companies from "@/components/Companies";
 import Residencies from "@/components/Residencies";
 import Value from "@/components/Value";
 import PostPropertyCTA from "@/components/PostPropertyCTA";
-import AgentLandlordCTA from "@/components/AgentLandlordCTA";
 import BecauseYouViewedSection from "@/components/BecauseYouViewedSection";
 import Testimonial from "@/components/Testimonial";
 import GetStarted from "@/components/GetStarted";
 import WhyPropertyBulbul from "@/components/WhyPropertyBulbul";
 
+import AgentLandlordCTA from "@/components/AgentLandlordCTA";
 import AppDownloadBanner from "@/components/home/AppDownloadBanner";
 import TrendingLocalities from "@/components/home/TrendingLocalities";
 import RoommateBanner from "@/components/home/RoommateBanner";

@@ -66,7 +66,12 @@ function formatVisitDate(raw: string | undefined): string {
   }
 }
 
-function formatPropertyLocation(location: { address?: string; city?: string; sector?: string } | null | undefined): string {
+function formatPropertyLocation(
+  location:
+    | { address?: string; city?: string; sector?: string }
+    | null
+    | undefined,
+): string {
   if (!location) return "Location not available";
   const parts = [location.sector, location.city].filter(Boolean);
   if (parts.length === 0) return location.address || "Location not available";
@@ -78,7 +83,10 @@ function VisitSkeleton() {
     <div aria-busy="true" aria-label="Loading visits">
       <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-20 animate-pulse rounded-2xl bg-white shadow-sm" />
+          <div
+            key={i}
+            className="h-20 animate-pulse rounded-2xl bg-white shadow-sm"
+          />
         ))}
       </div>
       <div className="h-64 animate-pulse rounded-2xl bg-white shadow-sm" />
@@ -101,8 +109,7 @@ export default function AgentDashboardVisitsPage() {
   const { data: bookings, isLoading } = useGetBookingsQuery(undefined, {
     skip: !isAuthenticated || !canAccess,
   });
-  const [cancelBooking, { isLoading: cancelling }] =
-    useCancelBookingMutation();
+  const [cancelBooking, { isLoading: cancelling }] = useCancelBookingMutation();
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   const stats = useMemo(() => {
@@ -123,7 +130,8 @@ export default function AgentDashboardVisitsPage() {
         .filter((b: any) => b.status === "Pending" || b.status === "Confirmed")
         .sort(
           (a: any, b: any) =>
-            (new Date(a.date).getTime() || 0) - (new Date(b.date).getTime() || 0),
+            (new Date(a.date).getTime() || 0) -
+            (new Date(b.date).getTime() || 0),
         ),
     [bookings],
   );
@@ -131,7 +139,9 @@ export default function AgentDashboardVisitsPage() {
   const history = useMemo(
     () =>
       (bookings ?? [])
-        .filter((b: any) => b.status === "Completed" || b.status === "Cancelled")
+        .filter(
+          (b: any) => b.status === "Completed" || b.status === "Cancelled",
+        )
         .sort(
           (a: any, b: any) =>
             (new Date(b.updatedAt ?? b.createdAt ?? 0).getTime() || 0) -
@@ -214,7 +224,7 @@ export default function AgentDashboardVisitsPage() {
   }
 
   return (
-    <div className="max-w-4xl min-w-0">
+    <div className="max-w-7xl min-w-0">
       <PageHeader
         eyebrow="Visits"
         title="My visits"
@@ -232,10 +242,22 @@ export default function AgentDashboardVisitsPage() {
       {/* ── Stats ── */}
       <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
-          { label: "Total visits", value: stats.total, accent: "text-gray-900" },
+          {
+            label: "Total visits",
+            value: stats.total,
+            accent: "text-gray-900",
+          },
           { label: "Pending", value: stats.pending, accent: "text-amber-600" },
-          { label: "Confirmed", value: stats.confirmed, accent: "text-emerald-600" },
-          { label: "Completed / Cancelled", value: stats.closed, accent: "text-gray-500" },
+          {
+            label: "Confirmed",
+            value: stats.confirmed,
+            accent: "text-emerald-600",
+          },
+          {
+            label: "Completed / Cancelled",
+            value: stats.closed,
+            accent: "text-gray-500",
+          },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -244,7 +266,9 @@ export default function AgentDashboardVisitsPage() {
             <p className="text-[11.5px] font-semibold uppercase tracking-wide text-gray-500">
               {stat.label}
             </p>
-            <p className={`mt-1 text-2xl font-bold tracking-tight ${stat.accent}`}>
+            <p
+              className={`mt-1 text-2xl font-bold tracking-tight ${stat.accent}`}
+            >
               {stat.value}
             </p>
           </div>
@@ -257,7 +281,9 @@ export default function AgentDashboardVisitsPage() {
         aria-label="Upcoming visits"
       >
         <div className="border-b border-gray-100 px-5 py-4">
-          <h2 className="text-base font-semibold text-gray-900">Upcoming visits</h2>
+          <h2 className="text-base font-semibold text-gray-900">
+            Upcoming visits
+          </h2>
           <p className="text-xs text-gray-500">
             Pending and confirmed requests, soonest first
           </p>
@@ -292,7 +318,10 @@ export default function AgentDashboardVisitsPage() {
                       />
                     ) : (
                       <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df]/10 to-[#7c93f2]/20 ring-1 ring-[#4161df]/10">
-                        <CalendarDays className="h-6 w-6 text-[#4161df]" aria-hidden />
+                        <CalendarDays
+                          className="h-6 w-6 text-[#4161df]"
+                          aria-hidden
+                        />
                       </span>
                     )}
 
@@ -300,7 +329,10 @@ export default function AgentDashboardVisitsPage() {
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusBadge status={booking.status} />
                         <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600">
-                          <CalendarDays className="h-3.5 w-3.5 text-gray-400" aria-hidden />
+                          <CalendarDays
+                            className="h-3.5 w-3.5 text-gray-400"
+                            aria-hidden
+                          />
                           {formatVisitDate(booking.date)}
                         </span>
                       </div>
@@ -345,12 +377,19 @@ export default function AgentDashboardVisitsPage() {
           aria-label="Visit history"
         >
           <div className="border-b border-gray-100 px-5 py-4">
-            <h2 className="text-base font-semibold text-gray-900">Visit history</h2>
-            <p className="text-xs text-gray-500">Completed and cancelled visits</p>
+            <h2 className="text-base font-semibold text-gray-900">
+              Visit history
+            </h2>
+            <p className="text-xs text-gray-500">
+              Completed and cancelled visits
+            </p>
           </div>
           <ul className="divide-y divide-gray-100">
             {history.map((booking: any) => (
-              <li key={booking._id} className="flex items-center gap-4 px-5 py-3.5">
+              <li
+                key={booking._id}
+                className="flex items-center gap-4 px-5 py-3.5"
+              >
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 ring-1 ring-gray-200">
                   <CalendarDays className="h-5 w-5 text-gray-400" aria-hidden />
                 </span>
@@ -371,4 +410,3 @@ export default function AgentDashboardVisitsPage() {
     </div>
   );
 }
-

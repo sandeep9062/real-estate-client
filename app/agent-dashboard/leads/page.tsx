@@ -22,10 +22,7 @@ import {
 } from "@/services/leadsApi";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import {
-  PageHeader,
-  StatCard,
-} from "@/components/agent-dashboard/ui";
+import { PageHeader, StatCard } from "@/components/agent-dashboard/ui";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -36,7 +33,9 @@ const STALE_ELIGIBLE_STATUSES: LeadStatus[] = ["New", "Contacted"];
 
 function isStaleLead(lead: Lead): boolean {
   if (!STALE_ELIGIBLE_STATUSES.includes(lead.status)) return false;
-  return Date.now() - new Date(lead.lastActivityAt).getTime() > STALE_THRESHOLD_MS;
+  return (
+    Date.now() - new Date(lead.lastActivityAt).getTime() > STALE_THRESHOLD_MS
+  );
 }
 
 function timeAgo(iso: string): string {
@@ -228,12 +227,7 @@ function LeadRow({ lead }: { lead: Lead }) {
 
   return (
     <tr className={cn("align-top transition-colors", stale && "bg-red-50/50")}>
-      <td
-        className={cn(
-          "px-4 py-3",
-          stale && "border-l-4 border-l-red-500",
-        )}
-      >
+      <td className={cn("px-4 py-3", stale && "border-l-4 border-l-red-500")}>
         <PropertyCell lead={lead} />
       </td>
       <td className="px-4 py-3">
@@ -305,7 +299,7 @@ export default function AgentDashboardLeadsPage() {
   const hasActiveFilters = Boolean(statusFilter || propertyFilter);
 
   return (
-    <div className="max-w-4xl min-w-0">
+    <div className="max-w-7xl min-w-0">
       <PageHeader
         eyebrow="Leads"
         title="WhatsApp leads"
@@ -316,7 +310,9 @@ export default function AgentDashboardLeadsPage() {
       <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard
           label="Leads this week"
-          value={typeof stats?.totalThisWeek === "number" ? stats.totalThisWeek : "—"}
+          value={
+            typeof stats?.totalThisWeek === "number" ? stats.totalThisWeek : "—"
+          }
           hint="Since Monday"
           icon={CalendarClock}
         />
@@ -324,7 +320,9 @@ export default function AgentDashboardLeadsPage() {
           label="Total leads"
           value={typeof stats?.total === "number" ? stats.total : "—"}
           hint={
-            typeof stats?.closed === "number" ? `${stats.closed} closed` : undefined
+            typeof stats?.closed === "number"
+              ? `${stats.closed} closed`
+              : undefined
           }
           icon={Users}
         />
@@ -413,7 +411,9 @@ export default function AgentDashboardLeadsPage() {
             <span className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-[#4161df]">
               <Inbox className="h-6 w-6" aria-hidden />
             </span>
-            <h2 className="text-lg font-semibold text-gray-900">No leads yet</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              No leads yet
+            </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
               When buyers tap “Chat on WhatsApp” on your listings, they’ll show
               up here automatically. Make sure your listings are live so buyers
