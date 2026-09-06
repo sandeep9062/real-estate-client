@@ -53,6 +53,13 @@ const SECTIONS: ProfileSection[] = [
     fields: [
       {
         kind: "text",
+        key: "name",
+        label: "Full name",
+        placeholder: "e.g. Rajesh Kumar",
+        maxLength: 80,
+      },
+      {
+        kind: "text",
         key: "title",
         label: "Title",
         placeholder: "e.g. Senior Property Advisor",
@@ -175,14 +182,26 @@ export default function AgentProfilePage() {
   const [updateProfile, { isLoading: saving }] =
     useUpdateMyAgentProfileMutation();
 
-  // Memoised so ProfileEditor's form draft isn't reset on every render.
-  const profile = useMemo(
-    () => (data?.data ?? {}) as Record<string, unknown>,
-    [data],
-  );
+  // The agent profile doc — data is the full API response ({ success, data }),
+  // so data.data is the actual Agent object (no transformResponse on this query).
+  const profile = data?.data;
 
-  // Resolve the display name — agent profile name, falling back to auth user name
-  const displayName = data?.data?.name || user?.name || "";
+  // Expose only the fields the editor renders (SECTIONS) to the form draft —
+  // mirrors the landlord profile page and keeps read-only/stale keys out.
+  const editorProfile = useMemo(() => {
+    if (!profile) return {};
+    const p = profile as unknown as Record<string, unknown>;
+    const editable: Record<string, unknown> = {};
+    for (const section of SECTIONS) {
+      for (const field of section.fields) {
+        editable[field.key] = p[field.key];
+      }
+    }
+    return editable;
+  }, [profile]);
+
+  // Resolve the display name — agent profile name, falling back to auth user name.
+  const displayName = profile?.name || user?.name || "";
 
   // One save for the whole form. A picked photo switches the payload to
   // multipart (non-string fields are JSON-encoded — the backend parses them).
@@ -342,15 +361,15 @@ export default function AgentProfilePage() {
 
       <ProfileCompletenessBanner
         role="agent"
-        percentage={data.data.profileCompleteness ?? 0}
+        percentage={profile?.profileCompleteness ?? 0}
         editHref="/agent-dashboard/profile"
       />
 
       <ProfileEditor
         sections={SECTIONS}
-        profile={profile}
+        profile={editorProfile}
         name={displayName || undefined}
-        avatar={data.data.avatar}
+        avatar={profile?.avatar}
         saving={saving}
         onSave={handleSave}
       />
