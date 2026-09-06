@@ -414,14 +414,6 @@ export default function LandlordProfilePage() {
   return (
     <div className="min-h-[100dvh] bg-[#FAF7F1]">
       <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
-        <Link
-          href="/landlord/dashboard"
-          className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-[13px] font-medium text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.98]"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to dashboard
-        </Link>
-
         <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
