@@ -1,6 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import {
   ArrowRight,
   CalendarClock,
@@ -10,12 +14,12 @@ import {
   LifeBuoy,
   Megaphone,
   MessageCircleHeart,
+  ShieldCheck,
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useSelector } from "react-redux";
 
-import { selectUser } from "@/store/authSlice";
+import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { useGetLeadStatsQuery } from "@/services/leadsApi";
 import { useGetMyAgentProfileQuery } from "@/services/agentsApi";
 import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
@@ -56,10 +60,70 @@ const QUICK_ACTIONS = [
   },
 ];
 
+function DashboardSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading dashboard">
+      <div className="mx-auto max-w-7xl">
+        <div className="h-44 animate-pulse rounded-2xl bg-gray-100 sm:h-48" />
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-24 animate-pulse rounded-xl border border-gray-200 bg-white"
+            />
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
+          {[0, 1].map((i) => (
+            <div
+              key={i}
+              className="h-28 animate-pulse rounded-2xl border border-gray-200/80 bg-white"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AgentDashboardOverviewPage() {
+  const router = useRouter();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
-  const { data: stats } = useGetLeadStatsQuery();
-  const { data: profileData } = useGetMyAgentProfileQuery();
+  const canAccess = user?.role === "agent" || user?.role === "admin";
+
+  // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
+  // visitor lands here.
+  const { data: stats, isFetching: fetchingStats } = useGetLeadStatsQuery(
+    undefined,
+    { skip: !isAuthenticated || !canAccess },
+  );
+  const { data: profileData } = useGetMyAgentProfileQuery(undefined, {
+    skip: !isAuthenticated || !canAccess,
+  });
+
+  const profile = profileData?.data;
+
+  const memberSince = useMemo(() => {
+    const raw = profile?.memberSince || profile?.createdAt;
+    if (!raw) return null;
+    try {
+      return new Date(raw).toLocaleDateString("en-IN", {
+        month: "short",
+        year: "numeric",
+      });
+    } catch {
+      return null;
+    }
+  }, [profile?.memberSince, profile?.createdAt]);
+
+  const initials = (user?.name ?? "A")
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   const today = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
@@ -67,49 +131,140 @@ export default function AgentDashboardOverviewPage() {
     month: "long",
   });
 
+  // ── Signed-out gate ──
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/10">
+          <Users className="h-7 w-7 text-[#4161df]" aria-hidden />
+        </span>
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
+          Agent dashboard
+        </h1>
+        <p className="max-w-[28ch] text-pretty text-sm text-gray-600 sm:text-base">
+          Sign in to manage your leads and agent profile.
+        </p>
+        <Link
+          href="/login"
+          className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center rounded-xl bg-[#4161df] px-6 py-3 text-base font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98]"
+        >
+          Log in
+        </Link>
+      </div>
+    );
+  }
+
+  // ── Wrong-role gate ──
+  if (!canAccess) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+          <ShieldCheck className="h-7 w-7 text-gray-400" aria-hidden />
+        </span>
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
+          Agent dashboard
+        </h1>
+        <p className="max-w-[34ch] text-pretty text-sm text-gray-600 sm:text-base">
+          This area is for registered agents. If you should have access, contact
+          support.
+        </p>
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 active:scale-[0.98]"
+        >
+          Back to home
+        </button>
+      </div>
+    );
+  }
+
+  // ── Loading (first visit, nothing cached yet) ──
+  if (!profileData && fetchingStats && !stats) {
+    return <DashboardSkeleton />;
+  }
+
   return (
-    <div className="min-w-0">
-      {/* Profile completeness banner (dismissible, non-blocking) */}
-      {profileData?.data && (
+    <div className="mx-auto max-w-7xl">
+      {/* ── Profile completeness banner (dismissible, non-blocking) ── */}
+      {profile && (
         <ProfileCompletenessBanner
           role="agent"
-          percentage={profileData.data.profileCompleteness ?? 0}
+          percentage={profile.profileCompleteness ?? 0}
           editHref="/agent-dashboard/profile"
         />
       )}
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] via-[#4f6ee6] to-[#7c93f2] p-6 text-white shadow-lg shadow-[#4161df]/20 sm:mb-8 sm:p-8">
         <div
           className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl"
           aria-hidden
         />
-        <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest backdrop-blur">
-          Agent workspace
-        </span>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
-        </h1>
-        <p
-          suppressHydrationWarning
-          className="mt-1 text-sm text-white/80 sm:text-base"
-        >
-          {today} · Here is what is happening with your business.
-        </p>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Link
-            href="/agent-dashboard/leads"
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-[#4161df] shadow-sm transition hover:bg-indigo-50 active:scale-[0.98]"
-          >
-            View leads
-            <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
-          <Link
-            href="/agent-dashboard/marketing"
-            className="inline-flex min-h-[44px] items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white ring-1 ring-white/40 transition hover:bg-white/10 active:scale-[0.98]"
-          >
-            Connect socials
-          </Link>
+
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            {user?.image ? (
+              <Image
+                src={user.image}
+                alt={user.name ?? "Your Image"}
+                width={60}
+                height={60}
+                className="h-14 w-14 rounded-2xl object-cover ring-1 ring-white/25 sm:h-[60px] sm:w-[60px]"
+              />
+            ) : (
+              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-lg font-semibold ring-1 ring-white/20 backdrop-blur sm:h-[60px] sm:w-[60px]">
+                {initials}
+              </span>
+            )}
+            <div className="min-w-0">
+              <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest backdrop-blur">
+                Agent workspace
+              </span>
+              <h1 className="mt-2 truncate text-2xl font-bold tracking-tight sm:text-3xl">
+                Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+              </h1>
+              <p
+                suppressHydrationWarning
+                className="mt-1 text-sm text-white/80 sm:text-base"
+              >
+                {today} · Here is what is happening with your business.
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-white/75 sm:text-sm">
+                {(profile?.isVerified || profile?.identityVerified) && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck
+                      className="h-3.5 w-3.5 text-emerald-300"
+                      aria-hidden
+                    />
+                    Verified agent
+                  </span>
+                )}
+                {memberSince && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5" aria-hidden />
+                    Member since {memberSince}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 flex-wrap gap-2.5">
+            <Link
+              href="/agent-dashboard/leads"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-[#4161df] shadow-sm transition hover:bg-indigo-50 active:scale-[0.98]"
+            >
+              View leads
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              href="/agent-dashboard/marketing"
+              className="inline-flex min-h-[44px] items-center rounded-xl border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 active:scale-[0.98]"
+            >
+              Connect socials
+            </Link>
+          </div>
         </div>
       </section>
 
