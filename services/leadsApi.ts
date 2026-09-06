@@ -100,7 +100,7 @@ export const leadsApi = createApi({
       providesTags: ["LeadStats"],
     }),
 
-    /** PATCH /api/leads/:id — update status and/or notes (agent-only). */
+    /** PATCH /api/leads/:id — update status and/or notes (agent/landlord owner). */
     updateLead: builder.mutation<
       Lead,
       { id: string; status?: LeadStatus; notes?: string }
