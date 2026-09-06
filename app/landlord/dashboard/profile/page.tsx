@@ -323,7 +323,7 @@ export default function LandlordProfilePage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4  pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4  px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/8 text-[#4161df]">
           <Building2 className="h-7 w-7" aria-hidden />
         </span>
@@ -368,8 +368,8 @@ export default function LandlordProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[100dvh] bg-[#FAF7F1]">
-        <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
+      <div className="min-h-[100dvh] ">
+        <div className="mx-auto max-w-5xl py-6 sm:py-8">
           <div className="mb-4 h-4 w-40 animate-pulse rounded-full bg-stone-200/70" />
           <div className="mb-6 h-40 animate-pulse rounded-3xl bg-stone-200/70" />
           <div className="mb-6 h-32 animate-pulse rounded-2xl bg-white" />
@@ -412,7 +412,7 @@ export default function LandlordProfilePage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-white">
+    <div className="min-h-[100dvh]">
       <div className="mx-auto max-w-5xl py-6 sm:py-8">
         <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
           <svg
