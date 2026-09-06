@@ -105,6 +105,17 @@ const MyPropertiesPage = () => {
   return (
     <div className="w-full pt-20">
       <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-12">
+        {/* Header with Logo */}
+        <div className="w-full flex flex-col items-center gap-2">
+          <div className="h-6 w-px bg-slate-200 mx-1" />
+          <h1 className="text-2xl font-semibold text-[#0F172A]">
+            My Properties
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Manage and review properties you have listed.
+          </p>
+        </div>
+
         {/* Search + Add button row */}
         <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="w-full max-w-[28rem] border border-gray-300 rounded-full flex items-center px-4 gap-3 py-2">
