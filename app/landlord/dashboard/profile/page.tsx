@@ -323,7 +323,7 @@ export default function LandlordProfilePage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 bg-[#FAF7F1] px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4  pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/8 text-[#4161df]">
           <Building2 className="h-7 w-7" aria-hidden />
         </span>
