@@ -182,7 +182,7 @@ const MyPropertiesPage = () => {
                         .join(", ")}
                     </td>
                     <td className="px-4 py-3 text-gray-600">
-                      {card.price ? `$${card.price}` : "-"}
+                      {card.price ? `Rs.${card.price}` : "-"}
                     </td>
                     <td className="px-4 py-3">
                       <span
