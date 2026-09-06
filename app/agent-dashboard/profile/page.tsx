@@ -200,8 +200,10 @@ export default function AgentProfilePage() {
     return editable;
   }, [profile]);
 
-  // Resolve the display name — agent profile name, falling back to auth user name.
-  const displayName = profile?.name || user?.name || "";
+  // Resolve the display name — always the agent profile name (the "Full name"
+  // field on this page). Never falls back to the auth user's original name,
+  // since the Agent doc name is required and always present.
+  const displayName = profile?.name || "";
 
   // One save for the whole form. A picked photo switches the payload to
   // multipart (non-string fields are JSON-encoded — the backend parses them).
