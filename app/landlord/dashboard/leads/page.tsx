@@ -10,6 +10,7 @@ import {
   Users,
   CalendarClock,
   ChevronDown,
+  SlidersHorizontal,
 } from "lucide-react";
 import {
   LEAD_STATUSES,
@@ -22,10 +23,7 @@ import {
 } from "@/services/leadsApi";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import {
-  PageHeader,
-  StatCard,
-} from "@/components/agent-dashboard/ui";
+import { PageHeader, StatCard } from "@/components/agent-dashboard/ui";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -36,7 +34,9 @@ const STALE_ELIGIBLE_STATUSES: LeadStatus[] = ["New", "Contacted"];
 
 function isStaleLead(lead: Lead): boolean {
   if (!STALE_ELIGIBLE_STATUSES.includes(lead.status)) return false;
-  return Date.now() - new Date(lead.lastActivityAt).getTime() > STALE_THRESHOLD_MS;
+  return (
+    Date.now() - new Date(lead.lastActivityAt).getTime() > STALE_THRESHOLD_MS
+  );
 }
 
 function timeAgo(iso: string): string {
@@ -227,16 +227,16 @@ function LeadRow({ lead }: { lead: Lead }) {
   const stale = isStaleLead(lead);
 
   return (
-    <tr className={cn("align-top transition-colors", stale && "bg-red-50/50")}>
-      <td
-        className={cn(
-          "px-4 py-3",
-          stale && "border-l-4 border-l-red-500",
-        )}
-      >
+    <tr
+      className={cn(
+        "align-top transition-colors hover:bg-gray-50/60",
+        stale && "bg-red-50/50 hover:bg-red-50/70",
+      )}
+    >
+      <td className={cn("px-4 py-3.5", stale && "border-l-4 border-l-red-500")}>
         <PropertyCell lead={lead} />
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3.5">
         <p className="font-medium text-gray-900">
           {lead.buyerName || "Anonymous buyer"}
         </p>
@@ -244,16 +244,16 @@ function LeadRow({ lead }: { lead: Lead }) {
           {lead.buyerPhone || "No phone captured"}
         </p>
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3.5">
         <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
           <MessageCircle className="h-3 w-3" aria-hidden />
           WhatsApp click
         </span>
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3.5">
         <StatusSelect lead={lead} />
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3.5">
         <p className="whitespace-nowrap text-gray-700">
           {timeAgo(lead.lastActivityAt)}
         </p>
@@ -264,7 +264,7 @@ function LeadRow({ lead }: { lead: Lead }) {
           </span>
         )}
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3.5">
         <NotesCell lead={lead} />
       </td>
     </tr>
@@ -316,7 +316,9 @@ export default function AgentDashboardLeadsPage() {
       <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard
           label="Leads this week"
-          value={typeof stats?.totalThisWeek === "number" ? stats.totalThisWeek : "—"}
+          value={
+            typeof stats?.totalThisWeek === "number" ? stats.totalThisWeek : "—"
+          }
           hint="Since Monday"
           icon={CalendarClock}
         />
@@ -324,7 +326,9 @@ export default function AgentDashboardLeadsPage() {
           label="Total leads"
           value={typeof stats?.total === "number" ? stats.total : "—"}
           hint={
-            typeof stats?.closed === "number" ? `${stats.closed} closed` : undefined
+            typeof stats?.closed === "number"
+              ? `${stats.closed} closed`
+              : undefined
           }
           icon={Users}
         />
@@ -341,7 +345,11 @@ export default function AgentDashboardLeadsPage() {
       </div>
 
       {/* Filters */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="mt-6 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center">
+        <span className="hidden shrink-0 items-center gap-1.5 text-xs font-medium text-gray-500 sm:flex">
+          <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden />
+          Filter
+        </span>
         <select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
@@ -377,7 +385,7 @@ export default function AgentDashboardLeadsPage() {
               setStatusFilter("");
               setPropertyFilter("");
             }}
-            className="text-sm font-medium text-[#4161df] hover:underline"
+            className="text-sm font-medium text-[#4161df] hover:underline sm:ml-auto"
           >
             Clear filters
           </button>
@@ -386,7 +394,8 @@ export default function AgentDashboardLeadsPage() {
 
       {/* Content */}
       {isError ? (
-        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           Couldn’t load your leads. Please refresh the page and try again.
         </div>
       ) : isLoading ? (
@@ -413,7 +422,9 @@ export default function AgentDashboardLeadsPage() {
             <span className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-[#4161df]">
               <Inbox className="h-6 w-6" aria-hidden />
             </span>
-            <h2 className="text-lg font-semibold text-gray-900">No leads yet</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              No leads yet
+            </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
               When buyers tap “Chat on WhatsApp” on your listings, they’ll show
               up here automatically. Make sure your listings are live so buyers

@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Building2,
   CalendarDays,
+  MessageCircle,
   UserPen,
   LifeBuoy,
 } from "lucide-react";
@@ -15,6 +16,7 @@ export type LandlordDashboardNavItem = {
 
 export const LANDLORD_DASHBOARD_NAV: LandlordDashboardNavItem[] = [
   { href: "/landlord/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/landlord/dashboard/leads", label: "Leads", icon: MessageCircle },
   { href: "/landlord/dashboard/visits", label: "Visits", icon: CalendarDays },
   { href: "/owned", label: "My properties", icon: Building2 },
   { href: "/landlord/dashboard/profile", label: "Profile", icon: UserPen },

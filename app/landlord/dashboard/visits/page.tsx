@@ -11,6 +11,7 @@ import {
   CalendarX2,
   CheckCircle2,
   Clock,
+  Layers,
   LogIn,
   Mail,
   Phone,
@@ -30,13 +31,6 @@ import { PageHeader } from "@/components/agent-dashboard/ui";
 
 type BookingStatus = "Pending" | "Confirmed" | "Completed" | "Cancelled";
 
-const STATUS_DOT: Record<BookingStatus, string> = {
-  Pending: "bg-amber-500",
-  Confirmed: "bg-emerald-500",
-  Completed: "bg-sky-500",
-  Cancelled: "bg-gray-400",
-};
-
 const STATUS_ICON: Record<BookingStatus, React.ElementType> = {
   Pending: Clock,
   Confirmed: CheckCircle2,
@@ -44,14 +38,21 @@ const STATUS_ICON: Record<BookingStatus, React.ElementType> = {
   Cancelled: XCircle,
 };
 
+// Same pill-badge language as the leads table, so status reads consistently
+// across the landlord dashboard.
+const STATUS_BADGE: Record<BookingStatus, string> = {
+  Pending: "border-amber-200 bg-amber-50 text-amber-700",
+  Confirmed: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  Completed: "border-sky-200 bg-sky-50 text-sky-700",
+  Cancelled: "border-gray-200 bg-gray-100 text-gray-600",
+};
+
 function StatusBadge({ status }: { status: BookingStatus }) {
   const Icon = STATUS_ICON[status];
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`}
-        aria-hidden
-      />
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_BADGE[status]}`}
+    >
       <Icon className="h-3.5 w-3.5" aria-hidden />
       {status}
     </span>
@@ -93,7 +94,7 @@ function VisitSkeleton() {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-20 animate-pulse rounded-xl border border-gray-200 bg-white"
+            className="h-24 animate-pulse rounded-xl border border-gray-200 bg-white"
           />
         ))}
       </div>
@@ -304,7 +305,7 @@ export default function LandlordDashboardVisitsPage() {
               <button
                 type="submit"
                 disabled={isFetching}
-                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#4161df] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-[42px] items-center gap-1.5 rounded-lg bg-[#4161df] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isFetching ? "Searching..." : "Search"}
               </button>
@@ -312,7 +313,7 @@ export default function LandlordDashboardVisitsPage() {
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98]"
+                  className="inline-flex min-h-[42px] items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98]"
                 >
                   Clear
                 </button>
@@ -337,42 +338,45 @@ export default function LandlordDashboardVisitsPage() {
           {
             label: "Total requests",
             value: stats.total,
-            accent: "text-gray-900",
-            dot: "bg-gray-400",
+            icon: Layers,
+            border: "border-l-gray-300",
+            iconTone: "bg-gray-100 text-gray-500",
           },
           {
             label: "Pending",
             value: stats.pending,
-            accent: "text-amber-600",
-            dot: "bg-amber-500",
+            icon: Clock,
+            border: "border-l-amber-400",
+            iconTone: "bg-amber-50 text-amber-600",
           },
           {
             label: "Confirmed",
             value: stats.confirmed,
-            accent: "text-emerald-600",
-            dot: "bg-emerald-500",
+            icon: CheckCircle2,
+            border: "border-l-emerald-400",
+            iconTone: "bg-emerald-50 text-emerald-600",
           },
           {
             label: "Completed / declined",
             value: stats.closed,
-            accent: "text-gray-500",
-            dot: "bg-sky-500",
+            icon: Building2,
+            border: "border-l-sky-400",
+            iconTone: "bg-sky-50 text-sky-600",
           },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-xl border border-gray-200 bg-white p-4"
+            className={`rounded-xl border border-gray-200 border-l-4 bg-white p-4 ${stat.border}`}
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium text-gray-500">{stat.label}</p>
               <span
-                className={`h-1.5 w-1.5 shrink-0 rounded-full ${stat.dot}`}
-                aria-hidden
-              />
+                className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${stat.iconTone}`}
+              >
+                <stat.icon className="h-3.5 w-3.5" aria-hidden />
+              </span>
             </div>
-            <p
-              className={`mt-2 text-2xl font-semibold tracking-tight ${stat.accent}`}
-            >
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
               {stat.value}
             </p>
           </div>
@@ -410,7 +414,10 @@ export default function LandlordDashboardVisitsPage() {
               const img = firstImageUrl(booking.property?.image);
               const busy = updating && pendingId === booking._id;
               return (
-                <li key={booking._id} className="px-5 py-4">
+                <li
+                  key={booking._id}
+                  className="px-5 py-4 transition-colors hover:bg-gray-50/60"
+                >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     {img ? (
                       <Image
@@ -447,14 +454,14 @@ export default function LandlordDashboardVisitsPage() {
                             ? `/property/${booking.property.slug}`
                             : "/owned"
                         }
-                        className="mt-1 block truncate font-semibold text-gray-900 transition hover:text-[#4161df]"
+                        className="mt-1.5 block truncate font-semibold text-gray-900 transition hover:text-[#4161df]"
                       >
                         {booking.property?.title ?? "Property listing"}
                       </Link>
                       <p className="mt-0.5 truncate text-xs text-gray-500">
                         {formatPropertyLocation(booking.property?.location)}
                       </p>
-                      <p className="mt-0.5 truncate text-sm text-gray-700">
+                      <p className="mt-1 truncate text-sm text-gray-700">
                         {booking.user?.name ?? "Visitor"}
                       </p>
                       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
@@ -551,7 +558,7 @@ export default function LandlordDashboardVisitsPage() {
             {history.map((booking: any) => (
               <li
                 key={booking._id}
-                className="flex items-center gap-4 px-5 py-3.5"
+                className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-gray-50/60"
               >
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
                   <Building2 className="h-5 w-5 text-gray-400" aria-hidden />
