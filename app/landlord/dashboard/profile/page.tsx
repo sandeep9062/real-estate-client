@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   ArrowLeft,
   Building2,
+  Landmark,
   MapPin,
   Phone,
   SlidersHorizontal,
@@ -180,7 +181,7 @@ const SECTIONS: ProfileSection[] = [
     id: "company",
     title: "Company info",
     description: "For corporate landlords — enable to show company details.",
-    icon: Building2,
+    icon: Landmark,
     fields: [
       {
         kind: "boolean",
@@ -322,14 +323,14 @@ export default function LandlordProfilePage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 bg-[#FAF7F1] px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/8 text-[#4161df]">
           <Building2 className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
           Landlord profile
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-stone-500">
           Log in to manage your listings and profile details.
         </p>
         <Link
@@ -344,20 +345,20 @@ export default function LandlordProfilePage() {
 
   if (!canAccess) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 bg-[#FAF7F1] px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100 text-stone-400">
           <Building2 className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
           Landlord profile
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-stone-500">
           This page is only available to landlord accounts.
         </p>
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-300 px-6 py-3 text-base font-medium text-slate-800 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-stone-300 px-6 py-3 text-base font-medium text-stone-800 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
         >
           Back to home
         </button>
@@ -367,10 +368,10 @@ export default function LandlordProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[100dvh] bg-[#f6f8fb]">
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
-          <div className="mb-4 h-4 w-40 animate-pulse rounded-full bg-slate-200" />
-          <div className="mb-6 h-40 animate-pulse rounded-3xl bg-slate-200" />
+      <div className="min-h-[100dvh] bg-[#FAF7F1]">
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
+          <div className="mb-4 h-4 w-40 animate-pulse rounded-full bg-stone-200/70" />
+          <div className="mb-6 h-40 animate-pulse rounded-3xl bg-stone-200/70" />
           <div className="mb-6 h-32 animate-pulse rounded-2xl bg-white" />
           <div className="space-y-4">
             {[0, 1, 2].map((i) => (
@@ -388,14 +389,14 @@ export default function LandlordProfilePage() {
 
   if (isError || !data?.data) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 bg-[#FAF7F1] px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
           <AlertTriangle className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
           Something went wrong
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-stone-500">
           We couldn&apos;t load your landlord profile. Please refresh the page
           or contact support if the problem persists.
         </p>
@@ -411,27 +412,47 @@ export default function LandlordProfilePage() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#f6f8fb]">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
+    <div className="min-h-[100dvh] bg-[#FAF7F1]">
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
         <Link
           href="/landlord/dashboard"
-          className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-[13px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.98]"
+          className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-[13px] font-medium text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.98]"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Back to dashboard
         </Link>
 
         <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
-          <Building2
-            className="pointer-events-none absolute -right-6 -top-6 h-40 w-40 text-white/[0.08]"
-            strokeWidth={1}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
             aria-hidden
-          />
+          >
+            <defs>
+              <pattern
+                id="plan-grid"
+                width="28"
+                height="28"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M 28 0 L 0 0 0 28"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="1"
+                />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#plan-grid)" />
+          </svg>
+
           <div className="relative max-w-md">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            <p className="text-[13px] font-medium text-white/70">
+              Landlord profile
+            </p>
+            <h1 className="mt-1.5 font-serif text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">
               {displayName ? `Hello, ${displayName}` : "Edit your profile"}
             </h1>
-            <p className="mt-2 text-sm leading-relaxed text-white/80 sm:text-base">
+            <p className="mt-2.5 text-sm leading-relaxed text-white/80 sm:text-base">
               Keep your details up to date — tenants see this on your listings.
             </p>
           </div>
