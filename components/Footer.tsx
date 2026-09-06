@@ -77,16 +77,16 @@ const Footer = () => {
                 // ["Projects", "/projects"],
 
                 // will add projects later on when this platform will be more mature and we will have more projects to list down
-                ["Register as Agent", "/agents/register"],
+                // ["Register as Agent", "/agents/register"],
                 ["Services", "/services"],
                 // ["Pricing", "/pricing"],
                 ["Journals", "/journal"],
                 ["Contact", "/contact"],
                 ["About Us", "/about-us"],
                 ["FAQ", "/faq"],
-                ["Register as Landlord", "/landlords/register"],
+                // ["Register as Landlord", "/landlords/register"],
 
-                ["Agents", "/agents"],
+                // ["Agents", "/agents"],
                 ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
               ].map(([label, link]) => (
