@@ -108,7 +108,6 @@ const OwnedPropertiesPage = () => {
       <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-12">
         {/* Header with Logo */}
         <div className="w-full flex flex-col items-center gap-2">
-          <div className="h-6 w-px bg-slate-200 mx-1" />
           <h1 className="text-2xl font-semibold text-[#0F172A]">
             Your Owned Properties
           </h1>
