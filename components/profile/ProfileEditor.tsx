@@ -20,11 +20,11 @@ import {
    ────────────────────────────────────────────── */
 
 export const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13.5px] text-slate-800 placeholder:text-slate-400 outline-none transition-all duration-150 hover:border-slate-300 focus:border-[#4161df] focus:ring-4 focus:ring-[#4161df]/10";
+  "w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[13.5px] text-slate-800 placeholder:text-slate-400 outline-none transition-colors duration-150 hover:border-slate-300 focus:border-[#4161df] focus:ring-4 focus:ring-[#4161df]/10";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="mb-1.5 block text-[12.5px] font-semibold tracking-wide text-slate-600">
+    <label className="mb-1.5 block text-[13px] font-medium text-slate-600">
       {children}
     </label>
   );
@@ -44,9 +44,9 @@ function Toggle({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition-all duration-150 active:scale-95 ${
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.97] ${
         active
-          ? "border-[#4161df] bg-[#4161df] text-white shadow-sm shadow-[#4161df]/30"
+          ? "border-[#4161df] bg-[#4161df] text-white"
           : "border-slate-200 bg-white text-slate-600 hover:border-[#4161df]/40 hover:text-[#4161df]"
       }`}
     >
@@ -178,7 +178,7 @@ function FieldRow({
       {spec.kind === "text" &&
         (spec.textarea ? (
           <textarea
-            className={`${inputClass} min-h-[104px] resize-none`}
+            className={`${inputClass} min-h-[104px] resize-none leading-relaxed`}
             placeholder={spec.placeholder}
             value={String(value ?? "")}
             onChange={(e) => onChange(e.target.value)}
@@ -194,8 +194,11 @@ function FieldRow({
             maxLength={spec.type === "number" ? undefined : spec.maxLength}
           />
         ))}
+      {spec.kind === "text" && spec.hint && (
+        <p className="mt-1.5 text-[12px] text-slate-400">{spec.hint}</p>
+      )}
       {spec.kind === "text" && spec.maxLength && (
-        <p className="mt-1 text-right text-[11px] text-slate-400">
+        <p className="mt-1 text-right text-[11px] tabular-nums text-slate-400">
           {String(value ?? "").length}/{spec.maxLength}
         </p>
       )}
@@ -269,7 +272,7 @@ function FieldRow({
               type="button"
               onClick={addListItem}
               disabled={!listDraft.trim()}
-              className="shrink-0 rounded-xl bg-[#4161df] px-4 text-[13px] font-semibold text-white transition hover:bg-[#3759dd] disabled:cursor-not-allowed disabled:opacity-40"
+              className="shrink-0 rounded-lg bg-[#4161df] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#3151c9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/40 disabled:cursor-not-allowed disabled:opacity-40"
             >
               Add
             </button>
@@ -286,7 +289,7 @@ function FieldRow({
                   <button
                     type="button"
                     onClick={() => removeListItem(i)}
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-200 hover:text-slate-600"
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
                     aria-label={`Remove ${item}`}
                   >
                     <X className="h-3 w-3" aria-hidden />
@@ -321,10 +324,10 @@ function AvatarSection({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm sm:p-6">
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
       <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
         <div className="relative shrink-0">
-          <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#4161df] to-[#7c93f2] p-[3px] shadow-lg shadow-[#4161df]/25">
+          <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#4161df] to-[#7c93f2] p-[3px]">
             <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white">
               {preview || avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -334,7 +337,7 @@ function AvatarSection({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span className="text-2xl font-bold text-[#4161df]">
+                <span className="text-2xl font-semibold text-[#4161df]">
                   {(name ?? "P").charAt(0).toUpperCase()}
                 </span>
               )}
@@ -344,24 +347,24 @@ function AvatarSection({
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label="Change profile photo"
-            className="absolute -bottom-0.5 -right-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#4161df] text-white shadow-md transition hover:bg-[#3759dd] active:scale-90"
+            className="absolute -bottom-0.5 -right-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#4161df] text-white transition-colors hover:bg-[#3151c9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/40 active:scale-90"
           >
             <Camera className="h-3.5 w-3.5" aria-hidden />
           </button>
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-semibold text-gray-900">
+          <p className="text-[15px] font-semibold text-slate-900">
             {name ?? "Your profile"}
           </p>
           <p className="mt-0.5 text-[12.5px] text-slate-500">
-            Add a friendly, recognisable photo — tenants trust faces.
+            A clear, friendly photo helps people trust who they're dealing with.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 shadow-sm transition hover:border-[#4161df]/40 hover:text-[#4161df] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition-colors hover:border-[#4161df]/40 hover:text-[#4161df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.98]"
             >
               <Upload className="h-4 w-4" aria-hidden />
               {photo ? "Change photo" : "Upload photo"}
@@ -370,7 +373,7 @@ function AvatarSection({
               <button
                 type="button"
                 onClick={() => onPick(null)}
-                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-400 transition hover:bg-gray-50 hover:text-slate-600"
+                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
               >
                 <X className="h-3.5 w-3.5" aria-hidden />
                 Discard
@@ -418,10 +421,7 @@ export default function ProfileEditor({
   name?: string;
   avatar?: string;
   saving?: boolean;
-  onSave: (
-    draft: Record<string, unknown>,
-    photo: File | null,
-  ) => Promise<void>;
+  onSave: (draft: Record<string, unknown>, photo: File | null) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Record<string, unknown>>(() =>
     initDraft(sections, profile),
@@ -532,35 +532,29 @@ export default function ProfileEditor({
           onPick={handlePick}
         />
 
-        {sections.map((section, index) => {
+        {sections.map((section) => {
           const Icon = section.icon;
           return (
             <section
               key={section.id}
-              className="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md sm:p-6"
+              className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
             >
-              <header className="mb-5 flex items-start gap-3.5 border-b border-gray-100 pb-4">
+              <header className="mb-5 flex items-start gap-3.5 border-b border-slate-100 pb-4">
                 {Icon && (
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df]/10 to-[#7c93f2]/20 text-[#4161df] ring-1 ring-[#4161df]/10">
-                    <Icon className="h-5 w-5" aria-hidden />
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#4161df]/8 text-[#4161df]">
+                    <Icon className="h-[18px] w-[18px]" aria-hidden />
                   </span>
                 )}
                 <div className="min-w-0 flex-1 pt-0.5">
-                  <h2 className="text-[15px] font-semibold text-gray-900">
+                  <h2 className="text-[15px] font-semibold text-slate-900">
                     {section.title}
                   </h2>
                   {section.description && (
-                    <p className="mt-0.5 text-[13px] text-gray-500">
+                    <p className="mt-0.5 text-[13px] text-slate-500">
                       {section.description}
                     </p>
                   )}
                 </div>
-                <span
-                  className="pt-1 text-[11px] font-semibold tabular-nums text-gray-300"
-                  aria-hidden
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
               </header>
 
               <div className="space-y-5">{renderFields(section.fields)}</div>
@@ -571,10 +565,10 @@ export default function ProfileEditor({
 
       {/* Single save bar for the whole form */}
       <div className="sticky bottom-4 z-10 mt-5">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-gray-200/80 bg-white/95 p-3 pl-4 shadow-lg shadow-gray-900/10 backdrop-blur">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 pl-4 shadow-lg shadow-slate-900/[0.06] backdrop-blur">
           <div className="min-w-0">
             <p
-              className={`flex items-center gap-2 text-[13px] font-semibold ${
+              className={`flex items-center gap-2 text-[13px] font-medium ${
                 saved && !dirty
                   ? "text-emerald-600"
                   : dirty
@@ -613,7 +607,7 @@ export default function ProfileEditor({
                 type="button"
                 onClick={handleReset}
                 disabled={saving}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 py-2.5 text-[13px] font-semibold text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <RotateCcw className="h-3.5 w-3.5" aria-hidden />
                 Discard
@@ -622,10 +616,10 @@ export default function ProfileEditor({
             <button
               type="submit"
               disabled={!dirty || saving}
-              className={`inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl px-5 text-[13px] font-semibold text-white shadow-md transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none ${
+              className={`inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl px-5 text-[13px] font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
                 saved && !dirty
-                  ? "bg-emerald-500 shadow-emerald-500/25 hover:bg-emerald-500"
-                  : "bg-gradient-to-r from-[#4161df] to-[#5570e8] shadow-[#4161df]/25 hover:from-[#3759dd] hover:to-[#4161df]"
+                  ? "bg-emerald-500 hover:bg-emerald-500"
+                  : "bg-[#4161df] hover:bg-[#3151c9]"
               }`}
             >
               {saved && !dirty ? (

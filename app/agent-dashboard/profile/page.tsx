@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import {
+  AlertTriangle,
   ArrowLeft,
   Briefcase,
   Phone,
@@ -121,14 +122,24 @@ const SECTIONS: ProfileSection[] = [
         type: "number",
         placeholder: "e.g. 5",
       },
-      { kind: "toggles", key: "locations", label: "Areas you operate in", options: LOCATIONS },
+      {
+        kind: "toggles",
+        key: "locations",
+        label: "Areas you operate in",
+        options: LOCATIONS,
+      },
       {
         kind: "toggles",
         key: "specialisations",
         label: "Specialisations",
         options: SPECIALISATIONS,
       },
-      { kind: "toggles", key: "languages", label: "Languages", options: LANGUAGES },
+      {
+        kind: "toggles",
+        key: "languages",
+        label: "Languages",
+        options: LANGUAGES,
+      },
     ],
   },
   {
@@ -193,17 +204,36 @@ export default function AgentProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="py-10 text-center text-sm text-gray-500">
-        Loading your profile…
+      <div className="min-w-0">
+        <div className="mb-4 h-4 w-32 animate-pulse rounded-full bg-slate-200" />
+        <div className="mb-6 h-36 animate-pulse rounded-2xl bg-slate-200" />
+        <div className="mb-6 h-28 animate-pulse rounded-2xl bg-slate-100" />
+        <div className="space-y-4">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="h-56 animate-pulse rounded-2xl bg-slate-100"
+              style={{ animationDelay: `${i * 120}ms` }}
+            />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (isError || !data?.data) {
     return (
-      <div className="py-10 text-center text-sm text-gray-600">
-        We couldn&apos;t load your agent profile. Please refresh the page or
-        contact support.
+      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+          <AlertTriangle className="h-6 w-6" aria-hidden />
+        </span>
+        <h2 className="text-base font-semibold text-slate-900">
+          Something went wrong
+        </h2>
+        <p className="max-w-sm text-sm text-slate-500">
+          We couldn&apos;t load your agent profile. Please refresh the page or
+          contact support.
+        </p>
       </div>
     );
   }
@@ -212,26 +242,26 @@ export default function AgentProfilePage() {
     <div className="min-w-0">
       <Link
         href="/agent-dashboard"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition hover:text-gray-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-slate-800"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Back to dashboard
       </Link>
 
-      <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] via-[#4f6ee6] to-[#7c93f2] p-6 text-white shadow-lg shadow-[#4161df]/20 sm:p-8">
-        <div
-          className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl"
+      <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
+        <Briefcase
+          className="pointer-events-none absolute -right-4 -top-4 h-32 w-32 text-white/[0.08]"
+          strokeWidth={1}
           aria-hidden
         />
-        <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest backdrop-blur">
-          Agent workspace
-        </span>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          Edit your profile
-        </h1>
-        <p className="mt-1 text-sm text-white/80 sm:text-base">
-          Complete profiles win more buyer trust — and more leads.
-        </p>
+        <div className="relative max-w-md">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Edit your profile
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-white/80 sm:text-base">
+            Complete profiles win more buyer trust — and more leads.
+          </p>
+        </div>
       </section>
 
       <ProfileCompletenessBanner
