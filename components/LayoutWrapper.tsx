@@ -35,6 +35,12 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
     return hideHeaderFooterRoutes.some((route) => pathname?.startsWith(route));
   }, [pathname]);
 
+  // Don't show the customer-facing chatbot inside the agent/landlord dashboards
+  const shouldHideChatbot = useMemo(() => {
+    const dashboardRoutes = ["/landlord/dashboard", "/agent-dashboard"];
+    return dashboardRoutes.some((route) => pathname?.startsWith(route));
+  }, [pathname]);
+
   if (shouldHideHeaderFooter) {
     return <>{children}</>;
   }
@@ -47,7 +53,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
         <SocialMediaLinks />
         <Footer />
         <ScrollToTopButton />
-        <ClientChatBotWrapper />
+        {!shouldHideChatbot && <ClientChatBotWrapper />}
         <CompareDrawer />
       </CompareProvider>
     </>
