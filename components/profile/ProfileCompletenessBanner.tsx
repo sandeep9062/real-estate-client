@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { X, TrendingUp } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 
 /**
  * Profile completeness banner for Agent / Landlord dashboards.
@@ -32,11 +32,9 @@ function dismiss(role: string) {
 }
 
 function statusFor(percentage: number) {
-  if (percentage >= 80)
-    return { label: "Almost there", tone: "bg-emerald-50 text-emerald-600" };
-  if (percentage >= 50)
-    return { label: "Good start", tone: "bg-amber-50 text-amber-600" };
-  return { label: "Just began", tone: "bg-rose-50 text-rose-500" };
+  if (percentage >= 80) return { label: "Almost there", dot: "bg-emerald-500" };
+  if (percentage >= 50) return { label: "Good start", dot: "bg-amber-500" };
+  return { label: "Just began", dot: "bg-rose-400" };
 }
 
 export default function ProfileCompletenessBanner({
@@ -67,33 +65,39 @@ export default function ProfileCompletenessBanner({
 
   return (
     <section
-      className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white"
+      className="mb-6 overflow-hidden rounded-2xl border border-[#EDE7D9] bg-white"
       aria-label="Profile completeness"
     >
-      <div className="flex items-start gap-4 p-5">
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4161df]/8 text-[#4161df]">
-          <TrendingUp className="h-5 w-5" aria-hidden />
-        </span>
+      <div className="flex items-start gap-5 p-5 sm:p-6">
+        {/* Big-number treatment: the completeness percentage is genuinely
+            the stat this banner exists to show */}
+        <div className="shrink-0">
+          <span className="font-serif text-[34px] font-medium leading-none tabular-nums text-[#4161df] sm:text-4xl">
+            {clamped}%
+          </span>
+        </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 pt-0.5">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-stone-900">
               Your profile is {clamped}% complete
             </p>
-            <span
-              className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${status.tone}`}
-            >
+            <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-stone-500">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${status.dot}`}
+                aria-hidden
+              />
               {status.label}
             </span>
           </div>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-stone-500">
             {role === "agent"
               ? "Agents with complete profiles get more leads."
               : "Landlords with complete profiles get more tenant interest."}
           </p>
 
           <div
-            className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100"
+            className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#F1ECE0]"
             role="progressbar"
             aria-valuenow={clamped}
             aria-valuemin={0}
@@ -110,6 +114,7 @@ export default function ProfileCompletenessBanner({
             className="mt-3.5 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg bg-[#4161df] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#3151c9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/40 active:scale-[0.98]"
           >
             Complete your profile
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
         </div>
 
@@ -117,7 +122,7 @@ export default function ProfileCompletenessBanner({
           type="button"
           onClick={handleDismiss}
           aria-label="Dismiss profile completeness banner"
-          className="shrink-0 rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
+          className="shrink-0 rounded-full p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
         >
           <X className="h-4 w-4" aria-hidden />
         </button>

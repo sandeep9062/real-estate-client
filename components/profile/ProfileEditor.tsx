@@ -20,11 +20,11 @@ import {
    ────────────────────────────────────────────── */
 
 export const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[13.5px] text-slate-800 placeholder:text-slate-400 outline-none transition-colors duration-150 hover:border-slate-300 focus:border-[#4161df] focus:ring-4 focus:ring-[#4161df]/10";
+  "w-full rounded-lg border border-[#E5DFCE] bg-white px-3.5 py-2.5 text-[13.5px] text-stone-800 placeholder:text-stone-400 outline-none transition-colors duration-150 hover:border-[#D9D0B8] focus:border-[#4161df] focus:ring-4 focus:ring-[#4161df]/10";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="mb-1.5 block text-[13px] font-medium text-slate-600">
+    <label className="mb-1.5 block text-[13px] font-medium text-stone-600">
       {children}
     </label>
   );
@@ -47,7 +47,7 @@ function Toggle({
       className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.97] ${
         active
           ? "border-[#4161df] bg-[#4161df] text-white"
-          : "border-slate-200 bg-white text-slate-600 hover:border-[#4161df]/40 hover:text-[#4161df]"
+          : "border-[#E5DFCE] bg-white text-stone-600 hover:border-[#4161df]/40 hover:text-[#4161df]"
       }`}
     >
       {active && <Check className="h-3 w-3" aria-hidden />}
@@ -136,8 +136,8 @@ function initDraft(
   return draft;
 }
 
-// Short single-line inputs pair up on a two-column grid inside a section;
-// everything else (textareas, toggles, lists, pills) takes the full row.
+// Short single-line inputs pair up on a grid inside a section; everything
+// else (textareas, toggles, lists, pills) takes the full row.
 const isHalfWidth = (spec: ProfileFieldSpec) =>
   spec.kind === "text" && !spec.textarea;
 
@@ -195,10 +195,10 @@ function FieldRow({
           />
         ))}
       {spec.kind === "text" && spec.hint && (
-        <p className="mt-1.5 text-[12px] text-slate-400">{spec.hint}</p>
+        <p className="mt-1.5 text-[12px] text-stone-400">{spec.hint}</p>
       )}
       {spec.kind === "text" && spec.maxLength && (
-        <p className="mt-1 text-right text-[11px] tabular-nums text-slate-400">
+        <p className="mt-1 text-right text-[11px] tabular-nums text-stone-400">
           {String(value ?? "").length}/{spec.maxLength}
         </p>
       )}
@@ -282,14 +282,14 @@ function FieldRow({
               {value.map((item, i) => (
                 <span
                   key={`${item}-${i}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/15 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-[12.5px] font-medium text-slate-700"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/15 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-[12.5px] font-medium text-stone-700"
                 >
                   <Check className="h-3 w-3 text-[#4161df]" aria-hidden />
                   {item}
                   <button
                     type="button"
                     onClick={() => removeListItem(i)}
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-stone-200 hover:text-stone-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
                     aria-label={`Remove ${item}`}
                   >
                     <X className="h-3 w-3" aria-hidden />
@@ -324,7 +324,7 @@ function AvatarSection({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+    <section className="rounded-2xl border border-[#EDE7D9] bg-white p-6 sm:p-7">
       <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
         <div className="relative shrink-0">
           <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#4161df] to-[#7c93f2] p-[3px]">
@@ -354,17 +354,17 @@ function AvatarSection({
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[15px] font-semibold text-slate-900">
+          <p className="font-serif text-[17px] font-medium text-stone-900">
             {name ?? "Your profile"}
           </p>
-          <p className="mt-0.5 text-[12.5px] text-slate-500">
+          <p className="mt-0.5 text-[12.5px] text-stone-500">
             A clear, friendly photo helps people trust who they're dealing with.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-medium text-slate-700 transition-colors hover:border-[#4161df]/40 hover:text-[#4161df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-lg border border-[#E5DFCE] bg-white px-3.5 py-2.5 text-[13px] font-medium text-stone-700 transition-colors hover:border-[#4161df]/40 hover:text-[#4161df] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 active:scale-[0.98]"
             >
               <Upload className="h-4 w-4" aria-hidden />
               {photo ? "Change photo" : "Upload photo"}
@@ -373,7 +373,7 @@ function AvatarSection({
               <button
                 type="button"
                 onClick={() => onPick(null)}
-                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-[12px] font-medium text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
+                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-2 text-[12px] font-medium text-stone-400 transition-colors hover:bg-stone-50 hover:text-stone-600"
               >
                 <X className="h-3.5 w-3.5" aria-hidden />
                 Discard
@@ -385,7 +385,7 @@ function AvatarSection({
               {photo.name} ready — save to apply
             </p>
           ) : (
-            <p className="mt-2 text-[11px] text-slate-400">
+            <p className="mt-2 text-[11px] text-stone-400">
               PNG or JPG, up to 5MB
             </p>
           )}
@@ -478,7 +478,7 @@ export default function ProfileEditor({
     }
   };
 
-  // Lay a section's fields out: short inputs pair up on a two-column grid,
+  // Lay a section's fields out: short inputs pair/triple up on a grid,
   // full-width fields break the run.
   const renderFields = (fields: ProfileFieldSpec[]) => {
     const nodes: React.ReactNode[] = [];
@@ -486,10 +486,13 @@ export default function ProfileEditor({
 
     const flushRun = () => {
       if (run.length === 0) return;
-      const pair = run;
+      const group = run;
       nodes.push(
-        <div key={`pair-${pair[0].key}`} className="grid gap-5 sm:grid-cols-2">
-          {pair.map((spec) => (
+        <div
+          key={`group-${group[0].key}`}
+          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {group.map((spec) => (
             <FieldRow
               key={spec.key}
               spec={spec}
@@ -523,7 +526,7 @@ export default function ProfileEditor({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-4 sm:space-y-5">
+      <div className="space-y-5">
         <AvatarSection
           avatar={avatar}
           name={name}
@@ -537,20 +540,20 @@ export default function ProfileEditor({
           return (
             <section
               key={section.id}
-              className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
+              className="rounded-2xl border border-[#EDE7D9] bg-white p-6 sm:p-7"
             >
-              <header className="mb-5 flex items-start gap-3.5 border-b border-slate-100 pb-4">
+              <header className="mb-6 flex items-start gap-3.5 border-b border-[#F0EAD9] pb-5">
                 {Icon && (
                   <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#4161df]/8 text-[#4161df]">
                     <Icon className="h-[18px] w-[18px]" aria-hidden />
                   </span>
                 )}
                 <div className="min-w-0 flex-1 pt-0.5">
-                  <h2 className="text-[15px] font-semibold text-slate-900">
+                  <h2 className="font-serif text-[17px] font-medium text-stone-900">
                     {section.title}
                   </h2>
                   {section.description && (
-                    <p className="mt-0.5 text-[13px] text-slate-500">
+                    <p className="mt-0.5 text-[13px] text-stone-500">
                       {section.description}
                     </p>
                   )}
@@ -565,7 +568,7 @@ export default function ProfileEditor({
 
       {/* Single save bar for the whole form */}
       <div className="sticky bottom-4 z-10 mt-5">
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 pl-4 shadow-lg shadow-slate-900/[0.06] backdrop-blur">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#EDE7D9] bg-white/95 p-3 pl-4 shadow-lg shadow-stone-900/[0.06] backdrop-blur">
           <div className="min-w-0">
             <p
               className={`flex items-center gap-2 text-[13px] font-medium ${
@@ -573,7 +576,7 @@ export default function ProfileEditor({
                   ? "text-emerald-600"
                   : dirty
                     ? "text-amber-600"
-                    : "text-slate-400"
+                    : "text-stone-400"
               }`}
             >
               <span
@@ -582,7 +585,7 @@ export default function ProfileEditor({
                     ? "bg-emerald-500"
                     : dirty
                       ? "animate-pulse bg-amber-500"
-                      : "bg-slate-300"
+                      : "bg-stone-300"
                 }`}
                 aria-hidden
               />
@@ -593,7 +596,7 @@ export default function ProfileEditor({
                   : "You're all caught up."}
             </p>
             {dirty && (
-              <p className="ml-4 text-[11px] text-slate-400">
+              <p className="ml-4 text-[11px] text-stone-400">
                 {changedCount > 0
                   ? `${changedCount} field${changedCount > 1 ? "s" : ""} changed${photo ? " + photo" : ""}`
                   : "New profile photo ready to upload"}
@@ -607,7 +610,7 @@ export default function ProfileEditor({
                 type="button"
                 onClick={handleReset}
                 disabled={saving}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-3 py-2.5 text-[13px] font-medium text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <RotateCcw className="h-3.5 w-3.5" aria-hidden />
                 Discard

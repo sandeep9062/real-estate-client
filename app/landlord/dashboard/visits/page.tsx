@@ -30,27 +30,29 @@ import { PageHeader } from "@/components/agent-dashboard/ui";
 
 type BookingStatus = "Pending" | "Confirmed" | "Completed" | "Cancelled";
 
-const STATUS_STYLES: Record<BookingStatus, string> = {
-  Pending: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  Confirmed: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-  Completed: "bg-sky-50 text-sky-700 ring-sky-600/20",
-  Cancelled: "bg-gray-100 text-gray-600 ring-gray-500/20",
+const STATUS_DOT: Record<BookingStatus, string> = {
+  Pending: "bg-amber-500",
+  Confirmed: "bg-emerald-500",
+  Completed: "bg-sky-500",
+  Cancelled: "bg-gray-400",
+};
+
+const STATUS_ICON: Record<BookingStatus, React.ElementType> = {
+  Pending: Clock,
+  Confirmed: CheckCircle2,
+  Completed: CheckCircle2,
+  Cancelled: XCircle,
 };
 
 function StatusBadge({ status }: { status: BookingStatus }) {
+  const Icon = STATUS_ICON[status];
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide ring-1 ring-inset ${STATUS_STYLES[status]}`}
-    >
-      {status === "Pending" ? (
-        <Clock className="h-3 w-3" aria-hidden />
-      ) : status === "Confirmed" ? (
-        <CheckCircle2 className="h-3 w-3" aria-hidden />
-      ) : status === "Completed" ? (
-        <CheckCircle2 className="h-3 w-3" aria-hidden />
-      ) : (
-        <XCircle className="h-3 w-3" aria-hidden />
-      )}
+    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+      <span
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`}
+        aria-hidden
+      />
+      <Icon className="h-3.5 w-3.5" aria-hidden />
       {status}
     </span>
   );
@@ -72,7 +74,12 @@ function formatVisitDate(raw: string | undefined): string {
   }
 }
 
-function formatPropertyLocation(location: { address?: string; city?: string; sector?: string } | null | undefined): string {
+function formatPropertyLocation(
+  location:
+    | { address?: string; city?: string; sector?: string }
+    | null
+    | undefined,
+): string {
   if (!location) return "Location not available";
   const parts = [location.sector, location.city].filter(Boolean);
   if (parts.length === 0) return location.address || "Location not available";
@@ -84,10 +91,13 @@ function VisitSkeleton() {
     <div aria-busy="true" aria-label="Loading visits">
       <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="h-20 animate-pulse rounded-2xl bg-white shadow-sm" />
+          <div
+            key={i}
+            className="h-20 animate-pulse rounded-xl border border-gray-200 bg-white"
+          />
         ))}
       </div>
-      <div className="h-64 animate-pulse rounded-2xl bg-white shadow-sm" />
+      <div className="h-64 animate-pulse rounded-2xl border border-gray-200 bg-white" />
     </div>
   );
 }
@@ -104,11 +114,17 @@ export default function LandlordDashboardVisitsPage() {
 
   // Search state — admins can search by userID to view other landlords' visits
   const [searchUserId, setSearchUserId] = useState("");
-  const [activeUserId, setActiveUserId] = useState<string | undefined>(undefined);
+  const [activeUserId, setActiveUserId] = useState<string | undefined>(
+    undefined,
+  );
 
   // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
   // visitor lands here.
-  const { data: bookings, isLoading, isFetching } = useGetOwnerBookingsQuery(
+  const {
+    data: bookings,
+    isLoading,
+    isFetching,
+  } = useGetOwnerBookingsQuery(
     activeUserId ? { userID: activeUserId } : undefined,
     { skip: !isAuthenticated || !canAccess },
   );
@@ -145,7 +161,8 @@ export default function LandlordDashboardVisitsPage() {
         .filter((b: any) => b.status === "Pending" || b.status === "Confirmed")
         .sort(
           (a: any, b: any) =>
-            (new Date(a.date).getTime() || 0) - (new Date(b.date).getTime() || 0),
+            (new Date(a.date).getTime() || 0) -
+            (new Date(b.date).getTime() || 0),
         ),
     [bookings],
   );
@@ -153,7 +170,9 @@ export default function LandlordDashboardVisitsPage() {
   const history = useMemo(
     () =>
       (bookings ?? [])
-        .filter((b: any) => b.status === "Completed" || b.status === "Cancelled")
+        .filter(
+          (b: any) => b.status === "Completed" || b.status === "Cancelled",
+        )
         .sort(
           (a: any, b: any) =>
             (new Date(b.updatedAt ?? b.createdAt ?? 0).getTime() || 0) -
@@ -177,8 +196,8 @@ export default function LandlordDashboardVisitsPage() {
   if (!isAuthenticated || !user) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
-        <span className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4161df]/10 to-[#7c93f2]/20 ring-1 ring-[#4161df]/10">
-          <CalendarDays className="h-8 w-8 text-[#4161df]" aria-hidden />
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/10">
+          <CalendarDays className="h-7 w-7 text-[#4161df]" aria-hidden />
         </span>
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
           Landlord visits
@@ -188,7 +207,7 @@ export default function LandlordDashboardVisitsPage() {
         </p>
         <Link
           href="/login"
-          className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4161df] to-[#5570e8] px-6 py-3 text-base font-semibold text-white shadow-md shadow-[#4161df]/25 transition hover:from-[#3759dd] hover:to-[#4161df] active:scale-[0.98]"
+          className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center gap-2 rounded-xl bg-[#4161df] px-6 py-3 text-base font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98]"
         >
           <LogIn className="h-4 w-4" aria-hidden />
           Log in
@@ -201,20 +220,20 @@ export default function LandlordDashboardVisitsPage() {
   if (!canAccess) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
-        <span className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 ring-1 ring-gray-200">
-          <ShieldCheck className="h-8 w-8 text-gray-400" aria-hidden />
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+          <ShieldCheck className="h-7 w-7 text-gray-400" aria-hidden />
         </span>
         <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
           Landlord visits
         </h1>
         <p className="max-w-[34ch] text-pretty text-sm text-gray-600 sm:text-base">
-          This area is for registered landlords. If you should have access, contact
-          support.
+          This area is for registered landlords. If you should have access,
+          contact support.
         </p>
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-800 shadow-sm transition hover:bg-gray-50 active:scale-[0.98]"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 active:scale-[0.98]"
         >
           Back to home
         </button>
@@ -244,7 +263,7 @@ export default function LandlordDashboardVisitsPage() {
         actions={
           <Link
             href="/owned"
-            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-[#4161df]/40 hover:text-[#4161df] active:scale-[0.98]"
+            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-[#4161df]/40 hover:text-[#4161df] active:scale-[0.98]"
           >
             <Building2 className="h-4 w-4" aria-hidden />
             My properties
@@ -254,24 +273,30 @@ export default function LandlordDashboardVisitsPage() {
 
       {/* ── Search by UserID (admin only) ── */}
       {user?.role === "admin" && (
-        <section className="mb-6 rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm">
-          <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <section className="mb-6 rounded-xl border border-gray-200 bg-white p-4">
+          <form
+            onSubmit={handleSearch}
+            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+          >
             <div className="flex-1">
               <label
                 htmlFor="search-userid"
-                className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-gray-500"
+                className="mb-1.5 block text-xs font-medium text-gray-500"
               >
-                Search landlord by User ID
+                Search landlord by user ID
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden />
+                <Search
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                  aria-hidden
+                />
                 <input
                   id="search-userid"
                   type="text"
                   value={searchUserId}
                   onChange={(e) => setSearchUserId(e.target.value)}
-                  placeholder="Enter landlord's User ID..."
-                  className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#4161df] focus:outline-none focus:ring-2 focus:ring-[#4161df]/20"
+                  placeholder="Enter landlord's user ID..."
+                  className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#4161df] focus:outline-none focus:ring-2 focus:ring-[#4161df]/20"
                 />
               </div>
             </div>
@@ -279,7 +304,7 @@ export default function LandlordDashboardVisitsPage() {
               <button
                 type="submit"
                 disabled={isFetching}
-                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#4161df] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#3759dd] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#4161df] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isFetching ? "Searching..." : "Search"}
               </button>
@@ -287,7 +312,7 @@ export default function LandlordDashboardVisitsPage() {
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98]"
+                  className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98]"
                 >
                   Clear
                 </button>
@@ -297,7 +322,10 @@ export default function LandlordDashboardVisitsPage() {
           {activeUserId && (
             <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
               <UserIcon className="h-3.5 w-3.5" aria-hidden />
-              Showing visits for landlord: <span className="font-mono font-semibold text-gray-700">{activeUserId}</span>
+              Showing visits for landlord:{" "}
+              <span className="font-mono font-medium text-gray-700">
+                {activeUserId}
+              </span>
             </p>
           )}
         </section>
@@ -306,19 +334,45 @@ export default function LandlordDashboardVisitsPage() {
       {/* ── Stats ── */}
       <section className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {[
-          { label: "Total requests", value: stats.total, accent: "text-gray-900" },
-          { label: "Pending", value: stats.pending, accent: "text-amber-600" },
-          { label: "Confirmed", value: stats.confirmed, accent: "text-emerald-600" },
-          { label: "Completed / Declined", value: stats.closed, accent: "text-gray-500" },
+          {
+            label: "Total requests",
+            value: stats.total,
+            accent: "text-gray-900",
+            dot: "bg-gray-400",
+          },
+          {
+            label: "Pending",
+            value: stats.pending,
+            accent: "text-amber-600",
+            dot: "bg-amber-500",
+          },
+          {
+            label: "Confirmed",
+            value: stats.confirmed,
+            accent: "text-emerald-600",
+            dot: "bg-emerald-500",
+          },
+          {
+            label: "Completed / declined",
+            value: stats.closed,
+            accent: "text-gray-500",
+            dot: "bg-sky-500",
+          },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-2xl border border-gray-200/80 bg-white p-4 shadow-sm"
+            className="rounded-xl border border-gray-200 bg-white p-4"
           >
-            <p className="text-[11.5px] font-semibold uppercase tracking-wide text-gray-500">
-              {stat.label}
-            </p>
-            <p className={`mt-1 text-2xl font-bold tracking-tight ${stat.accent}`}>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-gray-500">{stat.label}</p>
+              <span
+                className={`h-1.5 w-1.5 shrink-0 rounded-full ${stat.dot}`}
+                aria-hidden
+              />
+            </div>
+            <p
+              className={`mt-2 text-2xl font-semibold tracking-tight ${stat.accent}`}
+            >
               {stat.value}
             </p>
           </div>
@@ -327,11 +381,13 @@ export default function LandlordDashboardVisitsPage() {
 
       {/* ── Upcoming visits ── */}
       <section
-        className="rounded-2xl border border-gray-200/80 bg-white shadow-sm"
+        className="rounded-2xl border border-gray-200 bg-white"
         aria-label="Upcoming visits"
       >
         <div className="border-b border-gray-100 px-5 py-4">
-          <h2 className="text-base font-semibold text-gray-900">Upcoming visits</h2>
+          <h2 className="text-base font-semibold text-gray-900">
+            Upcoming visits
+          </h2>
           <p className="text-xs text-gray-500">
             Pending and confirmed requests, soonest first
           </p>
@@ -339,13 +395,13 @@ export default function LandlordDashboardVisitsPage() {
 
         {upcoming.length === 0 ? (
           <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
-            <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/10 ring-1 ring-[#4161df]/15">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/10">
               <CalendarX2 className="h-7 w-7 text-[#4161df]" aria-hidden />
             </span>
             <p className="font-semibold text-gray-900">No upcoming visits</p>
             <p className="max-w-[40ch] text-sm text-gray-600">
-              When someone books a visit from one of your listings, the request will
-              show up here for you to confirm.
+              When someone books a visit from one of your listings, the request
+              will show up here for you to confirm.
             </p>
           </div>
         ) : (
@@ -360,22 +416,28 @@ export default function LandlordDashboardVisitsPage() {
                       <Image
                         src={img}
                         alt={booking.property?.title ?? "Property"}
-                        width={64}
-                        height={64}
+                        width={60}
+                        height={60}
                         loading="lazy"
-                        className="h-16 w-16 shrink-0 rounded-xl object-cover ring-1 ring-gray-200"
+                        className="h-[60px] w-[60px] shrink-0 rounded-lg object-cover ring-1 ring-gray-200"
                       />
                     ) : (
-                      <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df]/10 to-[#7c93f2]/20 ring-1 ring-[#4161df]/10">
-                        <Building2 className="h-6 w-6 text-[#4161df]" aria-hidden />
+                      <span className="inline-flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-lg bg-[#4161df]/10">
+                        <Building2
+                          className="h-6 w-6 text-[#4161df]"
+                          aria-hidden
+                        />
                       </span>
                     )}
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-3">
                         <StatusBadge status={booking.status} />
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600">
-                          <CalendarDays className="h-3.5 w-3.5 text-gray-400" aria-hidden />
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500">
+                          <CalendarDays
+                            className="h-3.5 w-3.5 text-gray-400"
+                            aria-hidden
+                          />
                           {formatVisitDate(booking.date)}
                         </span>
                       </div>
@@ -417,8 +479,10 @@ export default function LandlordDashboardVisitsPage() {
                           <button
                             type="button"
                             disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Confirmed")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                            onClick={() =>
+                              handleStatusChange(booking._id, "Confirmed")
+                            }
+                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <CheckCircle2 className="h-4 w-4" aria-hidden />
                             Confirm
@@ -426,8 +490,10 @@ export default function LandlordDashboardVisitsPage() {
                           <button
                             type="button"
                             disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Cancelled")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                            onClick={() =>
+                              handleStatusChange(booking._id, "Cancelled")
+                            }
+                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <XCircle className="h-4 w-4" aria-hidden />
                             Decline
@@ -439,8 +505,10 @@ export default function LandlordDashboardVisitsPage() {
                           <button
                             type="button"
                             disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Completed")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-[#4161df] px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#3759dd] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                            onClick={() =>
+                              handleStatusChange(booking._id, "Completed")
+                            }
+                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#4161df] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <CheckCircle2 className="h-4 w-4" aria-hidden />
                             Mark completed
@@ -448,8 +516,10 @@ export default function LandlordDashboardVisitsPage() {
                           <button
                             type="button"
                             disabled={busy}
-                            onClick={() => handleStatusChange(booking._id, "Cancelled")}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                            onClick={() =>
+                              handleStatusChange(booking._id, "Cancelled")
+                            }
+                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <XCircle className="h-4 w-4" aria-hidden />
                             Cancel
@@ -468,17 +538,22 @@ export default function LandlordDashboardVisitsPage() {
       {/* ── Visit history ── */}
       {history.length > 0 && (
         <section
-          className="mt-6 rounded-2xl border border-gray-200/80 bg-white shadow-sm"
+          className="mt-6 rounded-2xl border border-gray-200 bg-white"
           aria-label="Visit history"
         >
           <div className="border-b border-gray-100 px-5 py-4">
             <h2 className="text-base font-semibold text-gray-900">History</h2>
-            <p className="text-xs text-gray-500">Completed and declined visits</p>
+            <p className="text-xs text-gray-500">
+              Completed and declined visits
+            </p>
           </div>
           <ul className="divide-y divide-gray-100">
             {history.map((booking: any) => (
-              <li key={booking._id} className="flex items-center gap-4 px-5 py-3.5">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-100 ring-1 ring-gray-200">
+              <li
+                key={booking._id}
+                className="flex items-center gap-4 px-5 py-3.5"
+              >
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
                   <Building2 className="h-5 w-5 text-gray-400" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -486,7 +561,8 @@ export default function LandlordDashboardVisitsPage() {
                     {booking.property?.title ?? "Property listing"}
                   </p>
                   <p className="truncate text-xs text-gray-500">
-                    {booking.user?.name ?? "Visitor"} · {formatVisitDate(booking.date)}
+                    {booking.user?.name ?? "Visitor"} ·{" "}
+                    {formatVisitDate(booking.date)}
                   </p>
                 </div>
                 <StatusBadge status={booking.status} />
@@ -498,4 +574,3 @@ export default function LandlordDashboardVisitsPage() {
     </div>
   );
 }
-
