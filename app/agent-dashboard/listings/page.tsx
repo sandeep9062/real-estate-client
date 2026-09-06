@@ -1,70 +1,223 @@
 "use client";
 
+import React, { useMemo, useState } from "react";
+import SearchBar, { SearchFilters } from "@/components/SearchBar";
+import { PuffLoader } from "react-spinners";
+import Image from "next/image";
+
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
+
+import AddPropertyModal from "@/components/AddPropertyModal";
+import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
+import { useGetUserByIdQuery } from "@/services/userApi";
 import Link from "next/link";
-import { ArrowRight, Home, PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-import { PageHeader } from "@/components/agent-dashboard/ui";
+const ListingsPage = () => {
+  const router = useRouter();
 
-export default function AgentDashboardListingsPage() {
-  return (
-    <div className="max-w-4xl min-w-0">
-      <PageHeader
-        eyebrow="Listings"
-        title="Your properties"
-        description="Owned listings live in the main PropertyBulbul workspace. Open it to add a property, edit copy and photos, or pause availability."
-      />
+  const [filter, setFilter] = useState<SearchFilters>({ query: "" });
+  const [modalOpened, setModalOpened] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<any>(null);
 
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+  const handleAddPropertyClick = () => {
+    if (isAuthenticated) {
+      setModalOpened(true);
+      setEditingProperty(null);
+    } else {
+      router.push("/auth");
+    }
+  };
+
+  const handleEditProperty = (property: any) => {
+    if (isAuthenticated) {
+      setEditingProperty(property);
+      setModalOpened(true);
+    }
+  };
+
+  // Auth state
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
+
+  // Fetch user (used for permissions sometimes)
+  const { data: userData, isFetching: fetchingUser } = useGetUserByIdQuery(
+    user?._id as string,
+    { skip: !user?._id },
+  );
+
+  // Fetch properties user owns
+  const { data, isLoading, isError } = useGetOwnedPropertiesQuery(undefined);
+
+  const properties = data || [];
+
+  // Filter logic
+  const filtered = useMemo(() => {
+    return properties.filter((property: any) => {
+      const q = filter.query.toLowerCase();
+
+      return (
+        (property.title?.toLowerCase() ?? "").includes(q) ||
+        (property.description?.toLowerCase() ?? "").includes(q) ||
+        (property.location?.city?.toLowerCase() ?? "").includes(q) ||
+        (property.location?.country?.toLowerCase() ?? "").includes(q) ||
+        (property.location?.address?.toLowerCase() ?? "").includes(q)
+      );
+    });
+  }, [properties, filter]);
+
+  // Loading
+  if (isLoading || fetchingUser) {
+    return (
+      <div className="w-full flex justify-center items-center h-[60vh]">
+        <PuffLoader size={80} aria-label="puff-loading" />
+      </div>
+    );
+  }
+
+  // Error
+  if (isError) {
+    return (
+      <div className="w-full flex justify-center items-center py-20">
+        <span className="text-red-500 font-medium">
+          Failed to load your properties
+        </span>
+      </div>
+    );
+  }
+
+  // Not logged in
+  if (!isAuthenticated) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center h-[60vh] gap-4">
+        <p className="text-gray-700">Please login to view your properties.</p>
         <Link
-          href="/owned"
-          className="group flex touch-manipulation flex-col rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#4161df]/30 hover:shadow-md active:scale-[0.99] sm:p-6"
+          href="/auth"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
         >
-          <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-[#4161df]">
-            <Home className="h-5 w-5" aria-hidden />
-          </span>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Owned properties
-          </h2>
-          <p className="mt-2 flex-1 text-sm text-gray-600">
-            Search, edit, or remove listings you have already published.
-          </p>
-          <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4161df]">
-            Go to owned listings
-            <ArrowRight
-              className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-              aria-hidden
-            />
-          </span>
-        </Link>
-
-        <Link
-          href="/properties"
-          className="group flex touch-manipulation flex-col rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#4161df]/30 hover:shadow-md active:scale-[0.99] sm:p-6"
-        >
-          <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-            <PlusCircle className="h-5 w-5" aria-hidden />
-          </span>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Browse inventory
-          </h2>
-          <p className="mt-2 flex-1 text-sm text-gray-600">
-            Compare pricing and positioning across Tricity before you publish.
-          </p>
-          <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#4161df]">
-            View all properties
-            <ArrowRight
-              className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-              aria-hidden
-            />
-          </span>
+          Login
         </Link>
       </div>
+    );
+  }
 
-      <p className="mt-6 rounded-2xl border border-gray-200/80 bg-white p-4 text-sm text-gray-600 shadow-sm sm:mt-8 sm:p-5">
-        <strong className="font-semibold text-gray-900">Tip:</strong> use{" "}
-        <strong className="font-semibold text-gray-900">Add Property</strong> in
-        the site header while logged in to create a new listing quickly.
-      </p>
+  return (
+    <div className="w-full pt-6">
+      <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-4">
+        {/* Header with Logo */}
+        <div className="w-full flex flex-col items-center gap-2">
+          <div className="h-6 w-px bg-slate-200 mx-1" />
+          <h1 className="text-2xl font-semibold text-[#0F172A]">
+            My Properties
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Manage and review properties you have listed.
+          </p>
+        </div>
+
+        {/* Search + Add button row */}
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="w-full max-w-[28rem] border border-gray-300 rounded-full flex items-center px-4 gap-3 py-2">
+            <SearchBar onSearch={setFilter} />
+          </div>
+          <button
+            onClick={handleAddPropertyClick}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg whitespace-nowrap"
+          >
+            Add Property
+          </button>
+        </div>
+
+        {/* Empty */}
+        {filtered.length === 0 ? (
+          <div className="w-full flex flex-col items-center justify-center py-16 gap-3 bg-gray-50 rounded-xl border">
+            <span className="text-gray-700">No properties found.</span>
+
+            <button
+              onClick={handleAddPropertyClick}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              Add Property
+            </button>
+          </div>
+        ) : (
+          // Property Table
+          <div className="w-full overflow-x-auto rounded-xl border border-gray-200">
+            <table className="w-full text-sm text-left border-collapse">
+              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                <tr>
+                  <th className="px-4 py-3">Image</th>
+                  <th className="px-4 py-3">Title</th>
+                  <th className="px-4 py-3">Location</th>
+                  <th className="px-4 py-3">Price</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((card: any) => (
+                  <tr
+                    key={card._id}
+                    className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100">
+                        {card.images?.[0] && (
+                          <Image
+                            src={card.images[0]}
+                            alt={card.title || "Property image"}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-medium text-[#0F172A] max-w-[220px] truncate">
+                      {card.title}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {[card.location?.city, card.location?.country]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {card.price ? `Rs.${card.price}` : "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          card.status === "available"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {card.status || "N/A"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleEditProperty(card)}
+                        className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <AddPropertyModal
+        opened={modalOpened}
+        setOpened={setModalOpened}
+        editingProperty={editingProperty}
+      />
     </div>
   );
-}
+};
+
+export default ListingsPage;

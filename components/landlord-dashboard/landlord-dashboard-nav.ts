@@ -19,8 +19,8 @@ export const LANDLORD_DASHBOARD_NAV: LandlordDashboardNavItem[] = [
   { href: "/landlord/dashboard/leads", label: "Leads", icon: MessageCircle },
   { href: "/landlord/dashboard/visits", label: "Visits", icon: CalendarDays },
   {
-    href: "/landlord/dashboard/my-properties",
-    label: "My properties",
+    href: "/landlord/dashboard/listings",
+    label: "Listings",
     icon: Building2,
   },
   { href: "/landlord/dashboard/profile", label: "Profile", icon: UserPen },
