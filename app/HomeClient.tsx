@@ -135,10 +135,10 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
       <section className="container mx-auto px-4 bg-white/60">
         <PostPropertyCTA />
       </section>
-
+      {/* 
       <section className="bg-white/60 relative z-10">
         <AgentLandlordCTA />
-      </section>
+      </section> */}
 
       <section className="bg-white/60 relative z-10">
         <Testimonial />
