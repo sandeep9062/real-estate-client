@@ -409,7 +409,7 @@ export default function LandlordProfilePage() {
   }
 
   return (
-    <div className="max-w-5xl min-w-0">
+    <div className="mx-auto max-w-7xl">
       <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
         <svg
           className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
