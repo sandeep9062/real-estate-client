@@ -240,14 +240,6 @@ export default function AgentProfilePage() {
 
   return (
     <div className="min-w-0">
-      <Link
-        href="/agent-dashboard"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-slate-800"
-      >
-        <ArrowLeft className="h-4 w-4" aria-hidden />
-        Back to dashboard
-      </Link>
-
       <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
         <Briefcase
           className="pointer-events-none absolute -right-4 -top-4 h-32 w-32 text-white/[0.08]"
@@ -273,7 +265,7 @@ export default function AgentProfilePage() {
       <ProfileEditor
         sections={SECTIONS}
         profile={profile}
-        name={data.data.name}
+        name={profile.name as string}
         avatar={data.data.avatar}
         saving={saving}
         onSave={handleSave}

@@ -88,10 +88,7 @@ export default function AgentDashboardOverviewPage() {
           Agent workspace
         </span>
         <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          Welcome back
-          {profileData?.data.name
-            ? `, ${profileData.data.name.split(" ")[0]}`
-            : ""}
+          Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
         </h1>
         <p
           suppressHydrationWarning
