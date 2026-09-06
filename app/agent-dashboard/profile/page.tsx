@@ -2,9 +2,10 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import {
   AlertTriangle,
-  ArrowLeft,
   Briefcase,
   Phone,
   Trophy,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import ProfileEditor, {
   type ProfileSection,
 } from "@/components/profile/ProfileEditor";
@@ -160,7 +162,16 @@ const SECTIONS: ProfileSection[] = [
 ];
 
 export default function AgentProfilePage() {
-  const { data, isLoading, isError } = useGetMyAgentProfileQuery();
+  const router = useRouter();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
+  const canAccess = user?.role === "agent" || user?.role === "admin";
+
+  // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
+  // visitor lands here.
+  const { data, isLoading, isError } = useGetMyAgentProfileQuery(undefined, {
+    skip: !isAuthenticated || !canAccess,
+  });
   const [updateProfile, { isLoading: saving }] =
     useUpdateMyAgentProfileMutation();
 
@@ -169,6 +180,9 @@ export default function AgentProfilePage() {
     () => (data?.data ?? {}) as Record<string, unknown>,
     [data],
   );
+
+  // Resolve the display name — agent profile name, falling back to auth user name
+  const displayName = data?.data?.name || user?.name || "";
 
   // One save for the whole form. A picked photo switches the payload to
   // multipart (non-string fields are JSON-encoded — the backend parses them).
@@ -202,17 +216,62 @@ export default function AgentProfilePage() {
     }
   };
 
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/8 text-[#4161df]">
+          <Briefcase className="h-7 w-7" aria-hidden />
+        </span>
+        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
+          Agent profile
+        </h1>
+        <p className="text-sm text-stone-500">
+          Log in to manage your listings and profile details.
+        </p>
+        <Link
+          href="/login"
+          className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center rounded-xl bg-[#4161df] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#3151c9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/40 active:scale-[0.98]"
+        >
+          Log in
+        </Link>
+      </div>
+    );
+  }
+
+  if (!canAccess) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100 text-stone-400">
+          <Briefcase className="h-7 w-7" aria-hidden />
+        </span>
+        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
+          Agent profile
+        </h1>
+        <p className="text-sm text-stone-500">
+          This page is only available to agent accounts.
+        </p>
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-stone-300 px-6 py-3 text-base font-medium text-stone-800 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/30"
+        >
+          Back to home
+        </button>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
-      <div className="min-w-0">
-        <div className="mb-4 h-4 w-32 animate-pulse rounded-full bg-slate-200" />
-        <div className="mb-6 h-36 animate-pulse rounded-2xl bg-slate-200" />
-        <div className="mb-6 h-28 animate-pulse rounded-2xl bg-slate-100" />
+      <div className="max-w-7xl min-w-0">
+        <div className="mb-4 h-4 w-40 animate-pulse rounded-full bg-stone-200/70" />
+        <div className="mb-6 h-40 animate-pulse rounded-3xl bg-stone-200/70" />
+        <div className="mb-6 h-32 animate-pulse rounded-2xl bg-white" />
         <div className="space-y-4">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-56 animate-pulse rounded-2xl bg-slate-100"
+              className="h-64 animate-pulse rounded-2xl bg-white"
               style={{ animationDelay: `${i * 120}ms` }}
             />
           ))}
@@ -223,34 +282,59 @@ export default function AgentProfilePage() {
 
   if (isError || !data?.data) {
     return (
-      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
-          <AlertTriangle className="h-6 w-6" aria-hidden />
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+          <AlertTriangle className="h-7 w-7" aria-hidden />
         </span>
-        <h2 className="text-base font-semibold text-slate-900">
+        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
           Something went wrong
-        </h2>
-        <p className="max-w-sm text-sm text-slate-500">
+        </h1>
+        <p className="text-sm text-stone-500">
           We couldn&apos;t load your agent profile. Please refresh the page or
-          contact support.
+          contact support if the problem persists.
         </p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[#4161df] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#3151c9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/40 active:scale-[0.98]"
+        >
+          Refresh page
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-w-0">
-      <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
-        <Briefcase
-          className="pointer-events-none absolute -right-4 -top-4 h-32 w-32 text-white/[0.08]"
-          strokeWidth={1}
+    <div className="mx-auto max-w-7xl">
+      <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
           aria-hidden
-        />
+        >
+          <defs>
+            <pattern
+              id="plan-grid"
+              width="28"
+              height="28"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 28 0 L 0 0 0 28"
+                fill="none"
+                stroke="white"
+                strokeWidth="1"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#plan-grid)" />
+        </svg>
+
         <div className="relative max-w-md">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Edit your profile
+          <p className="text-[13px] font-medium text-white/70">Agent profile</p>
+          <h1 className="mt-1.5 font-serif text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">
+            {displayName ? `Hello, ${displayName}` : "Edit your profile"}
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-white/80 sm:text-base">
+          <p className="mt-2.5 text-sm leading-relaxed text-white/80 sm:text-base">
             Complete profiles win more buyer trust — and more leads.
           </p>
         </div>
@@ -265,7 +349,7 @@ export default function AgentProfilePage() {
       <ProfileEditor
         sections={SECTIONS}
         profile={profile}
-        name={profile.name as string}
+        name={displayName || undefined}
         avatar={data.data.avatar}
         saving={saving}
         onSave={handleSave}
