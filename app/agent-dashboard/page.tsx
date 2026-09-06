@@ -19,10 +19,7 @@ import { selectUser } from "@/store/authSlice";
 import { useGetLeadStatsQuery } from "@/services/leadsApi";
 import { useGetMyAgentProfileQuery } from "@/services/agentsApi";
 import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
-import {
-  PageHeader,
-  StatCard,
-} from "@/components/agent-dashboard/ui";
+import { PageHeader, StatCard } from "@/components/agent-dashboard/ui";
 
 const QUICK_ACTIONS = [
   {
@@ -91,7 +88,10 @@ export default function AgentDashboardOverviewPage() {
           Agent workspace
         </span>
         <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-          Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+          Welcome back
+          {profileData?.data.name
+            ? `, ${profileData.data.name.split(" ")[0]}`
+            : ""}
         </h1>
         <p
           suppressHydrationWarning
