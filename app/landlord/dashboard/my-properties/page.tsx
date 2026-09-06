@@ -103,8 +103,8 @@ const MyPropertiesPage = () => {
   }
 
   return (
-    <div className="w-full pt-20">
-      <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-12">
+    <div className="w-full pt-6">
+      <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto px-4 py-4">
         {/* Header with Logo */}
         <div className="w-full flex flex-col items-center gap-2">
           <div className="h-6 w-px bg-slate-200 mx-1" />
