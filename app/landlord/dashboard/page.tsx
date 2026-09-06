@@ -276,7 +276,7 @@ export default function LandlordDashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-7xl">
       {/* ── Hero ── */}
       <section className="relative mb-8 overflow-hidden rounded-2xl bg-[#2c3f8f] p-6 text-white sm:p-8">
         {/* faint blueprint grid — the one deliberate decorative moment */}
@@ -329,10 +329,10 @@ export default function LandlordDashboardPage() {
 
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            {profile?.avatar ? (
+            {user?.image ? (
               <Image
-                src={profile.avatar}
-                alt={user.name ?? "Your avatar"}
+                src={user.image}
+                alt={user.name ?? "Your Image"}
                 width={60}
                 height={60}
                 className="h-14 w-14 rounded-2xl object-cover ring-1 ring-white/25 sm:h-[60px] sm:w-[60px]"
