@@ -256,7 +256,7 @@ export default function LandlordDashboardVisitsPage() {
   }
 
   return (
-    <div className="max-w-4xl min-w-0">
+    <div className="max-w-5xl min-w-0">
       <PageHeader
         eyebrow="Visits"
         title="Site visits"
