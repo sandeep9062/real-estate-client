@@ -15,6 +15,35 @@ function getInitials(name?: string | null): string {
   return parts.map((part) => part.charAt(0).toUpperCase()).join("") || "A";
 }
 
+// Same API-origin detection as ProfileMenu (getApiBaseUrl isn't exported).
+function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+
+    if (
+      hostname === "www.propertybulbul.com" ||
+      hostname === "propertybulbul.com"
+    ) {
+      return "https://api.propertybulbul.com/api";
+    }
+  }
+
+  return "http://localhost:9000/api";
+}
+
+// Resolve the auth user's profile pic: absolute http(s) URLs pass through,
+// relative paths (e.g. uploads/...) are served from the API origin.
+function getUserImageUrl(imagePath?: string | null): string | undefined {
+  if (!imagePath) return undefined;
+  if (imagePath.startsWith("http")) return imagePath;
+  const baseUrl = getApiBaseUrl().replace("/api", "");
+  return `${baseUrl}/${imagePath.replace(/\\/g, "/")}`;
+}
+
 export default function AgentDashboardShell({
   children,
 }: {
@@ -22,6 +51,7 @@ export default function AgentDashboardShell({
 }) {
   const pathname = usePathname();
   const user = useSelector(selectUser);
+  const avatarUrl = getUserImageUrl(user?.image);
 
   return (
     <div className="min-h-[100dvh] w-full bg-[#f6f8fb]">
@@ -81,9 +111,17 @@ export default function AgentDashboardShell({
             {/* User card */}
             <div className="rounded-2xl border border-gray-200/80 bg-white p-3 shadow-sm">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-[#4161df]">
-                  {getInitials(user?.name)}
-                </span>
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={`${user?.name ?? "Agent"} profile picture`}
+                    className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white/80"
+                  />
+                ) : (
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-[#4161df]">
+                    {getInitials(user?.name)}
+                  </span>
+                )}
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-gray-900">
                     {user?.name ?? "Agent"}
