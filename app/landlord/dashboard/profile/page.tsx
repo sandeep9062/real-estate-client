@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
   AlertTriangle,
-  ArrowLeft,
   Building2,
   Landmark,
   MapPin,
@@ -323,7 +322,7 @@ export default function LandlordProfilePage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4  px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/8 text-[#4161df]">
           <Building2 className="h-7 w-7" aria-hidden />
         </span>
@@ -345,7 +344,7 @@ export default function LandlordProfilePage() {
 
   if (!canAccess) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 bg-[#FAF7F1] px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100 text-stone-400">
           <Building2 className="h-7 w-7" aria-hidden />
         </span>
@@ -368,20 +367,18 @@ export default function LandlordProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[100dvh] ">
-        <div className="mx-auto max-w-5xl py-6 sm:py-8">
-          <div className="mb-4 h-4 w-40 animate-pulse rounded-full bg-stone-200/70" />
-          <div className="mb-6 h-40 animate-pulse rounded-3xl bg-stone-200/70" />
-          <div className="mb-6 h-32 animate-pulse rounded-2xl bg-white" />
-          <div className="space-y-4">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="h-64 animate-pulse rounded-2xl bg-white"
-                style={{ animationDelay: `${i * 120}ms` }}
-              />
-            ))}
-          </div>
+      <div className="max-w-4xl min-w-0">
+        <div className="mb-4 h-4 w-40 animate-pulse rounded-full bg-stone-200/70" />
+        <div className="mb-6 h-40 animate-pulse rounded-3xl bg-stone-200/70" />
+        <div className="mb-6 h-32 animate-pulse rounded-2xl bg-white" />
+        <div className="space-y-4">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="h-64 animate-pulse rounded-2xl bg-white"
+              style={{ animationDelay: `${i * 120}ms` }}
+            />
+          ))}
         </div>
       </div>
     );
@@ -389,7 +386,7 @@ export default function LandlordProfilePage() {
 
   if (isError || !data?.data) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 bg-[#FAF7F1] px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
+      <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-4 pt-[calc(6rem+env(safe-area-inset-top))] text-center sm:pt-24">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
           <AlertTriangle className="h-7 w-7" aria-hidden />
         </span>
@@ -412,59 +409,57 @@ export default function LandlordProfilePage() {
   }
 
   return (
-    <div className="min-h-[100dvh]">
-      <div className="mx-auto max-w-5xl py-6 sm:py-8">
-        <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
-            aria-hidden
-          >
-            <defs>
-              <pattern
-                id="plan-grid"
-                width="28"
-                height="28"
-                patternUnits="userSpaceOnUse"
-              >
-                <path
-                  d="M 28 0 L 0 0 0 28"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="1"
-                />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#plan-grid)" />
-          </svg>
+    <div className="max-w-4xl min-w-0">
+      <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-[#37509c] via-[#4161df] to-[#5570e8] p-6 text-white sm:p-8">
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
+          aria-hidden
+        >
+          <defs>
+            <pattern
+              id="plan-grid"
+              width="28"
+              height="28"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 28 0 L 0 0 0 28"
+                fill="none"
+                stroke="white"
+                strokeWidth="1"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#plan-grid)" />
+        </svg>
 
-          <div className="relative max-w-md">
-            <p className="text-[13px] font-medium text-white/70">
-              Landlord profile
-            </p>
-            <h1 className="mt-1.5 font-serif text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">
-              {displayName ? `Hello, ${displayName}` : "Edit your profile"}
-            </h1>
-            <p className="mt-2.5 text-sm leading-relaxed text-white/80 sm:text-base">
-              Keep your details up to date — tenants see this on your listings.
-            </p>
-          </div>
-        </section>
+        <div className="relative max-w-md">
+          <p className="text-[13px] font-medium text-white/70">
+            Landlord profile
+          </p>
+          <h1 className="mt-1.5 font-serif text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">
+            {displayName ? `Hello, ${displayName}` : "Edit your profile"}
+          </h1>
+          <p className="mt-2.5 text-sm leading-relaxed text-white/80 sm:text-base">
+            Keep your details up to date — tenants see this on your listings.
+          </p>
+        </div>
+      </section>
 
-        <ProfileCompletenessBanner
-          role="landlord"
-          percentage={profile?.profileCompleteness ?? 0}
-          editHref="/landlord/dashboard/profile"
-        />
+      <ProfileCompletenessBanner
+        role="landlord"
+        percentage={profile?.profileCompleteness ?? 0}
+        editHref="/landlord/dashboard/profile"
+      />
 
-        <ProfileEditor
-          sections={SECTIONS}
-          profile={editorProfile}
-          name={displayName || undefined}
-          avatar={profile?.avatar}
-          saving={saving}
-          onSave={handleSave}
-        />
-      </div>
+      <ProfileEditor
+        sections={SECTIONS}
+        profile={editorProfile}
+        name={displayName || undefined}
+        avatar={profile?.avatar}
+        saving={saving}
+        onSave={handleSave}
+      />
     </div>
   );
 }
