@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Home, Upload, Sparkles, Clock } from "lucide-react";
-import AddPropertyModal from "./AddPropertyModal";
+
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { selectIsAuthenticated } from "@/store/authSlice";
@@ -12,13 +12,12 @@ const BRAND_DARK = "#2b3f9e";
 
 const PostPropertyCTA = () => {
   const router = useRouter();
-  const [modalOpened, setModalOpened] = useState(false);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const handleAddPropertyClick = () => {
     if (isAuthenticated) {
-      setModalOpened(true);
+      router.push("/add-property");
     } else {
       router.push("/login");
     }
@@ -103,8 +102,6 @@ const PostPropertyCTA = () => {
             <Clock className="w-3.5 h-3.5" />
             Takes less than 2 minutes
           </span>
-
-          <AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />
         </motion.div>
       </motion.div>
     </div>
