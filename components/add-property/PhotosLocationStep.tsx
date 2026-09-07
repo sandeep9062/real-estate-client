@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useForm } from "@mantine/form";
-import { Button, Group, Select, TextInput, Text, Divider } from "@mantine/core";
+import { Box, Button, Group, Select, TextInput, Text, Divider } from "@mantine/core";
 import { Dropzone, MIME_TYPES } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -121,7 +121,7 @@ const PhotosLocationStep: React.FC<PhotosLocationStepProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 mt-8 w-full max-w-2xl mx-auto">
+    <Box className="flex flex-col gap-8 mt-8 w-full">
       <div>
         <Text fw={700} size="lg" mb="sm">
           Photos & videos
@@ -287,7 +287,7 @@ const PhotosLocationStep: React.FC<PhotosLocationStepProps> = ({
           </Button>
         </Group>
       </form>
-    </div>
+    </Box>
   );
 };
 

@@ -118,7 +118,10 @@ export default function AddPropertyPageContent() {
     if (!coordinates) return { lat: 0, lng: 0 };
 
     // Already-transformed format from backend: { lat, lng }
-    if (typeof coordinates.lat === "number" && typeof coordinates.lng === "number") {
+    if (
+      typeof coordinates.lat === "number" &&
+      typeof coordinates.lng === "number"
+    ) {
       return { lat: coordinates.lat, lng: coordinates.lng };
     }
 
@@ -212,7 +215,7 @@ export default function AddPropertyPageContent() {
   }
 
   return (
-    <Container size="md" py="xl" mt={60}>
+    <Container size="md" py="xl" mt={65}>
       <Stepper active={active} onStepClick={goToStep}>
         <Stepper.Step label="AI Magic" description="Auto-fill data">
           <MagicFill
