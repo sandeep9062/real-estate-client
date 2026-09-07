@@ -6,105 +6,152 @@ import {
   AccordionItemHeading,
   AccordionItemButton,
   AccordionItemPanel,
+  AccordionItemState,
 } from "react-accessible-accordion";
-import "react-accessible-accordion/dist/fancy-example.css";
 
 import { MdOutlineArrowDropDown } from "react-icons/md";
 import { HiShieldCheck } from "react-icons/hi";
 import { MdCancel, MdAnalytics } from "react-icons/md";
 import Image from "next/image";
 
+const BRAND = "#4161df";
+const INK = "#161A2E";
+const INK_SOFT = "#5C5F73";
+const TINT_BG = "#EEF1FC";
+const TINT_LINE = "#DCE1F7";
+
 const data = [
   {
     icon: <HiShieldCheck />,
-    heading: "Verified Properties with Zero Risk",
+    heading: "Verified properties, zero risk",
     detail:
-      "Every property in Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar is thoroughly verified to ensure you get 100% safe, legal, and dispute-free deals.",
+      "Every property across Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar is checked for legal and title issues, so you close with confidence, not crossed fingers.",
   },
   {
     icon: <MdCancel />,
-    heading: "No Price Manipulation",
+    heading: "No price manipulation",
     detail:
-      "Say goodbye to brokers inflating rates. PropertyBulbul provides transparent, real-time property prices across the entire Tricity market.",
+      "Real-time, transparent pricing across the Tricity market, so no broker can quietly inflate what you pay.",
   },
   {
     icon: <MdAnalytics />,
-    heading: "Accurate Market Insights",
+    heading: "Market insights you can act on",
     detail:
-      "Get data-backed analytics on the Tricity real estate market so you can buy, sell, or invest smarter with clear trends, demand, and pricing insights.",
+      "Data-backed trends on demand and pricing, so you buy, sell, or invest on evidence, not guesswork.",
   },
 ];
 
 const Value = () => {
   return (
-    <section id="value" className="py-8 sm:py-10 md:py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-6 sm:gap-8 md:gap-10">
+    <section id="value" className="py-14 sm:py-16 md:py-20">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-10 md:gap-14">
         {/* left image */}
         <div className="flex-1 w-full md:w-auto order-first md:order-first">
-          <div className="border-4 sm:border-6 md:border-8 border-gray-200 rounded-lg overflow-hidden max-w-sm sm:max-w-md mx-auto md:mx-0">
-            <Image
-              src="/value-image.png"
-              alt="value"
-              width={600}
-              height={600}
-              className="w-full h-auto"
+          <div className="relative max-w-sm sm:max-w-md mx-auto md:mx-0">
+            <div
+              aria-hidden
+              className="absolute -top-6 -left-6 w-28 h-28 rounded-full"
+              style={{ background: TINT_BG }}
             />
+            <div
+              className="relative rounded-2xl overflow-hidden border"
+              style={{ borderColor: TINT_LINE }}
+            >
+              <Image
+                src="/value-image.png"
+                alt="A PropertyBulbul team member reviewing a verified property listing"
+                width={600}
+                height={600}
+                className="w-full h-auto"
+              />
+            </div>
           </div>
         </div>
 
         {/* right */}
-        <div className="flex-1 flex flex-col gap-2 w-full">
-          <span className="text-orange-900 font-semibold uppercase tracking-wider text-xs sm:text-sm">
-            Our Value
-          </span>
-          <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
-            Value We Give to You
-          </span>
-          <span className="text-gray-600 text-sm sm:text-base leading-relaxed">
-            We are ready to help by providing the best services for you.
-            <br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>
-            We believe a good place to live can make your life better.
-          </span>
+        <div className="flex-1 flex flex-col w-full">
+          <div className="flex items-center gap-2.5 mb-4">
+            <span
+              className="w-8 h-[3px] rounded-full"
+              style={{ background: BRAND }}
+            />
+            <span className="text-sm font-medium" style={{ color: BRAND }}>
+              Our value
+            </span>
+          </div>
 
-          <Accordion
-            allowMultipleExpanded={false}
-            preExpanded={[0]}
-            className="mt-4 sm:mt-6"
+          <h2
+            className="text-2xl sm:text-3xl md:text-4xl font-bold leading-[1.15] mb-3"
+            style={{ color: INK }}
           >
-            {data.map((item: any, i: number) => {
-              return (
-                <AccordionItem
-                  key={i}
-                  uuid={i}
-                  className="border border-gray-300 rounded-lg mb-3 sm:mb-4 overflow-hidden"
-                >
-                  <AccordionItemHeading>
-                    <AccordionItemButton className="flex items-center justify-between gap-2 sm:gap-3 cursor-pointer bg-white p-3 sm:p-4">
-                      {/* left icon */}
-                      <div className="p-1.5 sm:p-2 bg-[#eeeeff] rounded text-lg sm:text-xl">
-                        {item.icon}
-                      </div>
+            The value we bring to every deal
+          </h2>
 
-                      <span className="flex-1 font-semibold text-black text-sm sm:text-base">
-                        {item.heading}
-                      </span>
+          <p
+            className="text-[15px] sm:text-base leading-relaxed mb-6 max-w-[52ch]"
+            style={{ color: INK_SOFT }}
+          >
+            We believe a good home starts with good information. Here&apos;s how
+            we back that up.
+          </p>
 
-                      <MdOutlineArrowDropDown
-                        className="text-[#4161df] flex-shrink-0"
-                        size={20}
-                      />
-                    </AccordionItemButton>
-                  </AccordionItemHeading>
+          <Accordion allowMultipleExpanded={false} preExpanded={["0"]}>
+            {data.map((item, i) => (
+              <AccordionItem
+                key={i}
+                uuid={String(i)}
+                className="rounded-xl mb-3 sm:mb-4 overflow-hidden border"
+                style={{ borderColor: TINT_LINE }}
+              >
+                <AccordionItemState>
+                  {({ expanded }) => (
+                    <>
+                      <AccordionItemHeading>
+                        <AccordionItemButton className="flex items-center justify-between gap-3 cursor-pointer bg-white p-4">
+                          <div
+                            className="flex items-center justify-center w-9 h-9 rounded-full text-lg shrink-0 transition-colors duration-200"
+                            style={{
+                              border: `1.5px solid ${BRAND}`,
+                              color: BRAND,
+                              background: expanded ? TINT_BG : "transparent",
+                            }}
+                          >
+                            {item.icon}
+                          </div>
 
-                  <AccordionItemPanel>
-                    <p className="text-gray-500 text-xs sm:text-sm px-3 sm:px-4 pb-3 sm:pb-4">
-                      {item.detail}
-                    </p>
-                  </AccordionItemPanel>
-                </AccordionItem>
-              );
-            })}
+                          <span
+                            className="flex-1 font-semibold text-sm sm:text-base"
+                            style={{ color: INK }}
+                          >
+                            {item.heading}
+                          </span>
+
+                          <MdOutlineArrowDropDown
+                            className="shrink-0 transition-transform duration-200"
+                            style={{
+                              color: BRAND,
+                              transform: expanded
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                            }}
+                            size={20}
+                          />
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+
+                      <AccordionItemPanel>
+                        <p
+                          className="text-[13px] sm:text-sm leading-relaxed px-4 pb-4"
+                          style={{ color: INK_SOFT }}
+                        >
+                          {item.detail}
+                        </p>
+                      </AccordionItemPanel>
+                    </>
+                  )}
+                </AccordionItemState>
+              </AccordionItem>
+            ))}
           </Accordion>
         </div>
       </div>

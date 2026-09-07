@@ -70,7 +70,9 @@ const ForgotPasswordPage = () => {
       try {
         result = raw ? JSON.parse(raw) : {};
       } catch {
-        toast.error("Server returned an invalid response. Check API URL and try again.");
+        toast.error(
+          "Server returned an invalid response. Check API URL and try again.",
+        );
         return;
       }
 
@@ -94,29 +96,35 @@ const ForgotPasswordPage = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Image */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-green-50 to-teal-100 relative overflow-hidden">
+      <div className="hidden md:flex md:w-1/2 relative overflow-hidden bg-white">
         <Image
-          src="/forgot-password-page.jpg"
+          src="/forgotpassword-image.png"
           alt="Property Bulbul Password Reset"
           fill
-          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: "cover", objectPosition: "75% center" }}
           priority
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-opacity-20"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-white text-center px-8">
-            <h1 className="text-3xl lg:text-4xl font-bold mb-4">
-              Reset Your Password
-            </h1>
-            <p className="text-base lg:text-lg">
-              We'll help you get back into your account
-            </p>
-          </div>
+
+        {/* Narrow scrim, just enough to guarantee contrast where the text sits */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent" />
+
+        <div className="absolute inset-0 flex flex-col justify-start pt-20 lg:pt-24 px-10 lg:px-14 max-w-[300px] lg:max-w-sm">
+          <span className="w-10 h-[3px] rounded-full bg-[#4161df] mb-5" />
+          <h1 className="text-3xl lg:text-4xl font-bold leading-[1.15] tracking-tight text-slate-900">
+            Let's get you
+            <br />
+            back in
+          </h1>
+          <p className="mt-4 text-base lg:text-lg text-slate-600">
+            We'll send a reset link straight to your inbox.
+          </p>
         </div>
       </div>
 
       {/* Right side - Reset Card */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gray-50">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
         <Card className="w-full max-w-sm sm:max-w-md shadow-xl">
           <CardHeader className="text-center px-4 sm:px-6 pt-4 sm:pt-6">
             {/* Logo */}

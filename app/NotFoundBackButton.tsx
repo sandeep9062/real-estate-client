@@ -6,9 +6,9 @@ export default function NotFoundBackButton() {
   return (
     <button
       onClick={() => window.history.back()}
-      className="inline-flex items-center gap-2 text-gray-500 hover:text-[#4161df] transition-colors font-medium"
+      className="inline-flex items-center gap-2 text-slate-300 hover:text-white transition-colors font-medium text-xs"
     >
-      <ArrowLeft size={16} />
+      <ArrowLeft size={14} />
       Go Back
     </button>
   );

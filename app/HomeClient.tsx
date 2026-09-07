@@ -114,7 +114,7 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
       {/* <section>
         <AppDownloadBanner />
       </section>
-      <section>
+     <section>
         <TrendingLocalities />
       </section>
       <section>

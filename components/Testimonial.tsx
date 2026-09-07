@@ -7,11 +7,19 @@ import {
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
+import { HiBadgeCheck } from "react-icons/hi";
+
+const BRAND = "#4161df";
+const INK = "#161A2E";
+const INK_SOFT = "#5C5F73";
+const TINT_BG = "#EEF1FC";
+const TINT_LINE = "#DCE1F7";
 
 interface TestimonialItem {
   id: number;
   name: string;
   role: string;
+  location: string;
   image?: string;
   text: string;
   rating: number;
@@ -22,54 +30,50 @@ const testimonials: TestimonialItem[] = [
     id: 1,
     name: "Rajat Sharma",
     role: "Home Buyer",
-    text: "PropertyBulbul made my home-buying journey incredibly simple. The platform helped me explore the right localities, compare properties, and connect with a trusted agent. Finally bought the perfect home for my family!",
+    location: "Chandigarh",
+    text: "PropertyBulbul made my home-buying journey incredibly simple. They helped me compare the right localities and connect with a trusted agent — finally found the perfect home for my family.",
     rating: 5,
   },
   {
     id: 2,
     name: "Mandeep Singh",
     role: "Commercial Buyer",
-    text: "I found exactly the commercial space I was looking for through PropertyBulbul. Smooth communication, verified listings, and excellent support made the entire process effortless.",
+    location: "Mohali",
+    text: "I found exactly the commercial space I was looking for through PropertyBulbul. Verified listings and smooth communication made the entire process effortless, start to finish.",
     rating: 5,
   },
   {
     id: 3,
     name: "Priya Patel",
     role: "Real Estate Investor",
-    text: "PropertyBulbul helped me identify high-return investment properties faster than ever. Their data-driven insights and professional service truly stand out in the market.",
+    location: "Zirakpur",
+    text: "PropertyBulbul helped me identify high-return investment properties faster than ever. Their data-driven insights genuinely stand out in a market full of guesswork.",
     rating: 5,
   },
   {
     id: 4,
     name: "Anil Kumar",
     role: "Property Seller",
-    text: "Listing my property on PropertyBulbul brought in genuine buyers within days. Their agent network, transparency, and marketing support helped me get a great offer quickly.",
+    location: "Panchkula",
+    text: "Listing my property on PropertyBulbul brought in genuine buyers within days. Their agent network and transparent process helped me close a great offer quickly.",
     rating: 4,
   },
   {
     id: 5,
     name: "Jasmine Kaur",
     role: "First-Time Buyer",
-    text: "Being a first-time buyer, I had many doubts. PropertyBulbul provided clear guidance, expert assistance, and verified listings that helped me purchase confidently and stress-free.",
+    location: "Kharar",
+    text: "Being a first-time buyer, I had a lot of doubts. Clear guidance and verified listings helped me purchase confidently, without the usual stress.",
     rating: 5,
   },
   {
     id: 6,
     name: "Vikram Reddy",
     role: "Luxury Property Buyer",
-    text: "PropertyBulbul offers an exceptional luxury property experience. Their curated listings, premium service, and attention to detail truly match the expectations of high-end buyers like me.",
+    location: "Chandigarh",
+    text: "An exceptional experience end to end. Curated listings, premium service, and real attention to detail — exactly what I look for as a high-end buyer.",
     rating: 5,
   },
-];
-
-// Consistent color per person based on their name
-const AVATAR_COLORS = [
-  "bg-indigo-500",
-  "bg-violet-500",
-  "bg-blue-500",
-  "bg-sky-500",
-  "bg-purple-500",
-  "bg-fuchsia-500",
 ];
 
 function getInitials(name: string): string {
@@ -81,17 +85,14 @@ function getInitials(name: string): string {
     .slice(0, 2);
 }
 
-function getAvatarColor(id: number): string {
-  return AVATAR_COLORS[(id - 1) % AVATAR_COLORS.length];
-}
-
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex gap-0.5">
+    <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
       {Array.from({ length: 5 }, (_, i) => (
         <FaStar
           key={i}
-          className={`w-3.5 h-3.5 ${i < rating ? "text-yellow-400" : "text-gray-200"}`}
+          className="w-3.5 h-3.5"
+          style={{ color: i < rating ? "#F5A623" : TINT_LINE }}
         />
       ))}
     </div>
@@ -104,9 +105,11 @@ function Avatar({ testimonial }: { testimonial: TestimonialItem }) {
 
   return (
     <div
-      className={`w-11 h-11 md:w-12 md:h-12 rounded-full shrink-0 border-2 border-indigo-200 shadow-sm overflow-hidden flex items-center justify-center ${
-        showInitials ? getAvatarColor(testimonial.id) : ""
-      }`}
+      className="w-11 h-11 md:w-12 md:h-12 rounded-full shrink-0 overflow-hidden flex items-center justify-center"
+      style={{
+        background: showInitials ? BRAND : "transparent",
+        border: `1.5px solid ${TINT_LINE}`,
+      }}
     >
       {showInitials ? (
         <span className="text-white font-semibold text-sm">
@@ -127,12 +130,18 @@ function Avatar({ testimonial }: { testimonial: TestimonialItem }) {
 
 function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
   return (
-    <div className="bg-white border border-gray-100 h-full p-5 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col relative">
+    <div
+      className="bg-white h-full p-5 md:p-6 rounded-2xl border shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col relative"
+      style={{ borderColor: TINT_LINE }}
+    >
       {/* Quote icon */}
-      <FaQuoteLeft
-        className="text-indigo-100 w-8 h-8 absolute top-5 right-5"
+      <div
+        className="absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center"
+        style={{ background: TINT_BG }}
         aria-hidden="true"
-      />
+      >
+        <FaQuoteLeft className="w-3.5 h-3.5" style={{ color: BRAND }} />
+      </div>
 
       {/* Rating */}
       <div className="mb-3">
@@ -140,25 +149,45 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
       </div>
 
       {/* Text */}
-      <p className="text-gray-600 text-sm sm:text-base leading-relaxed grow">
+      <p
+        className="text-sm sm:text-base leading-relaxed grow pr-6"
+        style={{ color: INK_SOFT }}
+      >
         {testimonial.text}
       </p>
 
       {/* Divider */}
-      <div className="border-t border-gray-100 mt-4 pt-4 flex items-center justify-between gap-3">
+      <div
+        className="border-t mt-4 pt-4 flex items-center justify-between gap-3"
+        style={{ borderColor: TINT_LINE }}
+      >
         <div className="flex items-center gap-3 min-w-0">
           <Avatar testimonial={testimonial} />
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 truncate">
+            <p
+              className="text-sm font-semibold truncate"
+              style={{ color: INK }}
+            >
               {testimonial.name}
             </p>
-            <p className="text-xs text-indigo-500 font-medium truncate">
-              {testimonial.role}
+            <p
+              className="text-xs font-medium truncate"
+              style={{ color: BRAND }}
+            >
+              {testimonial.role} · {testimonial.location}
             </p>
           </div>
         </div>
         {/* Verified badge */}
-        <span className="shrink-0 text-xs bg-green-50 text-green-600 border border-green-100 px-2 py-0.5 rounded-full font-medium">
+        <span
+          className="shrink-0 flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium"
+          style={{
+            background: TINT_BG,
+            color: BRAND,
+            border: `1px solid ${TINT_LINE}`,
+          }}
+        >
+          <HiBadgeCheck className="w-3.5 h-3.5" />
           Verified
         </span>
       </div>
@@ -217,20 +246,35 @@ const Testimonial: React.FC = () => {
 
   return (
     <section
-      className="w-full py-10 sm:py-14 md:py-16 px-4 sm:px-6 lg:px-8 font-sans"
+      className="w-full py-14 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 font-sans"
       aria-label="Client testimonials"
     >
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-10 md:mb-12">
-          <p className="text-indigo-600 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-2">
-            Client Stories
-          </p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
-            Folks Who Love Us
+        {/* Header — matches Value section's label + heading pattern */}
+        <div className="flex flex-col items-center text-center mb-10 sm:mb-12">
+          <div className="flex items-center gap-2.5 mb-4">
+            <span
+              className="w-8 h-[3px] rounded-full"
+              style={{ background: BRAND }}
+            />
+            <span className="text-sm font-medium" style={{ color: BRAND }}>
+              Client stories
+            </span>
+          </div>
+
+          <h2
+            className="text-2xl sm:text-3xl md:text-4xl font-bold leading-[1.15] mb-3"
+            style={{ color: INK }}
+          >
+            Folks who trust PropertyBulbul
           </h2>
-          <p className="text-gray-500 mt-3 max-w-xl mx-auto text-sm sm:text-base">
-            Real experiences from buyers, sellers, and investors across Tricity.
+
+          <p
+            className="text-[15px] sm:text-base leading-relaxed max-w-[52ch]"
+            style={{ color: INK_SOFT }}
+          >
+            Real experiences from buyers, sellers, and investors across the
+            Tricity — Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar.
           </p>
         </div>
 
@@ -270,7 +314,18 @@ const Testimonial: React.FC = () => {
           {/* Prev button */}
           <button
             onClick={handlePrev}
-            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 bg-white border border-gray-200 text-gray-500 p-2.5 rounded-full shadow hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 bg-white p-2.5 rounded-full shadow transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = BRAND;
+              e.currentTarget.style.color = "#fff";
+              e.currentTarget.style.borderColor = BRAND;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#fff";
+              e.currentTarget.style.color = INK_SOFT;
+              e.currentTarget.style.borderColor = TINT_LINE;
+            }}
             aria-label="Previous testimonials"
           >
             <FaChevronLeft className="w-4 h-4" />
@@ -279,7 +334,18 @@ const Testimonial: React.FC = () => {
           {/* Next button */}
           <button
             onClick={handleNext}
-            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 bg-white border border-gray-200 text-gray-500 p-2.5 rounded-full shadow hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 bg-white p-2.5 rounded-full shadow transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = BRAND;
+              e.currentTarget.style.color = "#fff";
+              e.currentTarget.style.borderColor = BRAND;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#fff";
+              e.currentTarget.style.color = INK_SOFT;
+              e.currentTarget.style.borderColor = TINT_LINE;
+            }}
             aria-label="Next testimonials"
           >
             <FaChevronRight className="w-4 h-4" />
@@ -299,11 +365,12 @@ const Testimonial: React.FC = () => {
               aria-selected={i === currentPage}
               aria-label={`Page ${i + 1}`}
               onClick={() => setCurrentPage(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === currentPage
-                  ? "bg-indigo-600 w-6 h-3"
-                  : "bg-gray-300 hover:bg-gray-400 w-3 h-3"
-              }`}
+              className="rounded-full transition-all duration-300"
+              style={{
+                background: i === currentPage ? BRAND : TINT_LINE,
+                width: i === currentPage ? "24px" : "12px",
+                height: "12px",
+              }}
             />
           ))}
         </div>

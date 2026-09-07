@@ -6,209 +6,255 @@ import {
   IconRobot,
   IconCircleCheck,
   IconCircleX,
+  IconArrowRight,
 } from "@tabler/icons-react";
+import Link from "next/link";
+
+const BRAND = "#4161df";
+const INK = "#161A2E";
+const INK_SOFT = "#5C5F73";
+const TINT_BG = "#EEF1FC";
+const TINT_LINE = "#DCE1F7";
+
+const tableData = [
+  {
+    feature: "Data freshness",
+    desc: "Refreshed daily from active Tricity broker networks, not left to go stale.",
+  },
+  {
+    feature: "Listing quality",
+    desc: "AI-written descriptions that read like a person wrote them, not copy-pasted spam.",
+  },
+  {
+    feature: "Response speed",
+    desc: "Message a broker directly on WhatsApp. No call centers, no forms.",
+  },
+  {
+    feature: "Brochure support",
+    desc: "A proper PDF brochure in seconds, not after three follow-up calls.",
+  },
+  {
+    feature: "Spam protection",
+    desc: "We never sell your number to telemarketers. Ever.",
+  },
+];
+
+const features = [
+  {
+    icon: IconShieldCheck,
+    title: "No ghost listings",
+    desc: "Stop calling about properties that sold months ago. Every listing is pulled from live WhatsApp broker networks — if it's on Bulbul, it's real.",
+  },
+  {
+    icon: IconBrandWhatsapp,
+    title: "WhatsApp-first",
+    desc: "Skip the ten-field forms and spam calls. Message brokers directly on WhatsApp and get brochures instantly.",
+  },
+  {
+    icon: IconRobot,
+    title: "AI-powered detail",
+    desc: "Our AI turns a broker's rough notes into a clear, professional brochure, so you know what you're walking into before you leave home.",
+  },
+];
 
 export default function WhyPropertyBulbul() {
-  const tableData = [
-    {
-      feature: "Data Freshness",
-      bulbul: true,
-      giants: false,
-      desc: "Sourced daily from active Tricity networks.",
-    },
-    {
-      feature: "Listing Quality",
-      bulbul: true,
-      giants: false,
-      desc: "AI-enhanced professional descriptions.",
-    },
-    {
-      feature: "Response Speed",
-      bulbul: true,
-      giants: false,
-      desc: "Direct WhatsApp connect—no middleman.",
-    },
-    {
-      feature: "Brochure Support",
-      bulbul: true,
-      giants: false,
-      desc: "Instant high-quality PDF downloads.",
-    },
-    {
-      feature: "Spam Protection",
-      bulbul: true,
-      giants: false,
-      desc: "Your number isn't sold to telemarketers.",
-    },
-  ];
-
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-white to-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="text-center mb-12 sm:mb-16">
-          <p className="text-blue-600 font-semibold tracking-wide uppercase text-xs sm:text-sm mb-3">
-            Why Choose Us
-          </p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold bg-black bg-clip-text text-transparent leading-tight">
-            Why Tricity Trusts PropertyBulbul
+    <section className="py-14 sm:py-20 md:py-24 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        {/* Header */}
+        <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16">
+          <div className="flex items-center justify-center gap-2.5 mb-5">
+            <span
+              className="w-8 h-[3px] rounded-full"
+              style={{ background: BRAND }}
+            />
+            <span className="text-sm font-medium" style={{ color: BRAND }}>
+              Why choose us
+            </span>
+          </div>
+          <h2
+            className="text-2xl sm:text-3xl md:text-[38px] font-bold leading-[1.15]"
+            style={{ color: INK }}
+          >
+            Quality over quantity, always
           </h2>
-          <p className="text-gray-500 mt-4 max-w-2xl mx-auto text-sm sm:text-base md:text-lg px-4">
-            Big portals have millions of listings, but we have the{" "}
-            <span className="font-semibold text-gray-700">right ones</span>. We
-            built the "Bulbul" way for the modern Chandigarh, Mohali, and
-            Zirakpur market.
+          <p
+            className="mt-4 text-[15px] sm:text-base leading-relaxed"
+            style={{ color: INK_SOFT }}
+          >
+            Portals like 99acres and MagicBricks chase listing counts. We chase{" "}
+            <span className="font-semibold" style={{ color: INK }}>
+              accuracy
+            </span>{" "}
+            — real listings, real responses, no games. Built the Bulbul way for
+            the modern Chandigarh, Mohali, and Zirakpur market.
           </p>
         </div>
 
-        {/* Comparison Table */}
+        {/* Comparison table */}
         <div className="mb-16 sm:mb-20">
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-8">
-            The Direct Comparison
-          </h3>
-
-          {/* Mobile Compact Layout */}
-          <div className="md:hidden bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="flex items-center px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 text-[10px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200">
+          {/* Mobile layout */}
+          <div
+            className="md:hidden rounded-2xl border overflow-hidden"
+            style={{ borderColor: TINT_LINE }}
+          >
+            <div
+              className="flex items-center px-4 py-3 text-[11px] font-semibold"
+              style={{ background: TINT_BG, color: INK_SOFT }}
+            >
               <div className="flex-1">Feature</div>
-              <div className="w-10 text-center text-[#4161df]">PB</div>
-              <div className="w-10 text-center">Others</div>
+              <div className="w-12 text-center" style={{ color: BRAND }}>
+                Bulbul
+              </div>
+              <div className="w-12 text-center">Others</div>
             </div>
-            {tableData.map((item) => (
+            {tableData.map((item, i) => (
               <div
                 key={item.feature}
-                className="flex items-start px-3 py-2.5 border-b border-gray-100 last:border-0"
+                className="flex items-start px-4 py-3"
+                style={{ borderTop: i === 0 ? "none" : "1px solid #EFF0F7" }}
               >
                 <div className="flex-1 min-w-0 pr-2">
-                  <span className="text-sm font-semibold text-gray-800 leading-tight block">
+                  <span
+                    className="text-sm font-semibold block"
+                    style={{ color: INK }}
+                  >
                     {item.feature}
                   </span>
-                  <span className="text-[11px] text-gray-400 leading-snug block mt-0.5">
+                  <span
+                    className="text-[11px] leading-snug block mt-0.5"
+                    style={{ color: INK_SOFT }}
+                  >
                     {item.desc}
                   </span>
                 </div>
-                <div className="w-10 flex justify-center pt-0.5 shrink-0">
+                <div
+                  className="w-12 flex justify-center items-center pt-0.5 shrink-0 self-stretch"
+                  style={{ background: TINT_BG }}
+                >
                   <IconCircleCheck className="text-green-600" size={18} />
                 </div>
-                <div className="w-10 flex justify-center pt-0.5 shrink-0">
-                  <IconCircleX className="text-red-500" size={18} />
+                <div className="w-12 flex justify-center pt-0.5 shrink-0">
+                  <IconCircleX className="text-gray-300" size={18} />
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Desktop Table Layout */}
-          <div className="hidden md:block overflow-x-auto">
-            <div className="inline-block min-w-full align-middle">
-              <table className="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                <thead>
-                  <tr className="bg-gradient-to-r from-blue-50 to-indigo-50">
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
-                      Feature
-                    </th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-[#4161df] uppercase tracking-wider border-b border-gray-200">
-                      PropertyBulbul
-                    </th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                      99acres / MagicBricks
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {tableData.map((item, index) => (
-                    <tr
-                      key={item.feature}
-                      className={`hover:bg-gray-50 transition-colors duration-200 ${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                      }`}
+          {/* Desktop layout */}
+          <div
+            className="hidden md:block rounded-2xl border overflow-hidden"
+            style={{ borderColor: TINT_LINE }}
+          >
+            <table className="w-full">
+              <thead>
+                <tr style={{ background: TINT_BG }}>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: INK }}
+                  >
+                    Feature
+                  </th>
+                  <th
+                    className="px-6 py-4 text-center text-sm font-semibold"
+                    style={{ color: BRAND }}
+                  >
+                    PropertyBulbul
+                  </th>
+                  <th
+                    className="px-6 py-4 text-center text-sm font-semibold"
+                    style={{ color: INK_SOFT }}
+                  >
+                    99acres / MagicBricks
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.map((item, i) => (
+                  <tr
+                    key={item.feature}
+                    style={{
+                      borderTop: i === 0 ? "none" : "1px solid #EFF0F7",
+                    }}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span
+                          className="font-semibold text-[15px]"
+                          style={{ color: INK }}
+                        >
+                          {item.feature}
+                        </span>
+                        <span
+                          className="text-xs mt-0.5"
+                          style={{ color: INK_SOFT }}
+                        >
+                          {item.desc}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      className="px-6 py-4 text-center"
+                      style={{ background: TINT_BG }}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="font-semibold text-gray-800 text-base">
-                            {item.feature}
-                          </span>
-                          <span className="text-xs text-gray-400 mt-1">
-                            {item.desc}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center">
-                          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                            <IconCircleCheck
-                              className="text-green-600"
-                              size={20}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center">
-                          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                            <IconCircleX className="text-red-500" size={20} />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      <div className="flex items-center justify-center">
+                        <IconCircleCheck className="text-green-600" size={22} />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center">
+                        <IconCircleX className="text-gray-300" size={22} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-          {/* Card 1 */}
-          <div className="group relative bg-white rounded-xl p-4 sm:p-5 shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-blue-300 hover:-translate-y-1 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg shadow-blue-500/30">
-                <IconShieldCheck className="text-white" size={22} />
-              </div>
-              <h4 className="text-base sm:text-lg font-bold text-gray-800 mb-2">
-                No "Ghost" Listings
+        {/* Feature cards */}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden"
+          style={{ background: "#E5E7F2" }}
+        >
+          {features.map((item) => (
+            <div key={item.title} className="bg-white p-6 sm:p-7">
+              <span
+                className="flex items-center justify-center w-11 h-11 rounded-full mb-5"
+                style={{ border: `1.5px solid ${BRAND}`, color: BRAND }}
+              >
+                <item.icon size={20} stroke={1.8} />
+              </span>
+              <h4
+                className="text-base sm:text-lg font-semibold mb-2"
+                style={{ color: INK }}
+              >
+                {item.title}
               </h4>
-              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">
-                Tired of calling about sold properties? We pull data from active
-                WhatsApp networks. If it's on Bulbul, it's real.
+              <p
+                className="text-[13.5px] sm:text-sm leading-relaxed"
+                style={{ color: INK_SOFT }}
+              >
+                {item.desc}
               </p>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Card 2 */}
-          <div className="group relative bg-white rounded-xl p-4 sm:p-5 shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-green-300 hover:-translate-y-1 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg shadow-green-500/30">
-                <IconBrandWhatsapp className="text-white" size={22} />
-              </div>
-              <h4 className="text-base sm:text-lg font-bold text-gray-800 mb-2">
-                WhatsApp-First
-              </h4>
-              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">
-                Skip the 10-field forms and spam. Connect directly with brokers
-                via WhatsApp. Get brochures instantly.
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="group relative bg-white rounded-xl p-4 sm:p-5 shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-violet-300 hover:-translate-y-1 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg shadow-violet-500/30">
-                <IconRobot className="text-white" size={22} />
-              </div>
-              <h4 className="text-base sm:text-lg font-bold text-gray-800 mb-2">
-                AI-Powered Detail
-              </h4>
-              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">
-                Our Gemini-powered AI turns messy notes into professional
-                brochures. Get the full story before you step outside.
-              </p>
-            </div>
-          </div>
+        {/* Closing link */}
+        <div className="mt-10 sm:mt-12 text-center">
+          <Link
+            href="/properties"
+            className="group inline-flex items-center gap-1.5 text-sm sm:text-base font-semibold"
+            style={{ color: BRAND }}
+          >
+            See real listings for yourself
+            <IconArrowRight
+              size={17}
+              className="transition-transform duration-200 group-hover:translate-x-0.5"
+            />
+          </Link>
         </div>
       </div>
     </section>

@@ -1,687 +1,727 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import CountUp from "react-countup";
-import { useInView } from "react-intersection-observer";
 import {
-  FaHome,
-  FaBuilding,
-  FaWarehouse,
-  FaBed,
-  FaMapMarkedAlt,
-  FaHandshake,
-  FaChartLine,
-  FaShieldAlt,
-  FaHeadset,
-  FaUserTie,
-  FaClipboardCheck,
-  FaSearch,
-  FaCheckCircle,
-  FaFileAlt,
-  FaBullhorn,
-  FaRobot,
-  FaWhatsapp,
-} from "react-icons/fa";
+  ArrowRight,
+  Search,
+  Home,
+  Building2,
+  Warehouse,
+  BedDouble,
+  MapPin,
+  Handshake,
+  FileText,
+  Sparkles,
+  Megaphone,
+  TrendingUp,
+  MessageCircle,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
 // ─────────────────────────────────────────────
-// Types
+// Tokens — matches AboutHero / AboutPropertyBulbulToday / GetStarted
 // ─────────────────────────────────────────────
-interface ServiceCardProps {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  badge?: string;
-  badgeColor?: string;
-  comingSoon?: boolean;
-}
+const BRAND = "#4161df";
+const BRAND_DARK = "#2b3f9e";
+const INK = "#161A2E";
+const INK_SOFT = "#5C5F73";
+const TINT_BG = "#EEF1FC";
 
-interface WhyCardProps {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}
-
-interface StepProps {
-  step: string;
-  title: string;
-  desc: string;
-  delay: number;
-  icon: React.ReactNode;
-}
+const CITIES = [
+  "Chandigarh",
+  "Mohali",
+  "Panchkula",
+  "Zirakpur",
+  "Kharar",
+  "New Chandigarh",
+];
 
 // ─────────────────────────────────────────────
-// Main Page
+// Shared bits (same pattern as AboutHero)
 // ─────────────────────────────────────────────
-const ServicesPage = () => {
-  const { ref: statsRef, inView: statsInView } = useInView({
-    threshold: 0.3,
-    triggerOnce: true,
-  });
-
+function Eyebrow({
+  label,
+  className = "",
+}: {
+  label: string;
+  className?: string;
+}) {
   return (
-    <div className="w-full bg-white dark:bg-[#0F111A]">
-      {/* ══════════════════════════════════════
-          HERO
-      ══════════════════════════════════════ */}
-      <section className="relative bg-background text-foreground pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-10 overflow-hidden">
-        {/* Background blobs */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 grid grid-cols-2 -space-x-52 opacity-40 dark:opacity-20"
-        >
-          <div className="blur-[106px] h-48 bg-gradient-to-br from-[#4161df] to-purple-400 dark:from-blue-700" />
-          <div className="blur-[106px] h-32 bg-gradient-to-r from-cyan-400 to-sky-300 dark:to-indigo-600" />
-        </div>
+    <span
+      className={`inline-flex items-center gap-2 text-[13px] font-semibold text-slate-700 ${className}`}
+    >
+      <span className="relative flex h-2 w-2">
+        <span
+          className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
+          style={{ background: BRAND }}
+        />
+        <span
+          className="relative inline-flex h-2 w-2 rounded-full"
+          style={{ background: BRAND }}
+        />
+      </span>
+      {label}
+    </span>
+  );
+}
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <motion.div
-              initial={{ y: "1rem", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              className="inline-flex items-center gap-2 bg-[#4161df]/10 border border-[#4161df]/20 rounded-full px-4 py-1.5 text-[#4161df] text-xs font-semibold mb-4 tracking-wider uppercase"
-            >
-              Tricity's Most Trusted Platform
-            </motion.div>
+function SectionTag({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2.5 mb-5">
+      <span
+        className="w-8 h-[3px] rounded-full"
+        style={{ background: BRAND }}
+      />
+      <span className="text-sm font-medium" style={{ color: BRAND }}>
+        {label}
+      </span>
+    </div>
+  );
+}
 
-            <motion.h1
-              initial={{ y: "2rem", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 1.2, type: "spring" }}
-              className="font-extrabold text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tight leading-[1.1] text-slate-900 dark:text-white"
-            >
-              Every Property Service
-              <br className="hidden sm:block" />
-              <span className="text-[#4161df]">
-                Tricity Needs — In One Place
-              </span>
-            </motion.h1>
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4161df]";
 
-            <motion.p
-              initial={{ y: "1.5rem", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 1.2, delay: 0.2, type: "spring" }}
-              className="mt-3 text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl"
-            >
-              Buy, rent, sell, invest — no hidden fees, no spam calls, no fake
-              listings. Built exclusively for Chandigarh, Mohali, Panchkula,
-              Zirakpur and Kharar.
-            </motion.p>
+function PrimaryLink({
+  href,
+  children,
+  icon,
+}: {
+  href: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] ${focusRing}`}
+      style={{ background: BRAND }}
+    >
+      {icon}
+      {children}
+    </Link>
+  );
+}
 
-            <motion.div
-              initial={{ y: "1.5rem", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 1.2, delay: 0.4, type: "spring" }}
-              className="mt-5 flex flex-wrap gap-3 justify-center"
-            >
-              <Link
-                href="/contact"
-                className="bg-[#4161df] text-white px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm hover:bg-[#3451c7] transition-all transform hover:scale-105 shadow-lg hover:shadow-[#4161df]/30"
+function SecondaryLink({
+  href,
+  children,
+  icon,
+}: {
+  href: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`inline-flex items-center justify-center gap-2 rounded-full border-2 border-slate-200 bg-white px-7 py-3.5 text-sm font-bold text-slate-800 transition-all duration-200 hover:border-[#4161df]/40 hover:bg-blue-50/50 hover:-translate-y-0.5 active:scale-[0.98] ${focusRing}`}
+    >
+      {children}
+      {icon}
+    </Link>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Data
+// ─────────────────────────────────────────────
+interface Service {
+  icon: React.ReactNode;
+  tag: string;
+  title: string;
+  desc: string;
+}
+
+const liveServices: Service[] = [
+  {
+    icon: <Building2 className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Rent a home",
+    desc: "Verified flats and builder floors, zero brokerage for Pro Seeker members.",
+  },
+  {
+    icon: <Sparkles className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "AI property search",
+    desc: "Describe what you want in plain English and get matched instantly.",
+  },
+  {
+    icon: <Home className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Buy a property",
+    desc: "Verified resale and new listings with the agent's contact on the page.",
+  },
+  {
+    icon: <Megaphone className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Sell a property",
+    desc: "List for free, get a shareable page and PDF brochure, take leads on WhatsApp.",
+  },
+  {
+    icon: <MapPin className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Plots & land",
+    desc: "Residential plots in Kharar, New Chandigarh and Mullanpur.",
+  },
+  {
+    icon: <BedDouble className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "PG & co-living",
+    desc: "Verified rooms near Chandigarh University, PU, PGIMER and Mohali IT Park.",
+  },
+  {
+    icon: <Warehouse className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Commercial spaces",
+    desc: "Shops, offices and showrooms with transparent pricing.",
+  },
+  {
+    icon: <FileText className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Instant brochures",
+    desc: "One-click branded PDF brochures, auto-filled from any listing.",
+  },
+  {
+    icon: <Handshake className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Live",
+    title: "Agent partnership",
+    desc: "A verified profile, lead analytics and featured placement. Free to start.",
+  },
+];
+
+const buildingServices: Service[] = [
+  {
+    icon: <MessageCircle className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Soon",
+    title: "Social auto-posting",
+    desc: "Send a listing to Facebook, Instagram and WhatsApp Status in one click.",
+  },
+  {
+    icon: <TrendingUp className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Soon",
+    title: "Investment insights",
+    desc: "Local appreciation trends and rental yields by sector.",
+  },
+  {
+    icon: <FileText className="w-5 h-5" strokeWidth={1.8} />,
+    tag: "Soon",
+    title: "Rent agreement builder",
+    desc: "Fill in details, generate a valid agreement, send it to registration.",
+  },
+];
+
+const differentiators = [
+  {
+    icon: ShieldCheck,
+    tag: "Verified",
+    title: "Every listing",
+    desc: "Re-checked as active before it's shown — nothing stale.",
+  },
+  {
+    icon: Sparkles,
+    tag: "AI-powered",
+    title: "Natural search",
+    desc: "Say what you want in plain English, no filter-guessing.",
+  },
+  {
+    icon: MessageCircle,
+    tag: "Zero spam",
+    title: "You go first",
+    desc: "Agents don't call you — you message them, when ready.",
+  },
+  {
+    icon: Users,
+    tag: "Local",
+    title: "Built here",
+    desc: "By a Panchkula engineer who lives in the sectors he lists.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Is PropertyBulbul free to use?",
+    a: "Searching and messaging agents costs nothing, always. Agents can list up to 5 properties free. Pro plans start at ₹499/month for agents and ₹299/month for seekers wanting direct, brokerage-free landlord access.",
+  },
+  {
+    q: "What kinds of properties are listed?",
+    a: "Rentals, resale and new-build homes, plots and land, PG and co-living, and commercial space — all inside Chandigarh, Mohali, Panchkula, Zirakpur, Kharar and New Chandigarh.",
+  },
+  {
+    q: "How do you verify listings?",
+    a: "Every listing is confirmed available and re-checked periodically. If a property's been let or sold, it comes down.",
+  },
+  {
+    q: "How is this different from a national portal?",
+    a: "Every listing is one you could actually visit today. That focus is what makes the AI search and brochure tools useful — built for six cities, not fifty.",
+  },
+  {
+    q: "I'm an agent — how do I start listing?",
+    a: "Click 'Add Property' in the navbar. The free plan covers 5 listings with brochure generation and WhatsApp leads; Pro Agent removes the cap and adds featured placement and lead analytics.",
+  },
+];
+
+// ─────────────────────────────────────────────
+// Main page
+// ─────────────────────────────────────────────
+export default function ServicesPage() {
+  return (
+    <div className="w-full bg-white">
+      {/* HERO */}
+      <section className="relative w-full overflow-hidden bg-white pt-28 pb-16 sm:pt-32 sm:pb-20">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Eyebrow
+              label="Tricity's property intelligence platform"
+              className="justify-center"
+            />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.08 }}
+            className="mt-4 font-bold leading-[1.1] tracking-tight text-slate-900 text-3xl sm:text-4xl md:text-5xl"
+          >
+            Every property service Tricity needs,
+            <br />
+            <span className="relative inline-block" style={{ color: BRAND }}>
+              in one place
+              <svg
+                viewBox="0 0 220 12"
+                className="absolute -bottom-2 left-0 w-full"
+                preserveAspectRatio="none"
+                aria-hidden
               >
-                Get Free Consultation
-              </Link>
-              <Link
-                href="/properties"
-                className="border-2 border-[#4161df] text-[#4161df] dark:text-white dark:border-white px-6 py-2.5 rounded-full font-semibold text-xs sm:text-sm hover:bg-[#4161df] hover:text-white transition-all"
-              >
-                Browse Properties
-              </Link>
-            </motion.div>
-          </div>
+                <path
+                  d="M2 8.5C40 3 100 2 218 7.5"
+                  stroke={BRAND}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  fill="none"
+                  opacity="0.35"
+                />
+              </svg>
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.18 }}
+            className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-slate-600 sm:text-base"
+          >
+            Buy, rent, sell or invest — no hidden fees, no spam calls, no fake
+            listings. Built with verified data and smart search for buyers,
+            sellers, investors and NRIs.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.26 }}
+            className="mt-4 text-sm text-slate-500"
+          >
+            <span className="font-semibold text-slate-700">Now live in </span>
+            {CITIES.slice(0, -1).join(", ")} and {CITIES[CITIES.length - 1]}.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.34 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-4"
+          >
+            <PrimaryLink
+              href="/properties"
+              icon={<Search className="h-4 w-4" />}
+            >
+              Explore properties
+            </PrimaryLink>
+            <SecondaryLink
+              href="/contact"
+              icon={<ArrowRight className="h-4 w-4" />}
+            >
+              Talk to our team
+            </SecondaryLink>
+          </motion.div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════
-          STATS STRIP
-      ══════════════════════════════════════ */}
+      {/* SERVICES — fact-card grid, same technique as AboutPropertyBulbulToday */}
       <section
-        ref={statsRef}
-        className="bg-white dark:bg-[#141824] border-y border-gray-100 dark:border-gray-800 py-6 px-4"
+        className="px-4 py-16 sm:py-20 md:py-24"
+        style={{ background: "#f8f9ff" }}
       >
-        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-          {[
-            { end: 200, suffix: "+", prefix: "", label: "Verified Listings" },
-            { end: 0, suffix: "", prefix: "", label: "Spam Calls Ever" },
-            { end: 5, suffix: "", prefix: "", label: "Tricity Cities" },
-            {
-              end: 0,
-              suffix: "",
-              prefix: "₹",
-              label: "Brokerage for Students",
-            },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <div className="text-2xl sm:text-3xl font-bold text-[#4161df]">
-                {stat.prefix}
-                {statsInView ? (
-                  <CountUp start={0} end={stat.end} duration={3} />
-                ) : (
-                  "0"
-                )}
-                {stat.suffix}
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionTag label="What we offer" />
+            <h2
+              className="mb-4 text-2xl font-bold leading-[1.15] sm:text-3xl md:text-[38px]"
+              style={{ color: INK }}
+            >
+              Complete real estate solutions
+            </h2>
+            <p
+              className="mb-10 max-w-[52ch] text-[15px] leading-relaxed sm:text-base"
+              style={{ color: INK_SOFT }}
+            >
+              Everything organized the way a growing intelligence layer should
+              be — verified, current, and easy to act on.
+            </p>
+          </motion.div>
 
-      {/* ══════════════════════════════════════
-          SERVICES GRID
-      ══════════════════════════════════════ */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-8"
-        >
-          <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
-            What We Offer
-          </span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
-            Complete Real Estate Solutions
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto mt-1">
-            From property search to legal assistance — everything you need in
-            Tricity.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {/* Live services */}
-          <ServiceCard
-            icon={<FaBuilding />}
-            title="Rent a Home"
-            desc="Find verified rental flats, apartments, and builder floors across Tricity. Zero brokerage for Pro Seeker members. Direct WhatsApp contact with landlords — no spam calls ever."
-            badge="MOST POPULAR"
-          />
-          <ServiceCard
-            icon={<FaRobot />}
-            title="AI Property Search"
-            desc="Type exactly what you need in plain English — '2BHK near IT Park Mohali under ₹20,000' — and our AI instantly finds the best matches. No other Tricity portal has this."
-            badge="AI POWERED"
-            badgeColor="#7c3aed"
-          />
-          <ServiceCard
-            icon={<FaFileAlt />}
-            title="Instant PDF Brochures"
-            desc="Agents generate professional, branded property brochures in one click. Auto-filled with photos, price, specs, and contact info. Ready to share on WhatsApp instantly."
-            badge="UNIQUE"
-            badgeColor="#059669"
-          />
-          <ServiceCard
-            icon={<FaHome />}
-            title="Buy a Property"
-            desc="Verified residential properties for sale across Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar. Direct agent contact, transparent pricing, no hidden fees."
-          />
-          <ServiceCard
-            icon={<FaBullhorn />}
-            title="Sell a Property"
-            desc="List your property for free and reach thousands of active buyers in Tricity. Professional listing page with photos, PDF brochure, and direct WhatsApp leads to you."
-          />
-          <ServiceCard
-            icon={<FaMapMarkedAlt />}
-            title="Plots & Land"
-            desc="Residential plots in Kharar, New Chandigarh, and Mullanpur — Tricity's fastest growing areas. Verified listings with clear ownership details and pricing."
-          />
-          <ServiceCard
-            icon={<FaBed />}
-            title="PG & Co-Living"
-            desc="Verified PGs and shared living near Chandigarh University, Panjab University, PGIMER, and Mohali IT Park. Safe, affordable, all amenities included."
-          />
-          <ServiceCard
-            icon={<FaWarehouse />}
-            title="Commercial Properties"
-            desc="Shops, offices, and showrooms in prime Tricity locations. Verified listings with direct owner contact and transparent pricing."
-          />
-          <ServiceCard
-            icon={<FaHandshake />}
-            title="Agent Partnership"
-            desc="Join PropertyBulbul as a verified agent. Get featured placement, lead analytics, PDF brochures, and a professional agent profile — starting free."
-          />
-
-          {/* Coming soon services */}
-          <ServiceCard
-            icon={<FaWhatsapp />}
-            title="Social Auto-Posting"
-            desc="Post your listings to Facebook, Instagram, and WhatsApp in one click with AI-generated captions and auto-watermarked photos. Maximum reach with zero effort."
-            badge="COMING SOON"
-            badgeColor="#6b7280"
-            comingSoon
-          />
-          <ServiceCard
-            icon={<FaChartLine />}
-            title="Property Investment Insights"
-            desc="Data-backed insights on Tricity property appreciation trends, rental yields, and emerging hotspots. Make smarter investment decisions with real local data."
-            badge="COMING SOON"
-            badgeColor="#6b7280"
-            comingSoon
-          />
-          <ServiceCard
-            icon={<FaFileAlt />}
-            title="Rent Agreement Builder"
-            desc="Generate a legally valid rent agreement in minutes. Fill in tenant and landlord details, download as PDF, and get it registered — all from PropertyBulbul."
-            badge="COMING SOON"
-            badgeColor="#6b7280"
-            comingSoon
-          />
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════
-          WHY PROPERTYBULBUL
-      ══════════════════════════════════════ */}
-      <section className="w-full bg-gray-50 dark:bg-[#141824] py-10 md:py-14 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl sm:grid-cols-2 lg:grid-cols-3"
+            style={{ background: "#E5E7F2" }}
           >
-            <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
-              Why PropertyBulbul
-            </span>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
-              What makes us different from 99acres & NoBroker
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-2xl mx-auto mt-1">
-              We are the only platform built exclusively for Tricity — not a
-              national platform trying to cover 50 cities at once.
-            </p>
+            {[...liveServices, ...buildingServices].map((s) => (
+              <ServiceCell key={s.title} service={s} />
+            ))}
           </motion.div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            <WhyCard
-              icon={<FaShieldAlt />}
-              title="Verified Listings Only"
-              desc="Every listing confirmed active before going live. No fake posts. No expired listings still showing."
-            />
-            <WhyCard
-              icon={<FaSearch />}
-              title="AI-Powered Search"
-              desc="Natural language search that understands exactly what you want. No other Tricity portal has this."
-            />
-            <WhyCard
-              icon={<FaHeadset />}
-              title="Zero Spam Calls"
-              desc="You initiate contact. No agent calls you randomly. No midnight WhatsApp spam. You stay in control."
-            />
-            <WhyCard
-              icon={<FaChartLine />}
-              title="Tricity Data Only"
-              desc="100% focused on Chandigarh, Mohali, Panchkula, Zirakpur, Kharar. No irrelevant pan-India noise."
-            />
-            <WhyCard
-              icon={<FaClipboardCheck />}
-              title="No Hidden Charges"
-              desc="Transparent pricing always. Free to search. Free to list. Paid plans clearly shown at /pricing."
-            />
-            <WhyCard
-              icon={<FaFileAlt />}
-              title="PDF Brochure Generator"
-              desc="One-click professional brochures for agents. Unique to PropertyBulbul — no other portal offers this."
-            />
-            <WhyCard
-              icon={<FaUserTie />}
-              title="Local Founder"
-              desc="Built by a Panchkula software engineer who lives in Tricity. Not a Bangalore startup guessing your needs."
-            />
-            <WhyCard
-              icon={<FaCheckCircle />}
-              title="Direct WhatsApp Connect"
-              desc="Buyers WhatsApp agents or landlords directly from every listing. No forms, no delays, no middleman."
-            />
+      {/* DIFFERENTIATORS — same split layout as AboutPropertyBulbulToday */}
+      <section className="px-4 py-16 sm:py-20 md:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5 }}
+            >
+              <SectionTag label="Why PropertyBulbul" />
+              <h2
+                className="mb-6 text-2xl font-bold leading-[1.15] sm:text-3xl md:text-[38px]"
+                style={{ color: INK }}
+              >
+                Not a 50-city portal guessing at Tricity
+              </h2>
+              <div
+                className="max-w-[52ch] space-y-4 text-[15px] leading-relaxed sm:text-base"
+                style={{ color: INK_SOFT }}
+              >
+                <p>
+                  National platforms spread the same listing engine across fifty
+                  cities. We built one thing for six — Chandigarh, Mohali,
+                  Panchkula, Zirakpur, Kharar and New Chandigarh — and it shows
+                  in the search results and the pricing.
+                </p>
+                <p>
+                  Every listing is checked before it goes live, every search
+                  understands plain English, and every conversation starts on
+                  your terms, on WhatsApp.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl sm:grid-cols-2"
+              style={{ background: "#E5E7F2" }}
+            >
+              {differentiators.map((item) => (
+                <div key={item.title} className="bg-white p-6 sm:p-7">
+                  <div className="mb-4 flex items-center justify-between">
+                    <span
+                      className="flex h-11 w-11 items-center justify-center rounded-full"
+                      style={{ border: `1.5px solid ${BRAND}`, color: BRAND }}
+                    >
+                      <item.icon className="h-5 w-5" strokeWidth={1.8} />
+                    </span>
+                    <span
+                      className="rounded-full px-2.5 py-1 text-xs font-semibold"
+                      style={{ background: TINT_BG, color: BRAND }}
+                    >
+                      {item.tag}
+                    </span>
+                  </div>
+                  <h3
+                    className="mb-1.5 text-base font-semibold sm:text-lg"
+                    style={{ color: INK }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p
+                    className="text-[13px] leading-relaxed sm:text-sm"
+                    style={{ color: INK_SOFT }}
+                  >
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════
-          HOW IT WORKS
-      ══════════════════════════════════════ */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-8"
-        >
-          <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
-            Our Process
-          </span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
-            Find your property in 3 steps
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm max-w-xl mx-auto mt-1">
-            No complicated process. No lengthy forms. Just search, find,
-            connect.
-          </p>
-        </motion.div>
-
-        <div className="relative">
-          {/* Connecting line desktop */}
-          <div className="hidden lg:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-[#4161df]/40 via-[#4161df] to-[#4161df]/40" />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 relative">
-            <ProcessStep
-              step="01"
-              title="Search with AI"
-              desc="Type exactly what you want in plain English. Our AI understands your requirements and filters perfectly matched properties instantly."
-              delay={0}
-              icon={<FaSearch />}
-            />
-            <ProcessStep
-              step="02"
-              title="Browse Verified Listings"
-              desc="Every listing is verified as active with real photos and accurate pricing. Download PDF brochures for properties you like."
-              delay={0.15}
-              icon={<FaClipboardCheck />}
-            />
-            <ProcessStep
-              step="03"
-              title="Connect Directly"
-              desc="WhatsApp the agent or landlord directly from the listing. No forms, no waiting, no middleman, no spam calls to you."
-              delay={0.3}
-              icon={<FaWhatsapp />}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════
-          FAQ
-      ══════════════════════════════════════ */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-10 md:py-14">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-8"
-        >
-          <span className="text-[#4161df] font-semibold uppercase tracking-wider text-xs">
-            FAQ
-          </span>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">
-            Common questions
-          </h2>
-        </motion.div>
-        <FAQSection />
-      </section>
-
-      {/* ══════════════════════════════════════
-          CTA
-      ══════════════════════════════════════ */}
-      <section className="relative py-12 md:py-16 px-4 sm:px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0f1d40] to-[#4161df]" />
-        <div aria-hidden="true" className="absolute inset-0 opacity-20">
-          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-cyan-300 blur-3xl" />
-        </div>
-
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">
-              Ready to find your perfect property?
-            </h2>
-            <p className="text-blue-100 mt-2 text-xs sm:text-sm md:text-base max-w-2xl mx-auto">
-              200+ verified listings across Tricity. AI search that understands
-              exactly what you need. Zero spam. Zero brokerage for Pro Seeker
-              members.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-3 justify-center">
-              <Link
-                href="/properties?deal=Rent"
-                className="bg-white text-[#1a3270] px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
-              >
-                Browse Rentals — Free →
-              </Link>
-              <Link
-                href="/pricing"
-                className="border-2 border-white text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-xs sm:text-sm hover:bg-white/10 transition-all"
-              >
-                See Pricing Plans
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-export default ServicesPage;
-
-// ─────────────────────────────────────────────
-// ServiceCard
-// ─────────────────────────────────────────────
-const ServiceCard = ({
-  icon,
-  title,
-  desc,
-  badge,
-  badgeColor = "#4161df",
-  comingSoon = false,
-}: ServiceCardProps) => (
-  <motion.div
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    viewport={{ once: true }}
-    whileHover={{ y: comingSoon ? 0 : -4 }}
-    className={`group relative bg-white dark:bg-[#1a1f2e] rounded-xl p-4 sm:p-5 border border-gray-200/80 dark:border-gray-700 transition-all duration-300 overflow-hidden ${
-      comingSoon ? "opacity-70" : "hover:shadow-xl"
-    }`}
-  >
-    {/* Hover gradient */}
-    {!comingSoon && (
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity bg-gradient-to-br from-[#4161df] to-purple-600" />
-    )}
-
-    {/* Badge */}
-    {badge && (
-      <span
-        className="absolute top-3 right-3 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"
-        style={{ background: badgeColor }}
+      {/* HOW IT WORKS */}
+      <section
+        className="px-4 py-16 sm:py-20 md:py-24"
+        style={{ background: "#f8f9ff" }}
       >
-        {badge}
-      </span>
-    )}
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+            className="mb-12 max-w-xl"
+          >
+            <SectionTag label="Our process" />
+            <h2
+              className="text-2xl font-bold leading-[1.15] sm:text-3xl md:text-[38px]"
+              style={{ color: INK }}
+            >
+              Three steps, start to WhatsApp
+            </h2>
+          </motion.div>
 
-    {/* Icon */}
-    <div
-      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center text-white text-sm sm:text-base mb-3 shadow-md transition-transform duration-300 ${
-        comingSoon ? "" : "group-hover:scale-110"
-      }`}
-      style={{ background: comingSoon ? "#9ca3af" : "#4161df" }}
-    >
-      {icon}
-    </div>
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+            {[
+              {
+                icon: Search,
+                title: "Search in plain English",
+                desc: "Say what you want. The AI does the filtering.",
+              },
+              {
+                icon: ShieldCheck,
+                title: "Browse what's verified",
+                desc: "Real photos, honest pricing, downloadable brochures.",
+              },
+              {
+                icon: MessageCircle,
+                title: "Message the agent",
+                desc: "One tap into WhatsApp. No form, no callback queue.",
+              },
+            ].map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+              >
+                <span
+                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+                  style={{ border: `1.5px solid ${BRAND}`, color: BRAND }}
+                >
+                  <step.icon className="h-5 w-5" strokeWidth={1.8} />
+                </span>
+                <h3
+                  className="text-base font-semibold sm:text-lg"
+                  style={{ color: INK }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className="mt-1.5 text-[13px] leading-relaxed sm:text-sm"
+                  style={{ color: INK_SOFT }}
+                >
+                  {step.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1">
-      {title}
-    </h3>
-    <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">
-      {desc}
-    </p>
-  </motion.div>
-);
+      {/* FAQ */}
+      <section className="px-4 py-16 sm:py-20 md:py-24">
+        <div className="mx-auto max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+            className="mb-10"
+          >
+            <SectionTag label="FAQ" />
+            <h2
+              className="text-2xl font-bold leading-[1.15] sm:text-3xl md:text-[38px]"
+              style={{ color: INK }}
+            >
+              Common questions
+            </h2>
+          </motion.div>
+          <FAQList />
+        </div>
+      </section>
 
-// ─────────────────────────────────────────────
-// WhyCard
-// ─────────────────────────────────────────────
-const WhyCard = ({ icon, title, desc }: WhyCardProps) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4 }}
-    viewport={{ once: true }}
-    whileHover={{ y: -3 }}
-    className="bg-white dark:bg-[#1a1f2e] p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 dark:border-gray-700 group"
-  >
-    <div className="w-8 h-8 rounded-md bg-[#4161df]/10 dark:bg-[#4161df]/20 flex items-center justify-center text-[#4161df] text-xs mb-2 group-hover:bg-[#4161df] group-hover:text-white transition-all duration-300">
-      {icon}
-    </div>
-    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">
-      {title}
-    </h3>
-    <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed">
-      {desc}
-    </p>
-  </motion.div>
-);
+      {/* CTA — same gradient panel + dot pattern as GetStarted */}
+      <div className="px-4 pb-16 sm:pb-20 md:pb-24">
+        <div className="mx-auto max-w-6xl">
+          <div
+            className="relative overflow-hidden rounded-3xl px-6 py-10 shadow-xl sm:px-10 md:px-14 md:py-14"
+            style={{
+              background: `linear-gradient(135deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
+            }}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/10"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-[0.07]"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, #fff 1px, transparent 1px)",
+                backgroundSize: "20px 20px",
+              }}
+            />
 
-// ─────────────────────────────────────────────
-// ProcessStep
-// ─────────────────────────────────────────────
-const ProcessStep = ({ step, title, desc, delay, icon }: StepProps) => (
-  <motion.div
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay }}
-    viewport={{ once: true }}
-    className="bg-white dark:bg-[#1a1f2e] p-6 sm:p-8 rounded-xl text-center relative border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all group"
-  >
-    {/* Step number bubble */}
-    <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 bg-gradient-to-br from-[#4161df] to-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xs shadow-md">
-      {step}
-    </div>
-
-    <div className="mt-4 mb-3">
-      <div className="w-10 h-10 mx-auto rounded-full bg-[#4161df]/10 dark:bg-[#4161df]/20 flex items-center justify-center text-[#4161df] text-sm group-hover:bg-[#4161df] group-hover:text-white transition-all">
-        {icon}
+            <div className="relative flex flex-col items-center gap-5 text-center sm:gap-6">
+              <h2 className="max-w-xl text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl">
+                Ready to find your perfect property?
+              </h2>
+              <p className="max-w-md text-sm leading-relaxed text-white/85 sm:text-base">
+                Verified listings, AI search that understands what you need,
+                zero brokerage for Pro Seeker members.
+              </p>
+              <div className="mt-1 flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/properties?deal=Rent"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold shadow-lg transition-transform duration-200 hover:scale-[1.03] sm:px-7"
+                  style={{ color: INK }}
+                >
+                  Browse rentals
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center rounded-xl border border-white/40 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10 sm:px-7"
+                >
+                  See pricing plans
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  );
+}
 
-    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">
-      {title}
-    </h3>
-    <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">
-      {desc}
-    </p>
-  </motion.div>
-);
+// ─────────────────────────────────────────────
+// ServiceCell
+// ─────────────────────────────────────────────
+function ServiceCell({ service }: { service: Service }) {
+  const isLive = service.tag === "Live";
+  return (
+    <div className="bg-white p-6 sm:p-7">
+      <div className="mb-4 flex items-center justify-between">
+        <span
+          className="flex h-11 w-11 items-center justify-center rounded-full"
+          style={{
+            border: `1.5px solid ${isLive ? BRAND : "#C7CAD9"}`,
+            color: isLive ? BRAND : "#9096AC",
+          }}
+        >
+          {service.icon}
+        </span>
+        <span
+          className="rounded-full px-2.5 py-1 text-xs font-semibold"
+          style={{
+            background: isLive ? TINT_BG : "#F1F2F6",
+            color: isLive ? BRAND : "#8A8FA3",
+          }}
+        >
+          {service.tag}
+        </span>
+      </div>
+      <h3
+        className="mb-1.5 text-base font-semibold sm:text-lg"
+        style={{ color: INK }}
+      >
+        {service.title}
+      </h3>
+      <p
+        className="text-[13px] leading-relaxed sm:text-sm"
+        style={{ color: INK_SOFT }}
+      >
+        {service.desc}
+      </p>
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────
 // FAQ
 // ─────────────────────────────────────────────
-const FAQSection = () => {
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
-
-  const faqs = [
-    {
-      question: "Is PropertyBulbul free to use?",
-      answer:
-        "Searching and contacting agents is completely free forever. Agents can list up to 5 properties free. Pro plans start at ₹499/month for agents and ₹299/month for seekers wanting direct landlord access with zero brokerage. Full details at propertybulbul.com/pricing.",
-    },
-    {
-      question: "What types of properties are listed?",
-      answer:
-        "Rental flats and houses, properties for sale, plots and land, PG and co-living spaces, and commercial properties — all exclusively in Chandigarh, Mohali, Panchkula, Zirakpur, and Kharar.",
-    },
-    {
-      question: "Are listings verified?",
-      answer:
-        "Yes. Every listing is confirmed as active and genuine before going live. We verify the property is available and photos are real. No fake listings. No already-rented properties still showing.",
-    },
-    {
-      question: "How is this different from 99acres or NoBroker?",
-      answer:
-        "We are 100% Tricity-focused — every single listing is in Chandigarh, Mohali, Panchkula, Zirakpur, or Kharar. We have AI-powered natural language search, one-click PDF brochures, and zero spam calls. No other Tricity portal offers any of these features.",
-    },
-    {
-      question: "Can students avoid paying brokerage?",
-      answer:
-        "Yes. Pro Seeker members get exclusive access to owner-direct listings with zero brokerage. Students relocating to Tricity typically save ₹15,000–25,000 per move. At ₹299/month, Pro Seeker pays for itself the first time you find a flat directly from a landlord.",
-    },
-    {
-      question: "I'm an agent — how do I list my properties?",
-      answer:
-        "Click 'Add Property' in the navbar. Free plan allows up to 5 listings with PDF brochure generation and direct WhatsApp leads. Pro Agent at ₹499/month gives unlimited listings, featured placement, and lead analytics. No upfront payment required to start.",
-    },
-    {
-      question: "How fast can I find a property?",
-      answer:
-        "Our AI search returns results instantly. Most users find matching properties in under 2 minutes. For urgent relocations, use the 'Post Requirement' feature — we match you with the most relevant listings and notify matching agents immediately.",
-    },
-    {
-      question: "What areas do you cover?",
-      answer:
-        "Chandigarh (all sectors), Mohali (including Aerocity, IT Park area, all sectors), Panchkula (all sectors), Zirakpur (bypass area, Lohgarh, Patiala road), and Kharar (near Chandigarh University). All of Tricity, nothing outside it.",
-    },
-  ];
-
+function FAQList() {
+  const [open, setOpen] = useState<number | null>(null);
   return (
-    <div className="space-y-2 sm:space-y-3">
-      {faqs.map((faq, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.04 }}
-          viewport={{ once: true }}
-          className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-[#1a1f2e]"
-        >
+    <div
+      className="divide-y overflow-hidden rounded-2xl border"
+      style={{ borderColor: "#E5E7F2" }}
+    >
+      {faqs.map((item, i) => (
+        <div key={item.q} style={{ borderColor: "#E5E7F2" }}>
           <button
-            onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-            className={`w-full flex justify-between items-center p-3 sm:p-4 text-left transition-colors ${
-              activeIndex === index ? "bg-[#4161df]/5 dark:bg-[#4161df]/10" : ""
-            }`}
+            onClick={() => setOpen(open === i ? null : i)}
+            className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6"
           >
-            <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-white pr-3">
-              {faq.question}
-            </span>
-            <div
-              className={`flex-shrink-0 w-6 h-6 rounded-full bg-[#4161df]/10 dark:bg-[#4161df]/20 flex items-center justify-center transition-transform duration-300 ${
-                activeIndex === index ? "rotate-45" : ""
-              }`}
+            <span
+              className="text-sm font-semibold sm:text-base"
+              style={{ color: INK }}
             >
-              <svg
-                className="h-3 w-3 text-[#4161df]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </div>
+              {item.q}
+            </span>
+            <span
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm transition-transform duration-300"
+              style={{
+                background: TINT_BG,
+                color: BRAND,
+                transform: open === i ? "rotate(45deg)" : "none",
+              }}
+            >
+              +
+            </span>
           </button>
-
           <motion.div
             initial={false}
             animate={{
-              height: activeIndex === index ? "auto" : 0,
-              opacity: activeIndex === index ? 1 : 0,
+              height: open === i ? "auto" : 0,
+              opacity: open === i ? 1 : 0,
             }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
-              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">
-                {faq.answer}
-              </p>
-            </div>
+            <p
+              className="px-5 pb-4 text-[13px] leading-relaxed sm:px-6 sm:text-sm"
+              style={{ color: INK_SOFT }}
+            >
+              {item.a}
+            </p>
           </motion.div>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
-};
+}

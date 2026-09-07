@@ -1,40 +1,103 @@
 "use client";
-import React from "react";
+import React, { useState, FormEvent } from "react";
+import { ArrowRight, BellRing, ShieldCheck, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+const BRAND = "#4161df";
+const BRAND_DARK = "#2b3f9e";
 
 const GetStarted = () => {
+  const router = useRouter();
+  const [sector, setSector] = useState("");
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const params = new URLSearchParams({ intent: "sector-alert" });
+    if (sector.trim()) params.set("sector", sector.trim());
+    router.push(`/contact?${params.toString()}`);
+  };
+
   return (
-    <div
-      id="get-started"
-      className="py-8 sm:py-12 md:py-16 px-3 sm:px-4 md:px-6"
-    >
-      <div className="max-w-4xl mx-auto">
+    <div id="get-started" className="py-8 sm:py-12 md:py-16 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
         <div
-          className="
-            flex flex-col items-center justify-center text-center gap-4 sm:gap-5 md:gap-6
-            bg-[#4161df] p-5 sm:p-6 md:p-8 rounded-xl border-4 sm:border-6 md:border-8 border-[#5d77d6]
-          "
+          className="relative overflow-hidden rounded-3xl px-6 py-8 sm:px-10 sm:py-10 md:px-14 md:py-12 shadow-xl"
+          style={{
+            background: `linear-gradient(135deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
+          }}
         >
-          <span className="text-white font-semibold text-lg sm:text-xl md:text-2xl">
-            Get started with PropertyBulbul
-          </span>
+          {/* Decorative accents */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/10"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-20 -left-10 w-48 h-48 rounded-full bg-white/10"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, #fff 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
+            }}
+          />
 
-          <span className="text-white text-sm sm:text-base leading-relaxed">
-            Get notified when new properties go live in your
-            <br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>
-            preferred sector.
-          </span>
+          <div className="relative flex flex-col items-center text-center gap-5 sm:gap-6">
+            <h2 className="text-white font-bold text-2xl sm:text-3xl md:text-4xl leading-tight max-w-xl">
+              Never miss the right property
+            </h2>
 
-          <a
-            href="/contact"
-            className="
-              bg-[#1e3a8a] border-2 border-white shadow-lg
-              rounded-xl text-white font-semibold px-5 sm:px-6 py-2 sm:py-2.5 md:py-3 hover:opacity-80
-              text-sm sm:text-base
-            "
-          >
-            Get Started
-          </a>
+            <p className="text-white/85 text-sm sm:text-base leading-relaxed max-w-md">
+              Tell us your preferred sector and we'll alert you the moment new,
+              verified listings go live there — before they're gone.
+            </p>
+
+            {/* Inline sector-alert form — makes the promise above something you can actually act on right here */}
+            <form
+              onSubmit={handleSubmit}
+              className="w-full max-w-md flex flex-col sm:flex-row items-stretch gap-2.5 sm:gap-2 mt-1"
+            >
+              <label htmlFor="sector-alert-input" className="sr-only">
+                Preferred sector or locality
+              </label>
+              <input
+                id="sector-alert-input"
+                type="text"
+                value={sector}
+                onChange={(e) => setSector(e.target.value)}
+                placeholder="e.g. Sector 22, Mohali"
+                className="flex-1 min-w-0 rounded-xl px-4 py-3 text-sm sm:text-base text-[#161A2E] placeholder:text-slate-400 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-white/70"
+              />
+              <button
+                type="submit"
+                className="group inline-flex items-center justify-center gap-2 bg-[#161A2E] text-white font-semibold px-5 sm:px-6 py-3 rounded-xl shadow-lg transition-transform duration-200 hover:scale-[1.03] text-sm sm:text-base whitespace-nowrap"
+              >
+                Notify me
+                <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </button>
+            </form>
+
+            <a
+              href="/properties"
+              className="text-white/80 text-xs sm:text-sm font-medium underline underline-offset-4 hover:text-white transition-colors"
+            >
+              Or just browse all listings
+            </a>
+
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-2 text-white/75 text-xs sm:text-[13px]">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                Verified listings only
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <BellRing className="w-3.5 h-3.5" />
+                Alerts you can turn off anytime
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,9 +1,9 @@
 export { default as AboutHero } from "./AboutHero";
 export { default as AboutStory } from "./AboutStory";
+export { default as AboutOurValues } from "./AboutOurValues";
 export { default as AboutMission } from "./AboutMission";
 export { default as AboutDifferentiators } from "./AboutDifferentiators";
 export { default as AboutVision } from "./AboutVision";
 export { default as AboutWhoWeHelp } from "./AboutWhoWeHelp";
 export { default as AboutPropertyBulbulToday } from "./AboutPropertyBulbulToday";
 export { default as AboutCTA } from "./AboutCTA";
-export { default as AboutOurValues } from "./AboutOurValues";
