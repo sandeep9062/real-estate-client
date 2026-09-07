@@ -13,6 +13,12 @@ import Facilities from "./Facilities";
 import useCountries from "../lib/useCountries";
 import MagicFill from "./MagicFill";
 
+// Single source of truth for step count — every step below must be counted here.
+// If you add/remove a Stepper.Step, update this number (or better: derive it,
+// see note at bottom of file).
+const TOTAL_STEPS = 6; // MagicFill, Images, Location, Basics, PricingDetails, Facilities
+const LAST_STEP_INDEX = TOTAL_STEPS - 1;
+
 const AddPropertyModal = ({
   opened,
   setOpened,
@@ -162,7 +168,13 @@ const AddPropertyModal = ({
     }
   }, [editingProperty, user?.email, countries]);
 
-  const nextStep = () => setActive((c) => Math.min(c + 1, 4));
+  // FIX: previously hardcoded `Math.min(c + 1, 4)`, which capped the stepper
+  // at index 4 (PricingDetails) even though there are 6 steps (0–5). That meant
+  // clicking "Next step" from PricingDetails could never advance to Facilities —
+  // the step that actually contains the submit button — so no one could complete
+  // the flow via the Next button. Now derived from LAST_STEP_INDEX so it can't
+  // silently break again if a step is added/removed.
+  const nextStep = () => setActive((c) => Math.min(c + 1, LAST_STEP_INDEX));
   const prevStep = () => setActive((c) => Math.max(c - 1, 0));
 
   return (
@@ -267,3 +279,13 @@ const AddPropertyModal = ({
 };
 
 export default AddPropertyModal;
+
+/**
+ * NOTE for future maintenance:
+ * TOTAL_STEPS is currently a manually maintained constant. If you add, remove,
+ * or reorder <Stepper.Step> entries above, you MUST update TOTAL_STEPS to match,
+ * or this bug can silently reappear. A more robust long-term fix is to render
+ * the steps from a config array (e.g. `const STEPS = [...]` mapped into both
+ * TOTAL_STEPS and the JSX below) so the count can never drift from reality —
+ * worth doing if this file keeps changing.
+ */
