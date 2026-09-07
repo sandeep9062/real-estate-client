@@ -44,7 +44,7 @@ const Header: React.FC = () => {
 
   const handleAddPropertyClick = () => {
     if (isAuthenticated) {
-      setModalOpened(true);
+      router.push("/add-property");
     } else {
       router.push("/login");
     }
@@ -137,10 +137,10 @@ const Header: React.FC = () => {
               >
                 Add Property
               </button>
-              <AddPropertyModal
+              {/* <AddPropertyModal
                 opened={modalOpened}
                 setOpened={setModalOpened}
-              />
+              /> */}
 
               <button
                 onClick={() => router.push("/post-requirement")}

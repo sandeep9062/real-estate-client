@@ -75,6 +75,38 @@ export const supportsAmenities = supportsFurnishing;
 export const supportsFacing = (category: string): boolean =>
   category !== "PG/Hostel";
 
+/**
+ * Categories with bedrooms/bathrooms/servant rooms/balconies as meaningful,
+ * listable attributes. Bare land and pure industrial/warehouse space don't
+ * have "bedrooms" in any meaningful sense, so they're excluded.
+ * `type` is accepted for future-proofing (e.g. if an Industrial category is
+ * ever reused under a context where room counts matter) but isn't needed by
+ * the current logic — category alone is sufficient today.
+ */
+const ROOM_COUNTS_APPLICABLE: PropertyCategory[] = [
+  "Apartment/Flat",
+  "House/Villa",
+  "Studio Apartment",
+  "Builder Floor",
+  "PG/Hostel",
+  "Farmhouse",
+  "Office",
+  "Retail",
+  "Shop/Showroom",
+];
+export const supportsRoomCounts = (_type: string, category: string): boolean =>
+  ROOM_COUNTS_APPLICABLE.includes(category as PropertyCategory);
+
+/**
+ * Categories where on-site parking is a meaningful, listable attribute.
+ * Bare land has nothing to park in/under, so it's excluded; everything else
+ * (including industrial/warehouse, which very much cares about parking/truck
+ * access) keeps it.
+ */
+const PARKING_NOT_APPLICABLE: PropertyCategory[] = ["Land/Plot"];
+export const supportsParking = (category: string): boolean =>
+  !PARKING_NOT_APPLICABLE.includes(category as PropertyCategory);
+
 // ── Property form option lists ──────────────────────────────────────────────
 
 export const LISTING_OPTS = [
@@ -104,4 +136,3 @@ export const OC_OPTIONS = [
   { value: "Not issued", label: "Not issued yet" },
   { value: "NA", label: "Not applicable" },
 ];
-
