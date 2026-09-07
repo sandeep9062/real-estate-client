@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { ForwardRefExoticComponent, RefAttributes } from "react";
 import {
   Mail,
   Phone,
@@ -9,6 +9,7 @@ import {
   FileText,
   MessageSquare,
   Send,
+  LucideProps,
 } from "lucide-react";
 import { useAddContactMutation } from "@/services/contactApi";
 import PhoneInput from "react-phone-number-input";
@@ -31,7 +32,12 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 // Replace with real PropertyBulbul contact details
-const CONTACT_DETAILS = [
+const CONTACT_DETAILS: {
+  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+  label: string;
+  value: string;
+  href?: string;
+}[] = [
   // {
   //   icon: Phone,
   //   label: "Call us",
