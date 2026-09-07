@@ -31,7 +31,7 @@ const solutions = [
   "Recommendations personalized to your needs",
 ];
 
-function ListPanel({ tone, label, icon, items }) {
+function ListPanel({ tone, label, icon, items }: { tone: string; label: string; icon: React.ReactNode; items: string[] }) {
   const isProblem = tone === "problem";
   const accent = isProblem ? PROBLEM : SOLUTION;
   const bg = isProblem ? PROBLEM_BG : SOLUTION_BG;
@@ -57,7 +57,7 @@ function ListPanel({ tone, label, icon, items }) {
         </h3>
       </div>
       <ul className="space-y-2.5">
-        {items.map((item) => (
+        {items.map((item: string) => (
           <li
             key={item}
             className="flex items-start gap-2.5 text-[13px] sm:text-sm leading-relaxed"
