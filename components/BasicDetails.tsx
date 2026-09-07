@@ -1,26 +1,35 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Box, Button, Group, Stepper } from "@mantine/core";
+import React, { useEffect } from "react";
+import {
+  Box,
+  Button,
+  Group,
+  MultiSelect,
+  NumberInput,
+  Select,
+  TextInput,
+  Textarea,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { validateString } from "@/lib/utils";
 import { slugify } from "@/lib/slugify";
 import {
+  PROPERTY_TYPES,
   getCategoriesForType,
   isLandCategory,
   supportsFurnishing,
   supportsAmenities,
   supportsFacing,
+  AMENITIES_OPTIONS,
 } from "@/lib/propertyOptions";
-import BasicInfoFields from "@/components/basic-details/BasicInfoFields";
-import PricingFields from "@/components/basic-details/PricingFields";
-import type { FieldVisibility } from "@/components/basic-details/types";
 
-function splitLines(s: string) {
-  return s
-    .split(/\n|,/)
-    .map((x) => x.trim())
-    .filter(Boolean);
+/** Wizard step 1 — property identity, deal/type/category, area & features. */
+interface BasicDetailsProps {
+  prevStep: () => void;
+  nextStep: () => void;
+  propertyDetails: any;
+  setPropertyDetails: React.Dispatch<React.SetStateAction<any>>;
 }
 
 function toOptNum(v: unknown): number | undefined {
@@ -29,32 +38,11 @@ function toOptNum(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
-const SUB_STEPS = [
-  { label: "Property details", description: "Type, category, area & features" },
-  { label: "Pricing & extras", description: "Terms, trust & nearby" },
-];
-
-/** Fields that must be valid before leaving each sub-step. */
-const REQUIRED_BY_SUB_STEP: string[][] = [
-  ["title", "description", "price", "areaValue"],
-  [],
-];
-
-interface BasicDetailsProps {
-  prevStep: () => void;
-  nextStep: () => void;
-  propertyDetails: any;
-  setPropertyDetails: React.Dispatch<React.SetStateAction<any>>;
-}
-
 const BasicDetails: React.FC<BasicDetailsProps> = ({
-  prevStep,
   nextStep,
   propertyDetails,
   setPropertyDetails,
 }) => {
-  const [subStep, setSubStep] = useState(0);
-
   const form = useForm({
     initialValues: {
       title: propertyDetails.title,
@@ -72,23 +60,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
       postedBy: propertyDetails.postedBy,
       commercialPropertyTypes: propertyDetails.commercialPropertyTypes,
       investmentOptions: propertyDetails.investmentOptions,
-      listingAvailability: propertyDetails.listingAvailability || "Available",
-      virtualTourUrl: propertyDetails.virtualTourUrl || "",
-      schoolsText: (propertyDetails.nearbyPlaces?.schools || []).join("\n"),
-      metroStationsText: (
-        propertyDetails.nearbyPlaces?.metroStations || []
-      ).join("\n"),
-      hospitalsText: (propertyDetails.nearbyPlaces?.hospitals || []).join("\n"),
-      mallsText: (propertyDetails.nearbyPlaces?.malls || []).join("\n"),
-      reraNumber: propertyDetails.reraNumber || "",
-      maintenanceCharge: propertyDetails.maintenanceCharge ?? "",
-      securityDeposit: propertyDetails.securityDeposit ?? "",
-      lockInMonths: propertyDetails.lockInMonths ?? "",
-      noticePeriodDays: propertyDetails.noticePeriodDays ?? "",
-      ocStatus: propertyDetails.ocStatus || "",
       ageOfProperty: propertyDetails.ageOfProperty ?? "",
-      pricePerSqft: propertyDetails.pricePerSqft ?? "",
-      negotiable: propertyDetails.negotiable !== false,
       amenities: propertyDetails.amenities || [],
     },
     validate: {
@@ -143,47 +115,22 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
     postedBy,
     commercialPropertyTypes,
     investmentOptions,
-    listingAvailability,
-    virtualTourUrl,
-    schoolsText,
-    metroStationsText,
-    hospitalsText,
-    mallsText,
-    reraNumber,
-    maintenanceCharge,
-    securityDeposit,
-    lockInMonths,
-    noticePeriodDays,
-    ocStatus,
     ageOfProperty,
-    pricePerSqft,
-    negotiable,
     amenities,
   } = form.values;
 
   // ── Field visibility, driven by deal / type / propertyCategory ────────────
-  const visibility: FieldVisibility = {
-    categoryOptions: getCategoriesForType(type),
-    isLand: isLandCategory(propertyCategory),
-    showCommercialExtras: type === "Commercial",
-    showFurnishing: supportsFurnishing(propertyCategory),
-    showFacing: supportsFacing(propertyCategory),
-    showAmenities: supportsAmenities(propertyCategory),
-    showAgeOfProperty: !isLandCategory(propertyCategory),
-    showRentTerms: deal === "Rent",
-    showSalePricePerSqft: deal === "Sale",
-    showOCStatus: deal === "Sale" && !isLandCategory(propertyCategory),
-  };
+  const categoryOptions = getCategoriesForType(type);
+  const isLand = isLandCategory(propertyCategory);
+  const showCommercialExtras = type === "Commercial";
+  const showFurnishing = supportsFurnishing(propertyCategory);
+  const showFacing = supportsFacing(propertyCategory);
+  const showAmenities = supportsAmenities(propertyCategory);
+  const showAgeOfProperty = !isLand;
 
   const handleSubmit = () => {
     const { hasErrors } = form.validate();
     if (!hasErrors) {
-      const nearbyPlaces = {
-        schools: splitLines(schoolsText),
-        metroStations: splitLines(metroStationsText),
-        hospitals: splitLines(hospitalsText),
-        malls: splitLines(mallsText),
-      };
       setPropertyDetails((prev: any) => ({
         ...prev,
         title,
@@ -196,71 +143,19 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         area: { value: areaValue, unit: areaUnit },
         availability,
         // Hidden fields are cleared so stale values are never submitted
-        furnishing: visibility.showFurnishing ? furnishing : undefined,
-        facing: visibility.showFacing ? facing : undefined,
+        furnishing: showFurnishing ? furnishing : undefined,
+        facing: showFacing ? facing : undefined,
         postedBy,
-        commercialPropertyTypes: visibility.showCommercialExtras
+        commercialPropertyTypes: showCommercialExtras
           ? commercialPropertyTypes
           : [],
-        investmentOptions: visibility.showCommercialExtras
-          ? investmentOptions
-          : [],
-        listingAvailability,
-        virtualTourUrl: virtualTourUrl?.trim() || "",
-        nearbyPlaces,
-        reraNumber: reraNumber?.trim() || "",
-        maintenanceCharge: visibility.showRentTerms
-          ? toOptNum(maintenanceCharge)
-          : undefined,
-        securityDeposit: visibility.showRentTerms
-          ? toOptNum(securityDeposit)
-          : undefined,
-        lockInMonths: visibility.showRentTerms
-          ? toOptNum(lockInMonths)
-          : undefined,
-        noticePeriodDays: visibility.showRentTerms
-          ? toOptNum(noticePeriodDays)
-          : undefined,
-        ocStatus: visibility.showOCStatus ? ocStatus || undefined : undefined,
-        ageOfProperty: visibility.showAgeOfProperty
-          ? toOptNum(ageOfProperty)
-          : undefined,
-        pricePerSqft: visibility.showSalePricePerSqft
-          ? toOptNum(pricePerSqft)
-          : undefined,
-        negotiable,
-        amenities:
-          visibility.showAmenities && Array.isArray(amenities) ? amenities : [],
+        investmentOptions: showCommercialExtras ? investmentOptions : [],
+        ageOfProperty: showAgeOfProperty ? toOptNum(ageOfProperty) : undefined,
+        amenities: showAmenities && Array.isArray(amenities) ? amenities : [],
       }));
       nextStep();
     }
   };
-
-  /** Validate only the fields relevant to the current sub-step. */
-  const validateSubStep = (step: number): boolean => {
-    let ok = true;
-    (REQUIRED_BY_SUB_STEP[step] || []).forEach((field) => {
-      const result = form.validateField(field);
-      if (result.hasError) ok = false;
-    });
-    return ok;
-  };
-
-  const goNext = () => {
-    if (!validateSubStep(subStep)) return;
-    if (subStep === SUB_STEPS.length - 1) {
-      handleSubmit();
-    } else {
-      setSubStep(subStep + 1);
-    }
-  };
-
-  const goBack = () => {
-    if (subStep === 0) prevStep();
-    else setSubStep(subStep - 1);
-  };
-
-  const isLastSubStep = subStep === SUB_STEPS.length - 1;
 
   return (
     <Box maw="100%" mx="auto" my="md">
@@ -268,43 +163,189 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         className="flex flex-col gap-6 mt-8"
         onSubmit={(e) => {
           e.preventDefault();
-          goNext();
+          handleSubmit();
         }}
       >
-        <Stepper
-          active={subStep}
-          size="sm"
-          iconSize={32}
-          allowNextStepsSelect={false}
-          onStepClick={(idx) => setSubStep(idx)}
-        >
-          {SUB_STEPS.map((step) => (
-            <Stepper.Step
-              key={step.label}
-              label={step.label}
-              description={step.description}
-            />
-          ))}
-        </Stepper>
+        <TextInput
+          withAsterisk
+          label="Title"
+          placeholder="Property Name"
+          {...form.getInputProps("title")}
+          classNames={{ input: "border-gray-300" }}
+        />
 
-        {subStep === 0 && (
-          <BasicInfoFields form={form} visibility={visibility} />
+        <TextInput
+          label="Slug"
+          description="Auto-generated from title. Used in the property URL."
+          placeholder="auto-generated-slug"
+          {...form.getInputProps("slug")}
+          classNames={{ input: "border-gray-300 bg-gray-50" }}
+          readOnly
+        />
+
+        <Textarea
+          placeholder="Description"
+          label="Description"
+          withAsterisk
+          {...form.getInputProps("description")}
+          autosize
+          minRows={3}
+          classNames={{ input: "border-gray-300" }}
+        />
+
+        <Group grow>
+          <NumberInput
+            withAsterisk
+            label="Price"
+            placeholder="e.g. 25000"
+            min={0}
+            {...form.getInputProps("price")}
+            classNames={{ input: "border-gray-300" }}
+          />
+          <Select
+            label="Deal"
+            data={["Rent", "Sale"]}
+            {...form.getInputProps("deal")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        </Group>
+
+        <Select
+          label="Type"
+          data={PROPERTY_TYPES}
+          description="Drives which property categories and fields are shown."
+          {...form.getInputProps("type")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        {showCommercialExtras && (
+          <>
+            <MultiSelect
+              label="Commercial Property Types"
+              data={[
+                "Office",
+                "Retail",
+                "Industrial",
+                "Warehouse",
+                "Hospitality",
+                "Land",
+              ]}
+              {...form.getInputProps("commercialPropertyTypes")}
+              classNames={{ input: "border-gray-300" }}
+              styles={{ dropdown: { zIndex: 1300 } }}
+            />
+            <MultiSelect
+              label="Investment Options"
+              data={[
+                "Fractional Ownership",
+                "REIT",
+                "Direct Purchase",
+                "Leasehold",
+              ]}
+              {...form.getInputProps("investmentOptions")}
+              classNames={{ input: "border-gray-300" }}
+              styles={{ dropdown: { zIndex: 1300 } }}
+            />
+          </>
         )}
-        {subStep === 1 && (
-          <PricingFields
-            form={form}
-            visibility={visibility}
-            propertyDetails={propertyDetails}
-            setPropertyDetails={setPropertyDetails}
+
+        <Select
+          label="Property Category"
+          description={`Options shown for ${type} properties.`}
+          data={categoryOptions}
+          {...form.getInputProps("propertyCategory")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        <Group grow>
+          <NumberInput
+            label="Area"
+            min={0}
+            {...form.getInputProps("areaValue")}
+            classNames={{ input: "border-gray-300" }}
+          />
+          <Select
+            label="Unit"
+            data={["sqft", "sqyard", "sqm", "marla", "kanal", "acre"]}
+            {...form.getInputProps("areaUnit")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        </Group>
+
+        <Select
+          label="Availability"
+          data={["Ready to Move", "Under Construction"]}
+          {...form.getInputProps("availability")}
+          classNames={{ input: "border-gray-300" }}
+          styles={{ dropdown: { zIndex: 1300 } }}
+        />
+
+        {showFurnishing && (
+          <Select
+            label="Furnishing"
+            data={["Furnished", "Semi Furnished", "Un-Furnished"]}
+            {...form.getInputProps("furnishing")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
+
+        {showFacing && (
+          <Select
+            label="Facing"
+            data={[
+              "North",
+              "South",
+              "East",
+              "West",
+              "North-East",
+              "North-West",
+              "South-East",
+              "South-West",
+            ]}
+            {...form.getInputProps("facing")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
+
+        <Group grow>
+          <Select
+            label="Posted By"
+            data={["Owner", "Agent", "Builder"]}
+            {...form.getInputProps("postedBy")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+          {showAgeOfProperty && (
+            <NumberInput
+              label="Age of property (years)"
+              description="Optional — N/A for land/plots"
+              min={0}
+              {...form.getInputProps("ageOfProperty")}
+              classNames={{ input: "border-gray-300" }}
+            />
+          )}
+        </Group>
+
+        {showAmenities && (
+          <MultiSelect
+            label="Amenities"
+            description="Select all that apply."
+            data={AMENITIES_OPTIONS}
+            {...form.getInputProps("amenities")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
           />
         )}
 
         <Group justify="center" mt="xl">
-          <Button variant="default" type="button" onClick={goBack}>
-            Back
-          </Button>
           <Button type="submit" color="blue">
-            {isLastSubStep ? "Next step" : "Continue"}
+            Next step
           </Button>
         </Group>
       </form>
@@ -312,5 +353,5 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
   );
 };
 
-export default BasicDetails;
 
+export default BasicDetails;

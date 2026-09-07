@@ -8,6 +8,7 @@ import { selectUser } from "../store/authSlice";
 import AddLocation from "./AddLocation";
 import UploadImage from "./UploadImage";
 import BasicDetails from "./BasicDetails";
+import PricingDetails from "./PricingDetails";
 import Facilities from "./Facilities";
 import useCountries from "../lib/useCountries";
 import MagicFill from "./MagicFill";
@@ -217,6 +218,15 @@ const AddPropertyModal = ({
                   ? String(editingProperty._id)
                   : "new-property"
               }
+              prevStep={prevStep}
+              nextStep={nextStep}
+              propertyDetails={propertyDetails}
+              setPropertyDetails={setPropertyDetails}
+            />
+          </Stepper.Step>
+
+          <Stepper.Step label="Pricing & extras">
+            <PricingDetails
               prevStep={prevStep}
               nextStep={nextStep}
               propertyDetails={propertyDetails}
