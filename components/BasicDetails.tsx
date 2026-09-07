@@ -17,6 +17,14 @@ import {
 import { useForm } from "@mantine/form";
 import { validateString } from "@/lib/utils";
 import { slugify } from "@/lib/slugify";
+import {
+  PROPERTY_TYPES,
+  getCategoriesForType,
+  isLandCategory,
+  supportsFurnishing,
+  supportsAmenities,
+  supportsFacing,
+} from "@/lib/propertyOptions";
 import FloorPlanUploadSection from "@/components/FloorPlanUploadSection";
 
 function splitLines(s: string) {
@@ -32,6 +40,7 @@ function toOptNum(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+/** Mirrors the `type` enum in backend/models/Property.js */
 const LISTING_OPTS = [
   { value: "Available", label: "Available — open enquiries" },
   { value: "Fresh", label: "Fresh listing" },
@@ -132,6 +141,15 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
     }
   }, [form.values.title]);
 
+  // Keep Property Category valid whenever the selected Type changes
+  useEffect(() => {
+    const categories = getCategoriesForType(form.values.type);
+    if (!form.values.propertyCategory || !categories.includes(form.values.propertyCategory)) {
+      form.setFieldValue("propertyCategory", categories[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.values.type]);
+
   const {
     title,
     slug,
@@ -166,6 +184,18 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
     amenities,
   } = form.values;
 
+  // ── Field visibility, driven by deal / type / propertyCategory ────────────
+  const categoryOptions = getCategoriesForType(type);
+  const isLand = isLandCategory(propertyCategory);
+  const showCommercialExtras = type === "Commercial";
+  const showFurnishing = supportsFurnishing(propertyCategory);
+  const showFacing = supportsFacing(propertyCategory);
+  const showAmenities = supportsAmenities(propertyCategory);
+  const showAgeOfProperty = !isLand;
+  const showRentTerms = deal === "Rent";
+  const showSalePricePerSqft = deal === "Sale";
+  const showOCStatus = deal === "Sale" && !isLand;
+
   const handleSubmit = () => {
     const { hasErrors } = form.validate();
     if (!hasErrors) {
@@ -186,24 +216,28 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         propertyCategory,
         area: { value: areaValue, unit: areaUnit },
         availability,
-        furnishing,
-        facing,
+        // Hidden fields are cleared so stale values are never submitted
+        furnishing: showFurnishing ? furnishing : undefined,
+        facing: showFacing ? facing : undefined,
         postedBy,
-        commercialPropertyTypes,
-        investmentOptions,
+        commercialPropertyTypes: showCommercialExtras
+          ? commercialPropertyTypes
+          : [],
+        investmentOptions: showCommercialExtras ? investmentOptions : [],
         listingAvailability,
         virtualTourUrl: virtualTourUrl?.trim() || "",
         nearbyPlaces,
         reraNumber: reraNumber?.trim() || "",
-        maintenanceCharge: toOptNum(maintenanceCharge),
-        securityDeposit: toOptNum(securityDeposit),
-        lockInMonths: toOptNum(lockInMonths),
-        noticePeriodDays: toOptNum(noticePeriodDays),
-        ocStatus: ocStatus || undefined,
-        ageOfProperty: toOptNum(ageOfProperty),
-        pricePerSqft: toOptNum(pricePerSqft),
+        maintenanceCharge: showRentTerms ? toOptNum(maintenanceCharge) : undefined,
+        securityDeposit: showRentTerms ? toOptNum(securityDeposit) : undefined,
+        lockInMonths: showRentTerms ? toOptNum(lockInMonths) : undefined,
+        noticePeriodDays: showRentTerms ? toOptNum(noticePeriodDays) : undefined,
+        ocStatus: showOCStatus ? ocStatus || undefined : undefined,
+        ageOfProperty: showAgeOfProperty ? toOptNum(ageOfProperty) : undefined,
+        pricePerSqft: showSalePricePerSqft ? toOptNum(pricePerSqft) : undefined,
         negotiable,
-        amenities: Array.isArray(amenities) ? amenities : [],
+        amenities:
+          showAmenities && Array.isArray(amenities) ? amenities : [],
       }));
       nextStep();
     }
@@ -264,13 +298,14 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
 
         <Select
           label="Type"
-          data={["Residential", "Commercial"]}
+          data={PROPERTY_TYPES}
+          description="Drives which property categories and fields are shown below."
           {...form.getInputProps("type")}
           classNames={{ input: "border-gray-300" }}
           styles={{ dropdown: { zIndex: 1300 } }}
         />
 
-        {form.values.type === "Commercial" && (
+        {showCommercialExtras && (
           <>
             <MultiSelect
               label="Commercial Property Types"
@@ -303,20 +338,8 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
 
         <Select
           label="Property Category"
-          data={[
-            "Apartment/Flat",
-            "House/Villa",
-            "Land/Plot",
-            "Studio Apartment",
-            "Builder Floor",
-            "PG/Hostel",
-            "Farmhouse",
-            "Retail",
-            "Office",
-            "Industrial",
-            "Warehouse",
-            "Shop/Showroom",
-          ]}
+          description={`Options shown for ${type} properties.`}
+          data={categoryOptions}
           {...form.getInputProps("propertyCategory")}
           classNames={{ input: "border-gray-300" }}
           styles={{ dropdown: { zIndex: 1300 } }}
@@ -346,30 +369,34 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
           styles={{ dropdown: { zIndex: 1300 } }}
         />
 
-        <Select
-          label="Furnishing"
-          data={["Furnished", "Semi Furnished", "Un-Furnished"]}
-          {...form.getInputProps("furnishing")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
+        {showFurnishing && (
+          <Select
+            label="Furnishing"
+            data={["Furnished", "Semi Furnished", "Un-Furnished"]}
+            {...form.getInputProps("furnishing")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
 
-        <Select
-          label="Facing"
-          data={[
-            "North",
-            "South",
-            "East",
-            "West",
-            "North-East",
-            "North-West",
-            "South-East",
-            "South-West",
-          ]}
-          {...form.getInputProps("facing")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
+        {showFacing && (
+          <Select
+            label="Facing"
+            data={[
+              "North",
+              "South",
+              "East",
+              "West",
+              "North-East",
+              "North-West",
+              "South-East",
+              "South-West",
+            ]}
+            {...form.getInputProps("facing")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
 
         <Select
           label="Posted By"
@@ -387,7 +414,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
             : "Price is total asking amount (₹)."}
         </Text>
 
-        {deal === "Rent" && (
+        {showRentTerms && (
           <>
             <NumberInput
               label="Monthly maintenance (₹)"
@@ -421,47 +448,52 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
           </>
         )}
 
-        {deal === "Sale" && (
-          <>
-            <NumberInput
-              label="Price per sqft (₹)"
-              description="Optional — helps buyers compare."
-              min={0}
-              {...form.getInputProps("pricePerSqft")}
-              classNames={{ input: "border-gray-300" }}
-            />
-            <Select
-              label="Occupancy certificate (OC)"
-              description="Helps buyers assess legal readiness."
-              data={OC_OPTIONS}
-              {...form.getInputProps("ocStatus")}
-              classNames={{ input: "border-gray-300" }}
-              styles={{ dropdown: { zIndex: 1300 } }}
-            />
-          </>
+        {showSalePricePerSqft && (
+          <NumberInput
+            label="Price per sqft (₹)"
+            description="Optional — helps buyers compare."
+            min={0}
+            {...form.getInputProps("pricePerSqft")}
+            classNames={{ input: "border-gray-300" }}
+          />
         )}
 
-        <NumberInput
-          label="Age of property (years)"
-          description="Optional"
-          min={0}
-          {...form.getInputProps("ageOfProperty")}
-          classNames={{ input: "border-gray-300" }}
-        />
+        {showOCStatus && (
+          <Select
+            label="Occupancy certificate (OC)"
+            description="Helps buyers assess legal readiness."
+            data={OC_OPTIONS}
+            {...form.getInputProps("ocStatus")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
+
+        {showAgeOfProperty && (
+          <NumberInput
+            label="Age of property (years)"
+            description="Optional — not applicable for land/plot listings."
+            min={0}
+            {...form.getInputProps("ageOfProperty")}
+            classNames={{ input: "border-gray-300" }}
+          />
+        )}
 
         <Checkbox
           label="Price is negotiable"
           {...form.getInputProps("negotiable", { type: "checkbox" })}
         />
 
-        <MultiSelect
-          label="Amenities"
-          description="Select all that apply."
-          data={AMENITIES_OPTIONS}
-          {...form.getInputProps("amenities")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
+        {showAmenities && (
+          <MultiSelect
+            label="Amenities"
+            description="Select all that apply."
+            data={AMENITIES_OPTIONS}
+            {...form.getInputProps("amenities")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
 
         <Divider
           label="Trust & rich listing (optional)"
