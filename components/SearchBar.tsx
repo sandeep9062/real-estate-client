@@ -261,30 +261,50 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
     };
   }, [value, onSearch]);
 
+  // Mobile "Search" key on the virtual keyboard should search immediately
+  // instead of waiting on the debounce timer.
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      onSearch(parseSearchQuery(value));
+      // Blur so the mobile keyboard dismisses after search
+      (document.activeElement as HTMLElement | null)?.blur();
+    },
+    [value, onSearch],
+  );
+
   return (
-    <div className="flex w-full items-center justify-center px-2 sm:px-0">
-      <div className="flex w-full max-w-2xl py-2 sm:py-3 md:py-4 items-center gap-2 sm:gap-3 rounded-full border border-border bg-white/70 p-2 sm:p-3 md:p-4 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200 transition-all duration-200">
-        <HiLocationMarker className="text-[#4161df] w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 flex-shrink-0" />
+    <form
+      onSubmit={handleSubmit}
+      className="flex w-full items-center justify-center px-2 sm:px-0"
+    >
+      <div className="flex w-full max-w-2xl items-center gap-1.5 xs:gap-2 sm:gap-3 rounded-full border border-border bg-white/70 px-3 py-2 xs:px-3.5 xs:py-2.5 sm:px-4 sm:py-3 md:px-5 md:py-4 shadow-sm backdrop-blur-sm ring-1 ring-transparent focus-within:ring-blue-200 transition-all duration-200">
+        <HiLocationMarker className="text-[#4161df] w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 flex-shrink-0" />
         <input
           placeholder="3BHK near IT Park Chandigarh under ₹40,000..."
-          type="text"
+          type="search"
+          inputMode="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          autoCorrect="off"
           value={value}
           onChange={handleChange}
-          className="flex-grow bg-transparent text-sm sm:text-base text-foreground focus:outline-none placeholder:text-gray-400 min-w-0"
+          className="flex-grow bg-transparent text-sm sm:text-base text-foreground focus:outline-none placeholder:text-gray-400 placeholder:truncate min-w-0 [&::-webkit-search-cancel-button]:hidden"
           aria-label="Search properties"
         />
         {value && (
           <button
             type="button"
             aria-label="Clear search"
-            className="text-xs text-gray-500 hover:text-gray-700 px-2 sm:px-3 py-1 flex-shrink-0 transition-colors"
+            className="text-xs text-gray-500 hover:text-gray-700 px-2 sm:px-3 py-2 -my-2 flex-shrink-0 transition-colors"
             onClick={handleClear}
           >
             Clear
           </button>
         )}
       </div>
-    </div>
+    </form>
   );
 };
 

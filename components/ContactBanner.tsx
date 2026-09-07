@@ -1,42 +1,77 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 interface ContactBannerProps {
   title?: string;
   subtitle?: string;
-  image?: string; // banner background image
+  image?: string; // banner image (white-bg character illustration by default)
+  overlay?: boolean; // set true if using a dark photo banner instead
+  textColor?: "dark" | "light";
 }
 
 const ContactBanner: React.FC<ContactBannerProps> = ({
-  title = "Connect With Tricity Property Experts",
-  subtitle = "Whether you are buying your first home, selling a property, or exploring investment opportunities — get the local insights you need to make confident decisions.",
+  title = "Let's Talk Property",
+  subtitle = "Have a question about buying, selling, or renting in the Tricity? Our team is one message away.",
   image = "/contact-banner.jpg",
+  overlay = false,
+  textColor = "dark",
 }) => {
+  const headingColor = textColor === "dark" ? "text-[#14213D]" : "text-white";
+  const subColor = textColor === "dark" ? "text-[#14213D]/70" : "text-white/90";
+
   return (
-    <section className="relative  w-full h-[280px] md:h-[480px] overflow-hidden flex items-center justify-center">
-      {/* BACKGROUND IMAGE */}
-      <div
-        className="
-          absolute inset-0 
-          bg-cover bg-center bg-no-repeat 
-         scale-105
-        "
-        style={{ backgroundImage: `url(${image})` }}
-      />
+    <section className="relative w-full bg-white overflow-hidden">
+      {/* MOBILE / TABLET: image shown in full (no crop), text stacked below */}
+      <div className="md:hidden">
+        <div className="relative w-full aspect-[2.56/1] bg-white">
+          <Image
+            src={image}
+            alt="Contact PropertyBulbul"
+            fill
+            priority
+            sizes="100vw"
+            className="object-contain object-right"
+          />
+        </div>
+        <div className="px-5 sm:px-8 py-6 sm:py-8 text-center">
+          <h1
+            className={`${headingColor} text-2xl sm:text-3xl font-bold leading-tight drop-shadow-sm`}
+          >
+            {title}
+          </h1>
+          <p className={`${subColor} text-sm sm:text-base mt-2`}>{subtitle}</p>
+        </div>
+      </div>
 
-      {/* DARK OVERLAY */}
-      <div className="absolute inset-0 bg-black/25"></div>
+      {/* DESKTOP: full-bleed image, text overlaid on the left */}
+      <div className="hidden md:block relative w-full aspect-[2.2/1] lg:aspect-[2.56/1]">
+        <Image
+          src={image}
+          alt="Contact PropertyBulbul"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
 
-      {/* CONTENT */}
-      <div className="relative z-10 text-center px-4">
-        <h1 className="text-white text-3xl md:text-5xl font-bold drop-shadow-md">
-          {title}
-        </h1>
+        {overlay && <div className="absolute inset-0 bg-black/25" />}
 
-        <p className="text-white/90 text-sm md:text-lg mt-2 max-w-2xl mx-auto">
-          {subtitle}
-        </p>
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full max-w-7xl mx-auto px-8 lg:px-12">
+            <div className="max-w-md lg:max-w-lg">
+              <h1
+                className={`${headingColor} text-3xl lg:text-5xl font-bold leading-tight drop-shadow-sm`}
+              >
+                {title}
+              </h1>
+              <p className={`${subColor} text-base lg:text-lg mt-3`}>
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
