@@ -209,12 +209,6 @@ const ListingsPage = () => {
           </div>
         )}
       </div>
-
-      <AddPropertyModal
-        opened={modalOpened}
-        setOpened={setModalOpened}
-        editingProperty={editingProperty}
-      />
     </div>
   );
 };
