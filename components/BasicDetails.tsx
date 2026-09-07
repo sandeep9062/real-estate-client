@@ -1,31 +1,20 @@
 "use client";
 
-import React, { useEffect } from "react";
-import {
-  TextInput,
-  Box,
-  Textarea,
-  Group,
-  Button,
-  NumberInput,
-  Select,
-  MultiSelect,
-  Divider,
-  Checkbox,
-  Text,
-} from "@mantine/core";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Group, Stepper } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { validateString } from "@/lib/utils";
 import { slugify } from "@/lib/slugify";
 import {
-  PROPERTY_TYPES,
   getCategoriesForType,
   isLandCategory,
   supportsFurnishing,
   supportsAmenities,
   supportsFacing,
 } from "@/lib/propertyOptions";
-import FloorPlanUploadSection from "@/components/FloorPlanUploadSection";
+import BasicInfoFields from "@/components/basic-details/BasicInfoFields";
+import PricingFields from "@/components/basic-details/PricingFields";
+import type { FieldVisibility } from "@/components/basic-details/types";
 
 function splitLines(s: string) {
   return s
@@ -40,33 +29,15 @@ function toOptNum(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
-/** Mirrors the `type` enum in backend/models/Property.js */
-const LISTING_OPTS = [
-  { value: "Available", label: "Available — open enquiries" },
-  { value: "Fresh", label: "Fresh listing" },
-  { value: "Under offer", label: "Under offer" },
-  { value: "Booked", label: "Booked / on hold" },
+const SUB_STEPS = [
+  { label: "Property details", description: "Type, category, area & features" },
+  { label: "Pricing & extras", description: "Terms, trust & nearby" },
 ];
 
-const AMENITIES_OPTIONS = [
-  "Parking",
-  "Lift",
-  "Power Backup",
-  "Security",
-  "Park",
-  "Gas Pipeline",
-  "Wifi",
-  "Gym",
-  "Swimming Pool",
-  "Club House",
-];
-
-const OC_OPTIONS = [
-  { value: "", label: "— Optional —" },
-  { value: "Available", label: "OC available" },
-  { value: "Applied", label: "OC applied" },
-  { value: "Not issued", label: "Not issued yet" },
-  { value: "NA", label: "Not applicable" },
+/** Fields that must be valid before leaving each sub-step. */
+const REQUIRED_BY_SUB_STEP: string[][] = [
+  ["title", "description", "price", "areaValue"],
+  [],
 ];
 
 interface BasicDetailsProps {
@@ -82,6 +53,8 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
   propertyDetails,
   setPropertyDetails,
 }) => {
+  const [subStep, setSubStep] = useState(0);
+
   const form = useForm({
     initialValues: {
       title: propertyDetails.title,
@@ -139,12 +112,16 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
       const generated = slugify(titleValue);
       form.setFieldValue("slug", generated);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values.title]);
 
   // Keep Property Category valid whenever the selected Type changes
   useEffect(() => {
     const categories = getCategoriesForType(form.values.type);
-    if (!form.values.propertyCategory || !categories.includes(form.values.propertyCategory)) {
+    if (
+      !form.values.propertyCategory ||
+      !categories.includes(form.values.propertyCategory)
+    ) {
       form.setFieldValue("propertyCategory", categories[0]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -185,16 +162,18 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
   } = form.values;
 
   // ── Field visibility, driven by deal / type / propertyCategory ────────────
-  const categoryOptions = getCategoriesForType(type);
-  const isLand = isLandCategory(propertyCategory);
-  const showCommercialExtras = type === "Commercial";
-  const showFurnishing = supportsFurnishing(propertyCategory);
-  const showFacing = supportsFacing(propertyCategory);
-  const showAmenities = supportsAmenities(propertyCategory);
-  const showAgeOfProperty = !isLand;
-  const showRentTerms = deal === "Rent";
-  const showSalePricePerSqft = deal === "Sale";
-  const showOCStatus = deal === "Sale" && !isLand;
+  const visibility: FieldVisibility = {
+    categoryOptions: getCategoriesForType(type),
+    isLand: isLandCategory(propertyCategory),
+    showCommercialExtras: type === "Commercial",
+    showFurnishing: supportsFurnishing(propertyCategory),
+    showFacing: supportsFacing(propertyCategory),
+    showAmenities: supportsAmenities(propertyCategory),
+    showAgeOfProperty: !isLandCategory(propertyCategory),
+    showRentTerms: deal === "Rent",
+    showSalePricePerSqft: deal === "Sale",
+    showOCStatus: deal === "Sale" && !isLandCategory(propertyCategory),
+  };
 
   const handleSubmit = () => {
     const { hasErrors } = form.validate();
@@ -217,31 +196,71 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         area: { value: areaValue, unit: areaUnit },
         availability,
         // Hidden fields are cleared so stale values are never submitted
-        furnishing: showFurnishing ? furnishing : undefined,
-        facing: showFacing ? facing : undefined,
+        furnishing: visibility.showFurnishing ? furnishing : undefined,
+        facing: visibility.showFacing ? facing : undefined,
         postedBy,
-        commercialPropertyTypes: showCommercialExtras
+        commercialPropertyTypes: visibility.showCommercialExtras
           ? commercialPropertyTypes
           : [],
-        investmentOptions: showCommercialExtras ? investmentOptions : [],
+        investmentOptions: visibility.showCommercialExtras
+          ? investmentOptions
+          : [],
         listingAvailability,
         virtualTourUrl: virtualTourUrl?.trim() || "",
         nearbyPlaces,
         reraNumber: reraNumber?.trim() || "",
-        maintenanceCharge: showRentTerms ? toOptNum(maintenanceCharge) : undefined,
-        securityDeposit: showRentTerms ? toOptNum(securityDeposit) : undefined,
-        lockInMonths: showRentTerms ? toOptNum(lockInMonths) : undefined,
-        noticePeriodDays: showRentTerms ? toOptNum(noticePeriodDays) : undefined,
-        ocStatus: showOCStatus ? ocStatus || undefined : undefined,
-        ageOfProperty: showAgeOfProperty ? toOptNum(ageOfProperty) : undefined,
-        pricePerSqft: showSalePricePerSqft ? toOptNum(pricePerSqft) : undefined,
+        maintenanceCharge: visibility.showRentTerms
+          ? toOptNum(maintenanceCharge)
+          : undefined,
+        securityDeposit: visibility.showRentTerms
+          ? toOptNum(securityDeposit)
+          : undefined,
+        lockInMonths: visibility.showRentTerms
+          ? toOptNum(lockInMonths)
+          : undefined,
+        noticePeriodDays: visibility.showRentTerms
+          ? toOptNum(noticePeriodDays)
+          : undefined,
+        ocStatus: visibility.showOCStatus ? ocStatus || undefined : undefined,
+        ageOfProperty: visibility.showAgeOfProperty
+          ? toOptNum(ageOfProperty)
+          : undefined,
+        pricePerSqft: visibility.showSalePricePerSqft
+          ? toOptNum(pricePerSqft)
+          : undefined,
         negotiable,
         amenities:
-          showAmenities && Array.isArray(amenities) ? amenities : [],
+          visibility.showAmenities && Array.isArray(amenities) ? amenities : [],
       }));
       nextStep();
     }
   };
+
+  /** Validate only the fields relevant to the current sub-step. */
+  const validateSubStep = (step: number): boolean => {
+    let ok = true;
+    (REQUIRED_BY_SUB_STEP[step] || []).forEach((field) => {
+      const result = form.validateField(field);
+      if (result.hasError) ok = false;
+    });
+    return ok;
+  };
+
+  const goNext = () => {
+    if (!validateSubStep(subStep)) return;
+    if (subStep === SUB_STEPS.length - 1) {
+      handleSubmit();
+    } else {
+      setSubStep(subStep + 1);
+    }
+  };
+
+  const goBack = () => {
+    if (subStep === 0) prevStep();
+    else setSubStep(subStep - 1);
+  };
+
+  const isLastSubStep = subStep === SUB_STEPS.length - 1;
 
   return (
     <Box maw="100%" mx="auto" my="md">
@@ -249,329 +268,43 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
         className="flex flex-col gap-6 mt-8"
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit();
+          goNext();
         }}
       >
-        <TextInput
-          withAsterisk
-          label="Title"
-          placeholder="Property Name"
-          {...form.getInputProps("title")}
-          classNames={{ input: "border-gray-300" }}
-        />
-
-        <TextInput
-          label="Slug"
-          description="Auto-generated from title. Used in the property URL."
-          placeholder="auto-generated-slug"
-          {...form.getInputProps("slug")}
-          classNames={{ input: "border-gray-300 bg-gray-50" }}
-          readOnly
-        />
-
-        <Textarea
-          placeholder="Description"
-          label="Description"
-          withAsterisk
-          {...form.getInputProps("description")}
-          autosize
-          minRows={3}
-          classNames={{ input: "border-gray-300" }}
-        />
-
-        <NumberInput
-          withAsterisk
-          label="Price"
-          placeholder="e.g. 25000"
-          min={0}
-          {...form.getInputProps("price")}
-          classNames={{ input: "border-gray-300" }}
-        />
-
-        <Select
-          label="Deal"
-          data={["Rent", "Sale"]}
-          {...form.getInputProps("deal")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
-
-        <Select
-          label="Type"
-          data={PROPERTY_TYPES}
-          description="Drives which property categories and fields are shown below."
-          {...form.getInputProps("type")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
-
-        {showCommercialExtras && (
-          <>
-            <MultiSelect
-              label="Commercial Property Types"
-              data={[
-                "Office",
-                "Retail",
-                "Industrial",
-                "Warehouse",
-                "Hospitality",
-                "Land",
-              ]}
-              {...form.getInputProps("commercialPropertyTypes")}
-              classNames={{ input: "border-gray-300" }}
-              styles={{ dropdown: { zIndex: 1300 } }}
+        <Stepper
+          active={subStep}
+          size="sm"
+          iconSize={32}
+          allowNextStepsSelect={false}
+          onStepClick={(idx) => setSubStep(idx)}
+        >
+          {SUB_STEPS.map((step) => (
+            <Stepper.Step
+              key={step.label}
+              label={step.label}
+              description={step.description}
             />
-            <MultiSelect
-              label="Investment Options"
-              data={[
-                "Fractional Ownership",
-                "REIT",
-                "Direct Purchase",
-                "Leasehold",
-              ]}
-              {...form.getInputProps("investmentOptions")}
-              classNames={{ input: "border-gray-300" }}
-              styles={{ dropdown: { zIndex: 1300 } }}
-            />
-          </>
+          ))}
+        </Stepper>
+
+        {subStep === 0 && (
+          <BasicInfoFields form={form} visibility={visibility} />
         )}
-
-        <Select
-          label="Property Category"
-          description={`Options shown for ${type} properties.`}
-          data={categoryOptions}
-          {...form.getInputProps("propertyCategory")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
-
-        <Group grow>
-          <NumberInput
-            label="Area"
-            min={0}
-            {...form.getInputProps("areaValue")}
-            classNames={{ input: "border-gray-300" }}
-          />
-          <Select
-            label="Unit"
-            data={["sqft", "sqyard", "sqm", "marla", "kanal", "acre"]}
-            {...form.getInputProps("areaUnit")}
-            classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
-          />
-        </Group>
-
-        <Select
-          label="Availability"
-          data={["Ready to Move", "Under Construction"]}
-          {...form.getInputProps("availability")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
-
-        {showFurnishing && (
-          <Select
-            label="Furnishing"
-            data={["Furnished", "Semi Furnished", "Un-Furnished"]}
-            {...form.getInputProps("furnishing")}
-            classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
+        {subStep === 1 && (
+          <PricingFields
+            form={form}
+            visibility={visibility}
+            propertyDetails={propertyDetails}
+            setPropertyDetails={setPropertyDetails}
           />
         )}
-
-        {showFacing && (
-          <Select
-            label="Facing"
-            data={[
-              "North",
-              "South",
-              "East",
-              "West",
-              "North-East",
-              "North-West",
-              "South-East",
-              "South-West",
-            ]}
-            {...form.getInputProps("facing")}
-            classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
-          />
-        )}
-
-        <Select
-          label="Posted By"
-          data={["Owner", "Agent", "Builder"]}
-          {...form.getInputProps("postedBy")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
-
-        <Divider label="Pricing & terms" labelPosition="center" my="sm" />
-
-        <Text size="sm" c="dimmed">
-          {deal === "Rent"
-            ? "Price is monthly rent (₹)."
-            : "Price is total asking amount (₹)."}
-        </Text>
-
-        {showRentTerms && (
-          <>
-            <NumberInput
-              label="Monthly maintenance (₹)"
-              description="Society / common charges if any."
-              min={0}
-              {...form.getInputProps("maintenanceCharge")}
-              classNames={{ input: "border-gray-300" }}
-            />
-            <NumberInput
-              label="Security deposit (₹)"
-              min={0}
-              {...form.getInputProps("securityDeposit")}
-              classNames={{ input: "border-gray-300" }}
-            />
-            <Group grow>
-              <NumberInput
-                label="Lock-in (months)"
-                description="Optional"
-                min={0}
-                {...form.getInputProps("lockInMonths")}
-                classNames={{ input: "border-gray-300" }}
-              />
-              <NumberInput
-                label="Notice period (days)"
-                description="Optional"
-                min={0}
-                {...form.getInputProps("noticePeriodDays")}
-                classNames={{ input: "border-gray-300" }}
-              />
-            </Group>
-          </>
-        )}
-
-        {showSalePricePerSqft && (
-          <NumberInput
-            label="Price per sqft (₹)"
-            description="Optional — helps buyers compare."
-            min={0}
-            {...form.getInputProps("pricePerSqft")}
-            classNames={{ input: "border-gray-300" }}
-          />
-        )}
-
-        {showOCStatus && (
-          <Select
-            label="Occupancy certificate (OC)"
-            description="Helps buyers assess legal readiness."
-            data={OC_OPTIONS}
-            {...form.getInputProps("ocStatus")}
-            classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
-          />
-        )}
-
-        {showAgeOfProperty && (
-          <NumberInput
-            label="Age of property (years)"
-            description="Optional — not applicable for land/plot listings."
-            min={0}
-            {...form.getInputProps("ageOfProperty")}
-            classNames={{ input: "border-gray-300" }}
-          />
-        )}
-
-        <Checkbox
-          label="Price is negotiable"
-          {...form.getInputProps("negotiable", { type: "checkbox" })}
-        />
-
-        {showAmenities && (
-          <MultiSelect
-            label="Amenities"
-            description="Select all that apply."
-            data={AMENITIES_OPTIONS}
-            {...form.getInputProps("amenities")}
-            classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
-          />
-        )}
-
-        <Divider
-          label="Trust & rich listing (optional)"
-          labelPosition="center"
-          my="md"
-        />
-
-        <Select
-          label="Listing status (for buyers)"
-          description="Shows on cards — reduce wasted calls when under offer or booked."
-          data={LISTING_OPTS}
-          {...form.getInputProps("listingAvailability")}
-          classNames={{ input: "border-gray-300" }}
-          styles={{ dropdown: { zIndex: 1300 } }}
-        />
-
-        <TextInput
-          label="RERA registration ID"
-          description="If applicable for your state — shown as a trust badge when set."
-          placeholder="e.g. PBRERA-SAS81-RE0834"
-          {...form.getInputProps("reraNumber")}
-          classNames={{ input: "border-gray-300" }}
-        />
-
-        <TextInput
-          label="Virtual tour link"
-          placeholder="https://…"
-          {...form.getInputProps("virtualTourUrl")}
-          classNames={{ input: "border-gray-300" }}
-        />
-
-        <FloorPlanUploadSection
-          urls={propertyDetails.floorPlanImages || []}
-          files={propertyDetails.floorPlanFiles || []}
-          onUrlsChange={(u) =>
-            setPropertyDetails((p: any) => ({ ...p, floorPlanImages: u }))
-          }
-          onFilesChange={(f) =>
-            setPropertyDetails((p: any) => ({ ...p, floorPlanFiles: f }))
-          }
-        />
-
-        <Textarea
-          label="Nearby — schools"
-          description="One per line"
-          autosize
-          minRows={2}
-          {...form.getInputProps("schoolsText")}
-          classNames={{ input: "border-gray-300" }}
-        />
-        <Textarea
-          label="Nearby — metro / transit"
-          autosize
-          minRows={2}
-          {...form.getInputProps("metroStationsText")}
-          classNames={{ input: "border-gray-300" }}
-        />
-        <Textarea
-          label="Nearby — hospitals (optional)"
-          autosize
-          minRows={2}
-          {...form.getInputProps("hospitalsText")}
-          classNames={{ input: "border-gray-300" }}
-        />
-        <Textarea
-          label="Nearby — malls & shopping (optional)"
-          autosize
-          minRows={2}
-          {...form.getInputProps("mallsText")}
-          classNames={{ input: "border-gray-300" }}
-        />
 
         <Group justify="center" mt="xl">
-          <Button variant="default" onClick={prevStep}>
+          <Button variant="default" type="button" onClick={goBack}>
             Back
           </Button>
           <Button type="submit" color="blue">
-            Next step
+            {isLastSubStep ? "Next step" : "Continue"}
           </Button>
         </Group>
       </form>
@@ -580,3 +313,4 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({
 };
 
 export default BasicDetails;
+
