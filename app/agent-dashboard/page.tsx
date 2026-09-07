@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { selectUser } from "@/store/authSlice";
 import { useGetLeadStatsQuery } from "@/services/leadsApi";
 import { useGetMyAgentProfileQuery } from "@/services/agentsApi";
+import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
 import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
 import { PageHeader, StatCard } from "@/components/agent-dashboard/ui";
 
@@ -60,6 +61,7 @@ export default function AgentDashboardOverviewPage() {
   const user = useSelector(selectUser);
   const { data: stats } = useGetLeadStatsQuery();
   const { data: profileData } = useGetMyAgentProfileQuery();
+  const { data: ownedProperties } = useGetOwnedPropertiesQuery(undefined);
 
   const today = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
@@ -119,7 +121,7 @@ export default function AgentDashboardOverviewPage() {
         title="Your numbers"
         description="Live lead activity captured from WhatsApp clicks across your listings."
       />
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
         <StatCard
           label="Total leads"
           value={typeof stats?.total === "number" ? stats.total : "—"}
@@ -156,6 +158,15 @@ export default function AgentDashboardOverviewPage() {
           hint="Closed ÷ total leads"
           icon={TrendingUp}
           tone="violet"
+        />
+        <StatCard
+          label="Total listings"
+          value={
+            Array.isArray(ownedProperties) ? ownedProperties.length : "—"
+          }
+          hint="Properties listed by you"
+          icon={Home}
+          tone="blue"
         />
       </section>
 
