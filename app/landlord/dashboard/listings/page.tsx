@@ -73,7 +73,7 @@ const ListingsPage = () => {
   const handleToggleActive = async (
     propertyId: string,
     isActive: boolean,
-    image: string[]
+    image: string[],
   ) => {
     try {
       await updateProperty({
@@ -206,8 +206,9 @@ const ListingsPage = () => {
                   <th className="px-4 py-3">Location</th>
                   <th className="px-4 py-3">Price</th>
                   <th className="px-4 py-3">Listing Availability</th>
-                  <th className="px-4 py-3">Active</th>
+
                   <th className="px-4 py-3">Created At</th>
+                  <th className="px-4 py-3">Active</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -267,11 +268,26 @@ const ListingsPage = () => {
                         ))}
                       </select>
                     </td>
+
+                    <td className="px-4 py-3 text-gray-600">
+                      {card.createdAt
+                        ? new Date(card.createdAt).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "-"}
+                    </td>
+
                     <td className="px-4 py-3">
                       <button
                         type="button"
                         onClick={() =>
-                          handleToggleActive(card._id, card.isActive, card.image)
+                          handleToggleActive(
+                            card._id,
+                            card.isActive,
+                            card.image,
+                          )
                         }
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                           card.isActive ? "bg-green-500" : "bg-gray-300"
@@ -283,15 +299,6 @@ const ListingsPage = () => {
                           }`}
                         />
                       </button>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {card.createdAt
-                        ? new Date(card.createdAt).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "-"}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
