@@ -67,11 +67,16 @@ const ListingsPage = () => {
     }
   };
 
-  const handleToggleActive = async (propertyId: string, isActive: boolean) => {
+  const handleToggleActive = async (
+    propertyId: string,
+    isActive: boolean,
+    image: string[]
+  ) => {
     try {
       await updateProperty({
         id: propertyId,
         isActive: !isActive,
+        image: image || [],
       }).unwrap();
     } catch (error) {
       console.error("Failed to toggle active status:", error);
@@ -260,7 +265,7 @@ const ListingsPage = () => {
                       <button
                         type="button"
                         onClick={() =>
-                          handleToggleActive(card._id, card.isActive)
+                          handleToggleActive(card._id, card.isActive, card.image)
                         }
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                           card.isActive ? "bg-green-500" : "bg-gray-300"
