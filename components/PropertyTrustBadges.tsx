@@ -117,8 +117,10 @@ export function ListingAvailabilityPill({
 
 /**
  * Tag showing who listed the property: "Agent listed" | "Owner listed" | "Builder listed".
- * Resolves from the property's `postedBy` field (Owner | Agent | Builder), falling back
- * to the listing user's role (agent → Agent, landlord → Owner) when postedBy is missing.
+ *
+ * The listing user's role is the most reliable source (agent → Agent, landlord/user → Owner,
+ * builder → Builder). When that isn't available (e.g. admin-created listings), we fall back
+ * to the property's `postedBy` field (Owner | Agent | Builder).
  */
 export function ListingPostedByTag({
   postedBy,
@@ -127,11 +129,29 @@ export function ListingPostedByTag({
   postedBy?: string;
   userRole?: string;
 }) {
-  const source =
-    // (postedBy || "").trim().toLowerCase() ||
-    userRole === "agent" ? "agent" : userRole === "landlord" ? "owner" : "";
+  const role = (userRole || "").trim().toLowerCase();
+  const rawPostedBy = (postedBy || "").trim().toLowerCase();
 
-  if (!["owner", "agent", "builder"].includes(source)) return null;
+  let source: string;
+  if (
+    role === "agent" ||
+    role === "landlord" ||
+    role === "builder" ||
+    role === "user"
+  ) {
+    // "user" = individual listing without a chosen role yet → they are the Owner.
+    source = role === "landlord" || role === "user" ? "owner" : role;
+  } else if (
+    rawPostedBy === "owner" ||
+    rawPostedBy === "agent" ||
+    rawPostedBy === "builder"
+  ) {
+    source = rawPostedBy;
+  } else {
+    source = "";
+  }
+
+  if (!source) return null;
 
   const isAgent = source === "agent";
   const isOwner = source === "owner";
