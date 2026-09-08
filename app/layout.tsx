@@ -181,38 +181,34 @@ export default function RootLayout({
                 position="top-right"
                 expand={false}
                 duration={3500}
+                style={
+                  { zIndex: 9999, "--width": "320px" } as React.CSSProperties
+                }
                 toastOptions={{
                   style: {
-                    background: "rgba(255, 255, 255, 0.85)",
-                    backdropFilter: "blur(14px)",
-                    border: "1px solid rgba(22, 26, 46, 0.06)",
+                    background: "#ffffff",
+                    border: "1px solid rgba(22, 26, 46, 0.08)",
                     boxShadow:
-                      "0 12px 24px -8px rgba(22, 26, 46, 0.18), 0 4px 8px -4px rgba(22, 26, 46, 0.08)",
+                      "0 4px 12px -2px rgba(22, 26, 46, 0.12), 0 2px 4px -2px rgba(22, 26, 46, 0.06)",
                   },
-                  className: "rounded-2xl p-4 border-l-[3px]",
+                  className: "rounded-lg py-3 px-3.5 border-l-[3px]",
                   classNames: {
                     toast: "group",
                     title:
-                      "text-[14px] font-bold tracking-tight text-[#161A2E]",
+                      "text-[13px] font-semibold tracking-tight text-[#161A2E]",
                     description:
-                      "text-[12px] text-[#5C5F73] font-medium mt-0.5",
+                      "text-[12px] text-[#5C5F73] mt-0.5 leading-snug",
                     actionButton:
-                      "!bg-[#4161df] !text-white rounded-full px-3.5 py-1.5 text-xs font-bold hover:!bg-[#3451c7] transition-colors",
+                      "!bg-[#4161df] !text-white rounded-md px-3 py-1 text-[11px] font-semibold hover:!bg-[#3451c7] transition-colors",
                     cancelButton:
-                      "!bg-[#EEF1FC] !text-[#161A2E] rounded-full px-3.5 py-1.5 text-xs font-bold hover:!bg-[#E2E7FA] transition-colors",
-                    icon: "!text-current",
-                    // Status tints stay in your existing semantic colors, but now with
-                    // a brand-blue-toned neutral border to tie every toast back to the
-                    // same family instead of four unrelated hues
+                      "!bg-[#F1F2F6] !text-[#161A2E] rounded-md px-3 py-1 text-[11px] font-semibold hover:!bg-[#E5E7F2] transition-colors",
                     success:
-                      "!bg-emerald-50/85 !text-emerald-700 !border-l-emerald-500",
-                    error: "!bg-rose-50/85 !text-rose-700 !border-l-rose-500",
-                    info: "!bg-[#EEF1FC]/90 !text-[#2b3f9e] !border-l-[#4161df]",
-                    warning:
-                      "!bg-amber-50/85 !text-amber-700 !border-l-amber-500",
+                      "!bg-white !text-emerald-700 !border-l-emerald-500",
+                    error: "!bg-white !text-rose-700 !border-l-rose-500",
+                    info: "!bg-white !text-[#2b3f9e] !border-l-[#4161df]",
+                    warning: "!bg-white !text-amber-700 !border-l-amber-500",
                   },
                 }}
-                style={{ zIndex: 9999 }}
               />
               {children}
             </LayoutWrapper>
