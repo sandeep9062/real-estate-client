@@ -25,6 +25,7 @@ import {
   supportsAmenities,
   supportsFacing,
   AMENITIES_OPTIONS,
+  SOCIETY_AMENITIES_OPTIONS,
   LISTING_OPTS,
   OC_OPTIONS,
 } from "@/lib/propertyOptions";
@@ -83,6 +84,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       investmentOptions: propertyDetails.investmentOptions,
       ageOfProperty: propertyDetails.ageOfProperty ?? "",
       amenities: propertyDetails.amenities || [],
+      societyAmenities: propertyDetails.societyAmenities || [],
       // Pricing & extras
       maintenanceCharge: propertyDetails.maintenanceCharge ?? "",
       securityDeposit: propertyDetails.securityDeposit ?? "",
@@ -199,6 +201,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
     investmentOptions,
     ageOfProperty,
     amenities,
+    societyAmenities,
     maintenanceCharge,
     securityDeposit,
     lockInMonths,
@@ -261,6 +264,8 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       investmentOptions: showCommercialExtras ? investmentOptions : [],
       ageOfProperty: showAgeOfProperty ? toOptNum(ageOfProperty) : undefined,
       amenities: showAmenities && Array.isArray(amenities) ? amenities : [],
+      societyAmenities:
+        showAmenities && Array.isArray(societyAmenities) ? societyAmenities : [],
       // Pricing & extras — hidden fields cleared so stale values are never submitted
       maintenanceCharge: showRentTerms
         ? toOptNum(maintenanceCharge)
@@ -476,6 +481,17 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
             description="Select all that apply."
             data={AMENITIES_OPTIONS}
             {...form.getInputProps("amenities")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
+
+        {showAmenities && (
+          <MultiSelect
+            label="Society Amenities"
+            description="Select all that apply. These are community/shared amenities."
+            data={SOCIETY_AMENITIES_OPTIONS}
+            {...form.getInputProps("societyAmenities")}
             classNames={{ input: "border-gray-300" }}
             styles={{ dropdown: { zIndex: 1300 } }}
           />
