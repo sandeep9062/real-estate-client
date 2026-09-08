@@ -164,10 +164,14 @@ export default function PropertyStaticContent({
                     data?.listingAvailability,
                 },
                 { label: "Category", value: data?.propertyCategory },
-                {
-                  label: "Area",
-                  value: `${data?.area?.value} ${data?.area?.unit}`,
-                },
+                ...(data?.area?.value
+                  ? [
+                      {
+                        label: "Area",
+                        value: `${data?.area?.value} ${data?.area?.unit}`,
+                      },
+                    ]
+                  : []),
                 ...(data?.area?.carpetArea?.value
                   ? [
                       {
@@ -219,7 +223,17 @@ export default function PropertyStaticContent({
                   : []),
                 { label: "Availability", value: data?.availability },
                 { label: "Furnishing", value: data?.furnishing },
-                { label: "Facing", value: data?.facing },
+                ...(data?.facing
+                  ? [{ label: "Facing", value: data.facing }]
+                  : []),
+                ...(data?.deal === "Rent" && data?.tenantPreference
+                  ? [
+                      {
+                        label: "Tenant Preference",
+                        value: data.tenantPreference,
+                      },
+                    ]
+                  : []),
                 ...(data?.deal === "Rent" &&
                 typeof data?.maintenanceCharge === "number"
                   ? [
