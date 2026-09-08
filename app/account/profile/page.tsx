@@ -18,7 +18,6 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Avatar,
-  Text,
   TextInput,
   Button,
   Image,
@@ -29,7 +28,7 @@ import {
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { ArrowLeft, Upload, X, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Camera, X, ShieldCheck, User, IdCard } from "lucide-react";
 
 import { useUpdateProfileMutation } from "@/services/userApi";
 import { setUser } from "@/store/authSlice";
@@ -133,12 +132,17 @@ export default function EditProfilePage() {
   if (!mounted || !user) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="min-h-screen"
+      style={{
+        background: `linear-gradient(180deg, ${TINT_BG} 0%, #F7F8FC 220px, #F7F8FC 100%)`,
+      }}
+    >
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Back nav */}
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 sm:mb-8"
+          className="inline-flex items-center gap-1.5 text-sm font-medium mb-5 sm:mb-6 transition-colors hover:opacity-70"
           style={{ color: INK_SOFT }}
         >
           <ArrowLeft size={16} />
@@ -146,26 +150,40 @@ export default function EditProfilePage() {
         </button>
 
         <div
-          className="bg-white rounded-2xl border overflow-hidden"
-          style={{ borderColor: TINT_LINE }}
+          className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_10px_-2px_rgba(22,26,46,0.08),0_12px_32px_-16px_rgba(22,26,46,0.12)]"
+          style={{ border: `1px solid ${TINT_LINE}` }}
         >
           {/* Header */}
-          <div className="px-6 sm:px-8 pt-7 sm:pt-8 pb-6">
-            <h1
-              className="text-xl sm:text-2xl font-bold leading-tight"
-              style={{ color: INK }}
+          <div className="px-6 sm:px-8 pt-7 sm:pt-8 pb-6 flex items-start gap-3">
+            <div
+              className="hidden sm:flex shrink-0 size-10 items-center justify-center rounded-xl"
+              style={{ background: TINT_BG, color: BRAND }}
             >
-              Edit profile
-            </h1>
-            <p className="text-sm mt-1" style={{ color: INK_SOFT }}>
-              Update your photo and personal details.
-            </p>
+              <IdCard size={18} />
+            </div>
+            <div>
+              <h1
+                className="text-xl sm:text-2xl font-bold leading-tight"
+                style={{ color: INK }}
+              >
+                Edit profile
+              </h1>
+              <p className="text-sm mt-1" style={{ color: INK_SOFT }}>
+                Update your photo and personal details.
+              </p>
+            </div>
           </div>
 
           <Divider color={TINT_LINE} />
 
           {/* Photo section */}
           <div className="px-6 sm:px-8 py-7 sm:py-8">
+            <p
+              className="text-[11px] font-semibold uppercase tracking-wide mb-4"
+              style={{ color: INK_SOFT }}
+            >
+              Profile photo
+            </p>
             <Dropzone
               openRef={openRef}
               onDrop={(files) => {
@@ -179,20 +197,34 @@ export default function EditProfilePage() {
               styles={{ root: { border: "none", padding: 0 } }}
             >
               <div className="flex items-center gap-5">
-                <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => openRef.current?.()}
+                  className="relative shrink-0 group cursor-pointer rounded-full"
+                  aria-label="Change profile photo"
+                >
                   {preview ? (
                     <Image
                       src={preview}
-                      width={72}
-                      height={72}
+                      width={76}
+                      height={76}
                       radius="999px"
                       style={{ border: `2px solid ${TINT_LINE}` }}
                     />
                   ) : (
-                    <Avatar radius="999px" size={72} color="blue">
-                      {name?.[0]?.toUpperCase() || "U"}
+                    <Avatar radius="999px" size={76} color="blue">
+                      {name?.[0]?.toUpperCase() || <User size={26} />}
                     </Avatar>
                   )}
+
+                  {/* Hover overlay hints that the avatar itself is clickable */}
+                  <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 group-hover:bg-black/35 transition-colors duration-200">
+                    <Camera
+                      size={18}
+                      className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    />
+                  </span>
+
                   {preview && imageFile && (
                     <ActionIcon
                       variant="filled"
@@ -209,10 +241,10 @@ export default function EditProfilePage() {
                       <X size={13} />
                     </ActionIcon>
                   )}
-                </div>
+                </button>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <div className="flex items-center gap-2 flex-wrap mb-1.5">
                     <span
                       className="font-semibold text-sm"
                       style={{ color: INK }}
@@ -232,13 +264,13 @@ export default function EditProfilePage() {
                   <button
                     type="button"
                     onClick={() => openRef.current?.()}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                    style={{ color: BRAND }}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold rounded-md px-2.5 py-1 -ml-2.5 transition-colors hover:opacity-80"
+                    style={{ color: BRAND, background: TINT_BG }}
                   >
-                    <Upload size={14} />
+                    <Camera size={14} />
                     Change photo
                   </button>
-                  <p className="text-xs mt-1" style={{ color: INK_SOFT }}>
+                  <p className="text-xs mt-1.5" style={{ color: INK_SOFT }}>
                     JPG or PNG, up to 3MB.
                   </p>
                 </div>
@@ -250,6 +282,12 @@ export default function EditProfilePage() {
 
           {/* Details section */}
           <div className="px-6 sm:px-8 py-7 sm:py-8">
+            <p
+              className="text-[11px] font-semibold uppercase tracking-wide mb-4"
+              style={{ color: INK_SOFT }}
+            >
+              Personal details
+            </p>
             <Stack gap="md">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <TextInput
@@ -258,6 +296,10 @@ export default function EditProfilePage() {
                   onChange={(e) => setName(e.currentTarget.value)}
                   required
                   radius="md"
+                  styles={{
+                    input: { borderColor: TINT_LINE },
+                    label: { color: INK, fontWeight: 500, marginBottom: 4 },
+                  }}
                 />
                 <TextInput
                   label="Email address"
@@ -266,6 +308,10 @@ export default function EditProfilePage() {
                   required
                   type="email"
                   radius="md"
+                  styles={{
+                    input: { borderColor: TINT_LINE },
+                    label: { color: INK, fontWeight: 500, marginBottom: 4 },
+                  }}
                 />
               </div>
 
@@ -276,15 +322,43 @@ export default function EditProfilePage() {
                 >
                   Phone number
                 </label>
-                <PhoneInput
-                  placeholder="Phone number with country code"
-                  value={phone}
-                  onChange={(value) => setPhone(value || "")}
-                  className="w-full p-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2"
-                  style={{ borderColor: "#D1D5DB" }}
-                  defaultCountry="IN"
-                  required
-                />
+                <div className="phone-input-wrap">
+                  <PhoneInput
+                    placeholder="Phone number with country code"
+                    value={phone}
+                    onChange={(value) => setPhone(value || "")}
+                    defaultCountry="IN"
+                    required
+                  />
+                </div>
+                <style jsx global>{`
+                  .phone-input-wrap .PhoneInput {
+                    display: flex;
+                    align-items: center;
+                    border: 1px solid ${TINT_LINE};
+                    border-radius: 8px;
+                    padding: 0.5rem 0.75rem;
+                    transition:
+                      border-color 0.15s ease,
+                      box-shadow 0.15s ease;
+                  }
+                  .phone-input-wrap .PhoneInput:focus-within {
+                    border-color: ${BRAND};
+                    box-shadow: 0 0 0 3px ${TINT_BG};
+                  }
+                  .phone-input-wrap .PhoneInputInput {
+                    border: none;
+                    outline: none;
+                    font-size: 0.875rem;
+                    color: ${INK};
+                    background: transparent;
+                    flex: 1;
+                    min-width: 0;
+                  }
+                  .phone-input-wrap .PhoneInputCountrySelect {
+                    margin-right: 0.5rem;
+                  }
+                `}</style>
               </div>
             </Stack>
           </div>
@@ -292,7 +366,10 @@ export default function EditProfilePage() {
           <Divider color={TINT_LINE} />
 
           {/* Actions */}
-          <div className="px-6 sm:px-8 py-5 flex items-center justify-end gap-3">
+          <div
+            className="px-6 sm:px-8 py-5 flex items-center justify-end gap-3"
+            style={{ background: "#FAFBFE" }}
+          >
             <Button
               variant="subtle"
               color="gray"
@@ -306,7 +383,7 @@ export default function EditProfilePage() {
               loading={isLoading}
               disabled={!hasChanges}
               unstyled
-              className="font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 text-sm shadow-sm disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none hover:shadow-md"
               style={{ background: BRAND, color: "white" }}
             >
               Save changes
