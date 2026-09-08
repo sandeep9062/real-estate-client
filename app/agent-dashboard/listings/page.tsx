@@ -16,6 +16,7 @@ import { useGetUserByIdQuery } from "@/services/userApi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
+import { firstImageUrl } from "@/services/leadsApi";
 
 // Mirrors the listingAvailability enum in backend/models/Property.js
 const LISTING_AVAILABILITY_OPTIONS = [
@@ -206,23 +207,28 @@ const ListingsPage = () => {
                     className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3">
-                      <Link
-                        href={`/property/${card.slug}`}
-                        className="block relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100 hover:opacity-80 transition-opacity"
-                      >
-                        {card.images?.[0] ? (
-                          <Image
-                            src={card.images[0]}
-                            alt={card.title || "Property image"}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                            No img
-                          </div>
-                        )}
-                      </Link>
+                      {(() => {
+                        const img = firstImageUrl(card.image);
+                        return (
+                          <Link
+                            href={`/property/${card.slug}`}
+                            className="block relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100 hover:opacity-80 transition-opacity"
+                          >
+                            {img ? (
+                              <Image
+                                src={img}
+                                alt={card.title || "Property image"}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                No img
+                              </div>
+                            )}
+                          </Link>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 font-medium text-[#0F172A] max-w-[220px] truncate">
                       {card.title}
