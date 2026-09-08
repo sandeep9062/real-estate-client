@@ -216,7 +216,7 @@ export default function AddPropertyPageContent() {
   }
 
   return (
-    <Container size="md" py="xl" mt={68} mb={40}>
+    <Container size="md" py="xl" mt={68} mb={30}>
       <Stepper active={active} onStepClick={goToStep}>
         <Stepper.Step label="AI Magic" description="Auto-fill data">
           <MagicFill
