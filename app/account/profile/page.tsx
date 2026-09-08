@@ -160,7 +160,7 @@ export default function EditProfilePage() {
         {/* Back nav */}
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-sm font-medium mb-6 transition-colors hover:opacity-70"
+          className="inline-flex items-center gap-2 text-sm font-medium mb-6 rounded-lg px-3 py-2 -ml-3 transition-colors hover:bg-white"
           style={{ color: INK_SOFT }}
         >
           <ArrowLeft size={16} />
