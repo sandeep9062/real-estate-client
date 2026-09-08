@@ -159,7 +159,7 @@ export default function EditProfilePage() {
 
   return (
     <div
-      className="min-h-screen pb-28"
+      className="min-h-screen pb-28 pt-8"
       style={{
         background: `linear-gradient(180deg, ${TINT_BG} 0%, #F7F8FC 260px, #F7F8FC 100%)`,
       }}
