@@ -43,7 +43,9 @@ export function PropertyTrustBadges({
     items.push({
       key: "visit",
       label: "Visit verified",
-      icon: <FiCheckCircle className="text-violet-700" size={compact ? 12 : 14} />,
+      icon: (
+        <FiCheckCircle className="text-violet-700" size={compact ? 12 : 14} />
+      ),
       className: "bg-violet-50 text-violet-800 border-violet-200",
     });
   }
@@ -59,7 +61,9 @@ export function PropertyTrustBadges({
     items.push({
       key: "legacy",
       label: "Verified",
-      icon: <FiCheckCircle className="text-blue-600" size={compact ? 12 : 14} />,
+      icon: (
+        <FiCheckCircle className="text-blue-600" size={compact ? 12 : 14} />
+      ),
       className: "bg-blue-50 text-blue-800 border-blue-200",
     });
   }
@@ -124,12 +128,8 @@ export function ListingPostedByTag({
   userRole?: string;
 }) {
   const source =
-    (postedBy || "").trim().toLowerCase() ||
-    (userRole === "agent"
-      ? "agent"
-      : userRole === "landlord"
-        ? "owner"
-        : "");
+    // (postedBy || "").trim().toLowerCase() ||
+    userRole === "agent" ? "agent" : userRole === "landlord" ? "owner" : "";
 
   if (!["owner", "agent", "builder"].includes(source)) return null;
 
