@@ -31,7 +31,7 @@ const OwnedPropertiesPage = () => {
   const handleEditProperty = (property: any) => {
     if (isAuthenticated) {
       setEditingProperty(property);
-      router.push(`/edit-property/${property._id}`);
+      router.push("/add-property?id=" + property._id);
     }
   };
   // Auth state
