@@ -332,6 +332,8 @@ export const propertiesApi = createApi({
             // Already handled above
           } else if (key === "floorPlanFiles") {
             // Appended above
+          } else if (property[key] === undefined || property[key] === null) {
+            // Skip undefined/null values so they don't get sent as strings
           } else if (
             typeof property[key] === "object" &&
             property[key] !== null
