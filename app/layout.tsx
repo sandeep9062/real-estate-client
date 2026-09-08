@@ -174,7 +174,7 @@ export default function RootLayout({
                 }}
                 style={{ zIndex: 9999 }}
               /> */}
-              //new toaster design
+
               <Toaster
                 richColors
                 closeButton
