@@ -547,6 +547,7 @@ function toPropertyCard(listing: Listing) {
     },
     listingAvailability: "Available" as const,
     isFeatured: false,
+    postedBy: "Agent" as const,
   };
 }
 

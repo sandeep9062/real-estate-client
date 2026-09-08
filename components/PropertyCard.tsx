@@ -18,6 +18,7 @@ import {
 import {
   PropertyTrustBadges,
   ListingAvailabilityPill,
+  ListingPostedByTag,
 } from "@/components/PropertyTrustBadges";
 
 interface PropertyCardProps {
@@ -470,7 +471,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </div>
         </div>
 
-        <PropertyTrustBadges property={card} compact />
+        <div className="flex flex-wrap items-center gap-1.5">
+          <ListingPostedByTag
+            postedBy={card.postedBy}
+            userRole={card.user?.role}
+          />
+          <PropertyTrustBadges property={card} compact />
+        </div>
         {statItems.length > 0 && (
           <div
             className={

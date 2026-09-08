@@ -1,7 +1,7 @@
 "use client";
 
 import { FiCheckCircle, FiShield } from "react-icons/fi";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaUserTie, FaHardHat } from "react-icons/fa";
 
 export function PropertyTrustBadges({
   property,
@@ -107,6 +107,62 @@ export function ListingAvailabilityPill({
       className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${styles[v] || styles.Available}`}
     >
       {labels[v] || v}
+    </span>
+  );
+}
+
+/**
+ * Tag showing who listed the property: "Agent listed" | "Owner listed" | "Builder listed".
+ * Resolves from the property's `postedBy` field (Owner | Agent | Builder), falling back
+ * to the listing user's role (agent → Agent, landlord → Owner) when postedBy is missing.
+ */
+export function ListingPostedByTag({
+  postedBy,
+  userRole,
+}: {
+  postedBy?: string;
+  userRole?: string;
+}) {
+  const source =
+    (postedBy || "").trim().toLowerCase() ||
+    (userRole === "agent"
+      ? "agent"
+      : userRole === "landlord"
+        ? "owner"
+        : "");
+
+  if (!["owner", "agent", "builder"].includes(source)) return null;
+
+  const isAgent = source === "agent";
+  const isOwner = source === "owner";
+
+  const label = isAgent
+    ? "Agent listed"
+    : isOwner
+      ? "Owner listed"
+      : "Builder listed";
+
+  const styles = isAgent
+    ? "bg-[#4161df]/10 text-[#4161df] border-[#4161df]/25"
+    : isOwner
+      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+      : "bg-orange-50 text-orange-700 border-orange-200";
+
+  const icon = isAgent ? (
+    <FaUserTie className="shrink-0" size={12} aria-hidden />
+  ) : isOwner ? (
+    <FaHome className="shrink-0" size={12} aria-hidden />
+  ) : (
+    <FaHardHat className="shrink-0" size={12} aria-hidden />
+  );
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-bold ${styles}`}
+      title={label}
+    >
+      {icon}
+      <span className="truncate">{label}</span>
     </span>
   );
 }

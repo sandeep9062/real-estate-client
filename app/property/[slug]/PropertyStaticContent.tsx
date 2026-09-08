@@ -8,6 +8,7 @@ import MediaGallery from "@/components/MediaGallery";
 import {
   PropertyTrustBadges,
   ListingAvailabilityPill,
+  ListingPostedByTag,
 } from "@/components/PropertyTrustBadges";
 
 interface PropertyStaticContentProps {
@@ -36,6 +37,10 @@ export default function PropertyStaticContent({
           <div className="flex flex-wrap items-center gap-2">
             <ListingAvailabilityPill
               listingAvailability={data?.listingAvailability}
+            />
+            <ListingPostedByTag
+              postedBy={data?.postedBy}
+              userRole={data?.user?.role}
             />
             <PropertyTrustBadges property={data} />
             <span className="bg-orange-50 text-orange-700 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
