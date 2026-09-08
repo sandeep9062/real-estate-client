@@ -207,6 +207,7 @@ const ListingsPage = () => {
                   <th className="px-4 py-3">Price</th>
                   <th className="px-4 py-3">Listing Availability</th>
                   <th className="px-4 py-3">Active</th>
+                  <th className="px-4 py-3">Created At</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -282,6 +283,15 @@ const ListingsPage = () => {
                           }`}
                         />
                       </button>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600">
+                      {card.createdAt
+                        ? new Date(card.createdAt).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "-"}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
