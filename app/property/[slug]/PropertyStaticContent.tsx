@@ -1,4 +1,4 @@
-import { FiMapPin } from "react-icons/fi";
+import { FiMapPin, FiCheck } from "react-icons/fi";
 import { FaShower, FaCar } from "react-icons/fa";
 import { MdLocationPin, MdMeetingRoom } from "react-icons/md";
 import { RiServiceLine } from "react-icons/ri";
@@ -334,6 +334,51 @@ export default function PropertyStaticContent({
           </section>
 
           {mainInteractions}
+
+          {/* Amenities Section */}
+          {(data?.amenities?.length || data?.societyAmenities?.length) && (
+            <section className="space-y-6">
+              {/* Property Amenities */}
+              {data?.amenities?.length > 0 && (
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    Property Amenities
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {data.amenities.map((amenity: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2 text-slate-700"
+                      >
+                        <FiCheck className="text-green-500 flex-shrink-0" size={16} />
+                        <span className="text-sm">{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Society Amenities */}
+              {data?.societyAmenities?.length > 0 && (
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    Society / Building Amenities
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {data.societyAmenities.map((amenity: string, i: number) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2 text-slate-700"
+                      >
+                        <FiCheck className="text-green-500 flex-shrink-0" size={16} />
+                        <span className="text-sm">{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Neighborhood */}
           {(() => {
