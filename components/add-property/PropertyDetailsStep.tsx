@@ -88,6 +88,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       securityDeposit: propertyDetails.securityDeposit ?? "",
       lockInMonths: propertyDetails.lockInMonths ?? "",
       noticePeriodDays: propertyDetails.noticePeriodDays ?? "",
+      tenantPreference: propertyDetails.tenantPreference || "Any",
       pricePerSqft: propertyDetails.pricePerSqft ?? "",
       ocStatus: propertyDetails.ocStatus || "",
       negotiable: propertyDetails.negotiable !== false,
@@ -159,6 +160,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
     securityDeposit,
     lockInMonths,
     noticePeriodDays,
+    tenantPreference,
     pricePerSqft,
     ocStatus,
     negotiable,
@@ -180,6 +182,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
   const showAmenities = supportsAmenities(propertyCategory);
   const showAgeOfProperty = !isLand;
   const showRentTerms = deal === "Rent";
+  const showTenantPreference = deal === "Rent";
   const showSalePricePerSqft = deal === "Sale";
   const showOCStatus = deal === "Sale" && !isLand;
 
@@ -222,6 +225,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       securityDeposit: showRentTerms ? toOptNum(securityDeposit) : undefined,
       lockInMonths: showRentTerms ? toOptNum(lockInMonths) : undefined,
       noticePeriodDays: showRentTerms ? toOptNum(noticePeriodDays) : undefined,
+      tenantPreference: showTenantPreference ? tenantPreference || "Any" : undefined,
       pricePerSqft: showSalePricePerSqft ? toOptNum(pricePerSqft) : undefined,
       ocStatus: showOCStatus ? ocStatus || undefined : undefined,
       negotiable,
@@ -411,6 +415,17 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
             />
           )}
         </Group>
+
+        {showTenantPreference && (
+          <Select
+            label="Tenant Preference"
+            description="Select the type of tenants you prefer."
+            data={["Family", "Bachelors", "Any", "Working Professionals", "Students"]}
+            {...form.getInputProps("tenantPreference")}
+            classNames={{ input: "border-gray-300" }}
+            styles={{ dropdown: { zIndex: 1300 } }}
+          />
+        )}
 
         {showAmenities && (
           <MultiSelect
