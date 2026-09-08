@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     data?.facilities?.bathrooms !== 1 ? "s" : ""
   }.`;
   const description = sanitizeMetaText(rawDescription);
-  const canonicalUrl = `https://www.propertybulbul.com/property/${data.slug || data._id}`;
+  const canonicalUrl = `https://www.propertybulbul.com/property/${data.slug}`;
 
   // Filter out video URLs from images
   const imageUrls = (data?.image || []).filter((img: string) => {

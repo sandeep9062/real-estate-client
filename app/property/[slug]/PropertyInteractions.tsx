@@ -284,7 +284,7 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
             {data?.user?.phone && (
               <a
                 href={`https://wa.me/${data.user.phone}?text=${encodeURIComponent(
-                  `Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${id}`,
+                  `Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${data.slug}`,
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
