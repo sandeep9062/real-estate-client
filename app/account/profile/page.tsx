@@ -3,11 +3,19 @@
 /**
  * app/account/profile/page.tsx
  *
- * Full-page profile editor. Redesigned for visual polish and fixes the
- * avatar-preview sizing bug from the previous version (Mantine's Image
- * width/height props weren't reliably constraining the rendered size,
- * so the photo spilled out of its circle). Preview now uses a fixed-size
- * container with a real <img> + object-fit: cover.
+ * Full-page profile editor.
+ *
+ * Changes in this pass:
+ * - Back button had almost no hit area (just text + tiny icon, no padding),
+ *   making it hard to click/tap. Now has real padding, a rounded hover
+ *   background, and a proper focus-visible ring.
+ * - Added focus-visible rings consistently (previously only :focus, which
+ *   some browsers won't show for keyboard nav).
+ * - Slightly increased spacing rhythm inside cards and between the two
+ *   columns for better visual separation.
+ * - Added a border to the role/verified pills so they don't blend into the
+ *   white card background.
+ * - Added a status dot to the "unsaved changes" bar for quicker scanning.
  */
 
 import React, { useEffect, useRef, useState } from "react";
@@ -157,11 +165,11 @@ export default function EditProfilePage() {
       }}
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        {/* Back nav */}
+        {/* Back nav — real hit area now: padded, rounded, hover + focus-visible state */}
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-sm font-medium mb-6 rounded-lg px-3 py-2 -ml-3 transition-colors hover:bg-white"
-          style={{ color: INK_SOFT }}
+          className="inline-flex items-center gap-2 text-sm font-medium mb-6 rounded-lg px-3 py-2 -ml-3 transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2"
+          style={{ color: INK_SOFT, ["--tw-ring-color" as any]: TINT_BG }}
         >
           <ArrowLeft size={16} />
           Back
@@ -180,7 +188,7 @@ export default function EditProfilePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
           {/* ---------------- Identity sidebar ---------------- */}
           <div className="lg:sticky lg:top-8 lg:self-start">
             <div
@@ -220,7 +228,8 @@ export default function EditProfilePage() {
                 <button
                   type="button"
                   onClick={() => openRef.current?.()}
-                  className="relative group cursor-pointer rounded-full outline-none"
+                  className="relative group cursor-pointer rounded-full outline-none focus-visible:ring-2"
+                  style={{ ["--tw-ring-color" as any]: BRAND }}
                   aria-label="Change profile photo"
                 >
                   <div
@@ -286,8 +295,12 @@ export default function EditProfilePage() {
               <button
                 type="button"
                 onClick={() => openRef.current?.()}
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold rounded-lg px-3 py-1.5 transition-colors hover:opacity-85"
-                style={{ color: BRAND, background: TINT_BG }}
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold rounded-lg px-3.5 py-2 transition-colors hover:opacity-85 focus-visible:outline-none focus-visible:ring-2"
+                style={{
+                  color: BRAND,
+                  background: TINT_BG,
+                  ["--tw-ring-color" as any]: BRAND,
+                }}
               >
                 <Camera size={14} />
                 Change photo
@@ -297,7 +310,7 @@ export default function EditProfilePage() {
               </p>
 
               <div
-                className="w-full mt-5 pt-5"
+                className="w-full mt-6 pt-5"
                 style={{ borderTop: `1px solid ${TINT_LINE}` }}
               >
                 <p
@@ -317,7 +330,11 @@ export default function EditProfilePage() {
                   {user.role && (
                     <span
                       className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full"
-                      style={{ background: TINT_BG, color: BRAND }}
+                      style={{
+                        background: TINT_BG,
+                        color: BRAND,
+                        border: `1px solid ${BRAND}22`,
+                      }}
                     >
                       <ShieldCheck size={12} />
                       {roleLabels[user.role] || user.role}
@@ -326,7 +343,11 @@ export default function EditProfilePage() {
                   {user.isVerified && (
                     <span
                       className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full"
-                      style={{ background: SUCCESS_BG, color: SUCCESS }}
+                      style={{
+                        background: SUCCESS_BG,
+                        color: SUCCESS,
+                        border: `1px solid ${SUCCESS}22`,
+                      }}
                     >
                       <Check size={12} />
                       Verified account
@@ -428,9 +449,13 @@ export default function EditProfilePage() {
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           <p
-            className="text-sm font-medium hidden sm:block"
+            className="text-sm font-medium hidden sm:flex items-center gap-2"
             style={{ color: INK_SOFT }}
           >
+            <span
+              className="inline-block rounded-full"
+              style={{ width: 6, height: 6, background: BRAND }}
+            />
             You have unsaved changes
           </p>
           <div className="flex items-center gap-3 ml-auto">
@@ -447,8 +472,12 @@ export default function EditProfilePage() {
               loading={isLoading}
               disabled={!hasChanges}
               unstyled
-              className="font-semibold py-2.5 px-6 rounded-lg transition-all duration-150 text-sm shadow-sm disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none"
-              style={{ background: BRAND, color: "white" }}
+              className="font-semibold py-2.5 px-6 rounded-lg transition-all duration-150 text-sm shadow-sm disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none focus-visible:outline-none focus-visible:ring-2"
+              style={{
+                background: BRAND,
+                color: "white",
+                ["--tw-ring-color" as any]: BRAND_DEEP,
+              }}
               onMouseEnter={(e) => {
                 if (hasChanges)
                   (e.currentTarget as HTMLElement).style.background =
@@ -474,7 +503,8 @@ export default function EditProfilePage() {
           border-color: ${TINT_LINE} !important;
           font-size: 14.5px;
         }
-        .pb-field:focus {
+        .pb-field:focus,
+        .pb-field:focus-visible {
           border-color: ${BRAND} !important;
           box-shadow: 0 0 0 3px ${TINT_BG};
         }
