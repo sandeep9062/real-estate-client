@@ -9,7 +9,6 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 
-import AddPropertyModal from "../../components/AddPropertyModal";
 import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
 import { useGetUserByIdQuery } from "@/services/userApi";
 import Link from "next/link";
@@ -18,12 +17,12 @@ const OwnedPropertiesPage = () => {
   const router = useRouter();
 
   const [filter, setFilter] = useState<SearchFilters>({ query: "" });
-  const [modalOpened, setModalOpened] = useState(false);
+
   const [editingProperty, setEditingProperty] = useState<any>(null);
 
   const handleAddPropertyClick = () => {
     if (isAuthenticated) {
-      setModalOpened(true);
+      router.push("/add-property");
       setEditingProperty(null);
     } else {
       router.push("/auth");
@@ -33,7 +32,7 @@ const OwnedPropertiesPage = () => {
   const handleEditProperty = (property: any) => {
     if (isAuthenticated) {
       setEditingProperty(property);
-      setModalOpened(true);
+      router.push(`/edit-property/${property._id}`);
     }
   };
   // Auth state
@@ -147,12 +146,6 @@ const OwnedPropertiesPage = () => {
           </div>
         )}
       </div>
-
-      <AddPropertyModal
-        opened={modalOpened}
-        setOpened={setModalOpened}
-        editingProperty={editingProperty}
-      />
     </div>
   );
 };

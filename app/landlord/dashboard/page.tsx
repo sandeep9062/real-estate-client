@@ -24,7 +24,6 @@ import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { useGetMyLandlordProfileQuery } from "@/services/landlordApi";
 import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
 import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
-import AddPropertyModal from "@/components/AddPropertyModal";
 
 // ──────────────────────────────────────────────
 // Helpers
@@ -162,8 +161,6 @@ export default function LandlordDashboardPage() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
   const canAccess = user?.role === "landlord" || user?.role === "admin";
-
-  const [modalOpened, setModalOpened] = useState(false);
 
   // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
   // visitor lands here.
@@ -380,7 +377,7 @@ export default function LandlordDashboardPage() {
           <div className="flex shrink-0 flex-wrap gap-2.5">
             <button
               type="button"
-              onClick={() => setModalOpened(true)}
+              onClick={() => router.push("/landlord/dashboard/add-property")}
               className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-[#2c3f8f] transition hover:bg-white/90 active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" aria-hidden />
@@ -482,7 +479,7 @@ export default function LandlordDashboardPage() {
               </p>
               <button
                 type="button"
-                onClick={() => setModalOpened(true)}
+                onClick={() => router.push("/landlord/dashboard/add-property")}
                 className="mt-1 inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-[#4161df] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3654cc] active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" aria-hidden />
@@ -663,12 +660,6 @@ export default function LandlordDashboardPage() {
           <ArrowRight className="h-4 w-4" aria-hidden />
         </span>
       </Link>
-
-      <AddPropertyModal
-        opened={modalOpened}
-        setOpened={setModalOpened}
-        editingProperty={null}
-      />
     </div>
   );
 }

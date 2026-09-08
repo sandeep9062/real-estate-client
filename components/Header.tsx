@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { BiMenuAltRight } from "react-icons/bi";
-import AddPropertyModal from "./AddPropertyModal";
+
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import ProfileMenu from "./ProfileMenu";
@@ -14,7 +14,7 @@ import Image from "next/image";
 const Header: React.FC = () => {
   const [menuOpened, setMenuOpened] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [modalOpened, setModalOpened] = useState(false);
+
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const user = useSelector(selectUser);
@@ -137,10 +137,6 @@ const Header: React.FC = () => {
               >
                 Add Property
               </button>
-              {/* <AddPropertyModal
-                opened={modalOpened}
-                setOpened={setModalOpened}
-              /> */}
 
               <button
                 onClick={() => router.push("/post-requirement")}
