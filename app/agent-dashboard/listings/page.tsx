@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { firstImageUrl } from "@/services/leadsApi";
+import { toast } from "@/hooks/use-toast";
 
 // Mirrors the listingAvailability enum in backend/models/Property.js
 const LISTING_AVAILABILITY_OPTIONS = [
@@ -62,8 +63,10 @@ const ListingsPage = () => {
         id: propertyId,
         listingAvailability: newAvailability,
       }).unwrap();
+      toast.success(`Listing availability updated to "${newAvailability}"`);
     } catch (error) {
       console.error("Failed to update listing availability:", error);
+      toast.error("Could not update listing availability. Please try again.");
     }
   };
 
@@ -78,8 +81,10 @@ const ListingsPage = () => {
         isActive: !isActive,
         image: image || [],
       }).unwrap();
+      toast.success(!isActive ? "Listing activated" : "Listing deactivated");
     } catch (error) {
       console.error("Failed to toggle active status:", error);
+      toast.error("Could not update listing status. Please try again.");
     }
   };
 
