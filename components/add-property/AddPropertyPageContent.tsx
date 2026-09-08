@@ -55,6 +55,7 @@ function buildDefaultPropertyDetails(userEmail?: string) {
     securityDeposit: undefined as number | undefined,
     lockInMonths: undefined as number | undefined,
     noticePeriodDays: undefined as number | undefined,
+    tenantPreference: "Any",
     ocStatus: "" as string,
     ageOfProperty: undefined as number | undefined,
     pricePerSqft: undefined as number | undefined,

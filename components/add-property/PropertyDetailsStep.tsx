@@ -116,6 +116,49 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
     },
   });
 
+  // Update form values when propertyDetails changes (e.g., when editing an existing property)
+  useEffect(() => {
+    if (propertyDetails) {
+      form.setValues({
+        title: propertyDetails.title,
+        slug: propertyDetails.slug || "",
+        description: propertyDetails.description,
+        price: propertyDetails.price,
+        deal: propertyDetails.deal,
+        type: propertyDetails.type,
+        propertyCategory: propertyDetails.propertyCategory,
+        areaValue: propertyDetails.area.value,
+        areaUnit: propertyDetails.area.unit,
+        availability: propertyDetails.availability,
+        furnishing: propertyDetails.furnishing,
+        facing: propertyDetails.facing || "",
+        postedBy: propertyDetails.postedBy,
+        commercialPropertyTypes: propertyDetails.commercialPropertyTypes,
+        investmentOptions: propertyDetails.investmentOptions,
+        ageOfProperty: propertyDetails.ageOfProperty ?? "",
+        amenities: propertyDetails.amenities || [],
+        maintenanceCharge: propertyDetails.maintenanceCharge ?? "",
+        securityDeposit: propertyDetails.securityDeposit ?? "",
+        lockInMonths: propertyDetails.lockInMonths ?? "",
+        noticePeriodDays: propertyDetails.noticePeriodDays ?? "",
+        tenantPreference: propertyDetails.tenantPreference || "Any",
+        pricePerSqft: propertyDetails.pricePerSqft ?? "",
+        ocStatus: propertyDetails.ocStatus || "",
+        negotiable: propertyDetails.negotiable !== false,
+        listingAvailability: propertyDetails.listingAvailability || "Available",
+        reraNumber: propertyDetails.reraNumber || "",
+        virtualTourUrl: propertyDetails.virtualTourUrl || "",
+        schoolsText: (propertyDetails.nearbyPlaces?.schools || []).join("\n"),
+        metroStationsText: (
+          propertyDetails.nearbyPlaces?.metroStations || []
+        ).join("\n"),
+        hospitalsText: (propertyDetails.nearbyPlaces?.hospitals || []).join("\n"),
+        mallsText: (propertyDetails.nearbyPlaces?.malls || []).join("\n"),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propertyDetails]);
+
   // Auto-generate slug from title
   useEffect(() => {
     const titleValue = form.values.title;

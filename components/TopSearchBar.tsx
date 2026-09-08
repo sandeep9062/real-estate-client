@@ -71,6 +71,7 @@ const TENANT_PREFERENCE_OPTIONS = [
   "Bachelors",
   "Any",
   "Working Professionals",
+  "Students",
 ];
 const OWNERSHIP_TYPE_OPTIONS = [
   "Freehold",
