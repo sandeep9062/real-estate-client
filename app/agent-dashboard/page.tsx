@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 import { selectUser } from "@/store/authSlice";
 import { useGetLeadStatsQuery } from "@/services/leadsApi";
@@ -21,6 +22,7 @@ import { useGetMyAgentProfileQuery } from "@/services/agentsApi";
 import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
 import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
 import { PageHeader, StatCard } from "@/components/agent-dashboard/ui";
+import { toast } from "@/hooks/use-toast";
 
 const QUICK_ACTIONS = [
   {
@@ -59,9 +61,27 @@ const QUICK_ACTIONS = [
 
 export default function AgentDashboardOverviewPage() {
   const user = useSelector(selectUser);
-  const { data: stats } = useGetLeadStatsQuery();
-  const { data: profileData } = useGetMyAgentProfileQuery();
-  const { data: ownedProperties } = useGetOwnedPropertiesQuery(undefined);
+  const { data: stats, error: statsError } = useGetLeadStatsQuery();
+  const { data: profileData, error: profileError } = useGetMyAgentProfileQuery();
+  const { data: ownedProperties, error: propertiesError } = useGetOwnedPropertiesQuery(undefined);
+
+  useEffect(() => {
+    if (statsError) {
+      toast.error("Failed to load lead statistics. Please refresh the page.");
+    }
+  }, [statsError]);
+
+  useEffect(() => {
+    if (profileError) {
+      toast.error("Failed to load your profile data. Please refresh the page.");
+    }
+  }, [profileError]);
+
+  useEffect(() => {
+    if (propertiesError) {
+      toast.error("Failed to load your properties. Please refresh the page.");
+    }
+  }, [propertiesError]);
 
   const today = new Date().toLocaleDateString("en-IN", {
     weekday: "long",

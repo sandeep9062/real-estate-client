@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
@@ -24,6 +24,7 @@ import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { useGetMyLandlordProfileQuery } from "@/services/landlordApi";
 import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
 import ProfileCompletenessBanner from "@/components/profile/ProfileCompletenessBanner";
+import { toast } from "@/hooks/use-toast";
 
 // ──────────────────────────────────────────────
 // Helpers
@@ -164,13 +165,25 @@ export default function LandlordDashboardPage() {
 
   // Skip until gated in — avoids a 401 (and its auto-logout) when a signed-out
   // visitor lands here.
-  const { data: profileData } = useGetMyLandlordProfileQuery(undefined, {
+  const { data: profileData, error: profileError } = useGetMyLandlordProfileQuery(undefined, {
     skip: !isAuthenticated || !canAccess,
   });
-  const { data: ownedData, isFetching: fetchingProperties } =
+  const { data: ownedData, isFetching: fetchingProperties, error: propertiesError } =
     useGetOwnedPropertiesQuery(undefined, {
       skip: !isAuthenticated || !canAccess,
     });
+
+  useEffect(() => {
+    if (profileError) {
+      toast.error("Failed to load your profile data. Please refresh the page.");
+    }
+  }, [profileError]);
+
+  useEffect(() => {
+    if (propertiesError) {
+      toast.error("Failed to load your properties. Please refresh the page.");
+    }
+  }, [propertiesError]);
 
   const profile = profileData?.data;
   const properties = useMemo(() => ownedData ?? [], [ownedData]);

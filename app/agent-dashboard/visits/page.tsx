@@ -28,6 +28,7 @@ import {
 } from "@/services/userApi";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { PageHeader } from "@/components/agent-dashboard/ui";
+import { toast } from "@/hooks/use-toast";
 
 type BookingStatus = "Pending" | "Confirmed" | "Completed" | "Cancelled";
 
@@ -186,8 +187,16 @@ export default function AgentDashboardVisitsPage() {
     setPendingId(id);
     try {
       await updateStatus({ id, status }).unwrap();
+      const statusMessages: Record<BookingStatus, string> = {
+        Pending: "Visit marked as pending",
+        Confirmed: "Visit confirmed successfully",
+        Completed: "Visit marked as completed",
+        Cancelled: "Visit cancelled",
+      };
+      toast.success(statusMessages[status]);
     } catch (err) {
       console.error("Failed to update visit status:", err);
+      toast.error("Could not update visit status. Please try again.");
     } finally {
       setPendingId(null);
     }
