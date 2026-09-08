@@ -164,7 +164,7 @@ export default function EditProfilePage() {
         background: `linear-gradient(180deg, ${TINT_BG} 0%, #F7F8FC 260px, #F7F8FC 100%)`,
       }}
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Back nav — real hit area now: padded, rounded, hover + focus-visible state */}
         <button
           onClick={() => router.back()}
@@ -419,6 +419,7 @@ export default function EditProfilePage() {
                     size={16}
                     color={INK_FAINT}
                     style={{ marginRight: 8, flexShrink: 0 }}
+                    aria-hidden="true"
                   />
                   <PhoneInput
                     placeholder="Phone number with country code"
@@ -508,19 +509,26 @@ export default function EditProfilePage() {
           border-color: ${BRAND} !important;
           box-shadow: 0 0 0 3px ${TINT_BG};
         }
-        .phone-input-wrap .PhoneInput {
+        .phone-input-wrap {
           display: flex;
           align-items: center;
           border: 1px solid ${TINT_LINE};
           border-radius: 8px;
           padding: 0.55rem 0.75rem;
+          background: white;
           transition:
             border-color 0.15s ease,
             box-shadow 0.15s ease;
         }
-        .phone-input-wrap .PhoneInput:focus-within {
+        .phone-input-wrap:focus-within {
           border-color: ${BRAND};
           box-shadow: 0 0 0 3px ${TINT_BG};
+        }
+        .phone-input-wrap .PhoneInput {
+          display: flex;
+          align-items: center;
+          flex: 1;
+          min-width: 0;
         }
         .phone-input-wrap .PhoneInputInput {
           border: none;
