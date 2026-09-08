@@ -4,7 +4,6 @@ import React, { useMemo, useState } from "react";
 import SearchBar, { SearchFilters } from "../../components/SearchBar";
 import { PuffLoader } from "react-spinners";
 import PropertyCard from "@/components/PropertyCard";
-import Image from "next/image";
 
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";

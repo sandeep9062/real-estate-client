@@ -8,10 +8,26 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 
-import { useGetOwnedPropertiesQuery } from "@/services/propertiesApi";
+import {
+  useGetOwnedPropertiesQuery,
+  useUpdatePropertyMutation,
+} from "@/services/propertiesApi";
 import { useGetUserByIdQuery } from "@/services/userApi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Pencil } from "lucide-react";
+
+// Mirrors the listingAvailability enum in backend/models/Property.js
+const LISTING_AVAILABILITY_OPTIONS = [
+  "Available",
+  "Fresh",
+  "Under offer",
+  "Booked",
+  "Sold",
+  "Rented",
+  "Review Required",
+  "Non Available",
+];
 
 const ListingsPage = () => {
   const router = useRouter();
@@ -36,6 +52,31 @@ const ListingsPage = () => {
     }
   };
 
+  const handleAvailabilityChange = async (
+    propertyId: string,
+    newAvailability: string
+  ) => {
+    try {
+      await updateProperty({
+        id: propertyId,
+        listingAvailability: newAvailability,
+      }).unwrap();
+    } catch (error) {
+      console.error("Failed to update listing availability:", error);
+    }
+  };
+
+  const handleToggleActive = async (propertyId: string, isActive: boolean) => {
+    try {
+      await updateProperty({
+        id: propertyId,
+        isActive: !isActive,
+      }).unwrap();
+    } catch (error) {
+      console.error("Failed to toggle active status:", error);
+    }
+  };
+
   // Auth state
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
@@ -48,6 +89,9 @@ const ListingsPage = () => {
 
   // Fetch properties user owns
   const { data, isLoading, isError } = useGetOwnedPropertiesQuery(undefined);
+
+  // Mutation for updating listing availability
+  const [updateProperty] = useUpdatePropertyMutation();
 
   const properties = data || [];
 
@@ -150,7 +194,8 @@ const ListingsPage = () => {
                   <th className="px-4 py-3">Title</th>
                   <th className="px-4 py-3">Location</th>
                   <th className="px-4 py-3">Price</th>
-                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Listing Availability</th>
+                  <th className="px-4 py-3">Active</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -161,16 +206,23 @@ const ListingsPage = () => {
                     className="border-t border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3">
-                      <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100">
-                        {card.images?.[0] && (
+                      <Link
+                        href={`/property/${card.slug}`}
+                        className="block relative w-14 h-14 rounded-lg overflow-hidden bg-gray-100 hover:opacity-80 transition-opacity"
+                      >
+                        {card.images?.[0] ? (
                           <Image
                             src={card.images[0]}
                             alt={card.title || "Property image"}
                             fill
                             className="object-cover"
                           />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                            No img
+                          </div>
                         )}
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-4 py-3 font-medium text-[#0F172A] max-w-[220px] truncate">
                       {card.title}
@@ -184,22 +236,42 @@ const ListingsPage = () => {
                       {card.price ? `Rs.${card.price}` : "-"}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          card.status === "available"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
+                      <select
+                        value={card.listingAvailability || "Available"}
+                        onChange={(e) =>
+                          handleAvailabilityChange(card._id, e.target.value)
+                        }
+                        className="px-2 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                      >
+                        {LISTING_AVAILABILITY_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleActive(card._id, card.isActive)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                          card.isActive ? "bg-green-500" : "bg-gray-300"
                         }`}
                       >
-                        {card.status || "N/A"}
-                      </span>
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${
+                            card.isActive ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </button>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleEditProperty(card)}
-                        className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg"
+                        className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit"
                       >
-                        Edit
+                        <Pencil className="w-4 h-4" />
                       </button>
                     </td>
                   </tr>
