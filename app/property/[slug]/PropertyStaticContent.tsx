@@ -296,9 +296,6 @@ export default function PropertyStaticContent({
                       },
                     ]
                   : []),
-                ...(Array.isArray(data?.amenities) && data.amenities.length > 0
-                  ? [{ label: "Amenities", value: data.amenities.join(", ") }]
-                  : []),
                 ...(data?.facilities?.parkingType
                   ? [
                       {
@@ -334,8 +331,12 @@ export default function PropertyStaticContent({
 
           {/* Amenities Section */}
           {(() => {
-            const amenities = data?.amenities ?? [];
-            const societyAmenities = data?.societyAmenities ?? [];
+            const amenities: string[] = [
+              ...new Set((data?.amenities ?? []) as string[]),
+            ];
+            const societyAmenities: string[] = [
+              ...new Set((data?.societyAmenities ?? []) as string[]),
+            ];
             if (!amenities.length && !societyAmenities.length) return null;
             return (
               <section className="space-y-6">
