@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import {
+  useGetOwnProfileQuery,
   useGetPublicProfileQuery,
   useSendConnectionRequestMutation,
 } from "@/services/roommatesApi";
@@ -13,11 +14,28 @@ export default function PublicProfilePage() {
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // "/profile/me" is a special alias for the authenticated user's own profile.
+  // The backend route /profile/me is matched before /profile/:id, but the
+  // frontend must use the own-profile endpoint here — otherwise "me" is cast
+  // as an ObjectId and throws
+  // "Cast to ObjectId failed for value 'me' at path '_id'".
+  const isOwnProfile = id === "me";
+
   const {
-    data: profile,
-    isLoading,
-    error: profileError,
-  } = useGetPublicProfileQuery(id, { skip: !id });
+    data: ownProfile,
+    isLoading: isLoadingOwn,
+    error: ownProfileError,
+  } = useGetOwnProfileQuery(undefined, { skip: !isOwnProfile });
+
+  const {
+    data: publicProfile,
+    isLoading: isLoadingPublic,
+    error: publicProfileError,
+  } = useGetPublicProfileQuery(id, { skip: isOwnProfile || !id });
+
+  const profile = isOwnProfile ? ownProfile : publicProfile;
+  const isLoading = isOwnProfile ? isLoadingOwn : isLoadingPublic;
+  const profileError = isOwnProfile ? ownProfileError : publicProfileError;
 
   const [sendConnectionRequest, { isLoading: sending }] =
     useSendConnectionRequestMutation();
@@ -26,6 +44,7 @@ export default function PublicProfilePage() {
 
   async function handleConnect(e: React.FormEvent) {
     e.preventDefault();
+    if (isOwnProfile) return;
     setSubmitError(null);
     try {
       await sendConnectionRequest({ toProfileId: id, message }).unwrap();
@@ -80,7 +99,9 @@ export default function PublicProfilePage() {
       </dl>
 
       <div className="mt-8 border-t border-slate-200 pt-6">
-        {sent ? (
+        {isOwnProfile ? (
+          <p className="text-sm text-slate-500">This is your own profile.</p>
+        ) : sent ? (
           <p className="text-sm text-emerald-700">Connection request sent.</p>
         ) : (
           <form onSubmit={handleConnect} className="space-y-3">
