@@ -30,6 +30,7 @@ import {
   OC_OPTIONS,
 } from "@/lib/propertyOptions";
 import FloorPlanUploadSection from "@/components/FloorPlanUploadSection";
+import HouseRulesSection from "@/components/add-property/HouseRulesSection";
 
 function splitLines(s: string) {
   return s
@@ -91,6 +92,22 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       allowsSubletting: propertyDetails.allowsSubletting ?? false,
       maxPersonsSharing: propertyDetails.maxPersonsSharing ?? "",
       petsAllowed: propertyDetails.petsAllowed ?? false,
+      houseRules: {
+        ownerLivesOnPremises:
+          propertyDetails.houseRules?.ownerLivesOnPremises ?? false,
+        curfew: {
+          hasCurfew: propertyDetails.houseRules?.curfew?.hasCurfew ?? false,
+          time: propertyDetails.houseRules?.curfew?.time ?? "",
+        },
+        oppositeGenderGuestsAllowed:
+          propertyDetails.houseRules?.oppositeGenderGuestsAllowed ?? "",
+        overnightGuestsAllowed:
+          propertyDetails.houseRules?.overnightGuestsAllowed ?? "",
+        smokingAllowedOnPremises:
+          propertyDetails.houseRules?.smokingAllowedOnPremises ?? false,
+        drinkingAllowedOnPremises:
+          propertyDetails.houseRules?.drinkingAllowedOnPremises ?? false,
+      },
       tenantPreference: propertyDetails.tenantPreference || "Any",
       pricePerSqft: propertyDetails.pricePerSqft ?? "",
       ocStatus: propertyDetails.ocStatus || "",
@@ -146,6 +163,22 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
         allowsSubletting: propertyDetails.allowsSubletting ?? false,
         maxPersonsSharing: propertyDetails.maxPersonsSharing ?? "",
         petsAllowed: propertyDetails.petsAllowed ?? false,
+        houseRules: {
+          ownerLivesOnPremises:
+            propertyDetails.houseRules?.ownerLivesOnPremises ?? false,
+          curfew: {
+            hasCurfew: propertyDetails.houseRules?.curfew?.hasCurfew ?? false,
+            time: propertyDetails.houseRules?.curfew?.time ?? "",
+          },
+          oppositeGenderGuestsAllowed:
+            propertyDetails.houseRules?.oppositeGenderGuestsAllowed ?? "",
+          overnightGuestsAllowed:
+            propertyDetails.houseRules?.overnightGuestsAllowed ?? "",
+          smokingAllowedOnPremises:
+            propertyDetails.houseRules?.smokingAllowedOnPremises ?? false,
+          drinkingAllowedOnPremises:
+            propertyDetails.houseRules?.drinkingAllowedOnPremises ?? false,
+        },
         tenantPreference: propertyDetails.tenantPreference || "Any",
         pricePerSqft: propertyDetails.pricePerSqft ?? "",
         ocStatus: propertyDetails.ocStatus || "",
@@ -210,6 +243,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
     allowsSubletting,
     maxPersonsSharing,
     petsAllowed,
+    houseRules,
     tenantPreference,
     pricePerSqft,
     ocStatus,
@@ -281,6 +315,25 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       maxPersonsSharing:
         showRentTerms && allowsSubletting ? toOptNum(maxPersonsSharing) : undefined,
       petsAllowed: showRentTerms ? petsAllowed : false,
+      houseRules:
+        showRentTerms && allowsSubletting
+          ? {
+              ownerLivesOnPremises: houseRules.ownerLivesOnPremises,
+              curfew: {
+                hasCurfew: houseRules.curfew.hasCurfew,
+                time:
+                  houseRules.curfew.hasCurfew && houseRules.curfew.time
+                    ? houseRules.curfew.time
+                    : undefined,
+              },
+              oppositeGenderGuestsAllowed:
+                houseRules.oppositeGenderGuestsAllowed || undefined,
+              overnightGuestsAllowed:
+                houseRules.overnightGuestsAllowed || undefined,
+              smokingAllowedOnPremises: houseRules.smokingAllowedOnPremises,
+              drinkingAllowedOnPremises: houseRules.drinkingAllowedOnPremises,
+            }
+          : undefined,
       tenantPreference: showTenantPreference ? tenantPreference || "Any" : undefined,
       pricePerSqft: showSalePricePerSqft ? toOptNum(pricePerSqft) : undefined,
       ocStatus: showOCStatus ? ocStatus || undefined : undefined,
@@ -545,6 +598,7 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
               description="Turn on if tenants can keep pets in the property."
               {...form.getInputProps("petsAllowed", { type: "checkbox" })}
             />
+            {allowsSubletting && <HouseRulesSection form={form} />}
           </>
         )}
 
