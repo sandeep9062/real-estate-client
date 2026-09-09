@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { Button, Card, Group, Stepper } from "@mantine/core";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/store/authSlice";
 import {
   useCreateProfileMutation,
   useCreateRoomFlatMutation,
@@ -132,6 +134,26 @@ function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const intent = searchParams.get("intent");
+
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  // The StoreProvider restores the session from localStorage inside a parent
+  // useEffect, which runs AFTER this component's effects on hydration. So we
+  // wait for `mounted` before trusting `isAuthenticated` — otherwise a
+  // signed-in user visiting /flatmates/onboarding directly would be falsely
+  // redirected to /login for one frame.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Auth guard: signed-out users are sent to /login and never see the form.
+  useEffect(() => {
+    if (!mounted) return;
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [mounted, isAuthenticated, router]);
 
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
@@ -284,6 +306,20 @@ function OnboardingContent() {
 
   const updateLocationExtra = (key: string, value: string) =>
     setRoomFlat((r) => ({ ...r, location: { ...r.location, [key]: value } }));
+
+  // ── Auth gate ─────────────────────────────────────────────────────────────
+  // While hydration/session-restore is pending, or for signed-out users (who
+  // are being redirected to /login), show a loader instead of the form.
+  if (!mounted || !isAuthenticated) {
+    return (
+      <main className="mx-auto max-w-xl px-6 py-24 flex justify-center">
+        <Loader2
+          className="w-5 h-5 animate-spin"
+          style={{ color: BRAND }}
+        />
+      </main>
+    );
+  }
 
   if (!intent) {
     return (
