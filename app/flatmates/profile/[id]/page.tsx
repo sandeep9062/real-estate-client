@@ -29,6 +29,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  ArrowLeft,
+  Link2,
+  Check,
 } from "lucide-react";
 
 const BRAND = "#4161df";
@@ -42,6 +45,7 @@ export default function PublicProfilePage() {
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const isOwnProfile = id === "me";
 
@@ -78,6 +82,13 @@ export default function PublicProfilePage() {
     }
   }
 
+  function handleCopyLink() {
+    if (typeof window === "undefined") return;
+    navigator.clipboard?.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   if (error && !profile) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-lg items-center justify-center px-6 py-16">
@@ -102,58 +113,86 @@ export default function PublicProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+      {/* Utility bar */}
+      <div className="mb-4 flex items-center justify-between">
+        <Link
+          href="/flatmates/browse"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors hover:opacity-75"
+          style={{ color: INK_SOFT }}
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to browse
+        </Link>
+        <button
+          onClick={handleCopyLink}
+          className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-[#EEF1FC]"
+          style={{ borderColor: BORDER, color: copied ? "#059669" : INK_SOFT }}
+        >
+          {copied ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Link2 className="h-3.5 w-3.5" />
+          )}
+          {copied ? "Copied" : "Copy link"}
+        </button>
+      </div>
+
       {/* Header card */}
       <div
         className="overflow-hidden rounded-2xl border bg-white"
         style={{ borderColor: BORDER }}
       >
         <div
-          className="h-24 sm:h-28"
+          className="h-28 sm:h-32"
           style={{
             background: "linear-gradient(135deg, #4161df 0%, #2b3f9e 100%)",
           }}
         />
-        <div className="px-5 pb-5 sm:px-6 sm:pb-6">
-          <div className="-mt-10 flex items-end gap-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-white shadow-md">
-              <User className="h-10 w-10" style={{ color: BRAND }} />
+        <div className="px-5 pb-5 sm:px-7 sm:pb-7">
+          <div className="-mt-12 flex items-end gap-4 sm:-mt-14">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-white shadow-md sm:h-28 sm:w-28">
+              <User
+                className="h-11 w-11 sm:h-12 sm:w-12"
+                style={{ color: BRAND }}
+              />
             </div>
             <div className="min-w-0 flex-1 pb-1">
               <h1
-                className="truncate text-xl font-bold sm:text-2xl"
+                className="truncate text-xl font-bold sm:text-[26px]"
                 style={{ color: INK }}
               >
                 {profile.gender ? humanize(profile.gender) : "Roommate"}
-                {profile.occupation && (
-                  <span className="font-normal" style={{ color: INK_SOFT }}>
-                    {" · "}
-                    {humanize(profile.occupation)}
-                  </span>
-                )}
               </h1>
-              <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                {profile.idVerified && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                    <ShieldCheck className="h-3 w-3" />
-                    ID verified
-                  </span>
-                )}
-                <StatusBadge status={profile.status} />
-                {isOwnProfile && (
-                  <span
-                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                    style={{ background: TINT_BG, color: "#2b3f9e" }}
-                  >
-                    You
-                  </span>
-                )}
-              </div>
+              {profile.occupation && (
+                <p className="mt-0.5 text-sm" style={{ color: INK_SOFT }}>
+                  {humanize(profile.occupation)}
+                </p>
+              )}
             </div>
           </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {profile.idVerified && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                <ShieldCheck className="h-3 w-3" />
+                ID verified
+              </span>
+            )}
+            <StatusBadge status={profile.status} />
+            {isOwnProfile && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                style={{ background: TINT_BG, color: "#2b3f9e" }}
+              >
+                You
+              </span>
+            )}
+          </div>
+
           {profile.bio && (
             <p
-              className="mt-4 text-sm leading-relaxed"
-              style={{ color: INK_SOFT }}
+              className="mt-4 border-t pt-4 text-sm leading-relaxed"
+              style={{ borderColor: BORDER, color: INK_SOFT }}
             >
               {profile.bio}
             </p>
@@ -293,10 +332,10 @@ export default function PublicProfilePage() {
             className="rounded-2xl border bg-white p-5 sm:p-6"
             style={{ borderColor: BORDER }}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-3.5">
               <span
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                style={{ border: `1.5px solid ${BRAND}`, color: BRAND }}
+                style={{ background: TINT_BG, color: BRAND }}
               >
                 <User className="h-4 w-4" />
               </span>
@@ -347,7 +386,7 @@ export default function PublicProfilePage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Say a bit about why you'd be a good fit (optional)"
-                className="w-full rounded-xl border p-3 text-sm outline-none transition-shadow placeholder:text-slate-400 focus:ring-2"
+                className="w-full rounded-xl border p-3 text-sm outline-none transition-shadow focus:ring-2"
                 style={{
                   borderColor: BORDER,
                   background: "#FAFBFF",
@@ -421,14 +460,21 @@ function DetailRows({
   const filled = items.filter((i) => i.value);
   if (filled.length === 0)
     return (
-      <p className="text-sm" style={{ color: "#9CA3AF" }}>
-        No info yet
-      </p>
+      <div
+        className="rounded-lg border border-dashed px-3 py-3 text-center text-xs"
+        style={{ borderColor: BORDER, color: "#9CA3AF" }}
+      >
+        Not shared yet
+      </div>
     );
   return (
-    <dl className="space-y-2.5">
+    <dl className="divide-y" style={{ borderColor: "#F3F4F8" }}>
       {filled.map((item) => (
-        <div key={item.label} className="flex items-center gap-2.5">
+        <div
+          key={item.label}
+          className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0"
+          style={{ borderColor: "#F3F4F8" }}
+        >
           <span style={{ color: "#9CA3AF" }}>{item.icon}</span>
           <dt className="text-xs" style={{ color: INK_SOFT }}>
             {item.label}
