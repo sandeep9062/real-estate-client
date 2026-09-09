@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Users, Home, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { Users, Home, ArrowRight, ImageIcon } from "lucide-react";
 import type { RoomFlat } from "@/services/roommatesApi";
 
 const BRAND = "#4161df";
@@ -13,6 +14,7 @@ interface PropertyListing {
   id?: string;
   title?: string;
   price?: number;
+  photos?: string[];
   location?: { city?: string; [key: string]: any };
   [key: string]: any;
 }
@@ -29,6 +31,29 @@ export default function ListingCardFlat({ source, listing }: ListingCardProps) {
     const profile = listing.roommateProfile;
     return (
       <div className="rounded-2xl border bg-white p-5 transition-colors hover:border-[#4161df]/30" style={{ borderColor: BORDER }}>
+        {/* Photo */}
+        {listing.photos && listing.photos.length > 0 ? (
+          <div className="relative mb-4 h-40 w-full overflow-hidden rounded-xl">
+            <Image
+              src={listing.photos[0]}
+              alt={listing.title || "Listing photo"}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+            {listing.photos.length > 1 && (
+              <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
+                <ImageIcon className="h-3 w-3" />
+                {listing.photos.length}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="mb-4 flex h-40 w-full items-center justify-center rounded-xl bg-slate-100">
+            <ImageIcon className="h-8 w-8 text-slate-300" />
+          </div>
+        )}
+
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <span
@@ -80,6 +105,29 @@ export default function ListingCardFlat({ source, listing }: ListingCardProps) {
   const property = listing as PropertyListing;
   return (
     <div className="rounded-2xl border bg-white p-5 transition-colors hover:border-[#4161df]/30" style={{ borderColor: BORDER }}>
+      {/* Photo */}
+      {property.photos && property.photos.length > 0 ? (
+        <div className="relative mb-4 h-40 w-full overflow-hidden rounded-xl">
+          <Image
+            src={property.photos[0]}
+            alt={property.title || "Listing photo"}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+          {property.photos.length > 1 && (
+            <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white">
+              <ImageIcon className="h-3 w-3" />
+              {property.photos.length}
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="mb-4 flex h-40 w-full items-center justify-center rounded-xl bg-slate-100">
+          <ImageIcon className="h-8 w-8 text-slate-300" />
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <span
