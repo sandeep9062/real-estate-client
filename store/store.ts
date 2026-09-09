@@ -14,12 +14,14 @@ import { landlordApi } from "@/services/landlordApi";
 import { journalApi } from "@/services/journalApi";
 import { savedSearchesApi } from "@/services/savedSearchesApi";
 import { leadsApi } from "@/services/leadsApi";
+import { roommatesApi } from "@/services/roommatesApi";
 
 const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [propertiesApi.reducerPath]: propertiesApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [roommatesApi.reducerPath]: roommatesApi.reducer,
     [savedSearchesApi.reducerPath]: savedSearchesApi.reducer,
     [aiBasedApi.reducerPath]: aiBasedApi.reducer,
     [contactApi.reducerPath]: contactApi.reducer,
@@ -39,6 +41,7 @@ const store = configureStore({
       projectsApi.middleware,
       developersApi.middleware,
       propertiesApi.middleware,
+      roommatesApi.middleware,
       aiBasedApi.middleware,
       userApi.middleware,
       agentsApi.middleware,
