@@ -79,7 +79,6 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       availability: propertyDetails.availability,
       furnishing: propertyDetails.furnishing,
       facing: propertyDetails.facing || "",
-      postedBy: propertyDetails.postedBy,
       commercialPropertyTypes: propertyDetails.commercialPropertyTypes,
       investmentOptions: propertyDetails.investmentOptions,
       ageOfProperty: propertyDetails.ageOfProperty ?? "",
@@ -134,7 +133,6 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
         availability: propertyDetails.availability,
         furnishing: propertyDetails.furnishing,
         facing: propertyDetails.facing || "",
-        postedBy: propertyDetails.postedBy,
         commercialPropertyTypes: propertyDetails.commercialPropertyTypes,
         investmentOptions: propertyDetails.investmentOptions,
         ageOfProperty: propertyDetails.ageOfProperty ?? "",
@@ -196,7 +194,6 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
     availability,
     furnishing,
     facing,
-    postedBy,
     commercialPropertyTypes,
     investmentOptions,
     ageOfProperty,
@@ -257,7 +254,8 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       availability,
       furnishing: showFurnishing ? furnishing : undefined,
       facing: showFacing ? facing : undefined,
-      postedBy,
+      // postedBy is derived from the logged-in user's role (see
+      // AddPropertyPageContent) — never user-editable here.
       commercialPropertyTypes: showCommercialExtras
         ? commercialPropertyTypes
         : [],
@@ -445,24 +443,15 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
           />
         )}
 
-        <Group grow>
-          <Select
-            label="Posted By"
-            data={["Owner", "Agent", "Builder"]}
-            {...form.getInputProps("postedBy")}
+        {showAgeOfProperty && (
+          <NumberInput
+            label="Age of property (years)"
+            description="Optional — N/A for land/plots"
+            min={0}
+            {...form.getInputProps("ageOfProperty")}
             classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
           />
-          {showAgeOfProperty && (
-            <NumberInput
-              label="Age of property (years)"
-              description="Optional — N/A for land/plots"
-              min={0}
-              {...form.getInputProps("ageOfProperty")}
-              classNames={{ input: "border-gray-300" }}
-            />
-          )}
-        </Group>
+        )}
 
         {showTenantPreference && (
           <Select

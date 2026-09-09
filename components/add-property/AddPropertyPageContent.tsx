@@ -15,7 +15,23 @@ import { useGetPropertyQuery } from "@/services/propertiesApi";
 const TOTAL_STEPS = 4; // MagicFill, Photos & Location, Property Details, Facilities & Submit
 const LAST_STEP_INDEX = TOTAL_STEPS - 1;
 
-function buildDefaultPropertyDetails(userEmail?: string) {
+/**
+ * postedBy is no longer a user-facing form choice — it is derived from the
+ * logged-in user's role so the "Agent listed" / "Owner listed" tag on cards
+ * always reflects who actually listed the property.
+ */
+const ROLE_TO_POSTED_BY: Record<string, string> = {
+  agent: "Agent",
+  landlord: "Owner",
+  user: "Owner",
+  builder: "Builder",
+};
+
+function getPostedByForRole(role?: string) {
+  return ROLE_TO_POSTED_BY[(role || "").toLowerCase()] || "Owner";
+}
+
+function buildDefaultPropertyDetails(userEmail?: string, userRole?: string) {
   return {
     title: "",
     slug: "",
@@ -28,7 +44,7 @@ function buildDefaultPropertyDetails(userEmail?: string) {
     availability: "Ready to Move",
     furnishing: "Un-Furnished",
     facing: "",
-    postedBy: "Owner",
+    postedBy: getPostedByForRole(userRole),
     location: {
       address: "",
       city: "Chandigarh",
@@ -88,7 +104,10 @@ export default function AddPropertyPageContent() {
       : 0,
   );
 
-  const defaultPropertyDetails = buildDefaultPropertyDetails(user?.email);
+  const defaultPropertyDetails = buildDefaultPropertyDetails(
+    user?.email,
+    user?.role,
+  );
   const [propertyDetails, setPropertyDetails] = useState(
     defaultPropertyDetails,
   );
