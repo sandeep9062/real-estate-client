@@ -4,7 +4,7 @@ import { Container, Stepper, Center, Loader, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSelector } from "react-redux";
-import { selectUser } from "@/store/authSlice";
+import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import useCountries from "@/lib/useCountries";
 import MagicFill from "@/components/MagicFill";
 import PhotosLocationStep from "@/components/add-property/PhotosLocationStep";
@@ -98,8 +98,27 @@ export default function AddPropertyPageContent() {
   const initialStep = Number(searchParams.get("step") ?? 0);
 
   const user = useSelector(selectUser);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const { getAll } = useCountries();
   const countries = getAll();
+
+  // The StoreProvider restores the session from localStorage inside a parent
+  // useEffect, which runs AFTER this component's effects on hydration. So we
+  // wait for `mounted` before trusting `isAuthenticated` — otherwise a
+  // signed-in user visiting /add-property directly would be falsely
+  // redirected to /login for one frame.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Auth guard: signed-out users are sent to /login and never see the form.
+  useEffect(() => {
+    if (!mounted) return;
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [mounted, isAuthenticated, router]);
 
   const [active, setActive] = useState(
     Number.isFinite(initialStep)
@@ -217,6 +236,17 @@ export default function AddPropertyPageContent() {
       user?.role === "landlord" ? "/landlord/dashboard" : "/agent-dashboard",
     );
   };
+
+  // ── Auth gate ─────────────────────────────────────────────────────────────
+  // While hydration/session-restore is pending, or for signed-out users (who
+  // are being redirected to /login), show a loader instead of the form.
+  if (!mounted || !isAuthenticated) {
+    return (
+      <Center h={400}>
+        <Loader />
+      </Center>
+    );
+  }
 
   if (editingId && isLoadingProperty) {
     return (
