@@ -99,6 +99,7 @@ export function ListingAvailabilityPill({
     Fresh: "bg-lime-50 text-lime-900 border-lime-200",
     "Under offer": "bg-amber-50 text-amber-900 border-amber-200",
     Booked: "bg-rose-50 text-rose-800 border-rose-200",
+    "Review Required": "bg-yellow-100 text-yellow-900 border-yellow-400",
   };
   const labels: Record<string, string> = {
     Available: "Available",

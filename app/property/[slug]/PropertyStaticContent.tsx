@@ -268,6 +268,22 @@ export default function PropertyStaticContent({
                       },
                     ]
                   : []),
+                ...(data?.deal === "Rent" &&
+                typeof data?.allowsSubletting === "boolean"
+                  ? [
+                      {
+                        label: "Subletting / room-sharing",
+                        value: data.allowsSubletting
+                          ? typeof data.maxPersonsSharing === "number" &&
+                            data.maxPersonsSharing > 0
+                            ? `Allowed — up to ${data.maxPersonsSharing} person${
+                                data.maxPersonsSharing !== 1 ? "s" : ""
+                              }`
+                            : "Allowed"
+                          : "Not allowed",
+                      },
+                    ]
+                  : []),
                 ...(data?.deal === "Sale" &&
                 typeof data?.pricePerSqft === "number"
                   ? [
@@ -339,57 +355,29 @@ export default function PropertyStaticContent({
             const amenities: string[] = [
               ...new Set((data?.amenities ?? []) as string[]),
             ];
-            const societyAmenities: string[] = [
-              ...new Set((data?.societyAmenities ?? []) as string[]),
-            ];
-            if (!amenities.length && !societyAmenities.length) return null;
+            if (!amenities.length) return null;
             return (
               <section className="space-y-6">
                 {/* Property Amenities */}
-                {amenities.length > 0 && (
-                  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <h3 className="text-xl font-bold text-slate-900 mb-4">
-                      Property Amenities
-                    </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {amenities.map((amenity: string, i: number) => (
-                        <div
-                          key={`${amenity}-${i}`}
-                          className="flex items-center gap-2 text-slate-700"
-                        >
-                          <FiCheck
-                            className="text-green-500 flex-shrink-0"
-                            size={16}
-                          />
-                          <span className="text-sm">{amenity}</span>
-                        </div>
-                      ))}
-                    </div>
+                <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    Property Amenities
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {amenities.map((amenity: string, i: number) => (
+                      <div
+                        key={`${amenity}-${i}`}
+                        className="flex items-center gap-2 text-slate-700"
+                      >
+                        <FiCheck
+                          className="text-green-500 flex-shrink-0"
+                          size={16}
+                        />
+                        <span className="text-sm">{amenity}</span>
+                      </div>
+                    ))}
                   </div>
-                )}
-
-                {/* Society Amenities */}
-                {societyAmenities.length > 0 && (
-                  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <h3 className="text-xl font-bold text-slate-900 mb-4">
-                      Society / Building Amenities
-                    </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {societyAmenities.map((amenity: string, i: number) => (
-                        <div
-                          key={`${amenity}-${i}`}
-                          className="flex items-center gap-2 text-slate-700"
-                        >
-                          <FiCheck
-                            className="text-green-500 flex-shrink-0"
-                            size={16}
-                          />
-                          <span className="text-sm">{amenity}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </div>
               </section>
             );
           })()}

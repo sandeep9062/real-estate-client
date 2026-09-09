@@ -22,7 +22,6 @@ import {
   Sun,
   Users,
   Shield,
-  PawPrint,
   Building,
   CheckCircle,
   Layers,
@@ -79,7 +78,6 @@ const OWNERSHIP_TYPE_OPTIONS = [
   "Co-operative",
   "Power of Attorney",
 ];
-const PETS_OPTIONS = ["Yes", "No"];
 const LISTING_AVAILABILITY_OPTIONS = [
   "Available",
   "Fresh",
@@ -124,7 +122,6 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
     facing: initialFilters.facing || "",
     tenantPreference: initialFilters.tenantPreference || "",
     ownershipType: initialFilters.ownershipType || "",
-    petsAllowed: initialFilters.petsAllowed || "",
     floorMin: initialFilters.floorMin || "",
     floorMax: initialFilters.floorMax || "",
     totalFloors: initialFilters.totalFloors || "",
@@ -188,7 +185,6 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
       facing: "",
       tenantPreference: "",
       ownershipType: "",
-      petsAllowed: "",
       floorMin: "",
       floorMax: "",
       totalFloors: "",
@@ -588,17 +584,6 @@ export default function TopSearchBar({ onApply, initialFilters = {} }: any) {
 
           {showAdvanced && (
             <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2.5">
-              {/* Pets Allowed */}
-              <FilterSelect
-                icon={<PawPrint className="w-4 h-4" />}
-                label="Pets Allowed"
-                value={filters.petsAllowed}
-                options={PETS_OPTIONS}
-                onChange={(v) =>
-                  setFilters((prev) => ({ ...prev, petsAllowed: v }))
-                }
-              />
-
               {/* Listing Availability */}
               <FilterSelect
                 icon={<CheckCircle className="w-4 h-4" />}

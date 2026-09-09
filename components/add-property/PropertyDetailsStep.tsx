@@ -10,6 +10,7 @@ import {
   MultiSelect,
   NumberInput,
   Select,
+  Switch,
   Text,
   TextInput,
   Textarea,
@@ -25,7 +26,6 @@ import {
   supportsAmenities,
   supportsFacing,
   AMENITIES_OPTIONS,
-  SOCIETY_AMENITIES_OPTIONS,
   LISTING_OPTS,
   OC_OPTIONS,
 } from "@/lib/propertyOptions";
@@ -83,12 +83,14 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       investmentOptions: propertyDetails.investmentOptions,
       ageOfProperty: propertyDetails.ageOfProperty ?? "",
       amenities: propertyDetails.amenities || [],
-      societyAmenities: propertyDetails.societyAmenities || [],
       // Pricing & extras
       maintenanceCharge: propertyDetails.maintenanceCharge ?? "",
       securityDeposit: propertyDetails.securityDeposit ?? "",
       lockInMonths: propertyDetails.lockInMonths ?? "",
       noticePeriodDays: propertyDetails.noticePeriodDays ?? "",
+      allowsSubletting: propertyDetails.allowsSubletting ?? false,
+      maxPersonsSharing: propertyDetails.maxPersonsSharing ?? "",
+      petsAllowed: propertyDetails.petsAllowed ?? false,
       tenantPreference: propertyDetails.tenantPreference || "Any",
       pricePerSqft: propertyDetails.pricePerSqft ?? "",
       ocStatus: propertyDetails.ocStatus || "",
@@ -141,6 +143,9 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
         securityDeposit: propertyDetails.securityDeposit ?? "",
         lockInMonths: propertyDetails.lockInMonths ?? "",
         noticePeriodDays: propertyDetails.noticePeriodDays ?? "",
+        allowsSubletting: propertyDetails.allowsSubletting ?? false,
+        maxPersonsSharing: propertyDetails.maxPersonsSharing ?? "",
+        petsAllowed: propertyDetails.petsAllowed ?? false,
         tenantPreference: propertyDetails.tenantPreference || "Any",
         pricePerSqft: propertyDetails.pricePerSqft ?? "",
         ocStatus: propertyDetails.ocStatus || "",
@@ -198,11 +203,13 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
     investmentOptions,
     ageOfProperty,
     amenities,
-    societyAmenities,
     maintenanceCharge,
     securityDeposit,
     lockInMonths,
     noticePeriodDays,
+    allowsSubletting,
+    maxPersonsSharing,
+    petsAllowed,
     tenantPreference,
     pricePerSqft,
     ocStatus,
@@ -262,8 +269,6 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       investmentOptions: showCommercialExtras ? investmentOptions : [],
       ageOfProperty: showAgeOfProperty ? toOptNum(ageOfProperty) : undefined,
       amenities: showAmenities && Array.isArray(amenities) ? amenities : [],
-      societyAmenities:
-        showAmenities && Array.isArray(societyAmenities) ? societyAmenities : [],
       // Pricing & extras — hidden fields cleared so stale values are never submitted
       maintenanceCharge: showRentTerms
         ? toOptNum(maintenanceCharge)
@@ -271,6 +276,11 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
       securityDeposit: showRentTerms ? toOptNum(securityDeposit) : undefined,
       lockInMonths: showRentTerms ? toOptNum(lockInMonths) : undefined,
       noticePeriodDays: showRentTerms ? toOptNum(noticePeriodDays) : undefined,
+      // Subletting only applies to rentals; the sharing capacity is only kept when allowed.
+      allowsSubletting: showRentTerms ? allowsSubletting : false,
+      maxPersonsSharing:
+        showRentTerms && allowsSubletting ? toOptNum(maxPersonsSharing) : undefined,
+      petsAllowed: showRentTerms ? petsAllowed : false,
       tenantPreference: showTenantPreference ? tenantPreference || "Any" : undefined,
       pricePerSqft: showSalePricePerSqft ? toOptNum(pricePerSqft) : undefined,
       ocStatus: showOCStatus ? ocStatus || undefined : undefined,
@@ -475,17 +485,6 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
           />
         )}
 
-        {showAmenities && (
-          <MultiSelect
-            label="Society Amenities"
-            description="Select all that apply. These are community/shared amenities."
-            data={SOCIETY_AMENITIES_OPTIONS}
-            {...form.getInputProps("societyAmenities")}
-            classNames={{ input: "border-gray-300" }}
-            styles={{ dropdown: { zIndex: 1300 } }}
-          />
-        )}
-
         <Divider />
         <Text fw={700} size="lg">
           Pricing & extras
@@ -527,6 +526,25 @@ const PropertyDetailsStep: React.FC<PropertyDetailsStepProps> = ({
                 classNames={{ input: "border-gray-300" }}
               />
             </Group>
+            <Checkbox
+              label="Allow subletting / room-sharing"
+              description="Tick if tenants can sublet rooms or share the space with roommates."
+              {...form.getInputProps("allowsSubletting", { type: "checkbox" })}
+            />
+            {allowsSubletting && (
+              <NumberInput
+                label="How many persons can share the property?"
+                description="Maximum number of people who can stay / share together (including sublets)."
+                min={1}
+                {...form.getInputProps("maxPersonsSharing")}
+                classNames={{ input: "border-gray-300" }}
+              />
+            )}
+            <Switch
+              label="Pets allowed"
+              description="Turn on if tenants can keep pets in the property."
+              {...form.getInputProps("petsAllowed", { type: "checkbox" })}
+            />
           </>
         )}
 
