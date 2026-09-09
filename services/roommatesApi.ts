@@ -196,7 +196,9 @@ export const roommatesApi = createApi({
 
     // ---- Room/Flat ----
 
-    createRoomFlat: builder.mutation<RoomFlat, Partial<RoomFlat>>({
+    // Body is either JSON (no new files) or FormData ("payload" JSON string +
+    // "photos" files) when PhotosLocationFlat picked new photos/videos.
+    createRoomFlat: builder.mutation<RoomFlat, Partial<RoomFlat> | FormData>({
       query: (roomFlatData) => ({
         url: "/v1/roommates/room-flat",
         method: "POST",

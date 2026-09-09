@@ -6,7 +6,7 @@ import {
   useBrowseRoomsAndFlatsQuery,
   type BrowseResult,
 } from "@/services/roommatesApi";
-import ListingCard from "../../../components/flatmates/ListingCard";
+import ListingCard from "../../../components/flatmates/ListingCardFlat";
 
 const EMPTY_RESULT: BrowseResult = {
   matchedListings: [],
@@ -14,8 +14,16 @@ const EMPTY_RESULT: BrowseResult = {
 };
 
 export default function BrowsePage() {
-  const [filters, setFilters] = useState({ city: "", minRent: "", maxRent: "" });
-  const [applied, setApplied] = useState({ city: "", minRent: "", maxRent: "" });
+  const [filters, setFilters] = useState({
+    city: "",
+    minRent: "",
+    maxRent: "",
+  });
+  const [applied, setApplied] = useState({
+    city: "",
+    minRent: "",
+    maxRent: "",
+  });
 
   const params = {
     city: applied.city || undefined,
@@ -43,7 +51,10 @@ export default function BrowsePage() {
     <main className="mx-auto max-w-4xl px-6 py-16">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-900">Browse rooms</h1>
-        <Link href="/flatmates/swap" className="text-sm underline underline-offset-2">
+        <Link
+          href="/flatmates/swap"
+          className="text-sm underline underline-offset-2"
+        >
           Looking to swap instead?
         </Link>
       </div>
@@ -59,14 +70,18 @@ export default function BrowsePage() {
           type="number"
           placeholder="Min rent"
           value={filters.minRent}
-          onChange={(e) => setFilters((f) => ({ ...f, minRent: e.target.value }))}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, minRent: e.target.value }))
+          }
           className="w-32 rounded-md border border-slate-300 p-2 text-sm"
         />
         <input
           type="number"
           placeholder="Max rent"
           value={filters.maxRent}
-          onChange={(e) => setFilters((f) => ({ ...f, maxRent: e.target.value }))}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, maxRent: e.target.value }))
+          }
           className="w-32 rounded-md border border-slate-300 p-2 text-sm"
         />
         <button
@@ -110,6 +125,9 @@ function getErrorMessage(error: unknown): string {
     message?: string;
   };
   return (
-    e.data?.message || e.error || e.message || "Something went wrong. Please try again."
+    e.data?.message ||
+    e.error ||
+    e.message ||
+    "Something went wrong. Please try again."
   );
 }

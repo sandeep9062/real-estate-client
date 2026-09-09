@@ -17,7 +17,7 @@ interface ListingCardProps {
   listing: RoomFlat | PropertyListing;
 }
 
-export default function ListingCard({ source, listing }: ListingCardProps) {
+export default function ListingCardFlat({ source, listing }: ListingCardProps) {
   if (source === "room_flat") {
     const profile = listing.roommateProfile;
     return (

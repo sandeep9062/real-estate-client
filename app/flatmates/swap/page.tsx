@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchSwapMatchesQuery } from "@/services/roommatesApi";
-import ListingCard from "../../../components/flatmates/ListingCard";
+import ListingCard from "../../../components/flatmates/ListingCardFlat";
 
 export default function SwapMatchesPage() {
   const {
@@ -54,6 +54,9 @@ function getErrorMessage(error: unknown): string {
     message?: string;
   };
   return (
-    e.data?.message || e.error || e.message || "Something went wrong. Please try again."
+    e.data?.message ||
+    e.error ||
+    e.message ||
+    "Something went wrong. Please try again."
   );
 }
