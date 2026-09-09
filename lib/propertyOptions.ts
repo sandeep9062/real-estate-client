@@ -114,6 +114,10 @@ export const LISTING_OPTS = [
   { value: "Fresh", label: "Fresh listing" },
   { value: "Under offer", label: "Under offer" },
   { value: "Booked", label: "Booked / on hold" },
+  { value: "Sold", label: "Sold" },
+  { value: "Rented", label: "Rented" },
+  { value: "Review Required", label: "Review Required" },
+  { value: "Non Available", label: "Non Available" },
 ];
 
 export const AMENITIES_OPTIONS = [
