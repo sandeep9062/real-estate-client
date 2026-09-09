@@ -8,7 +8,7 @@ const Footer = () => {
     <footer className="w-full bg-white border-t border-black/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12 lg:py-14">
         {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 md:gap-12 items-start">
           {/* Logo + Tagline */}
           <div className="flex flex-col gap-3 sm:gap-4 items-center md:items-start">
             <Link href="/">
@@ -28,6 +28,32 @@ const Footer = () => {
             </p>
           </div>
 
+          {/* Buy or Rent — kept visually separate from Quick Links as standout pills */}
+          <div className="text-center md:text-left">
+            <h3 className="text-sm sm:text-base font-semibold text-neutral-900 mb-3 sm:mb-4 md:mb-5">
+              Looking to
+            </h3>
+
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-neutral-600">
+              <li>
+                <Link
+                  href="/properties?deal=Sale"
+                  className="hover:text-[#4161df] font-medium text-gray-700  transition"
+                >
+                  Buy a property
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/properties?deal=Rent"
+                  className="hover:text-[#4161df] font-medium text-gray-700  transition"
+                >
+                  Rent a property
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Cities */}
           <div className="text-center md:text-left">
             <h3 className="text-sm sm:text-base font-semibold text-neutral-900 mb-3 sm:mb-4 md:mb-5">
@@ -40,7 +66,7 @@ const Footer = () => {
                   <li key={city}>
                     <Link
                       href={`/properties/${city.toLowerCase()}`}
-                      className="hover:text-[#4161df] transition"
+                      className="hover:text-[#4161df] transition font-medium text-gray-700 "
                     >
                       {city}
                     </Link>
