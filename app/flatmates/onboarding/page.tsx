@@ -10,6 +10,7 @@ import {
   useCreateProfileMutation,
   useCreateRoomFlatMutation,
 } from "@/services/roommatesApi";
+import { toast } from "@/hooks/use-toast";
 import PhotosLocationFlat from "@/components/flatmates/PhotosLocationFlat";
 import AboutYouStep from "@/components/flatmates/onboarding/AboutYouStep";
 import SeekerStep from "@/components/flatmates/onboarding/SeekerStep";
@@ -347,10 +348,69 @@ function OnboardingContent() {
     await doSubmit();
   }
 
+  /**
+   * Validates the profile before submission. Returns an array of human-readable
+   * error messages for any missing/invalid fields. Shows a toast for each error
+   * so the user knows exactly what to fix on Step 1 (AboutYou).
+   */
+  function validateProfile(): string[] {
+    const errors: string[] = [];
+
+    // ---- Habits: every enum field must be a non-empty valid value ----
+    const habitFields: { key: keyof ProfileDraft["habits"]; label: string }[] = [
+      { key: "smoking", label: "Smoking" },
+      { key: "drinking", label: "Drinking" },
+      { key: "nightlifeFriendly", label: "Nightlife-friendly" },
+      { key: "foodPreference", label: "Food preference" },
+      { key: "cleanlinessLevel", label: "Cleanliness level" },
+      { key: "guestsFrequency", label: "Guests frequency" },
+    ];
+    for (const { key, label } of habitFields) {
+      const val = profile.habits[key];
+      if (typeof val === "string" && (!val || val.trim() === "")) {
+        errors.push(`Please select ${label.toLowerCase()} in the Habits section`);
+      }
+    }
+
+    // ---- Looking-for age range: must be >= 16 and min <= max ----
+    const minRaw = profile.lookingFor.ageRange.min;
+    const maxRaw = profile.lookingFor.ageRange.max;
+    const min = minRaw ? Number(minRaw) : NaN;
+    const max = maxRaw ? Number(maxRaw) : NaN;
+
+    if (minRaw && Number.isNaN(min)) {
+      errors.push("Minimum age must be a valid number");
+    } else if (minRaw && min < 16) {
+      errors.push("Minimum age must be at least 16");
+    }
+
+    if (maxRaw && Number.isNaN(max)) {
+      errors.push("Maximum age must be a valid number");
+    } else if (maxRaw && max < 16) {
+      errors.push("Maximum age must be at least 16");
+    }
+
+    if (minRaw && maxRaw && !Number.isNaN(min) && !Number.isNaN(max) && min > max) {
+      errors.push("Minimum age cannot be greater than maximum age");
+    }
+
+    return errors;
+  }
+
   async function doSubmit(roomFlatOverride?: RoomFlatDraft) {
     if (submitting) return;
     setSubmitting(true);
     setError(null);
+
+    // Client-side validation: surface every issue as a toast instead of letting
+    // the request reach the backend and fail with a generic 400.
+    const validationErrors = validateProfile();
+    if (validationErrors.length > 0) {
+      validationErrors.forEach((msg) => toast.error(msg));
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const payload = {
         intent,
