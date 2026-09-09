@@ -43,7 +43,7 @@ export interface ProfileDraft {
   occupation: string;
   workSchedule: string;
   sleepSchedule: string;
-  languages: string;
+  languages: string[];
   habits: HabitsDraft;
   lookingFor: LookingForDraft;
   searchArea: SearchAreaDraft;

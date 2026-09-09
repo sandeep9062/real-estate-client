@@ -73,6 +73,31 @@ const PhotosLocationStep: React.FC<PhotosLocationStepProps> = ({
 }) => {
   const { getAll } = useCountries();
 
+  // Map expects { lat, lng } but the draft stores GeoJSON
+  // { type: "Point", coordinates: [lng, lat] } — convert for the Map prop so
+  // the pin actually reflects the saved location (and vice-versa on click).
+  const mapLocation = (() => {
+    const c = propertyDetails?.location?.coordinates;
+    if (!c) return undefined;
+    if (
+      typeof c.lat === "number" &&
+      typeof c.lng === "number" &&
+      Number.isFinite(c.lat) &&
+      Number.isFinite(c.lng)
+    ) {
+      return { lat: c.lat, lng: c.lng };
+    }
+    if (
+      Array.isArray(c.coordinates) &&
+      c.coordinates.length >= 2 &&
+      Number.isFinite(Number(c.coordinates[1])) &&
+      Number.isFinite(Number(c.coordinates[0]))
+    ) {
+      return { lat: Number(c.coordinates[1]), lng: Number(c.coordinates[0]) };
+    }
+    return undefined;
+  })();
+
   // ── Images sub-section state (unchanged logic from old UploadImage.tsx) ──
   const existingImages = propertyDetails.image || [];
   const existingCount = existingImages.length;
@@ -280,9 +305,16 @@ const PhotosLocationStep: React.FC<PhotosLocationStepProps> = ({
           classNames={{ input: "border-gray-300" }}
         />
 
+        <Text size="sm" fw={500} mt="md" mb={4}>
+          Pick on map (latitude &amp; longitude)
+        </Text>
+        <Text size="xs" c="dimmed" mb={8}>
+          Click on the map to drop a pin for your property location. The pin
+          is saved as latitude &amp; longitude with the listing.
+        </Text>
         <div className="w-full h-72 rounded-lg overflow-hidden border border-gray-300">
           <Map
-            location={propertyDetails?.location?.coordinates}
+            location={mapLocation}
             setLocation={(coords: { lat: number; lng: number }) => {
               const geoJSONCoords = convertLatLngToGeoJSON
                 ? convertLatLngToGeoJSON(coords)

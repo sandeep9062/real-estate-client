@@ -171,7 +171,7 @@ function OnboardingContent() {
     occupation: "",
     workSchedule: "",
     sleepSchedule: "",
-    languages: "",
+    languages: [],
     habits: {
       smoking: "",
       drinking: "",
@@ -209,7 +209,7 @@ function OnboardingContent() {
     minStayMonths: "",
     openToSwap: false,
     petsAllowed: false,
-    location: { sector: "", state: "", pincode: "", landmark: "" },
+    location: {},
     houseRules: {
       ownerLivesOnPremises: false,
       curfew: { hasCurfew: false, time: "" },
@@ -304,9 +304,6 @@ function OnboardingContent() {
       ...r,
       temporaryDetails: { ...r.temporaryDetails, [key]: value },
     }));
-
-  const updateLocationExtra = (key: string, value: string) =>
-    setRoomFlat((r) => ({ ...r, location: { ...r.location, [key]: value } }));
 
   // ── Auth gate ─────────────────────────────────────────────────────────────
   // While hydration/session-restore is pending, or for signed-out users (who
@@ -420,10 +417,14 @@ function OnboardingContent() {
         occupation: profile.occupation,
         workSchedule: profile.workSchedule || undefined,
         sleepSchedule: profile.sleepSchedule || undefined,
-        languages: profile.languages
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0),
+        languages: Array.isArray(profile.languages)
+          ? profile.languages.map((s) => String(s).trim()).filter((s) => s.length > 0)
+          : typeof (profile as any).languages === "string" && (profile as any).languages
+            ? String((profile as any).languages)
+                .split(",")
+                .map((s: string) => s.trim())
+                .filter((s: string) => s.length > 0)
+            : [],
         habits: profile.habits,
         lookingFor: {
           ...profile.lookingFor,
@@ -498,7 +499,6 @@ function OnboardingContent() {
     setError(null);
 
     const location = {
-      ...roomFlat.location,
       ...(resolved?.location || {}),
       coordinates: normalizeCoordinates(roomFlatDetails.location.coordinates),
     };
@@ -622,7 +622,6 @@ function OnboardingContent() {
           <PropertyStep
             roomFlat={roomFlat}
             onField={updateRoomFlatField}
-            onLocationExtra={updateLocationExtra}
           />
           <Group justify="space-between" mt={32}>
             <Button variant="default" onClick={() => setStep(1)}>

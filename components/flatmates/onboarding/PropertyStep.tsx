@@ -16,17 +16,16 @@ import type { RoomFlatDraft } from "./types";
 export interface PropertyStepProps {
   roomFlat: RoomFlatDraft;
   onField: (key: string, value: any) => void;
-  onLocationExtra: (key: string, value: string) => void;
 }
 
 /**
  * Step 2 for property intents (has_room / swap / temporary_offer) — the
- * RoomFlat base fields, laid out two per row.
+ * RoomFlat base fields, laid out two per row. Address/city/country + the map
+ * pin live in Step 4 (PhotosLocationFlat), so no location fields here.
  */
 export default function PropertyStep({
   roomFlat,
   onField,
-  onLocationExtra,
 }: PropertyStepProps) {
   return (
     <>
@@ -97,37 +96,6 @@ export default function PropertyStep({
         value={roomFlat.description}
         onChange={(e) => onField("description", e.currentTarget.value)}
       />
-
-      <Divider my="sm" />
-
-      <Text fw={700} size="md" mb={8}>
-        Location extras (optional)
-      </Text>
-      <SimpleGrid cols={{ base: 1, sm: 2 }}>
-        <TextInput
-          label="Sector"
-          placeholder="e.g. Sector 21"
-          value={roomFlat.location.sector}
-          onChange={(e) => onLocationExtra("sector", e.currentTarget.value)}
-        />
-        <TextInput
-          label="State"
-          value={roomFlat.location.state}
-          onChange={(e) => onLocationExtra("state", e.currentTarget.value)}
-        />
-      </SimpleGrid>
-      <SimpleGrid cols={{ base: 1, sm: 2 }}>
-        <TextInput
-          label="Pincode"
-          value={roomFlat.location.pincode}
-          onChange={(e) => onLocationExtra("pincode", e.currentTarget.value)}
-        />
-        <TextInput
-          label="Landmark"
-          value={roomFlat.location.landmark}
-          onChange={(e) => onLocationExtra("landmark", e.currentTarget.value)}
-        />
-      </SimpleGrid>
 
       <Divider my="sm" />
 

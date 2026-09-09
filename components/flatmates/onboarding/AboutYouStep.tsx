@@ -3,6 +3,7 @@
 import React from "react";
 import {
   Divider,
+  MultiSelect,
   Select,
   SimpleGrid,
   Switch,
@@ -77,11 +78,17 @@ export default function AboutYouStep({
         />
       </SimpleGrid>
 
-      <TextInput
+      <MultiSelect
         label="Languages"
-        description="Comma-separated, e.g. English, Hindi, Punjabi"
-        value={profile.languages}
-        onChange={(e) => onField("languages", e.currentTarget.value)}
+        description="Select all languages you speak"
+        placeholder="Select languages…"
+        data={[...OPTIONS.languages]}
+        value={Array.isArray(profile.languages) ? profile.languages : []}
+        onChange={(value) => onField("languages", value)}
+        searchable
+        clearable
+        nothingFoundMessage="No language found"
+        maxDropdownHeight={220}
       />
 
       <Textarea

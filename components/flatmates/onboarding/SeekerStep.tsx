@@ -1,8 +1,11 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { Divider, SimpleGrid, Text, TextInput } from "@mantine/core";
 import type { BudgetRangeDraft, SearchAreaDraft } from "./types";
+
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export interface SeekerStepProps {
   searchArea: SearchAreaDraft;
@@ -21,6 +24,14 @@ export default function SeekerStep({
   onSearchArea,
   onBudget,
 }: SeekerStepProps) {
+  const latNum = Number(searchArea.lat);
+  const lngNum = Number(searchArea.lng);
+  const hasCoords =
+    searchArea.lat !== "" &&
+    searchArea.lng !== "" &&
+    Number.isFinite(latNum) &&
+    Number.isFinite(lngNum);
+
   return (
     <>
       <Text fw={700} size="md" mb={8}>
@@ -42,13 +53,31 @@ export default function SeekerStep({
         />
       </SimpleGrid>
 
-      <SimpleGrid cols={{ base: 1, sm: 3 }}>
-        <TextInput
-          label="Search radius (km)"
-          type="number"
-          value={searchArea.radiusKm}
-          onChange={(e) => onSearchArea("radiusKm", e.currentTarget.value)}
+      <TextInput
+        label="Search radius (km)"
+        type="number"
+        value={searchArea.radiusKm}
+        onChange={(e) => onSearchArea("radiusKm", e.currentTarget.value)}
+      />
+
+      <Text size="sm" fw={500} mt="md" mb={4}>
+        Pick on map (latitude &amp; longitude)
+      </Text>
+      <Text size="xs" c="dimmed" mb={8}>
+        Click on the map to drop a pin — the latitude &amp; longitude fields
+        update automatically. You can also type them manually.
+      </Text>
+      <div className="w-full h-72 rounded-lg overflow-hidden border border-gray-300">
+        <Map
+          location={hasCoords ? { lat: latNum, lng: lngNum } : undefined}
+          setLocation={(coords: { lat: number; lng: number }) => {
+            onSearchArea("lat", String(coords.lat));
+            onSearchArea("lng", String(coords.lng));
+          }}
         />
+      </div>
+
+      <SimpleGrid cols={{ base: 1, sm: 2 }} mt="md">
         <TextInput
           label="Latitude"
           type="number"
