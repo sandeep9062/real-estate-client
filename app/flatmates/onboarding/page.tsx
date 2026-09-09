@@ -137,7 +137,7 @@ function OnboardingContent() {
   }
 
   return (
-    <main className="mx-auto max-w-xl px-6 py-14 sm:py-20">
+    <main className="mx-auto max-w-7xl px-6 py-14 sm:py-20">
       {INTENT_LABELS[intent] && (
         <span
           className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4"

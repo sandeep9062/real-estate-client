@@ -74,7 +74,7 @@ function Eyebrow() {
 
 export default function FlatmatesLanding() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-20 sm:py-24">
+    <main className="mx-auto max-w-7xl px-6 py-20 sm:py-24">
       <Eyebrow />
       <h1
         className="mt-4 font-bold leading-[1.1] tracking-tight text-3xl sm:text-4xl"
