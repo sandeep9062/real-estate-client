@@ -182,8 +182,8 @@ export default function JournalClient({
     return (
       <div className="min-h-screen bg-white font-sans text-[#201d1a]">
         <div className="mx-auto max-w-[1220px] px-5 py-10 md:px-8">
-          <div className="mb-[30px] h-[60px] w-[260px] animate-pulse bg-[#d8d2c4]" />
-          <div className="grid grid-cols-1 gap-[1px] border border-[#d8d2c4] bg-[#d8d2c4] sm:grid-cols-2 lg:grid-cols-6">
+          <div className="mb-[30px] h-[60px] w-[260px] animate-pulse bg-white" />
+          <div className="grid grid-cols-1 gap-[1px] border border-[#d8d2c4] bg-white sm:grid-cols-2 lg:grid-cols-6">
             <div className="p-0 sm:col-span-2 lg:col-span-4">
               <CardSkeleton tall />
             </div>
