@@ -2,7 +2,16 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Loader2 } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarClock,
+  Clock,
+  Loader2,
+  Repeat,
+  Search,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { Button, Card, Group, Stepper } from "@mantine/core";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/store/authSlice";
@@ -31,6 +40,7 @@ const BRAND = "#4161df";
 const INK = "#161A2E";
 const INK_SOFT = "#5C5F73";
 const TINT_BG = "#EEF1FC";
+const BORDER = "#E5E7F2";
 
 const NEEDS_PROPERTY = ["has_room", "swap", "temporary_offer"];
 const NEEDS_SEARCH_AREA = ["seeking_room", "temporary_seek"];
@@ -42,6 +52,72 @@ const INTENT_LABELS: Record<string, string> = {
   temporary_offer: "Offering a temporary stay",
   temporary_seek: "Need a temporary stay",
 };
+
+// Step-0 intent picker options — same copy/accent colors as the /flatmates
+// landing cards so both entry points feel like one flow. The landing cards
+// deep-link with ?intent= (pre-selects); this picker covers direct visits
+// ("Create your free profile", sidebar "Create listing", bookmarks).
+const INTENT_OPTIONS: {
+  key: string;
+  icon: LucideIcon;
+  tag: string;
+  title: string;
+  description: string;
+  accent: string;
+  accentBg: string;
+  popular?: boolean;
+}[] = [
+  {
+    key: "has_room",
+    icon: Users,
+    tag: "List a room",
+    title: "I have a room, need a flatmate",
+    description: "List your spare room or flat and find someone who fits.",
+    accent: "#059669",
+    accentBg: "#ECFDF5",
+    popular: true,
+  },
+  {
+    key: "seeking_room",
+    icon: Search,
+    tag: "Search rooms",
+    title: "I'm looking for a room",
+    description:
+      "Search rooms and flats near you, filtered by budget and lifestyle.",
+    accent: BRAND,
+    accentBg: TINT_BG,
+    popular: true,
+  },
+  {
+    key: "swap",
+    icon: Repeat,
+    tag: "Swap",
+    title: "I want to swap flats",
+    description:
+      "Trade places with someone whose location works better for you.",
+    accent: "#7C3AED",
+    accentBg: "#F5F3FF",
+  },
+  {
+    key: "temporary_offer",
+    icon: Clock,
+    tag: "Short-term",
+    title: "I have a place for temporary stay",
+    description: "Offer your room or flat for a short-term stay.",
+    accent: "#D97706",
+    accentBg: "#FFFBEB",
+  },
+  {
+    key: "temporary_seek",
+    icon: CalendarClock,
+    tag: "Short-term",
+    title: "I need a temporary stay",
+    description:
+      "Find a short-term room while you sort out something longer-term.",
+    accent: "#E11D48",
+    accentBg: "#FFF1F2",
+  },
+];
 
 // Same conversion the add-property flow uses: Map reports {lat,lng}, while the
 // backend stores GeoJSON {type:"Point", coordinates:[lng,lat]}.
@@ -292,6 +368,9 @@ function OnboardingContent() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Create mode: the intent picked on-page (step 0) or via a ?intent= deep
+  // link. Edit mode ignores this — it uses the saved profile's intent.
+  const [chosenIntent, setChosenIntent] = useState<string | null>(urlIntent);
   // Guards the edit-mode prefill below so typing into the form is never
   // clobbered by refetches of the saved profile.
   const [prefilled, setPrefilled] = useState(false);
@@ -310,8 +389,8 @@ function OnboardingContent() {
   } = useGetOwnProfileQuery(undefined, { skip: !isEditMode });
 
   // Locked at creation — changing it would orphan the listing type, so edit
-  // mode reuses the saved intent instead of the URL param.
-  const intent = isEditMode ? (existingProfile?.intent ?? null) : urlIntent;
+  // mode reuses the saved intent instead of the on-page/deep-link choice.
+  const intent = isEditMode ? (existingProfile?.intent ?? null) : chosenIntent;
 
   // Every user-editable field from RoommateProfile (backend model).
   const [profile, setProfile] = useState<ProfileDraft>({
@@ -482,9 +561,9 @@ function OnboardingContent() {
     }));
 
   // Edit mode: while the saved profile (+ populated roomFlat) is still
-  // loading, `intent` is null — show the loader rather than the "pick your
-  // intent" prompt. If the fetch failed (e.g. no profile yet), surface that
-  // instead.
+  // loading, `intent` is null — show the loader rather than the step-0
+  // intent picker (edit mode locks the intent to the saved profile). If the
+  // fetch failed (e.g. no profile yet), surface that instead.
   if (!mounted || !isAuthenticated || (isEditMode && !prefilled)) {
     if (isEditMode && existingProfileError) {
       return (
@@ -510,20 +589,108 @@ function OnboardingContent() {
     );
   }
 
+  // ── Step 0 · Intent picker (create mode, no intent chosen yet) ────────────
+  // Replaces the old "go back and pick" dead-end: the intent choice now lives
+  // INSIDE the onboarding flow, so direct visits to /flatmates/onboarding
+  // (hero CTA, sidebar, bookmarks) get an actionable first screen.
   if (!intent) {
     return (
-      <main className="mx-auto max-w-xl px-6 pb-8 text-center">
-        <p className="text-[15px]" style={{ color: INK_SOFT }}>
-          Pick what you&apos;re here for first —{" "}
-          <a
-            href="/flatmates"
-            className="font-semibold underline"
-            style={{ color: BRAND }}
-          >
-            go back
-          </a>
-          .
+      <main className="mx-auto max-w-5xl px-6 pb-12 sm:pb-16">
+        <h1
+          className="text-2xl sm:text-3xl font-bold tracking-tight"
+          style={{ color: INK }}
+        >
+          Set up your profile
+        </h1>
+        <p className="mt-2 max-w-xl text-[15px]" style={{ color: INK_SOFT }}>
+          What brings you here? Pick one to start — the rest of the wizard
+          adapts to your choice, and you can edit everything later.
         </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {INTENT_OPTIONS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => setChosenIntent(option.key)}
+              className="group relative flex flex-col rounded-2xl border bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-100/70"
+              style={{ borderColor: BORDER }}
+            >
+              {option.popular && (
+                <span
+                  className="absolute right-4 top-4 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                  style={{ background: TINT_BG, color: BRAND }}
+                >
+                  Popular
+                </span>
+              )}
+              <span
+                className="flex h-11 w-11 items-center justify-center rounded-xl transition-transform group-hover:scale-105"
+                style={{ background: option.accentBg, color: option.accent }}
+              >
+                <option.icon className="h-5 w-5" strokeWidth={1.9} />
+              </span>
+              <span
+                className="mt-4 w-fit rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider"
+                style={{ background: option.accentBg, color: option.accent }}
+              >
+                {option.tag}
+              </span>
+              <h3
+                className="mt-2 text-[15px] font-semibold leading-snug"
+                style={{ color: INK }}
+              >
+                {option.title}
+              </h3>
+              <p
+                className="mt-1.5 flex-1 text-[13px] leading-relaxed"
+                style={{ color: INK_SOFT }}
+              >
+                {option.description}
+              </p>
+              <span
+                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold transition-all group-hover:gap-2.5"
+                style={{ color: option.accent }}
+              >
+                Get started
+                <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </button>
+          ))}
+
+          {/* 6th card — browse without a profile */}
+          <a
+            href="/flatmates/browse"
+            className="group flex flex-col items-start justify-center rounded-2xl border-2 border-dashed p-5 transition-colors hover:bg-[#FAFBFF]"
+            style={{ borderColor: BORDER }}
+          >
+            <span
+              className="flex h-11 w-11 items-center justify-center rounded-xl"
+              style={{ background: "#F8FAFC", color: INK_SOFT }}
+            >
+              <Search className="h-5 w-5" strokeWidth={1.9} />
+            </span>
+            <h3
+              className="mt-4 text-[15px] font-semibold"
+              style={{ color: INK }}
+            >
+              Just looking around?
+            </h3>
+            <p
+              className="mt-1.5 flex-1 text-[13px] leading-relaxed"
+              style={{ color: INK_SOFT }}
+            >
+              Browse rooms and flat-shares without creating a profile.
+            </p>
+            <span
+              className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold transition-all group-hover:gap-2.5"
+              style={{ color: INK }}
+            >
+              Open browse
+              <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          </a>
+        </div>
       </main>
     );
   }
@@ -852,7 +1019,11 @@ function OnboardingContent() {
               style={{ background: BRAND }}
               disabled={submitting}
             >
-              {submitting ? "Saving…" : isEditMode ? "Save changes" : "Create profile"}
+              {submitting
+                ? "Saving…"
+                : isEditMode
+                  ? "Save changes"
+                  : "Create profile"}
             </Button>
           </Group>
         </form>
