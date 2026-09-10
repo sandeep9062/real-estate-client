@@ -16,8 +16,6 @@
 
 
 
-
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -203,5 +201,14 @@
     animation-duration: 0.4s;
     animation-timing-function: ease-out;
     animation-fill-mode: backwards;
+  }
+
+  /* Journal wall cards: each card is fully self-contained (fixed height,
+     overflow hidden, absolute cover + overlay). `contain: layout paint`
+     tells the browser it can cache and reuse the card's rendering, so
+     scrolling just moves cached layers instead of re-painting big image +
+     gradient areas every frame (this removed the white-blank flashes). */
+  .journal-card {
+    contain: layout paint;
   }
 }

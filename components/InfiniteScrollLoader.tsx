@@ -14,13 +14,19 @@ interface InfiniteScrollLoaderProps {
  * When it becomes visible (via Intersection Observer) it fires `onIntersect`
  * to load the next page.
  *
- * Improvements for reliability:
- * - Huge rootMargin (1500px) so the next page starts loading very early
- *   and the user never sees an empty bottom area.
- * - A safety-net `scroll` listener on the window that triggers load
- *   when the user is within 200px of the document bottom — guarantees
- *   the observer fires even if the sentinel is hidden behind the
- *   map column, off-screen on mobile, or in a flex/grid layout.
+ * FIX: this used to also run a `window.scroll` listener as a "safety net"
+ * that read `document.documentElement.scrollHeight` on every scroll event.
+ * Reading scrollHeight forces the browser to synchronously flush layout
+ * before it can return a value ("forced synchronous layout"/"layout
+ * thrashing"). Doing that on every scroll tick — potentially dozens of
+ * times a second during a fast scroll or fling — blocked the main thread
+ * badly enough that the compositor had nothing ready to paint, which is
+ * what showed up as blank frames while scrolling fast.
+ *
+ * The IntersectionObserver below does the same job (triggering load-more)
+ * without ever touching layout, and the large 1500px rootMargin already
+ * makes it fire well before the sentinel is actually on-screen — so the
+ * scroll listener wasn't buying any real reliability, just cost.
  */
 export default function InfiniteScrollLoader({
   onIntersect,
@@ -42,7 +48,9 @@ export default function InfiniteScrollLoader({
       },
       {
         // Start loading 1500px before the sentinel enters the viewport.
-        // Larger value = more eager loading, fewer "stuck" moments.
+        // Larger value = more eager loading, fewer "stuck" moments —
+        // this alone is what keeps loading reliable, no scroll listener
+        // needed on top of it.
         rootMargin: "1500px 0px 1500px 0px",
         threshold: 0,
       },
@@ -50,31 +58,8 @@ export default function InfiniteScrollLoader({
 
     observer.observe(sentinel);
 
-    // Safety net: a window-scroll listener that triggers loadMore when
-    // the user is within 200px of the document bottom. This guarantees
-    // that the next page always loads, even when the sentinel is in a
-    // layout that doesn't intersect reliably (e.g. inside a sticky map
-    // container, or in a virtualized parent that resizes dynamically).
-    const handleScroll = () => {
-      if (!hasMore || loading) return;
-      const scrolled = window.scrollY + window.innerHeight;
-      const total = document.documentElement.scrollHeight;
-      if (total - scrolled < 200) {
-        onIntersect();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
-
-    // Run once on mount in case the page is already short enough
-    // that the sentinel is visible.
-    handleScroll();
-
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
     };
   }, [onIntersect, loading, hasMore]);
 
