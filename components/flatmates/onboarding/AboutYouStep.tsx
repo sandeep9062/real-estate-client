@@ -1,21 +1,95 @@
 "use client";
 
-import React from "react";
 import {
   Divider,
   MultiSelect,
+  Radio,
   Select,
   SimpleGrid,
+  Stack,
   Switch,
   Text,
   TextInput,
   Textarea,
 } from "@mantine/core";
+import type { LucideIcon } from "lucide-react";
+import { CalendarClock, Clock, Repeat, Search, Users } from "lucide-react";
 import { OPTIONS, enumData } from "./options";
 import type { ProfileDraft } from "./types";
 
+export interface IntentOption {
+  key: string;
+  icon: LucideIcon;
+  tag: string;
+  title: string;
+  description: string;
+  accent: string;
+  accentBg: string;
+  popular?: boolean;
+}
+
+// Intent choices — radio-selectable inside Step 1 so the wizard no longer
+// needs a standalone step-0 picker. Same copy/accent colors as the
+// /flatmates landing cards so both entry points feel like one flow. The
+// ?intent= deep-link still pre-selects via the page.
+export const INTENT_OPTIONS: IntentOption[] = [
+  {
+    key: "has_room",
+    icon: Users,
+    tag: "List a room",
+    title: "I have a room, need a flatmate",
+    description: "List your spare room or flat and find someone who fits.",
+    accent: "#059669",
+    accentBg: "#ECFDF5",
+    popular: true,
+  },
+  {
+    key: "seeking_room",
+    icon: Search,
+    tag: "Search rooms",
+    title: "I'm looking for a room",
+    description:
+      "Search rooms and flats near you, filtered by budget and lifestyle.",
+    accent: "#4161df",
+    accentBg: "#EEF1FC",
+    popular: true,
+  },
+  {
+    key: "swap",
+    icon: Repeat,
+    tag: "Swap",
+    title: "I want to swap flats",
+    description: "Trade places with someone whose location works better for you.",
+    accent: "#7C3AED",
+    accentBg: "#F5F3FF",
+  },
+  {
+    key: "temporary_offer",
+    icon: Clock,
+    tag: "Short-term",
+    title: "I have a place for temporary stay",
+    description: "Offer your room or flat for a short-term stay.",
+    accent: "#D97706",
+    accentBg: "#FFFBEB",
+  },
+  {
+    key: "temporary_seek",
+    icon: CalendarClock,
+    tag: "Short-term",
+    title: "I need a temporary stay",
+    description: "Find a short-term room while you sort out something longer-term.",
+    accent: "#E11D48",
+    accentBg: "#FFF1F2",
+  },
+];
+
+// Radios talk in "" (none) while the page tracks null — same semantic, so the
+// setter coerces "" → null for the radio and string → string otherwise.
 export interface AboutYouStepProps {
   profile: ProfileDraft;
+  intent: string | null;
+  intentLocked: boolean;
+  onIntent: (value: string | null) => void;
   onField: (key: string, value: any) => void;
   onHabit: (key: string, value: any) => void;
   onLookingFor: (key: string, value: any) => void;
@@ -23,11 +97,14 @@ export interface AboutYouStepProps {
 }
 
 /**
- * Step 1 — every RoommateProfile field grouped into compact sections.
- * Three fields per row where it fits, two otherwise.
+ * Step 1 — intent (radio) + every RoommateProfile field grouped into compact
+ * sections. Three fields per row where it fits, two otherwise.
  */
 export default function AboutYouStep({
   profile,
+  intent,
+  intentLocked,
+  onIntent,
   onField,
   onHabit,
   onLookingFor,
@@ -35,6 +112,83 @@ export default function AboutYouStep({
 }: AboutYouStepProps) {
   return (
     <>
+      <Radio.Group
+        name="roommate-intent"
+        label="What brings you here?"
+        description={
+          intentLocked
+            ? "Your intent is locked to your saved profile — it can't be changed while editing."
+            : "Pick one — the rest of the wizard adapts to your choice."
+        }
+        value={intent || null}
+        onChange={(value) => onIntent(value || "")}
+        mb="sm"
+      >
+        <Stack gap="sm" mt="xs">
+          {INTENT_OPTIONS.map((option) => {
+            const Icon = option.icon;
+            const selected = intent === option.key;
+            return (
+              <Radio
+                key={option.key}
+                value={option.key}
+                disabled={intentLocked}
+                label={
+                  <span style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span
+                      style={{
+                        display: "flex",
+                        height: 40,
+                        width: 40,
+                        flexShrink: 0,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 10,
+                        background: option.accentBg,
+                        color: option.accent,
+                        opacity: intentLocked && !selected ? 0.55 : 1,
+                      }}
+                    >
+                      <Icon size={20} strokeWidth={1.9} />
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <Text fw={600} size="sm">
+                        {option.title}
+                        {option.popular && (
+                          <Text span size="xs" fw={700} ml={8} c="blue">
+                            · Popular
+                          </Text>
+                        )}
+                      </Text>
+                      <Text size="xs" c="dimmed" mt={2}>
+                        {option.description}
+                      </Text>
+                    </span>
+                  </span>
+                }
+                styles={{
+                  body: selected
+                    ? {
+                        border: `2px solid ${option.accent}`,
+                        borderRadius: 10,
+                        padding: 12,
+                        background: option.accentBg,
+                      }
+                    : {
+                        border: "1px solid #E5E7F2",
+                        borderRadius: 10,
+                        padding: 12,
+                        background: "#fff",
+                      },
+                }}
+              />
+            );
+          })}
+        </Stack>
+      </Radio.Group>
+
+      <Divider my="sm" />
+
       <Text fw={700} size="md" mb={8}>
         Identity &amp; work
       </Text>

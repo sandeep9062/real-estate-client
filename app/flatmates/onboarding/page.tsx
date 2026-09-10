@@ -1,17 +1,8 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  ArrowRight,
-  CalendarClock,
-  Clock,
-  Loader2,
-  Repeat,
-  Search,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Button, Card, Group, Stepper } from "@mantine/core";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/store/authSlice";
@@ -19,6 +10,7 @@ import {
   useCreateProfileMutation,
   useCreateRoomFlatMutation,
   useGetOwnProfileQuery,
+  useLazyGetOwnProfileQuery,
   useUpdateProfileMutation,
   useUpdateRoomFlatMutation,
   type RoomFlat,
@@ -26,7 +18,9 @@ import {
 } from "@/services/roommatesApi";
 import { toast } from "@/hooks/use-toast";
 import PhotosLocationFlat from "@/components/flatmates/PhotosLocationFlat";
-import AboutYouStep from "@/components/flatmates/onboarding/AboutYouStep";
+import AboutYouStep, {
+  INTENT_OPTIONS,
+} from "@/components/flatmates/onboarding/AboutYouStep";
 import SeekerStep from "@/components/flatmates/onboarding/SeekerStep";
 import PropertyStep from "@/components/flatmates/onboarding/PropertyStep";
 import HouseRulesStep from "@/components/flatmates/onboarding/HouseRulesStep";
@@ -40,84 +34,13 @@ const BRAND = "#4161df";
 const INK = "#161A2E";
 const INK_SOFT = "#5C5F73";
 const TINT_BG = "#EEF1FC";
-const BORDER = "#E5E7F2";
 
 const NEEDS_PROPERTY = ["has_room", "swap", "temporary_offer"];
 const NEEDS_SEARCH_AREA = ["seeking_room", "temporary_seek"];
 
-const INTENT_LABELS: Record<string, string> = {
-  has_room: "Have a room, need a flatmate",
-  seeking_room: "Looking for a room",
-  swap: "Want to swap flats",
-  temporary_offer: "Offering a temporary stay",
-  temporary_seek: "Need a temporary stay",
-};
-
-// Step-0 intent picker options — same copy/accent colors as the /flatmates
-// landing cards so both entry points feel like one flow. The landing cards
-// deep-link with ?intent= (pre-selects); this picker covers direct visits
-// ("Create your free profile", sidebar "Create listing", bookmarks).
-const INTENT_OPTIONS: {
-  key: string;
-  icon: LucideIcon;
-  tag: string;
-  title: string;
-  description: string;
-  accent: string;
-  accentBg: string;
-  popular?: boolean;
-}[] = [
-  {
-    key: "has_room",
-    icon: Users,
-    tag: "List a room",
-    title: "I have a room, need a flatmate",
-    description: "List your spare room or flat and find someone who fits.",
-    accent: "#059669",
-    accentBg: "#ECFDF5",
-    popular: true,
-  },
-  {
-    key: "seeking_room",
-    icon: Search,
-    tag: "Search rooms",
-    title: "I'm looking for a room",
-    description:
-      "Search rooms and flats near you, filtered by budget and lifestyle.",
-    accent: BRAND,
-    accentBg: TINT_BG,
-    popular: true,
-  },
-  {
-    key: "swap",
-    icon: Repeat,
-    tag: "Swap",
-    title: "I want to swap flats",
-    description:
-      "Trade places with someone whose location works better for you.",
-    accent: "#7C3AED",
-    accentBg: "#F5F3FF",
-  },
-  {
-    key: "temporary_offer",
-    icon: Clock,
-    tag: "Short-term",
-    title: "I have a place for temporary stay",
-    description: "Offer your room or flat for a short-term stay.",
-    accent: "#D97706",
-    accentBg: "#FFFBEB",
-  },
-  {
-    key: "temporary_seek",
-    icon: CalendarClock,
-    tag: "Short-term",
-    title: "I need a temporary stay",
-    description:
-      "Find a short-term room while you sort out something longer-term.",
-    accent: "#E11D48",
-    accentBg: "#FFF1F2",
-  },
-];
+const INTENT_LABELS: Record<string, string> = Object.fromEntries(
+  INTENT_OPTIONS.map((option) => [option.key, option.title]),
+);
 
 // Same conversion the add-property flow uses: Map reports {lat,lng}, while the
 // backend stores GeoJSON {type:"Point", coordinates:[lng,lat]}.
@@ -367,9 +290,13 @@ function OnboardingContent() {
 
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  // Same-tick double-submit guard: two calls in the same tick (e.g. a double
+  // click before React flushes state) both see the stale `submitting === false`
+  // closure value — the ref catches what the state cannot.
+  const submittingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
-  // Create mode: the intent picked on-page (step 0) or via a ?intent= deep
-  // link. Edit mode ignores this — it uses the saved profile's intent.
+  // Create mode: the intent picked via the Step-1 radio or a ?intent=
+  // deep-link. Edit mode ignores this — it uses the saved profile's intent.
   const [chosenIntent, setChosenIntent] = useState<string | null>(urlIntent);
   // Guards the edit-mode prefill below so typing into the form is never
   // clobbered by refetches of the saved profile.
@@ -379,6 +306,9 @@ function OnboardingContent() {
   const [createRoomFlat] = useCreateRoomFlatMutation();
   const [updateProfile] = useUpdateProfileMutation();
   const [updateRoomFlat] = useUpdateRoomFlatMutation();
+  // Fallback fetch used only when the backend 409s without attaching the
+  // existing listing (e.g. older deployed backend) — lets us PATCH it anyway.
+  const [fetchOwnProfile] = useLazyGetOwnProfileQuery();
 
   // Edit mode loads the saved profile (now with its roomFlat populated, see
   // getOwnProfile) so every step can be pre-filled.
@@ -389,8 +319,10 @@ function OnboardingContent() {
   } = useGetOwnProfileQuery(undefined, { skip: !isEditMode });
 
   // Locked at creation — changing it would orphan the listing type, so edit
-  // mode reuses the saved intent instead of the on-page/deep-link choice.
-  const intent = isEditMode ? (existingProfile?.intent ?? null) : chosenIntent;
+  // mode reuses the saved intent instead of the Step-1/deep-link choice.
+  const intent: string | null = isEditMode
+    ? (existingProfile?.intent ?? null)
+    : chosenIntent;
 
   // Every user-editable field from RoommateProfile (backend model).
   const [profile, setProfile] = useState<ProfileDraft>({
@@ -561,9 +493,9 @@ function OnboardingContent() {
     }));
 
   // Edit mode: while the saved profile (+ populated roomFlat) is still
-  // loading, `intent` is null — show the loader rather than the step-0
-  // intent picker (edit mode locks the intent to the saved profile). If the
-  // fetch failed (e.g. no profile yet), surface that instead.
+  // loading, `intent` is null — show the loader rather than Step 1 (edit mode
+  // locks the intent to the saved profile). If the fetch failed (e.g. no
+  // profile yet), surface that instead.
   if (!mounted || !isAuthenticated || (isEditMode && !prefilled)) {
     if (isEditMode && existingProfileError) {
       return (
@@ -589,114 +521,20 @@ function OnboardingContent() {
     );
   }
 
-  // ── Step 0 · Intent picker (create mode, no intent chosen yet) ────────────
-  // Replaces the old "go back and pick" dead-end: the intent choice now lives
-  // INSIDE the onboarding flow, so direct visits to /flatmates/onboarding
-  // (hero CTA, sidebar, bookmarks) get an actionable first screen.
-  if (!intent) {
-    return (
-      <main className="mx-auto max-w-5xl px-6 pb-12 sm:pb-16">
-        <h1
-          className="text-2xl sm:text-3xl font-bold tracking-tight"
-          style={{ color: INK }}
-        >
-          Set up your profile
-        </h1>
-        <p className="mt-2 max-w-xl text-[15px]" style={{ color: INK_SOFT }}>
-          What brings you here? Pick one to start — the rest of the wizard
-          adapts to your choice, and you can edit everything later.
-        </p>
+  // Step 1 (AboutYouStep) always renders — the intent radio lives inside it,
+  // and the rest of the wizard below only unlocks once an intent is chosen
+  // (guarded per-step, so a direct visit doesn't hit a dead-end).
+  const needsProperty = !!intent && NEEDS_PROPERTY.includes(intent);
+  const needsSearchArea = !!intent && NEEDS_SEARCH_AREA.includes(intent);
 
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {INTENT_OPTIONS.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              onClick={() => setChosenIntent(option.key)}
-              className="group relative flex flex-col rounded-2xl border bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-100/70"
-              style={{ borderColor: BORDER }}
-            >
-              {option.popular && (
-                <span
-                  className="absolute right-4 top-4 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                  style={{ background: TINT_BG, color: BRAND }}
-                >
-                  Popular
-                </span>
-              )}
-              <span
-                className="flex h-11 w-11 items-center justify-center rounded-xl transition-transform group-hover:scale-105"
-                style={{ background: option.accentBg, color: option.accent }}
-              >
-                <option.icon className="h-5 w-5" strokeWidth={1.9} />
-              </span>
-              <span
-                className="mt-4 w-fit rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider"
-                style={{ background: option.accentBg, color: option.accent }}
-              >
-                {option.tag}
-              </span>
-              <h3
-                className="mt-2 text-[15px] font-semibold leading-snug"
-                style={{ color: INK }}
-              >
-                {option.title}
-              </h3>
-              <p
-                className="mt-1.5 flex-1 text-[13px] leading-relaxed"
-                style={{ color: INK_SOFT }}
-              >
-                {option.description}
-              </p>
-              <span
-                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold transition-all group-hover:gap-2.5"
-                style={{ color: option.accent }}
-              >
-                Get started
-                <ArrowRight className="h-3.5 w-3.5" />
-              </span>
-            </button>
-          ))}
-
-          {/* 6th card — browse without a profile */}
-          <a
-            href="/flatmates/browse"
-            className="group flex flex-col items-start justify-center rounded-2xl border-2 border-dashed p-5 transition-colors hover:bg-[#FAFBFF]"
-            style={{ borderColor: BORDER }}
-          >
-            <span
-              className="flex h-11 w-11 items-center justify-center rounded-xl"
-              style={{ background: "#F8FAFC", color: INK_SOFT }}
-            >
-              <Search className="h-5 w-5" strokeWidth={1.9} />
-            </span>
-            <h3
-              className="mt-4 text-[15px] font-semibold"
-              style={{ color: INK }}
-            >
-              Just looking around?
-            </h3>
-            <p
-              className="mt-1.5 flex-1 text-[13px] leading-relaxed"
-              style={{ color: INK_SOFT }}
-            >
-              Browse rooms and flat-shares without creating a profile.
-            </p>
-            <span
-              className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold transition-all group-hover:gap-2.5"
-              style={{ color: INK }}
-            >
-              Open browse
-              <ArrowRight className="h-3.5 w-3.5" />
-            </span>
-          </a>
-        </div>
-      </main>
-    );
-  }
-
-  const needsProperty = NEEDS_PROPERTY.includes(intent);
-  const needsSearchArea = NEEDS_SEARCH_AREA.includes(intent);
+  const goToStep2 = () => {
+    // Intent gates the rest of the wizard — don't advance without it.
+    if (!intent) {
+      toast.error("Please pick what brings you here to continue");
+      return;
+    }
+    setStep(2);
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -762,7 +600,8 @@ function OnboardingContent() {
   }
 
   async function doSubmit(roomFlatOverride?: RoomFlatDraft) {
-    if (submitting) return;
+    if (submitting || submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError(null);
 
@@ -771,6 +610,16 @@ function OnboardingContent() {
     const validationErrors = validateProfile();
     if (validationErrors.length > 0) {
       validationErrors.forEach((msg) => toast.error(msg));
+      submittingRef.current = false;
+      setSubmitting(false);
+      return;
+    }
+
+    // Intent gates the rest of the wizard — the radio lives inside Step 1, so
+    // the final submit can't fire without a choice.
+    if (!intent) {
+      toast.error("Please pick what brings you here to continue");
+      submittingRef.current = false;
       setSubmitting(false);
       return;
     }
@@ -841,14 +690,20 @@ function OnboardingContent() {
 
         if (needsProperty) {
           const draft = roomFlatOverride ?? roomFlat;
-          const savedFlat =
-            existingProfile.roomFlat &&
-            typeof existingProfile.roomFlat === "object"
-              ? (existingProfile.roomFlat as RoomFlat)
-              : null;
-          if (savedFlat) {
+          // roomFlat can arrive as a populated document OR a raw ObjectId
+          // string (unpopulated/stale cache) — both identify the saved
+          // listing. Only POST when there is genuinely none, otherwise the
+          // backend correctly 409s ("already has a room/flat listed").
+          const raw = existingProfile.roomFlat;
+          const savedFlatId =
+            raw && typeof raw === "object"
+              ? ((raw as RoomFlat)._id ?? null)
+              : typeof raw === "string"
+                ? raw
+                : null;
+          if (savedFlatId) {
             await updateRoomFlat({
-              id: savedFlat._id,
+              id: savedFlatId,
               update: buildRoomFlatRequestBody(draft) as any,
             }).unwrap();
           } else {
@@ -863,17 +718,65 @@ function OnboardingContent() {
         return;
       }
 
-      await createProfile({ intent, ...profileBody } as any).unwrap();
+      try {
+        await createProfile({ intent, ...profileBody } as any).unwrap();
+      } catch (err) {
+        // 409 = the user already has a profile (re-entering onboarding
+        // without ?edit=1). Intent is locked at creation, so update the
+        // profile without it — same rule as edit mode.
+        const e = err as { status?: number };
+        if (e.status !== 409) throw err;
+        await updateProfile(profileBody as any).unwrap();
+      }
 
       if (needsProperty) {
         const draft = roomFlatOverride ?? roomFlat;
-        await createRoomFlat(buildRoomFlatRequestBody(draft) as any).unwrap();
+        const body = buildRoomFlatRequestBody(draft) as any;
+        try {
+          await createRoomFlat(body).unwrap();
+        } catch (err) {
+          // 409 = the profile already has a listing. Happens when a previous
+          // attempt actually created it (lost response, retry, double
+          // submit). Newer backends attach the existing listing to the 409 —
+          // PATCH it with the draft so the submitted data is still saved
+          // instead of dead-ending on the conflict. Unknown older servers
+          // don't attach it, so refetch the profile as a fallback.
+          const e = err as {
+            status?: number;
+            data?: {
+              existingRoomFlat?: { _id?: string } | null;
+              existingRoomFlatId?: string;
+            };
+          };
+          let existingId =
+            e.data?.existingRoomFlat?._id ?? e.data?.existingRoomFlatId;
+          if (e.status === 409 && !existingId) {
+            try {
+              const own = await fetchOwnProfile(undefined).unwrap();
+              const raw = own?.roomFlat;
+              existingId =
+                (raw && typeof raw === "object"
+                  ? ((raw as RoomFlat)._id ?? undefined)
+                  : typeof raw === "string"
+                    ? raw
+                    : undefined) ?? existingId;
+            } catch {
+              // Fallback fetch failed — fall through to rethrowing the 409.
+            }
+          }
+          if (e.status === 409 && existingId) {
+            await updateRoomFlat({ id: existingId, update: body }).unwrap();
+          } else {
+            throw err;
+          }
+        }
       }
 
       router.push("/flatmates/profile/me");
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -982,6 +885,9 @@ function OnboardingContent() {
         <Card p="lg" radius="md" withBorder shadow="sm">
           <AboutYouStep
             profile={profile}
+            intent={intent ?? ""}
+            intentLocked={isEditMode}
+            onIntent={setChosenIntent}
             onField={updateProfileField}
             onHabit={updateHabit}
             onLookingFor={updateLookingFor}
@@ -991,9 +897,14 @@ function OnboardingContent() {
             <Button
               style={{ background: BRAND }}
               rightSection={<ArrowRight className="w-4 h-4" />}
-              onClick={() => setStep(2)}
+              onClick={goToStep2}
             >
-              Next: {needsProperty ? "your place" : "where & budget"}
+              Next:{" "}
+              {!intent
+                ? "continue"
+                : needsProperty
+                  ? "your place"
+                  : "where & budget"}
             </Button>
           </Group>
         </Card>
@@ -1053,7 +964,7 @@ function OnboardingContent() {
         <Card p="lg" radius="md" withBorder shadow="sm">
           <HouseRulesStep
             roomFlat={roomFlat}
-            intent={intent}
+            intent={intent ?? ""}
             onHouseRule={updateHouseRule}
             onCurfew={updateCurfew}
             onSwapDetail={updateSwapDetail}

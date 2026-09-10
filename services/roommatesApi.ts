@@ -285,6 +285,7 @@ export const roommatesApi = createApi({
 
 export const {
   useGetOwnProfileQuery,
+  useLazyGetOwnProfileQuery,
   useGetPublicProfileQuery,
   useCreateProfileMutation,
   useUpdateProfileMutation,
