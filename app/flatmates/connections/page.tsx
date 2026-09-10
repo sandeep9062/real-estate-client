@@ -83,7 +83,9 @@ function initialsOf(profile?: RoommateProfile) {
   const occupation = profile?.occupation;
   if (!occupation) return "R";
   const parts = occupation.split("_");
-  return (parts[0]?.[0] || "R").toUpperCase() + (parts[1]?.[0] || "").toUpperCase();
+  return (
+    (parts[0]?.[0] || "R").toUpperCase() + (parts[1]?.[0] || "").toUpperCase()
+  );
 }
 
 export default function ConnectionsPage() {
@@ -115,7 +117,9 @@ export default function ConnectionsPage() {
       const fromId = asProfile(c.fromProfile)?._id;
       const toId = asProfile(c.toProfile)?._id;
       // Fall back to string form if either side isn't populated.
-      const isFromMe = fromId ? fromId === myProfileId : c.fromProfile === myProfileId;
+      const isFromMe = fromId
+        ? fromId === myProfileId
+        : c.fromProfile === myProfileId;
       if (isFromMe) s.push(c);
       else r.push(c);
     }
@@ -126,7 +130,8 @@ export default function ConnectionsPage() {
     };
   }, [connections, myProfileId]);
 
-  const visible = tab === "received" ? received : tab === "sent" ? sent : connections;
+  const visible =
+    tab === "received" ? received : tab === "sent" ? sent : connections;
 
   const errorMessage = actionError || getErrorMessage(error);
 
@@ -158,7 +163,7 @@ export default function ConnectionsPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pb-20 sm:px-6">
+    <main className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6">
       {/* Header */}
       <div className="flex items-start gap-4">
         <span
@@ -175,8 +180,8 @@ export default function ConnectionsPage() {
             Connection requests
           </h1>
           <p className="mt-1 text-sm" style={{ color: INK_SOFT }}>
-            People who want to share a place with you — and requests
-            you&apos;ve sent.
+            People who want to share a place with you — and requests you&apos;ve
+            sent.
           </p>
         </div>
       </div>
@@ -198,11 +203,7 @@ export default function ConnectionsPage() {
             className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold transition-colors ${
               tab === t.key ? "text-white" : "hover:bg-[#EEF1FC]"
             }`}
-            style={
-              tab === t.key
-                ? { background: BRAND }
-                : { color: INK_SOFT }
-            }
+            style={tab === t.key ? { background: BRAND } : { color: INK_SOFT }}
           >
             {t.label}
             {t.key === "received" && pendingReceivedCount > 0 && (
@@ -324,7 +325,10 @@ function ConnectionCard({
   connection: FlatmateConnection;
   myProfileId: string | null;
   busy: boolean;
-  onRespond: (id: string, status: "accepted" | "declined" | "withdrawn") => void;
+  onRespond: (
+    id: string,
+    status: "accepted" | "declined" | "withdrawn",
+  ) => void;
 }) {
   // listMyConnections returns both directions with both sides populated.
   // Determine which side is "mine" so we can show the other person and the
@@ -345,10 +349,9 @@ function ConnectionCard({
         : null;
   const profileHref = otherId ? `/flatmates/profile/${otherId}` : null;
 
-  const statusCfg =
-    STATUS_STYLES[connection.status] ?? STATUS_STYLES.pending;
+  const statusCfg = STATUS_STYLES[connection.status] ?? STATUS_STYLES.pending;
   const intent = other?.intent
-    ? INTENT_LABELS[other.intent] ?? humanize(other.intent)
+    ? (INTENT_LABELS[other.intent] ?? humanize(other.intent))
     : "";
   const areaLine = other?.searchArea
     ? [other.searchArea.city, other.searchArea.locality]
@@ -405,15 +408,9 @@ function ConnectionCard({
           className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold"
           style={{ background: statusCfg.bg, color: statusCfg.color }}
         >
-          {pending && isReceived && (
-            <ArrowDownLeft className="h-3 w-3" />
-          )}
-          {pending && isFromMe && (
-            <ArrowUpRight className="h-3 w-3" />
-          )}
-          {connection.status === "accepted" && (
-            <Check className="h-3 w-3" />
-          )}
+          {pending && isReceived && <ArrowDownLeft className="h-3 w-3" />}
+          {pending && isFromMe && <ArrowUpRight className="h-3 w-3" />}
+          {connection.status === "accepted" && <Check className="h-3 w-3" />}
           {statusCfg.label}
         </span>
       </div>
@@ -532,6 +529,9 @@ function getErrorMessage(error: unknown): string {
     message?: string;
   };
   return (
-    e.data?.message || e.error || e.message || "Something went wrong. Please try again."
+    e.data?.message ||
+    e.error ||
+    e.message ||
+    "Something went wrong. Please try again."
   );
 }

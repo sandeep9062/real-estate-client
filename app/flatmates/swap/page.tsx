@@ -32,7 +32,7 @@ export default function SwapMatchesPage() {
   } = useSearchSwapMatchesQuery();
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 pb-20 sm:px-6">
+    <main className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6">
       {/* Header */}
       <div className="flex items-start gap-4">
         <span
@@ -127,7 +127,8 @@ export default function SwapMatchesPage() {
         <>
           <div className="mt-8 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold" style={{ color: INK }}>
-              {matches.length} mutual {matches.length === 1 ? "match" : "matches"}
+              {matches.length} mutual{" "}
+              {matches.length === 1 ? "match" : "matches"}
             </p>
             <Link
               href="/flatmates/browse"
@@ -198,10 +199,7 @@ export default function SwapMatchesPage() {
           className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors hover:opacity-75"
           style={{ color: INK_SOFT }}
         >
-          <ArrowLeftRight
-            className="h-3.5 w-3.5"
-            style={{ color: BRAND }}
-          />
+          <ArrowLeftRight className="h-3.5 w-3.5" style={{ color: BRAND }} />
           All flatmate options
         </Link>
       </div>

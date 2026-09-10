@@ -232,7 +232,7 @@ function OnboardingContent() {
   const [roomFlatDetails, setRoomFlatDetails] = useState<RoomFlatMediaDraft>({
     image: [],
     location: { country: "", city: "", address: "", coordinates: null },
-  });// ---- Update helpers (pure setters for nested pieces of state) ----
+  }); // ---- Update helpers (pure setters for nested pieces of state) ----
   const updateProfileField = (key: string, value: any) =>
     setProfile((p) => ({ ...p, [key]: value }));
 
@@ -255,7 +255,10 @@ function OnboardingContent() {
     }));
 
   const updateSearchArea = (key: string, value: any) =>
-    setProfile((p) => ({ ...p, searchArea: { ...p.searchArea, [key]: value } }));
+    setProfile((p) => ({
+      ...p,
+      searchArea: { ...p.searchArea, [key]: value },
+    }));
 
   const updateBudget = (key: "min" | "max", value: string) =>
     setProfile((p) => ({
@@ -296,10 +299,7 @@ function OnboardingContent() {
       },
     }));
 
-  const updateTemporaryDetail = (
-    key: "startDate" | "endDate",
-    value: string,
-  ) =>
+  const updateTemporaryDetail = (key: "startDate" | "endDate", value: string) =>
     setRoomFlat((r) => ({
       ...r,
       temporaryDetails: { ...r.temporaryDetails, [key]: value },
@@ -311,10 +311,7 @@ function OnboardingContent() {
   if (!mounted || !isAuthenticated) {
     return (
       <main className="mx-auto max-w-xl px-6 pb-8 flex justify-center">
-        <Loader2
-          className="w-5 h-5 animate-spin"
-          style={{ color: BRAND }}
-        />
+        <Loader2 className="w-5 h-5 animate-spin" style={{ color: BRAND }} />
       </main>
     );
   }
@@ -354,18 +351,21 @@ function OnboardingContent() {
     const errors: string[] = [];
 
     // ---- Habits: every enum field must be a non-empty valid value ----
-    const habitFields: { key: keyof ProfileDraft["habits"]; label: string }[] = [
-      { key: "smoking", label: "Smoking" },
-      { key: "drinking", label: "Drinking" },
-      { key: "nightlifeFriendly", label: "Nightlife-friendly" },
-      { key: "foodPreference", label: "Food preference" },
-      { key: "cleanlinessLevel", label: "Cleanliness level" },
-      { key: "guestsFrequency", label: "Guests frequency" },
-    ];
+    const habitFields: { key: keyof ProfileDraft["habits"]; label: string }[] =
+      [
+        { key: "smoking", label: "Smoking" },
+        { key: "drinking", label: "Drinking" },
+        { key: "nightlifeFriendly", label: "Nightlife-friendly" },
+        { key: "foodPreference", label: "Food preference" },
+        { key: "cleanlinessLevel", label: "Cleanliness level" },
+        { key: "guestsFrequency", label: "Guests frequency" },
+      ];
     for (const { key, label } of habitFields) {
       const val = profile.habits[key];
       if (typeof val === "string" && (!val || val.trim() === "")) {
-        errors.push(`Please select ${label.toLowerCase()} in the Habits section`);
+        errors.push(
+          `Please select ${label.toLowerCase()} in the Habits section`,
+        );
       }
     }
 
@@ -387,7 +387,13 @@ function OnboardingContent() {
       errors.push("Maximum age must be at least 16");
     }
 
-    if (minRaw && maxRaw && !Number.isNaN(min) && !Number.isNaN(max) && min > max) {
+    if (
+      minRaw &&
+      maxRaw &&
+      !Number.isNaN(min) &&
+      !Number.isNaN(max) &&
+      min > max
+    ) {
       errors.push("Minimum age cannot be greater than maximum age");
     }
 
@@ -418,8 +424,11 @@ function OnboardingContent() {
         workSchedule: profile.workSchedule || undefined,
         sleepSchedule: profile.sleepSchedule || undefined,
         languages: Array.isArray(profile.languages)
-          ? profile.languages.map((s) => String(s).trim()).filter((s) => s.length > 0)
-          : typeof (profile as any).languages === "string" && (profile as any).languages
+          ? profile.languages
+              .map((s) => String(s).trim())
+              .filter((s) => s.length > 0)
+          : typeof (profile as any).languages === "string" &&
+              (profile as any).languages
             ? String((profile as any).languages)
                 .split(",")
                 .map((s: string) => s.trim())
@@ -485,9 +494,10 @@ function OnboardingContent() {
    * the resolved photos + location (handed over by the component before its
    * own state update flushes) and submit everything in one go.
    */
-  async function handlePlaceNext(
-    resolved?: { image?: (string | File)[]; location?: Record<string, any> },
-  ) {
+  async function handlePlaceNext(resolved?: {
+    image?: (string | File)[];
+    location?: Record<string, any>;
+  }) {
     if (!roomFlat.title.trim()) {
       setError("Please add a listing title.");
       return;
@@ -531,7 +541,7 @@ function OnboardingContent() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 pb-12 sm:pb-16">
+    <main className="mx-auto max-w-7xl px-6 pb-12 sm:pb-16">
       {INTENT_LABELS[intent] && (
         <span
           className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4"
@@ -620,10 +630,7 @@ function OnboardingContent() {
       {/* ── Step 2 · Property: describe your place (RoomFlat basics) ────── */}
       {step === 2 && needsProperty && (
         <Card p="lg" radius="md" withBorder shadow="sm">
-          <PropertyStep
-            roomFlat={roomFlat}
-            onField={updateRoomFlatField}
-          />
+          <PropertyStep roomFlat={roomFlat} onField={updateRoomFlatField} />
           <Group justify="space-between" mt={32}>
             <Button variant="default" onClick={() => setStep(1)}>
               Back
