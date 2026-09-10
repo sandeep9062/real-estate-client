@@ -142,7 +142,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       className={[
         "group relative w-full max-w-full cursor-pointer overflow-hidden rounded-2xl border bg-white transition-shadow duration-300",
         carousel
-          ? "flex h-[420px] flex-col"
+          ? "flex h-[396px] flex-col sm:h-[420px]"
           : "flex min-h-[460px] h-full flex-col",
         isSelected
           ? "border-slate-400/80 shadow-md ring-1 ring-slate-400/60"
@@ -154,7 +154,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <div
         className={
           carousel
-            ? "relative h-56 w-full shrink-0 overflow-hidden"
+            ? "relative h-48 w-full shrink-0 overflow-hidden sm:h-56"
             : "relative min-h-[12.5rem] w-full flex-1 basis-0 overflow-hidden sm:min-h-[14rem]"
         }
       >
@@ -173,7 +173,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               src={firstMedia}
               alt={card.title || "Property"}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              sizes={
+                carousel
+                  ? "(max-width: 640px) 90vw, (max-width: 1280px) 50vw, 33vw"
+                  : "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              }
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
             />
           )

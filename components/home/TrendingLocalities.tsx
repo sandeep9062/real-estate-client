@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -36,16 +36,95 @@ interface Locality {
 
 export default function TrendingLocalities() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const stepRef = useRef(0);
+  const isDragRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollRef = useRef(0);
+  const dragMovedRef = useRef(false);
+  const [visiblePerPage, setVisiblePerPage] = useState(1);
+  const [activePage, setActivePage] = useState(0);
 
-  const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft } = scrollContainerRef.current;
-      const scrollTo =
-        direction === "left" ? scrollLeft - 220 : scrollLeft + 220;
-      scrollContainerRef.current.scrollTo({
-        left: scrollTo,
-        behavior: "smooth",
-      });
+  const count = trendingLocalitiesData.length;
+  const pages = Math.max(1, count - visiblePerPage + 1);
+
+  const measure = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const first = el.querySelector<HTMLElement>("[data-slide]");
+    if (!first) return;
+    const gap = parseFloat(getComputedStyle(el).columnGap || "0") || 0;
+    const step = first.offsetWidth + gap;
+    const perPage = Math.max(1, Math.round(el.clientWidth / step));
+    stepRef.current = step;
+    setVisiblePerPage(perPage);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el || !stepRef.current) return;
+    setActivePage(
+      Math.min(Math.max(0, Math.round(el.scrollLeft / stepRef.current)), pages - 1),
+    );
+  }, [pages]);
+
+  const scrollToPage = useCallback((page: number) => {
+    const el = scrollContainerRef.current;
+    if (!el || !stepRef.current) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    el.scrollTo({
+      left: Math.max(0, Math.min(page * stepRef.current, maxScroll)),
+      behavior: "smooth",
+    });
+    setActivePage(Math.min(page, pages - 1));
+  }, [pages]);
+
+  // Mouse drag-to-scroll (touch devices use native overflow scrolling)
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    isDragRef.current = true;
+    dragMovedRef.current = false;
+    dragStartXRef.current = e.clientX;
+    dragStartScrollRef.current = el.scrollLeft;
+    el.style.scrollBehavior = "auto";
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = scrollContainerRef.current;
+    if (!el || !isDragRef.current) return;
+    const dx = e.clientX - dragStartXRef.current;
+    if (!dragMovedRef.current && Math.abs(dx) > 6) {
+      dragMovedRef.current = true;
+    }
+    if (dragMovedRef.current) {
+      el.scrollLeft = dragStartScrollRef.current - dx;
+    }
+  };
+
+  const endDrag = () => {
+    if (!isDragRef.current) return;
+    const el = scrollContainerRef.current;
+    if (el) {
+      el.style.scrollBehavior = "";
+    }
+    isDragRef.current = false;
+  };
+
+  const handleClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (dragMovedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragMovedRef.current = false;
     }
   };
 
@@ -94,7 +173,7 @@ export default function TrendingLocalities() {
             </button>
             <div className="flex gap-1.5">
               <button
-                onClick={() => scroll("left")}
+                onClick={() => scrollToPage(Math.max(0, activePage - 1))}
                 className="p-1.5 bg-white rounded-full shadow-sm transition-all active:scale-95"
                 style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
                 aria-label="Scroll left"
@@ -102,7 +181,7 @@ export default function TrendingLocalities() {
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
-                onClick={() => scroll("right")}
+                onClick={() => scrollToPage(Math.min(activePage + 1, pages - 1))}
                 className="p-1.5 bg-white rounded-full shadow-sm transition-all active:scale-95"
                 style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
                 aria-label="Scroll right"
@@ -121,11 +200,18 @@ export default function TrendingLocalities() {
 
           <div
             ref={scrollContainerRef}
-            className="flex gap-3 overflow-x-auto scroll-smooth pb-2 px-4 sm:px-0 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            onScroll={handleScroll}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            onClickCapture={handleClickCapture}
+            className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 px-4 sm:px-0 select-none cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {trendingLocalitiesData.map((locality: Locality) => (
               <div
                 key={locality.id}
+                data-slide
                 className="min-w-[168px] sm:min-w-[184px] max-w-[184px] bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group snap-start overflow-hidden flex flex-col cursor-pointer"
                 style={{ border: `1px solid ${TINT_LINE}` }}
               >
@@ -257,6 +343,25 @@ export default function TrendingLocalities() {
               </div>
             ))}
           </div>
+
+          {pages > 1 && (
+            <div className="mt-2 flex items-center justify-center gap-1.5">
+              {Array.from({ length: pages }).map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={`Go to page ${i + 1}`}
+                  onClick={() => scrollToPage(i)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === activePage ? "w-5" : "w-1.5"
+                  }`}
+                  style={{
+                    background: i === activePage ? BRAND : "#CBD5E1",
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Mobile-only See all */}

@@ -28,7 +28,6 @@ const scrollContainerClass =
 const Residencies: React.FC<ResidenciesProps> = ({ featuredProperties }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const stepRef = useRef(0);
-  const pageStepRef = useRef(1);
   const isDragRef = useRef(false);
   const dragStartXRef = useRef(0);
   const dragStartScrollRef = useRef(0);
@@ -50,7 +49,6 @@ const Residencies: React.FC<ResidenciesProps> = ({ featuredProperties }) => {
     const step = first.offsetWidth + gap;
     const perPage = Math.max(1, Math.round(el.clientWidth / step));
     stepRef.current = step;
-    pageStepRef.current = step * perPage;
     setVisiblePerPage(perPage);
   }, []);
 
@@ -65,21 +63,18 @@ const Residencies: React.FC<ResidenciesProps> = ({ featuredProperties }) => {
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
-    if (!el || !pageStepRef.current) return;
+    if (!el || !stepRef.current) return;
     setActivePage(
-      Math.min(
-        Math.max(0, Math.round(el.scrollLeft / pageStepRef.current)),
-        pages - 1,
-      ),
+      Math.min(Math.max(0, Math.round(el.scrollLeft / stepRef.current)), pages - 1),
     );
   }, [pages]);
 
   const scrollToPage = useCallback((page: number) => {
     const el = scrollRef.current;
-    if (!el) return;
+    if (!el || !stepRef.current) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
     el.scrollTo({
-      left: Math.max(0, Math.min(page * pageStepRef.current, maxScroll)),
+      left: Math.max(0, Math.min(page * stepRef.current, maxScroll)),
       behavior: "smooth",
     });
     setSeq((s) => s + 1);
@@ -127,17 +122,18 @@ const Residencies: React.FC<ResidenciesProps> = ({ featuredProperties }) => {
     }
   };
 
-  // Soft autoplay — advances one page at a time, pauses while hovered
+  // Soft autoplay — advances one card step, pauses while hovered
   useEffect(() => {
     if (paused || count <= 1) return;
     const id = window.setInterval(() => {
       const el = scrollRef.current;
-      if (!el || !pageStepRef.current) return;
+      if (!el || !stepRef.current) return;
       const maxScroll = el.scrollWidth - el.clientWidth;
       if (maxScroll <= 0) return;
-      const next = el.scrollLeft + pageStepRef.current;
+      const nearest = Math.round(el.scrollLeft / stepRef.current);
+      const next = (nearest + 1) * stepRef.current;
       el.scrollTo({
-        left: next >= maxScroll - 2 ? 0 : Math.min(next, maxScroll),
+        left: next >= maxScroll ? 0 : Math.min(next, maxScroll),
         behavior: "smooth",
       });
     }, AUTOPLAY_DELAY);
