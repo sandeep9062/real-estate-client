@@ -28,6 +28,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
     const hideHeaderFooterRoutes = [
       "/login",
       "/signup",
+      "/choose-role",
       "/forgot-password",
       "/reset-password",
       "/verify-email",
