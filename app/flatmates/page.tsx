@@ -516,7 +516,7 @@ export default function FlatmatesLanding() {
           </Link>
         </div>
       </section>
-      3{/* ---------- Showcase banner ---------- */}
+      {/* ---------- Showcase banner ---------- */}
       <ShowcaseBanner />
       {/* ---------- How it works ---------- */}
       <section className="mt-14">
