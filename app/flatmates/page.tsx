@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Users,
@@ -112,6 +113,11 @@ const TRUST_POINTS = [
   { icon: MapPin, label: "Tricity-wide" },
 ];
 
+const BANNER_STATS = [
+  { value: "2,400+", label: "Verified profiles" },
+  { value: "1,100+", label: "Successful matches" },
+];
+
 function Eyebrow() {
   return (
     <span
@@ -133,12 +139,48 @@ function Eyebrow() {
   );
 }
 
-function MatchMockCard() {
+/**
+ * Hero showcase: a real photo (swap the `src` for your own asset) with a
+ * few floating UI cards layered on top for a "product in context" feel.
+ * On small screens the floating cards are hidden and only the photo shows;
+ * from `sm:` up they reappear, anchored to the image's corners.
+ */
+function HeroShowcase() {
   return (
-    <div className="relative hidden h-[300px] lg:block" aria-hidden="true">
+    <div className="relative mt-10 lg:mt-0">
+      <div
+        className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border shadow-xl shadow-indigo-100/70 sm:aspect-[16/11] lg:aspect-auto lg:h-[440px]"
+        style={{ borderColor: BORDER }}
+      >
+        {/* Replace with your own photo — e.g. flatmates in a shared living room */}
+        <Image
+          src="/flatmates-hero.png"
+          alt="Flatmates relaxing together in a shared living room"
+          fill
+          sizes="(max-width: 1024px) 100vw, 45vw"
+          className="object-contain"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
+
+        {/* Swap chip — sits directly on the photo, glass effect */}
+        <div
+          className="animate-fade-in-up absolute left-4 top-4 hidden items-center gap-2 rounded-full border bg-white/90 px-3.5 py-2 shadow-md backdrop-blur-sm sm:flex"
+          style={{ borderColor: BORDER, animationDelay: "240ms" }}
+        >
+          <ArrowLeftRight
+            className="h-3.5 w-3.5"
+            style={{ color: "#7C3AED" }}
+          />
+          <span className="text-xs font-semibold" style={{ color: INK }}>
+            Flat swap matched
+          </span>
+        </div>
+      </div>
+
       {/* Floating match card */}
       <div
-        className="animate-fade-in-up absolute right-2 top-2 w-72 rotate-2 rounded-2xl border bg-white p-4 shadow-lg shadow-indigo-100"
+        className="animate-fade-in-up absolute -right-3 -top-6 hidden w-64 rotate-2 rounded-2xl border bg-white p-4 shadow-lg shadow-indigo-100 sm:block sm:-right-6"
         style={{ borderColor: BORDER }}
       >
         <div className="flex items-center gap-3">
@@ -185,7 +227,7 @@ function MatchMockCard() {
 
       {/* Floating listing card */}
       <div
-        className="animate-fade-in-up absolute bottom-2 left-0 w-60 -rotate-2 rounded-2xl border bg-white p-4 shadow-lg shadow-indigo-100"
+        className="animate-fade-in-up absolute -bottom-6 -left-3 hidden w-60 -rotate-2 rounded-2xl border bg-white p-4 shadow-lg shadow-indigo-100 sm:block sm:-left-6"
         style={{ borderColor: BORDER, animationDelay: "120ms" }}
       >
         <div className="flex items-center justify-between">
@@ -206,22 +248,66 @@ function MatchMockCard() {
           </span>
         </p>
         <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
-          <CheckCircle2 className="h-3 w-3" />
-          3 people interested this week
+          <CheckCircle2 className="h-3 w-3" />3 people interested this week
         </p>
       </div>
-
-      {/* Floating swap chip */}
-      <div
-        className="animate-fade-in-up absolute bottom-24 right-0 flex items-center gap-2 rounded-full border bg-white px-3.5 py-2 shadow-md"
-        style={{ borderColor: BORDER, animationDelay: "240ms" }}
-      >
-        <ArrowLeftRight className="h-3.5 w-3.5" style={{ color: "#7C3AED" }} />
-        <span className="text-xs font-semibold" style={{ color: INK }}>
-          Flat swap matched
-        </span>
-      </div>
     </div>
+  );
+}
+
+/** Full-width photo banner with a headline and stat chips over it. */
+function ShowcaseBanner() {
+  return (
+    <section className="mt-14">
+      <div
+        className="relative overflow-hidden rounded-3xl border shadow-xl shadow-indigo-100/70"
+        style={{ borderColor: BORDER }}
+      >
+        <div className="relative aspect-[16/10] w-full sm:aspect-[21/9]">
+          {/* Replace with your own photo — e.g. flatmates cooking or moving in together */}
+          <Image
+            src="/flatmates-banner.png"
+            alt="Group of flatmates cooking together in a shared kitchen"
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/30 to-black/0" />
+        </div>
+
+        <div className="absolute inset-0 flex flex-col justify-center px-6 py-8 sm:px-10 sm:py-0 md:px-14">
+          <div className="max-w-md">
+            <span className="mb-4 block h-[3px] w-10 rounded-full bg-white" />
+            <h2 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl">
+              Real people, real move-ins — every week
+            </h2>
+            <p className="mt-2 max-w-sm text-sm text-white/85 sm:text-base">
+              Verified, compatibility-scored profiles turn into flatmate matches
+              across the Tricity every month.
+            </p>
+          </div>
+        </div>
+
+        <div className="absolute bottom-4 right-4 hidden gap-3 sm:flex">
+          {BANNER_STATS.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-xl bg-white/95 px-4 py-2.5 shadow-lg backdrop-blur"
+            >
+              <p className="text-base font-bold" style={{ color: INK }}>
+                {stat.value}
+              </p>
+              <p
+                className="text-[11px] font-medium"
+                style={{ color: INK_SOFT }}
+              >
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -306,10 +392,9 @@ export default function FlatmatesLanding() {
             </div>
           </div>
 
-          <MatchMockCard />
+          <HeroShowcase />
         </div>
       </section>
-
       {/* ---------- Popular cities ---------- */}
       <section className="mt-8 flex flex-wrap items-center gap-2">
         <span
@@ -330,56 +415,6 @@ export default function FlatmatesLanding() {
           </Link>
         ))}
       </section>
-
-      {/* ---------- How it works ---------- */}
-      <section className="mt-14">
-        <h2
-          className="text-xl font-bold tracking-tight sm:text-2xl"
-          style={{ color: INK }}
-        >
-          How it works
-        </h2>
-        <p className="mt-1 text-sm" style={{ color: INK_SOFT }}>
-          Three steps between you and a flatmate who gets your routine.
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {STEPS.map((step, index) => (
-            <div
-              key={step.title}
-              className="rounded-2xl border bg-white p-5 transition-shadow hover:shadow-md"
-              style={{ borderColor: BORDER }}
-            >
-              <div className="flex items-center justify-between">
-                <span
-                  className="flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: TINT_BG, color: BRAND }}
-                >
-                  <step.icon className="h-5 w-5" strokeWidth={1.9} />
-                </span>
-                <span
-                  className="text-3xl font-bold opacity-15"
-                  style={{ color: BRAND }}
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-              </div>
-              <h3
-                className="mt-4 text-[15px] font-semibold"
-                style={{ color: INK }}
-              >
-                {step.title}
-              </h3>
-              <p
-                className="mt-1.5 text-[13px] leading-relaxed"
-                style={{ color: INK_SOFT }}
-              >
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ---------- Intents ---------- */}
       <section className="mt-14">
         <Eyebrow />
@@ -481,7 +516,56 @@ export default function FlatmatesLanding() {
           </Link>
         </div>
       </section>
-
+      3{/* ---------- Showcase banner ---------- */}
+      <ShowcaseBanner />
+      {/* ---------- How it works ---------- */}
+      <section className="mt-14">
+        <h2
+          className="text-xl font-bold tracking-tight sm:text-2xl"
+          style={{ color: INK }}
+        >
+          How it works
+        </h2>
+        <p className="mt-1 text-sm" style={{ color: INK_SOFT }}>
+          Three steps between you and a flatmate who gets your routine.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          {STEPS.map((step, index) => (
+            <div
+              key={step.title}
+              className="rounded-2xl border bg-white p-5 transition-shadow hover:shadow-md"
+              style={{ borderColor: BORDER }}
+            >
+              <div className="flex items-center justify-between">
+                <span
+                  className="flex h-10 w-10 items-center justify-center rounded-xl"
+                  style={{ background: TINT_BG, color: BRAND }}
+                >
+                  <step.icon className="h-5 w-5" strokeWidth={1.9} />
+                </span>
+                <span
+                  className="text-3xl font-bold opacity-15"
+                  style={{ color: BRAND }}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <h3
+                className="mt-4 text-[15px] font-semibold"
+                style={{ color: INK }}
+              >
+                {step.title}
+              </h3>
+              <p
+                className="mt-1.5 text-[13px] leading-relaxed"
+                style={{ color: INK_SOFT }}
+              >
+                {step.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* ---------- Quick links ---------- */}
       <section className="mt-12 grid gap-4 sm:grid-cols-2">
         <Link
