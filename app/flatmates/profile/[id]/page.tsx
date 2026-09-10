@@ -32,6 +32,10 @@ import {
   ArrowLeft,
   Link2,
   Check,
+  Search,
+  Repeat,
+  CalendarClock,
+  type LucideIcon,
 } from "lucide-react";
 
 const BRAND = "#4161df";
@@ -39,6 +43,61 @@ const INK = "#161A2E";
 const INK_SOFT = "#5C5F73";
 const TINT_BG = "#EEF1FC";
 const BORDER = "#E5E7F2";
+
+// Same labels + accent colors as the intent cards on /flatmates and the
+// step-0 picker in the onboarding wizard, so an intent reads identically
+// wherever it appears. temporary_seek and seeking_room share the "looking"
+// family; has_room / swap / temporary_offer are the "listing" family.
+const INTENT_STYLES: Record<
+  string,
+  { label: string; icon: LucideIcon; accent: string; accentBg: string }
+> = {
+  has_room: {
+    label: "Has a room",
+    icon: Users,
+    accent: "#059669",
+    accentBg: "#ECFDF5",
+  },
+  seeking_room: {
+    label: "Looking for a room",
+    icon: Search,
+    accent: BRAND,
+    accentBg: TINT_BG,
+  },
+  swap: {
+    label: "Open to swap",
+    icon: Repeat,
+    accent: "#7C3AED",
+    accentBg: "#F5F3FF",
+  },
+  temporary_offer: {
+    label: "Temporary stay offered",
+    icon: Clock,
+    accent: "#D97706",
+    accentBg: "#FFFBEB",
+  },
+  temporary_seek: {
+    label: "Needs a temporary stay",
+    icon: CalendarClock,
+    accent: "#E11D48",
+    accentBg: "#FFF1F2",
+  },
+};
+
+function IntentBadge({ intent }: { intent?: string }) {
+  if (!intent) return null;
+  const cfg = INTENT_STYLES[intent];
+  if (!cfg) return null;
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+      style={{ background: cfg.accentBg, color: cfg.accent }}
+    >
+      <cfg.icon className="h-3 w-3" />
+      {cfg.label}
+    </span>
+  );
+}
 
 export default function PublicProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -172,6 +231,7 @@ export default function PublicProfilePage() {
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
+            <IntentBadge intent={profile.intent} />
             {profile.idVerified && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                 <ShieldCheck className="h-3 w-3" />
