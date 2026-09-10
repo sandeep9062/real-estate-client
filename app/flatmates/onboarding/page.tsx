@@ -310,7 +310,7 @@ function OnboardingContent() {
   // are being redirected to /login), show a loader instead of the form.
   if (!mounted || !isAuthenticated) {
     return (
-      <main className="mx-auto max-w-xl px-6 py-24 flex justify-center">
+      <main className="mx-auto max-w-xl px-6 pb-8 flex justify-center">
         <Loader2
           className="w-5 h-5 animate-spin"
           style={{ color: BRAND }}
@@ -321,7 +321,7 @@ function OnboardingContent() {
 
   if (!intent) {
     return (
-      <main className="mx-auto max-w-xl px-6 py-24 text-center">
+      <main className="mx-auto max-w-xl px-6 pb-8 text-center">
         <p className="text-[15px]" style={{ color: INK_SOFT }}>
           Pick what you&apos;re here for first —{" "}
           <a
@@ -530,7 +530,8 @@ function OnboardingContent() {
     await doSubmit(draft);
   }
 
-  return (<main className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
+  return (
+    <main className="mx-auto max-w-4xl px-6 pb-12 sm:pb-16">
       {INTENT_LABELS[intent] && (
         <span
           className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4"
@@ -698,7 +699,7 @@ export default function OnboardingPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto max-w-xl px-6 py-24 flex justify-center">
+        <main className="mx-auto max-w-xl px-6 pb-8 flex justify-center">
           <Loader2
             className="w-5 h-5 animate-spin"
             style={{ color: "#4161df" }}

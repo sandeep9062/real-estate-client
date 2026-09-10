@@ -209,7 +209,7 @@ export default function BrowsePage() {
         </button>
       </div>
 
-    <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 pt-24 pb-12">
+    <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 pb-12">
       <div className="w-full text-center">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
           Find Your Perfect Room or Flatmate in Tricity

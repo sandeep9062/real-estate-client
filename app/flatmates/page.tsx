@@ -313,7 +313,7 @@ function ShowcaseBanner() {
 
 export default function FlatmatesLanding() {
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-24 sm:px-6 md:px-10">
+    <main className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 md:px-10">
       {/* ---------- Hero ---------- */}
       <section
         className="relative overflow-hidden rounded-3xl border px-6 py-10 sm:px-10 sm:py-14"

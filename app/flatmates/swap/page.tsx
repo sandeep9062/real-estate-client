@@ -32,7 +32,7 @@ export default function SwapMatchesPage() {
   } = useSearchSwapMatchesQuery();
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 pb-20 pt-24 sm:px-6">
+    <main className="mx-auto w-full max-w-5xl px-4 pb-20 sm:px-6">
       {/* Header */}
       <div className="flex items-start gap-4">
         <span

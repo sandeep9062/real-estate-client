@@ -158,7 +158,7 @@ export default function ConnectionsPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 pb-20 pt-24 sm:px-6">
+    <main className="mx-auto w-full max-w-3xl px-4 pb-20 sm:px-6">
       {/* Header */}
       <div className="flex items-start gap-4">
         <span
