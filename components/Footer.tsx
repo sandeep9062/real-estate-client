@@ -22,7 +22,7 @@ const Footer = () => {
               />
             </Link>
 
-            <p className="text-gray-500 text-xs sm:text-sm text-center md:text-left leading-relaxed">
+            <p className="text-gray-500 font-medium text-xs sm:text-sm text-center md:text-left leading-relaxed">
               TRICITY'S MOST HELPFUL <br />
               REAL ESTATE PARTNER
             </p>
