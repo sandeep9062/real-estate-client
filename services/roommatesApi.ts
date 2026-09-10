@@ -43,7 +43,8 @@ export interface RoommateProfile {
   _id: string;
   user: string;
   intent: RoommateIntent;
-  roomFlat?: string;
+  // Populated by GET /profile/me; otherwise just the RoomFlat id.
+  roomFlat?: string | RoomFlat;
   searchArea?: SearchArea;
   budgetRange?: { min?: number; max?: number };
   moveInDate?: string;
@@ -97,6 +98,7 @@ export interface RoomFlat {
   roommateProfile: string | RoommateProfile;
   owner: string;
   intent: "has_room" | "swap" | "temporary_offer" | "subletting_out";
+  openToSwap?: boolean;
   title: string;
   description?: string;
   location: RoomFlatLocation;
@@ -210,7 +212,13 @@ export const roommatesApi = createApi({
       ],
     }),
 
-    updateRoomFlat: builder.mutation<RoomFlat, { id: string; update: Partial<RoomFlat> }>({
+    updateRoomFlat: builder.mutation<
+      RoomFlat,
+      // `update` is JSON for edits without new files, or FormData ("payload"
+      // JSON string + "photos" files) once PhotosLocationFlat picks new files
+      // — same dual shape as createRoomFlat.
+      { id: string; update: Partial<RoomFlat> | FormData }
+    >({
       query: ({ id, update }) => ({
         url: `/v1/roommates/room-flat/${id}`,
         method: "PATCH",
@@ -219,6 +227,7 @@ export const roommatesApi = createApi({
       invalidatesTags: (result, error, { id }) => [
         { type: "RoomFlat", id },
         { type: "RoomFlat", id: "LIST" },
+        { type: "RoommateProfile", id: "ME" },
       ],
     }),
 

@@ -349,7 +349,7 @@ export default function PublicProfilePage() {
                     : "Finish setting up your profile so others can find you."}
                 </p>
                 <Link
-                  href="/flatmates/onboarding"
+                  href="/flatmates/onboarding?edit=1"
                   className="mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: BRAND }}
                 >

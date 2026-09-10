@@ -117,6 +117,9 @@ const PhotosLocationStep: React.FC<PhotosLocationStepProps> = ({
   };
 
   // ── Location sub-section state (unchanged logic from old AddLocation.tsx) ─
+  // In edit mode the saved listing arrives AFTER this component first renders
+  // (the parent fetches it), so re-seed the form's initial values when the
+  // location payload finally shows up.
   const form = useForm({
     initialValues: {
       country: propertyDetails?.location?.country,
@@ -129,6 +132,22 @@ const PhotosLocationStep: React.FC<PhotosLocationStepProps> = ({
       address: (value) => validateString(value),
     },
   });
+
+  useEffect(() => {
+    const loc = propertyDetails?.location || {};
+    if (loc.country || loc.city || loc.address) {
+      form.setValues({
+        country: loc.country ?? "",
+        city: loc.city ?? "",
+        address: loc.address ?? "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    propertyDetails?.location?.country,
+    propertyDetails?.location?.city,
+    propertyDetails?.location?.address,
+  ]);
 
   const handleSubmit = () => {
     const { hasErrors } = form.validate();
