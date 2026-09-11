@@ -34,12 +34,19 @@ export interface LookingFor {
   occupation?: "student" | "working" | "any";
 }
 
+export interface UserRef {
+  _id: string;
+  name?: string;
+  avatarUrl?: string;
+}
+
 export interface RoommateProfile {
   _id: string;
-  user: string;
+  user: UserRef;
   type: "have_room" | "no_room";
-  // Populated by GET /profile/me; otherwise just the RoomFlat id.
-  roomFlat?: string | RoomFlat;
+  // Populated by GET /profile/me, GET /profile/:id, and searchSeekers;
+  // otherwise just the RoomFlat id (stringified by serializeProfile).
+  roomFlat?: RoomFlat | { _id: string };
   searchArea?: SearchArea;
   budgetRange?: { min?: number; max?: number };
   moveInDate?: string;
@@ -124,9 +131,9 @@ export interface RoomFlat {
 
 export interface FlatmateConnection {
   _id: string;
-  fromProfile: string | RoommateProfile;
+  fromProfile: RoommateProfile;
   toProfile: RoommateProfile;
-  roomFlat?: string | RoomFlat;
+  roomFlat?: RoomFlat | { _id: string };
   message?: string;
   matchScore?: number;
   status: "pending" | "accepted" | "declined" | "withdrawn";

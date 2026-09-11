@@ -112,10 +112,7 @@ export default function ConnectionsPage() {
     for (const c of connections) {
       const fromId = asProfile(c.fromProfile)?._id;
       const toId = asProfile(c.toProfile)?._id;
-      // Fall back to string form if either side isn't populated.
-      const isFromMe = fromId
-        ? fromId === myProfileId
-        : c.fromProfile === myProfileId;
+            const isFromMe = fromId === myProfileId;
       if (isFromMe) s.push(c);
       else r.push(c);
     }
@@ -330,9 +327,7 @@ function ConnectionCard({
   // Determine which side is "mine" so we can show the other person and the
   // right actions (accept/decline for incoming, withdraw for outgoing).
   const fromId = asProfile(connection.fromProfile)?._id;
-  const isFromMe = fromId
-    ? fromId === myProfileId
-    : connection.fromProfile === myProfileId;
+    const isFromMe = fromId === myProfileId;
   const isReceived = !isFromMe;
 
   const otherValue = isFromMe ? connection.toProfile : connection.fromProfile;
