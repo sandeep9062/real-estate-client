@@ -167,23 +167,6 @@ export default function BrowsePage() {
     }
   }, [connectionsData]);
 
-  // Check if a profile has a pending outgoing request using fresh connection data
-  const hasPendingRequest = (id: string): boolean => {
-    if (connectedIds.has(id)) return true;
-    // Fall back to scanning the live connection list for any pending outgoing
-    // request to this profile. This covers the window between sendConnectionRequest
-    // succeeding and the sync useEffect re-running with the updated response.
-    if (!connectionsData || connectionsData.length === 0) return false;
-    return connectionsData.some((c) => {
-      if (c.status !== "pending") return false;
-      const toProfileId =
-        typeof c.toProfile === "string"
-          ? c.toProfile
-          : (c.toProfile as { _id: string })?._id;
-      return toProfileId === id;
-    });
-  };
-
   const activeFiltersCount = useMemo(
     () =>
       Object.values(filters).filter(
@@ -199,6 +182,22 @@ export default function BrowsePage() {
       ).length,
     [applied],
   );
+  // Check if a profile has a pending outgoing request using fresh connection data
+  // The backend (flatmateConnectionController.js) now serializes all populated
+  // references as plain objects with string `_id` values, so direct === comparison
+  // against the string ID works reliably here.
+  const hasPendingRequest = (id: string): boolean => {
+    if (connectedIds.has(id)) return true;
+    // Fall back to scanning the live connection list for any pending outgoing
+    // request to this profile. This covers the window between sendConnectionRequest
+    // succeeding and the sync useEffect re-running with the updated response.
+    if (!connectionsData || connectionsData.length === 0) return false;
+    return connectionsData.some((c) => {
+      if (c.status !== "pending") return false;
+      // toProfile is guaranteed to be a plain object with string _id when populated
+      return c.toProfile?._id === id;
+    });
+  };
 
   const params = {
     city: applied.city || undefined,
@@ -279,11 +278,8 @@ export default function BrowsePage() {
     try {
       // Find the connection ID for this profile
       const connection = connectionsData?.find((c) => {
-        const toProfileId =
-          typeof c.toProfile === "string"
-            ? c.toProfile
-            : (c.toProfile as { _id: string })._id;
-        return toProfileId === id;
+        // toProfile is guaranteed to be a plain object with string _id when populated
+        return c.toProfile?._id === id;
       });
       if (connection) {
         await respondToConnectionRequest({

@@ -125,7 +125,7 @@ export interface RoomFlat {
 export interface FlatmateConnection {
   _id: string;
   fromProfile: string | RoommateProfile;
-  toProfile: string | RoommateProfile;
+  toProfile: RoommateProfile;
   roomFlat?: string | RoomFlat;
   message?: string;
   matchScore?: number;
