@@ -74,7 +74,10 @@ export interface RoommateDocument {
 export interface HouseRules {
   ownerLivesOnPremises?: boolean;
   curfew?: { hasCurfew: boolean; time?: string };
-  oppositeGenderGuestsAllowed?: "allowed" | "allowed_with_notice" | "not_allowed";
+  oppositeGenderGuestsAllowed?:
+    | "allowed"
+    | "allowed_with_notice"
+    | "not_allowed";
   overnightGuestsAllowed?: "allowed" | "allowed_with_notice" | "not_allowed";
   smokingAllowedOnPremises?: boolean;
   drinkingAllowedOnPremises?: boolean;
@@ -182,7 +185,11 @@ export const roommatesApi = createApi({
     // records the resulting key, it never accepts raw file bytes.
     uploadDocument: builder.mutation<
       { documents: RoommateDocument[] },
-      { type: RoommateDocument["type"]; lastFourDigits?: string; fileKey: string }
+      {
+        type: RoommateDocument["type"];
+        lastFourDigits?: string;
+        fileKey: string;
+      }
     >({
       query: (documentData) => ({
         url: "/v1/roommates/profile/documents",
@@ -235,14 +242,12 @@ export const roommatesApi = createApi({
       ],
     }),
 
-    browseRoomsAndFlats: builder.query<BrowseResult, Record<string, any> | undefined>({
+    browseRoomsAndFlats: builder.query<
+      BrowseResult,
+      Record<string, any> | undefined
+    >({
       query: (params) => ({ url: "/v1/roommates/browse", params }),
       providesTags: [{ type: "RoomFlat", id: "LIST" }],
-    }),
-
-    searchSwapMatches: builder.query<RoomFlat[], void>({
-      query: () => "/v1/roommates/swap-matches",
-      providesTags: [{ type: "RoomFlat", id: "SWAP_MATCHES" }],
     }),
 
     // ---- Connections ----
@@ -279,7 +284,10 @@ export const roommatesApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.map(({ _id }) => ({ type: "FlatmateConnection" as const, id: _id })),
+              ...result.map(({ _id }) => ({
+                type: "FlatmateConnection" as const,
+                id: _id,
+              })),
               { type: "FlatmateConnection", id: "LIST" },
             ]
           : [{ type: "FlatmateConnection", id: "LIST" }],
@@ -299,7 +307,6 @@ export const {
   useUpdateRoomFlatMutation,
   useBrowseRoomsAndFlatsQuery,
   useLazyBrowseRoomsAndFlatsQuery,
-  useSearchSwapMatchesQuery,
   useSendConnectionRequestMutation,
   useRespondToConnectionRequestMutation,
   useListMyConnectionsQuery,
