@@ -105,9 +105,21 @@ export default function PropertyStep({
       <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <Switch
           label="Open to swapping this room/flat later"
+          description="List it in swap matches"
           checked={roomFlat.openToSwap}
           onChange={(e) => onField("openToSwap", e.currentTarget.checked)}
         />
+        <Switch
+          label="Open to temporary stays"
+          description="Short-term stays welcome"
+          checked={roomFlat.openToTemporaryStay}
+          onChange={(e) =>
+            onField("openToTemporaryStay", e.currentTarget.checked)
+          }
+        />
+      </SimpleGrid>
+
+      <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <Switch
           label="Pets allowed"
           checked={roomFlat.petsAllowed}
