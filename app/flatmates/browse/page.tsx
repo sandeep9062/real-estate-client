@@ -188,7 +188,9 @@ export default function BrowsePage() {
           onClick={() => setLaptopMapOpen((o) => !o)}
           className="flex flex-col items-center gap-1 bg-[#4161df] text-white px-3 py-4 rounded-2xl shadow-2xl hover:bg-[#4161df]/10 transition-all transform active:scale-95"
           aria-label={
-            laptopMapOpen ? "Hide map, expand listings" : "Show map beside listings"
+            laptopMapOpen
+              ? "Hide map, expand listings"
+              : "Show map beside listings"
           }
         >
           {laptopMapOpen ? (
@@ -209,314 +211,321 @@ export default function BrowsePage() {
         </button>
       </div>
 
-    <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 pb-12">
-      <div className="w-full text-center">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
-          Find Your Perfect Room or Flatmate in Tricity
-        </h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-600 px-2">
-          Discover rooms, flat-shares and verified flatmates for rent in
-          Chandigarh, Panchkula, Mohali &amp; more.
-        </p>
-      </div>
-      <div className="mt-4 flex justify-center">
-        <Link
-          href="/flatmates/swap"
-          className="inline-flex items-center gap-1.5 rounded-full border bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-[#EEF1FC]"
-          style={{ borderColor: BORDER, color: INK }}
+      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 pb-12">
+        <div className="w-full text-center">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
+            Find Your Perfect Roommate or Flatmate in Tricity
+          </h1>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 px-2">
+            Discover rooms, flat-shares and verified flatmates for rent in
+            Chandigarh, Panchkula, Mohali &amp; more.
+          </p>
+        </div>
+        <div className="mt-4 flex justify-center">
+          <Link
+            href="/flatmates/swap"
+            className="inline-flex items-center gap-1.5 rounded-full border bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-[#EEF1FC]"
+            style={{ borderColor: BORDER, color: INK }}
+          >
+            <ArrowLeftRight className="h-3.5 w-3.5" />
+            Looking to swap instead?
+          </Link>
+        </div>
+
+        <form
+          onSubmit={runSearch}
+          className="mt-6 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
         >
-          <ArrowLeftRight className="h-3.5 w-3.5" />
-          Looking to swap instead?
-        </Link>
-      </div>
-
-      <form
-        onSubmit={runSearch}
-        className="mt-6 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
-      >
-        <div className="border-b border-gray-100 bg-gray-50/50 px-4 py-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4161df]">
-                <Search className="h-4 w-4 text-white" />
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold text-gray-900">
-                  Search rooms
-                </h2>
-                <p className="hidden text-[11px] text-gray-500 sm:block">
-                  {appliedCount > 0
-                    ? `${appliedCount} filter${appliedCount > 1 ? "s" : ""} applied`
-                    : "Apply filters to refine your search"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {activeFiltersCount > 0 && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-                >
-                  <RotateCcw className="h-3 w-3" />
-                  <span className="hidden sm:inline">Clear</span>
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setFiltersOpen((o) => !o)}
-                className="flex items-center gap-1 rounded-md bg-[#4161df] px-3 py-1.5 text-xs font-medium text-white transition-colors md:hidden"
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                Filters
-                {activeFiltersCount > 0 && (
-                  <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0.5 text-[10px]">
-                    {activeFiltersCount}
-                  </span>
-                )}
-                {filtersOpen ? (
-                  <ChevronUp className="ml-1 h-3.5 w-3.5" />
-                ) : (
-                  <ChevronDown className="ml-1 h-3.5 w-3.5" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${filtersOpen ? "block" : "hidden"} p-4 md:block`}>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
-            <label className="block">
-              <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                <MapPin className="h-3.5 w-3.5" />
-                City
-              </span>
-              <span className="relative block">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  placeholder="e.g. Mohali, Chandigarh…"
-                  value={filters.city}
-                  onChange={(e) =>
-                    setFilters((f) => ({ ...f, city: e.target.value }))
-                  }
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                />
-              </span>
-            </label>
-            <label className="block">
-              <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                <IndianRupee className="h-3.5 w-3.5" />
-                Min rent
-              </span>
-              <input
-                type="number"
-                min={0}
-                placeholder="₹ min"
-                value={filters.minRent}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, minRent: e.target.value }))
-                }
-                className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                <IndianRupee className="h-3.5 w-3.5" />
-                Max rent
-              </span>
-              <input
-                type="number"
-                min={0}
-                placeholder="₹ max"
-                value={filters.maxRent}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, maxRent: e.target.value }))
-                }
-                className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                <BedDouble className="h-3.5 w-3.5" />
-                Room type
-              </span>
-              <span className="relative block">
-                <select
-                  value={filters.roomType}
-                  onChange={(e) =>
-                    setFilters((f) => ({ ...f, roomType: e.target.value }))
-                  }
-                  className={`h-10 w-full appearance-none rounded-lg border bg-white pl-3 pr-8 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20 ${
-                    filters.roomType
-                      ? "border-[#4161df]/30 font-medium text-[#4161df]"
-                      : "border-gray-200 text-gray-700"
-                  }`}
-                >
-                  {ROOM_TYPE_OPTIONS.map((o) => (
-                    <option key={o.value || "any"} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-              </span>
-            </label>
-            <div className="flex items-end">
-              <button
-                type="submit"
-                className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#3451c9] sm:w-auto"
-              >
-                <Search className="h-3.5 w-3.5" />
-                Search
-              </button>
-            </div>
-          </div>
-          <BrowseFilterExtras
-            filters={filters}
-            setFilters={setFilters}
-            applied={applied}
-            setApplied={setApplied}
-            appliedCount={appliedCount}
-            onRemoveChip={removeAppliedChip}
-          />
-        </div>
-      </form>
-
-      {error && (
-        <div
-          className="mt-4 flex items-center gap-2.5 rounded-xl border-l-[3px] bg-rose-50/70 px-4 py-3"
-          style={{ borderLeftColor: "#e11d48" }}
-        >
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-          <p className="text-sm text-rose-700">{getErrorMessage(error)}</p>
-        </div>
-      )}
-
-      <div className="mt-8">
-        {loading && (
-          <div className="flex items-center gap-2.5 py-10 justify-center">
-            <Loader2
-              className="h-5 w-5 animate-spin"
-              style={{ color: BRAND }}
-            />
-            <p className="text-sm" style={{ color: INK_SOFT }}>
-              Searching…
-            </p>
-          </div>
-        )}
-
-        {!loading && markers.length > 0 && activeTab === "list" && !laptopMapOpen && (
-          <div
-            className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3 lg:hidden"
-            style={{ borderColor: BORDER }}
-          >
-            <MapPin className="h-4 w-4 shrink-0" style={{ color: BRAND }} />
-            <p className="text-xs" style={{ color: INK_SOFT }}>
-              {markers.length} {markers.length === 1 ? "listing" : "listings"}{" "}
-              with map location — tap the Map button on the right to view.
-            </p>
-          </div>
-        )}
-
-        {!loading && markers.length === 0 && allResults.length > 0 && (
-          <div
-            className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3"
-            style={{ borderColor: BORDER }}
-          >
-            <MapPin className="h-4 w-4 shrink-0" style={{ color: "#9CA3AF" }} />
-            <p className="text-xs" style={{ color: INK_SOFT }}>
-              These listings don&apos;t have a map location saved yet — ask
-              posters to drop a pin during onboarding.
-            </p>
-          </div>
-        )}
-
-        {!loading && allResults.length === 0 && (
-          <div
-            className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
-            style={{ borderColor: BORDER }}
-          >
-            <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
-            <p className="text-sm" style={{ color: INK_SOFT }}>
-              No listings match yet — try widening the city or rent range.
-            </p>
-          </div>
-        )}
-
-        {!loading && allResults.length > 0 && (
-          <div
-            className={`grid grid-cols-1 gap-6 items-start ${laptopMapOpen ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}
-          >
-            {/* List Section */}
-            <div
-              className={`${activeTab === "list" ? "block" : "hidden"} lg:block order-2 lg:order-1 space-y-3 min-w-0`}
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="text-sm font-medium text-gray-700">
-                  {allResults.length} listing
-                  {allResults.length !== 1 ? "s" : ""}
-                </p>
-                <span className="text-xs sm:text-sm text-gray-500">
-                  {markers.length > 0
-                    ? `${markers.length} with map location`
-                    : "No map locations yet"}
-                </span>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                {allResults.map((r) => (
-                  <ListingCard
-                    key={r.listing._id || r.listing.id}
-                    source={r.source}
-                    listing={r.listing}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Map Section — sticky on desktop, toggled by right-center button */}
-            <div
-              className={`${activeTab === "map" ? "block" : "hidden"} ${laptopMapOpen ? "lg:block" : "lg:hidden"} order-1 lg:order-2 lg:sticky lg:top-24 z-10 w-full min-w-0 self-start`}
-            >
-              {markers.length > 0 ? (
-                <div
-                  className="overflow-hidden rounded-2xl border bg-white"
-                  style={{ borderColor: BORDER }}
-                >
-                  <div className="flex items-center justify-between px-4 pt-3">
-                    <p
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                      style={{ color: INK }}
-                    >
-                      <MapPin className="h-4 w-4" style={{ color: BRAND }} />
-                      {markers.length}{" "}
-                      {markers.length === 1 ? "listing" : "listings"} on map
-                    </p>
-                    <p className="text-xs" style={{ color: INK_SOFT }}>
-                      Click a pin for rent &amp; area
-                    </p>
-                  </div>
-                  <div className="p-3">
-                    <div className="w-full overflow-hidden rounded-xl border border-gray-200">
-                      <Map markers={markers} />
-                    </div>
-                  </div>
+          <div className="border-b border-gray-100 bg-gray-50/50 px-4 py-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4161df]">
+                  <Search className="h-4 w-4 text-white" />
                 </div>
-              ) : (
-                <div
-                  className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
-                  style={{ borderColor: BORDER }}
-                >
-                  <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
-                  <p className="text-sm" style={{ color: INK_SOFT }}>
-                    No map locations for these results yet.
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    Search rooms
+                  </h2>
+                  <p className="hidden text-[11px] text-gray-500 sm:block">
+                    {appliedCount > 0
+                      ? `${appliedCount} filter${appliedCount > 1 ? "s" : ""} applied`
+                      : "Apply filters to refine your search"}
                   </p>
                 </div>
-              )}
+              </div>
+              <div className="flex items-center gap-2">
+                {activeFiltersCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    <span className="hidden sm:inline">Clear</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                  className="flex items-center gap-1 rounded-md bg-[#4161df] px-3 py-1.5 text-xs font-medium text-white transition-colors md:hidden"
+                >
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0.5 text-[10px]">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                  {filtersOpen ? (
+                    <ChevronUp className="ml-1 h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronDown className="ml-1 h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
+
+          <div className={`${filtersOpen ? "block" : "hidden"} p-4 md:block`}>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <MapPin className="h-3.5 w-3.5" />
+                  City
+                </span>
+                <span className="relative block">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    placeholder="e.g. Mohali, Chandigarh…"
+                    value={filters.city}
+                    onChange={(e) =>
+                      setFilters((f) => ({ ...f, city: e.target.value }))
+                    }
+                    className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                  />
+                </span>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <IndianRupee className="h-3.5 w-3.5" />
+                  Min rent
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="₹ min"
+                  value={filters.minRent}
+                  onChange={(e) =>
+                    setFilters((f) => ({ ...f, minRent: e.target.value }))
+                  }
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <IndianRupee className="h-3.5 w-3.5" />
+                  Max rent
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="₹ max"
+                  value={filters.maxRent}
+                  onChange={(e) =>
+                    setFilters((f) => ({ ...f, maxRent: e.target.value }))
+                  }
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <BedDouble className="h-3.5 w-3.5" />
+                  Room type
+                </span>
+                <span className="relative block">
+                  <select
+                    value={filters.roomType}
+                    onChange={(e) =>
+                      setFilters((f) => ({ ...f, roomType: e.target.value }))
+                    }
+                    className={`h-10 w-full appearance-none rounded-lg border bg-white pl-3 pr-8 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20 ${
+                      filters.roomType
+                        ? "border-[#4161df]/30 font-medium text-[#4161df]"
+                        : "border-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {ROOM_TYPE_OPTIONS.map((o) => (
+                      <option key={o.value || "any"} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                </span>
+              </label>
+              <div className="flex items-end">
+                <button
+                  type="submit"
+                  className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#3451c9] sm:w-auto"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  Search
+                </button>
+              </div>
+            </div>
+            <BrowseFilterExtras
+              filters={filters}
+              setFilters={setFilters}
+              applied={applied}
+              setApplied={setApplied}
+              appliedCount={appliedCount}
+              onRemoveChip={removeAppliedChip}
+            />
+          </div>
+        </form>
+
+        {error && (
+          <div
+            className="mt-4 flex items-center gap-2.5 rounded-xl border-l-[3px] bg-rose-50/70 px-4 py-3"
+            style={{ borderLeftColor: "#e11d48" }}
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+            <p className="text-sm text-rose-700">{getErrorMessage(error)}</p>
+          </div>
         )}
-      </div>
-    </main>
+
+        <div className="mt-8">
+          {loading && (
+            <div className="flex items-center gap-2.5 py-10 justify-center">
+              <Loader2
+                className="h-5 w-5 animate-spin"
+                style={{ color: BRAND }}
+              />
+              <p className="text-sm" style={{ color: INK_SOFT }}>
+                Searching…
+              </p>
+            </div>
+          )}
+
+          {!loading &&
+            markers.length > 0 &&
+            activeTab === "list" &&
+            !laptopMapOpen && (
+              <div
+                className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3 lg:hidden"
+                style={{ borderColor: BORDER }}
+              >
+                <MapPin className="h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                <p className="text-xs" style={{ color: INK_SOFT }}>
+                  {markers.length}{" "}
+                  {markers.length === 1 ? "listing" : "listings"} with map
+                  location — tap the Map button on the right to view.
+                </p>
+              </div>
+            )}
+
+          {!loading && markers.length === 0 && allResults.length > 0 && (
+            <div
+              className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3"
+              style={{ borderColor: BORDER }}
+            >
+              <MapPin
+                className="h-4 w-4 shrink-0"
+                style={{ color: "#9CA3AF" }}
+              />
+              <p className="text-xs" style={{ color: INK_SOFT }}>
+                These listings don&apos;t have a map location saved yet — ask
+                posters to drop a pin during onboarding.
+              </p>
+            </div>
+          )}
+
+          {!loading && allResults.length === 0 && (
+            <div
+              className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
+              style={{ borderColor: BORDER }}
+            >
+              <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
+              <p className="text-sm" style={{ color: INK_SOFT }}>
+                No listings match yet — try widening the city or rent range.
+              </p>
+            </div>
+          )}
+
+          {!loading && allResults.length > 0 && (
+            <div
+              className={`grid grid-cols-1 gap-6 items-start ${laptopMapOpen ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}
+            >
+              {/* List Section */}
+              <div
+                className={`${activeTab === "list" ? "block" : "hidden"} lg:block order-2 lg:order-1 space-y-3 min-w-0`}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    {allResults.length} listing
+                    {allResults.length !== 1 ? "s" : ""}
+                  </p>
+                  <span className="text-xs sm:text-sm text-gray-500">
+                    {markers.length > 0
+                      ? `${markers.length} with map location`
+                      : "No map locations yet"}
+                  </span>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  {allResults.map((r) => (
+                    <ListingCard
+                      key={r.listing._id || r.listing.id}
+                      source={r.source}
+                      listing={r.listing}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Map Section — sticky on desktop, toggled by right-center button */}
+              <div
+                className={`${activeTab === "map" ? "block" : "hidden"} ${laptopMapOpen ? "lg:block" : "lg:hidden"} order-1 lg:order-2 lg:sticky lg:top-24 z-10 w-full min-w-0 self-start`}
+              >
+                {markers.length > 0 ? (
+                  <div
+                    className="overflow-hidden rounded-2xl border bg-white"
+                    style={{ borderColor: BORDER }}
+                  >
+                    <div className="flex items-center justify-between px-4 pt-3">
+                      <p
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                        style={{ color: INK }}
+                      >
+                        <MapPin className="h-4 w-4" style={{ color: BRAND }} />
+                        {markers.length}{" "}
+                        {markers.length === 1 ? "listing" : "listings"} on map
+                      </p>
+                      <p className="text-xs" style={{ color: INK_SOFT }}>
+                        Click a pin for rent &amp; area
+                      </p>
+                    </div>
+                    <div className="p-3">
+                      <div className="w-full overflow-hidden rounded-xl border border-gray-200">
+                        <Map markers={markers} />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
+                    style={{ borderColor: BORDER }}
+                  >
+                    <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
+                    <p className="text-sm" style={{ color: INK_SOFT }}>
+                      No map locations for these results yet.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

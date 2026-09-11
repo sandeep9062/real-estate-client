@@ -330,12 +330,24 @@ function OnboardingContent() {
   const [fetchOwnProfile] = useLazyGetOwnProfileQuery();
 
   // Edit mode loads the saved profile (now with its roomFlat populated, see
-  // getOwnProfile) so every step can be pre-filled.
+  // getOwnProfile) so every step can be pre-filled. In create mode the same
+  // query runs (after mount, once the session is restored) purely to detect
+  // an existing profile — see the redirect effect below.
   const {
     data: existingProfile,
     isLoading: isLoadingExisting,
     error: existingProfileError,
-  } = useGetOwnProfileQuery(undefined, { skip: !isEditMode });
+  } = useGetOwnProfileQuery(undefined, { skip: !isEditMode && !mounted });
+
+  // The backend enforces one profile per user (creating again would 409). So
+  // a signed-in user who already has a profile but lands on the wizard in
+  // create mode — via the "Create listing" nav link, the flatmates landing
+  // page, etc. — is sent straight into edit mode: same wizard, pre-filled
+  // with their saved profile + listing, PATCHing on save instead of POSTing.
+  useEffect(() => {
+    if (!mounted || isEditMode || !existingProfile) return;
+    router.replace("/flatmates/onboarding?edit=1");
+  }, [mounted, isEditMode, existingProfile, router]);
 
   // Every user-editable field from RoommateProfile (backend model).
   const [profile, setProfile] = useState<ProfileDraft>({
@@ -511,8 +523,15 @@ function OnboardingContent() {
   // Edit mode: while the saved profile (+ populated roomFlat) is still
   // loading, show the loader rather than Step 1 (edit mode pre-fills every
   // field including `type`, which gates the wizard branch). If the fetch
-  // failed (e.g. no profile yet), surface that instead.
-  if (!mounted || !isAuthenticated || (isEditMode && !prefilled)) {
+  // failed (e.g. no profile yet), surface that instead. In create mode the
+  // loader also covers the existing-profile check — if one exists we
+  // redirect to edit mode, and the create form must not flash first.
+  if (
+    !mounted ||
+    !isAuthenticated ||
+    (!isEditMode && isLoadingExisting) ||
+    (isEditMode && !prefilled)
+  ) {
     if (isEditMode && existingProfileError) {
       return (
         <main className="mx-auto max-w-xl px-6 pb-8 text-center">
