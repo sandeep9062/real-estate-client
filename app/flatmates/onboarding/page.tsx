@@ -888,9 +888,6 @@ function OnboardingContent() {
         <Card p="lg" radius="md" withBorder shadow="sm">
           <AboutYouStep
             profile={profile}
-            intent={intent ?? ""}
-            intentLocked={isEditMode}
-            onIntent={setChosenIntent}
             onField={updateProfileField}
             onHabit={updateHabit}
             onLookingFor={updateLookingFor}
