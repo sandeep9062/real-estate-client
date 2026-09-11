@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import {
   useSearchSeekersQuery,
+  useSendConnectionRequestMutation,
   type RoommateProfile,
 } from "@/services/roommatesApi";
 import type { MapMarker } from "@/components/Map";
@@ -137,6 +138,10 @@ export default function BrowsePage() {
   const [activeTab, setActiveTab] = useState<"list" | "map">("list");
   const [laptopMapOpen, setLaptopMapOpen] = useState(false);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
+  const [connectError, setConnectError] = useState<string | null>(null);
+
+  const [sendConnectionRequest] = useSendConnectionRequestMutation();
 
   const activeFiltersCount = useMemo(
     () =>
@@ -208,6 +213,17 @@ export default function BrowsePage() {
       else next.add(id);
       return next;
     });
+  }
+
+  async function handleConnect(id: string) {
+    if (connectedIds.has(id)) return;
+    setConnectError(null);
+    try {
+      await sendConnectionRequest({ toProfileId: id }).unwrap();
+      setConnectedIds((prev) => new Set(prev).add(id));
+    } catch (err) {
+      setConnectError(getErrorMessage(err));
+    }
   }
 
   const profiles: RoommateProfileCardData[] = useMemo(
@@ -728,13 +744,12 @@ export default function BrowsePage() {
                       key={p._id}
                       profile={p}
                       saved={savedIds.has(p._id)}
+                      connected={connectedIds.has(p._id)}
                       onView={(id) => {
                         window.location.href = `/flatmates/${id}`;
                       }}
                       onSave={toggleSaved}
-                      onConnect={(id) => {
-                        window.location.href = `/flatmates/${id}`;
-                      }}
+                      onConnect={handleConnect}
                     />
                   ))}
                 </div>
