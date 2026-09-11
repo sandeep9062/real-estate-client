@@ -45,13 +45,9 @@ const STATUS_STYLES: Record<
   withdrawn: { label: "Withdrawn", bg: "#F1F5F9", color: "#64748B" },
 };
 
-const INTENT_LABELS: Record<string, string> = {
-  has_room: "Has a room",
-  seeking_room: "Looking for a room",
-  swap: "Wants to swap",
-  temporary_offer: "Offering short stay",
-  temporary_seek: "Needs short stay",
-  subletting_out: "Subletting",
+const TYPE_LABELS: Record<string, string> = {
+  have_room: "Has a room",
+  no_room: "Looking for a room",
 };
 
 function humanize(str: string) {
@@ -350,8 +346,8 @@ function ConnectionCard({
   const profileHref = otherId ? `/flatmates/profile/${otherId}` : null;
 
   const statusCfg = STATUS_STYLES[connection.status] ?? STATUS_STYLES.pending;
-  const intent = other?.intent
-    ? (INTENT_LABELS[other.intent] ?? humanize(other.intent))
+  const typeLabel = other?.type
+    ? (TYPE_LABELS[other.type] ?? humanize(other.type))
     : "";
   const areaLine = other?.searchArea
     ? [other.searchArea.city, other.searchArea.locality]
@@ -400,7 +396,7 @@ function ConnectionCard({
             )}
           </p>
           <p className="truncate text-xs" style={{ color: INK_SOFT }}>
-            {[intent, areaLine].filter(Boolean).join(" · ") ||
+            {[typeLabel, areaLine].filter(Boolean).join(" · ") ||
               "No details shared yet"}
           </p>
         </div>

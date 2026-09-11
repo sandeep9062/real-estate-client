@@ -3,13 +3,15 @@ import { baseQueryWithAuth } from "./api";
 
 // ---------- Types ----------
 
-export type RoommateIntent =
-  | "has_room"
-  | "seeking_room"
-  | "swap"
-  | "temporary_offer"
-  | "temporary_seek"
-  | "subletting_out";
+export interface SearchArea {
+  location?: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  locality?: string;
+  city?: string;
+  radiusKm?: number;
+}
 
 export interface RoommateHabits {
   smoking?: "yes" | "no";
@@ -32,18 +34,10 @@ export interface LookingFor {
   occupation?: "student" | "working" | "any";
 }
 
-export interface SearchArea {
-  city?: string;
-  locality?: string;
-  radiusKm?: number;
-  location?: { type: "Point"; coordinates: [number, number] };
-}
-
 export interface RoommateProfile {
   _id: string;
   user: string;
   type: "have_room" | "no_room";
-  intent: RoommateIntent;
   // Populated by GET /profile/me; otherwise just the RoomFlat id.
   roomFlat?: string | RoomFlat;
   searchArea?: SearchArea;
@@ -98,8 +92,8 @@ export interface RoomFlat {
   _id: string;
   roommateProfile: string | RoommateProfile;
   owner: string;
-  intent: "has_room" | "swap" | "temporary_offer" | "subletting_out";
   openToSwap?: boolean;
+  openToTemporaryStay?: boolean;
   title: string;
   description?: string;
   location: RoomFlatLocation;

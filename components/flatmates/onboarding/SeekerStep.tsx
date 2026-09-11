@@ -15,7 +15,7 @@ export interface SeekerStepProps {
 }
 
 /**
- * Step 2 for seeker intents (seeking_room / temporary_seek) — every
+ * Step 2 for no_room (seeker) profiles — every
  * searchArea + budgetRange field.
  */
 export default function SeekerStep({

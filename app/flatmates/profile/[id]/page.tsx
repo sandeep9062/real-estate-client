@@ -33,8 +33,6 @@ import {
   Link2,
   Check,
   Search,
-  Repeat,
-  CalendarClock,
   type LucideIcon,
 } from "lucide-react";
 
@@ -44,49 +42,28 @@ const INK_SOFT = "#5C5F73";
 const TINT_BG = "#EEF1FC";
 const BORDER = "#E5E7F2";
 
-// Same labels + accent colors as the intent cards on /flatmates and the
-// step-0 picker in the onboarding wizard, so an intent reads identically
-// wherever it appears. temporary_seek and seeking_room share the "looking"
-// family; has_room / swap / temporary_offer are the "listing" family.
-const INTENT_STYLES: Record<
+// Labels + accent colors for the profile-type badge (have_room vs no_room).
+const TYPE_STYLES: Record<
   string,
   { label: string; icon: LucideIcon; accent: string; accentBg: string }
 > = {
-  has_room: {
+  have_room: {
     label: "Has a room",
     icon: Users,
     accent: "#059669",
     accentBg: "#ECFDF5",
   },
-  seeking_room: {
+  no_room: {
     label: "Looking for a room",
     icon: Search,
     accent: BRAND,
     accentBg: TINT_BG,
   },
-  swap: {
-    label: "Open to swap",
-    icon: Repeat,
-    accent: "#7C3AED",
-    accentBg: "#F5F3FF",
-  },
-  temporary_offer: {
-    label: "Temporary stay offered",
-    icon: Clock,
-    accent: "#D97706",
-    accentBg: "#FFFBEB",
-  },
-  temporary_seek: {
-    label: "Needs a temporary stay",
-    icon: CalendarClock,
-    accent: "#E11D48",
-    accentBg: "#FFF1F2",
-  },
 };
 
-function IntentBadge({ intent }: { intent?: string }) {
-  if (!intent) return null;
-  const cfg = INTENT_STYLES[intent];
+function TypeBadge({ type }: { type?: string }) {
+  if (!type) return null;
+  const cfg = TYPE_STYLES[type];
   if (!cfg) return null;
   return (
     <span
@@ -231,7 +208,7 @@ export default function PublicProfilePage() {
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <IntentBadge intent={profile.intent} />
+            <TypeBadge type={profile.type} />
             {profile.idVerified && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                 <ShieldCheck className="h-3 w-3" />

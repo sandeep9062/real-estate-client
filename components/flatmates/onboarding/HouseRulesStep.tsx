@@ -14,7 +14,6 @@ import type { RoomFlatDraft } from "./types";
 
 export interface HouseRulesStepProps {
   roomFlat: RoomFlatDraft;
-  intent: string;
   onHouseRule: (key: string, value: any) => void;
   onCurfew: (key: string, value: any) => void;
   onSwapDetail: (key: string, value: any) => void;
@@ -23,12 +22,11 @@ export interface HouseRulesStepProps {
 }
 
 /**
- * Step 3 — houseRules for every property intent, plus swapDetails (swap) and
- * temporaryDetails (temporary_offer) where relevant. Two per row.
+ * Step 3 — houseRules for every property, plus swapDetails and
+ * temporaryDetails where relevant. Two per row.
  */
 export default function HouseRulesStep({
   roomFlat,
-  intent,
   onHouseRule,
   onCurfew,
   onSwapDetail,
@@ -101,7 +99,7 @@ export default function HouseRulesStep({
         />
       </SimpleGrid>
 
-      {intent === "swap" && (
+      {roomFlat.openToSwap && (
         <>
           <Divider my="sm" />
           <Text fw={700} size="md" mb={8}>
@@ -138,7 +136,7 @@ export default function HouseRulesStep({
         </>
       )}
 
-      {intent === "temporary_offer" && (
+      {roomFlat.openToTemporaryStay && (
         <>
           <Divider my="sm" />
           <Text fw={700} size="md" mb={8}>

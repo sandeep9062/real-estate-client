@@ -19,7 +19,7 @@ export interface PropertyStepProps {
 }
 
 /**
- * Step 2 for property intents (has_room / swap / temporary_offer) — the
+ * Step 2 for have_room (property-owner) profiles — the
  * RoomFlat base fields, laid out two per row. Address/city/country + the map
  * pin live in Step 4 (PhotosLocationFlat), so no location fields here.
  */

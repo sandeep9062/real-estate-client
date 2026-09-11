@@ -18,9 +18,7 @@ import {
 } from "@/services/roommatesApi";
 import { toast } from "@/hooks/use-toast";
 import PhotosLocationFlat from "@/components/flatmates/PhotosLocationFlat";
-import AboutYouStep, {
-  INTENT_OPTIONS,
-} from "@/components/flatmates/onboarding/AboutYouStep";
+import AboutYouStep from "@/components/flatmates/onboarding/AboutYouStep";
 import SeekerStep from "@/components/flatmates/onboarding/SeekerStep";
 import PropertyStep from "@/components/flatmates/onboarding/PropertyStep";
 import HouseRulesStep from "@/components/flatmates/onboarding/HouseRulesStep";
@@ -35,12 +33,13 @@ const INK = "#161A2E";
 const INK_SOFT = "#5C5F73";
 const TINT_BG = "#EEF1FC";
 
-const NEEDS_PROPERTY = ["has_room", "swap", "temporary_offer"];
-const NEEDS_SEARCH_AREA = ["seeking_room", "temporary_seek"];
-
-const INTENT_LABELS: Record<string, string> = Object.fromEntries(
-  INTENT_OPTIONS.map((option) => [option.key, option.title]),
-);
+// The profile `type` drives which branch of the wizard runs: have_room users
+// list a property (RoomFlat steps 2-4), no_room users give a search area +
+// budget instead.
+const TYPE_LABELS: Record<string, string> = {
+  have_room: "Has a room",
+  no_room: "Looking for a room",
+};
 
 // Same conversion the add-property flow uses: Map reports {lat,lng}, while the
 // backend stores GeoJSON {type:"Point", coordinates:[lng,lat]}.
@@ -217,6 +216,7 @@ function roomFlatToDraft(rf: RoomFlat): RoomFlatDraft {
     availableFrom: toDateInput(rf.availableFrom),
     minStayMonths: numToString(rf.minStayMonths),
     openToSwap: rf.openToSwap ?? false,
+    openToTemporaryStay: rf.openToTemporaryStay ?? false,
     petsAllowed: rf.petsAllowed ?? false,
     location: rf.location
       ? {
@@ -263,7 +263,6 @@ function roomFlatToDraft(rf: RoomFlat): RoomFlatDraft {
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const urlIntent = searchParams.get("intent");
   // /flatmates/profile/me links here with ?edit=1 — same wizard, but it
   // loads the saved profile + listing, pre-fills every step, and PATCHes on
   // save instead of POSTing a new record (which would 409).
@@ -296,9 +295,6 @@ function OnboardingContent() {
   // closure value — the ref catches what the state cannot.
   const submittingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
-  // Create mode: the intent picked via the Step-1 radio or a ?intent=
-  // deep-link. Edit mode ignores this — it uses the saved profile's intent.
-  const [chosenIntent, setChosenIntent] = useState<string | null>(urlIntent);
   // Guards the edit-mode prefill below so typing into the form is never
   // clobbered by refetches of the saved profile.
   const [prefilled, setPrefilled] = useState(false);
@@ -318,12 +314,6 @@ function OnboardingContent() {
     isLoading: isLoadingExisting,
     error: existingProfileError,
   } = useGetOwnProfileQuery(undefined, { skip: !isEditMode });
-
-  // Locked at creation — changing it would orphan the listing type, so edit
-  // mode reuses the saved intent instead of the Step-1/deep-link choice.
-  const intent: string | null = isEditMode
-    ? (existingProfile?.intent ?? null)
-    : chosenIntent;
 
   // Every user-editable field from RoommateProfile (backend model).
   const [profile, setProfile] = useState<ProfileDraft>({
@@ -371,6 +361,7 @@ function OnboardingContent() {
     availableFrom: "",
     minStayMonths: "",
     openToSwap: false,
+    openToTemporaryStay: false,
     petsAllowed: false,
     location: {},
     houseRules: {
@@ -495,9 +486,9 @@ function OnboardingContent() {
     }));
 
   // Edit mode: while the saved profile (+ populated roomFlat) is still
-  // loading, `intent` is null — show the loader rather than Step 1 (edit mode
-  // locks the intent to the saved profile). If the fetch failed (e.g. no
-  // profile yet), surface that instead.
+  // loading, show the loader rather than Step 1 (edit mode pre-fills every
+  // field including `type`, which gates the wizard branch). If the fetch
+  // failed (e.g. no profile yet), surface that instead.
   if (!mounted || !isAuthenticated || (isEditMode && !prefilled)) {
     if (isEditMode && existingProfileError) {
       return (
@@ -523,16 +514,16 @@ function OnboardingContent() {
     );
   }
 
-  // Step 1 (AboutYouStep) always renders — the intent radio lives inside it,
-  // and the rest of the wizard below only unlocks once an intent is chosen
+  // Step 1 (AboutYouStep) always renders — the type Select lives inside it,
+  // and the rest of the wizard below only unlocks once a type is chosen
   // (guarded per-step, so a direct visit doesn't hit a dead-end).
-  const needsProperty = !!intent && NEEDS_PROPERTY.includes(intent);
-  const needsSearchArea = !!intent && NEEDS_SEARCH_AREA.includes(intent);
+  const needsProperty = profile.type === "have_room";
+  const needsSearchArea = profile.type === "no_room";
 
   const goToStep2 = () => {
-    // Intent gates the rest of the wizard — don't advance without it.
-    if (!intent) {
-      toast.error("Please pick what brings you here to continue");
+    // Type gates the rest of the wizard — don't advance without it.
+    if (!profile.type) {
+      toast.error("Please select a profile type to continue");
       return;
     }
     setStep(2);
@@ -617,18 +608,17 @@ function OnboardingContent() {
       return;
     }
 
-    // Intent gates the rest of the wizard — the radio lives inside Step 1, so
+    // Type gates the rest of the wizard — the Select lives inside Step 1, so
     // the final submit can't fire without a choice.
-    if (!intent) {
-      toast.error("Please pick what brings you here to continue");
+    if (!profile.type) {
+      toast.error("Please select a profile type to continue");
       submittingRef.current = false;
       setSubmitting(false);
       return;
     }
 
     try {
-      // Edit mode PATCHes the existing records; create mode POSTs fresh ones
-      // (intent is create-only — it stays out of the update payload).
+      // Edit mode PATCHes the existing records; create mode POSTs fresh ones.
       const profileBody = {
         bio: profile.bio,
         type: profile.type || undefined,
@@ -722,11 +712,10 @@ function OnboardingContent() {
       }
 
       try {
-        await createProfile({ intent, ...profileBody } as any).unwrap();
+        await createProfile(profileBody as any).unwrap();
       } catch (err) {
         // 409 = the user already has a profile (re-entering onboarding
-        // without ?edit=1). Intent is locked at creation, so update the
-        // profile without it — same rule as edit mode.
+        // without ?edit=1) — update it instead, same rule as edit mode.
         const e = err as { status?: number };
         if (e.status !== 409) throw err;
         await updateProfile(profileBody as any).unwrap();
@@ -814,45 +803,18 @@ function OnboardingContent() {
       location,
     };
 
-    if (intent === "swap") {
-      draft.swapDetails = {
-        desiredCity: roomFlat.swapDetails.desiredCity || undefined,
-        desiredLocality: roomFlat.swapDetails.desiredLocality || undefined,
-        desiredRentRange: {
-          min: roomFlat.swapDetails.desiredRentRange?.min || undefined,
-          max: roomFlat.swapDetails.desiredRentRange?.max || undefined,
-        },
-      };
-    }
-
-    if (intent === "temporary_offer") {
-      draft.temporaryDetails = {
-        startDate: roomFlat.temporaryDetails.startDate || undefined,
-        endDate: roomFlat.temporaryDetails.endDate || undefined,
-      };
-    }
-
     await doSubmit(draft);
   }
 
   return (
     <main className="mx-auto max-w-7xl px-6 pb-12 sm:pb-16">
-      {isEditMode ? (
+      {TYPE_LABELS[profile.type] && (
         <span
           className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4"
           style={{ background: TINT_BG, color: BRAND }}
         >
-          {INTENT_LABELS[intent as string] ?? "Edit profile"}
+          {TYPE_LABELS[profile.type]}
         </span>
-      ) : (
-        INTENT_LABELS[intent as string] && (
-          <span
-            className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4"
-            style={{ background: TINT_BG, color: BRAND }}
-          >
-            {INTENT_LABELS[intent as string]}
-          </span>
-        )
       )}
 
       <h1
@@ -900,7 +862,7 @@ function OnboardingContent() {
               onClick={goToStep2}
             >
               Next:{" "}
-              {!intent
+              {!profile.type
                 ? "continue"
                 : needsProperty
                   ? "your place"
@@ -964,7 +926,6 @@ function OnboardingContent() {
         <Card p="lg" radius="md" withBorder shadow="sm">
           <HouseRulesStep
             roomFlat={roomFlat}
-            intent={intent ?? ""}
             onHouseRule={updateHouseRule}
             onCurfew={updateCurfew}
             onSwapDetail={updateSwapDetail}

@@ -328,10 +328,10 @@ function RoomFlatCard({ listing }: { listing: RoomFlat }) {
 
   const media = (listing.photos || [])[0];
   const mediaCount = (listing.photos || []).length;
-  const intentBadge =
-    listing.intent === "swap"
+  const listingBadge =
+    listing.openToSwap
       ? "Open to swap"
-      : listing.intent === "temporary_offer"
+      : listing.openToTemporaryStay
         ? "Temporary stay"
         : "Flatmate wanted";
 
@@ -347,7 +347,7 @@ function RoomFlatCard({ listing }: { listing: RoomFlat }) {
           mediaAlt={listing.title || "Listing photo"}
           bottomBadge={
             <span className="inline-flex rounded-md border border-white/25 bg-black/50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
-              {intentBadge}
+              {listingBadge}
             </span>
           }
         />

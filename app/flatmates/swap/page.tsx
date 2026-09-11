@@ -91,7 +91,7 @@ export default function SwapMatchesPage() {
           <p className="mt-2 text-sm text-rose-600/80">
             To see swap matches you need an active swap listing.{" "}
             <Link
-              href="/flatmates/onboarding?intent=swap"
+              href="/flatmates/onboarding"
               className="font-semibold underline underline-offset-2"
             >
               Set one up
@@ -172,7 +172,7 @@ export default function SwapMatchesPage() {
                   Browse rooms meanwhile
                 </Link>
                 <Link
-                  href="/flatmates/onboarding?intent=swap"
+                  href="/flatmates/onboarding?edit=1"
                   className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
                   style={{ background: BRAND }}
                 >

@@ -94,6 +94,7 @@ export interface RoomFlatDraft {
   availableFrom: string;
   minStayMonths: string;
   openToSwap: boolean;
+  openToTemporaryStay: boolean;
   petsAllowed: boolean;
   location: RoomFlatLocationDraft;
   houseRules: HouseRulesDraft;
