@@ -732,6 +732,9 @@ export default function BrowsePage() {
                         window.location.href = `/flatmates/${id}`;
                       }}
                       onSave={toggleSaved}
+                      onConnect={(id) => {
+                        window.location.href = `/flatmates/${id}`;
+                      }}
                     />
                   ))}
                 </div>
