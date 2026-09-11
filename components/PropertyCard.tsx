@@ -43,7 +43,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const router = useRouter();
   const pid = String(card._id || card.id);
-  const slug = card.slug || pid;
+  const slug = card.slug;
 
   const [inCompare, setInCompare] = React.useState(false);
   React.useEffect(() => {
