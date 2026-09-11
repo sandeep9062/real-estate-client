@@ -156,6 +156,7 @@ function profileToDraft(p: RoommateProfile): ProfileDraft {
   const coords = p.searchArea?.location?.coordinates;
   return {
     bio: p.bio ?? "",
+    type: (p as { type?: string }).type ?? "",
     gender: p.gender ?? "",
     dateOfBirth: toDateInput((p as { dateOfBirth?: string }).dateOfBirth),
     occupation: p.occupation ?? "",
@@ -327,6 +328,7 @@ function OnboardingContent() {
   // Every user-editable field from RoommateProfile (backend model).
   const [profile, setProfile] = useState<ProfileDraft>({
     bio: "",
+    type: "",
     gender: "",
     dateOfBirth: "",
     occupation: "",
@@ -629,6 +631,7 @@ function OnboardingContent() {
       // (intent is create-only — it stays out of the update payload).
       const profileBody = {
         bio: profile.bio,
+        type: profile.type || undefined,
         gender: profile.gender,
         dateOfBirth: profile.dateOfBirth || undefined,
         occupation: profile.occupation,

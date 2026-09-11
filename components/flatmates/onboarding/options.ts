@@ -27,6 +27,7 @@ export const OPTIONS = {
   prefYesNo: ["yes", "no", "no_preference"],
   foodPrefAny: ["veg", "non_veg", "any"],
   occupationAny: ["student", "working", "any"],
+  profileType: ["have_room", "no_room"],
   roomType: ["private_room", "shared_room", "entire_flat"],
   furnishing: ["furnished", "semi_furnished", "unfurnished"],
   guestsAllowed: ["allowed", "allowed_with_notice", "not_allowed"],

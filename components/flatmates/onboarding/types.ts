@@ -38,6 +38,7 @@ export interface BudgetRangeDraft {
 
 export interface ProfileDraft {
   bio: string;
+  type: string;
   gender: string;
   dateOfBirth: string;
   occupation: string;

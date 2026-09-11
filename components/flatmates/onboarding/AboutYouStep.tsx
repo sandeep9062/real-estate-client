@@ -200,6 +200,13 @@ export default function AboutYouStep({
           value={profile.gender || null}
           onChange={(value) => onField("gender", value || "")}
         />
+        <Select
+          label="Type"
+          placeholder="Select…"
+          data={enumData(OPTIONS.profileType)}
+          value={profile.type || null}
+          onChange={(value) => onField("type", value || "")}
+        />
         <TextInput
           label="Date of birth"
           type="date"

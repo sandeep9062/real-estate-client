@@ -42,6 +42,7 @@ export interface SearchArea {
 export interface RoommateProfile {
   _id: string;
   user: string;
+  type: "have_room" | "no_room";
   intent: RoommateIntent;
   // Populated by GET /profile/me; otherwise just the RoomFlat id.
   roomFlat?: string | RoomFlat;
