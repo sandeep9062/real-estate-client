@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
@@ -147,6 +147,24 @@ export default function BrowsePage() {
   const [sendConnectionRequest] = useSendConnectionRequestMutation();
   const [respondToConnectionRequest] = useRespondToConnectionRequestMutation();
   const { data: connectionsData } = useListMyConnectionsQuery();
+
+  // Sync connectedIds with existing connections (sent requests)
+  useEffect(() => {
+    if (connectionsData && connectionsData.length > 0) {
+      const sentProfileIds = new Set<string>();
+      connectionsData.forEach((connection) => {
+        // Only show as "sent" if the request is still pending (not accepted/declined)
+        if (connection.status === "pending") {
+          const toProfileId =
+            typeof connection.toProfile === "string"
+              ? connection.toProfile
+              : (connection.toProfile as { _id: string })?._id;
+          if (toProfileId) sentProfileIds.add(toProfileId);
+        }
+      });
+      setConnectedIds(sentProfileIds);
+    }
+  }, [connectionsData]);
 
   const activeFiltersCount = useMemo(
     () =>
@@ -789,7 +807,7 @@ export default function BrowsePage() {
                       saved={savedIds.has(p._id)}
                       connected={connectedIds.has(p._id)}
                       onView={(id) => {
-                        window.location.href = `/flatmates/${id}`;
+                        window.location.href = `/flatmates/profile/${id}`;
                       }}
                       onSave={toggleSaved}
                       onConnect={handleConnect}
