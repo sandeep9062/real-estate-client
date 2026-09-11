@@ -206,7 +206,7 @@ export default function RoommateProfileCard({
       <button
         type="button"
         onClick={() => onView?.(`/flatmate/${profile._id}`)}
-        className="relative aspect-[4/5] w-full overflow-hidden bg-[#EDEAE3] text-left"
+        className="relative aspect-[3/2] w-full overflow-hidden bg-[#EDEAE3] text-left"
       >
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -217,22 +217,22 @@ export default function RoommateProfileCard({
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-serif text-4xl text-[#B7B2A6]">
+          <div className="flex h-full w-full items-center justify-center font-serif text-3xl text-[#B7B2A6]">
             {profile.user.name.charAt(0).toUpperCase()}
           </div>
         )}
 
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-4 pb-3 pt-10 text-white">
-          <span className="font-serif text-lg leading-none">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-3 pb-2 pt-6 text-white">
+          <span className="font-serif text-base leading-none">
             {profile.user.name}
           </span>
           {location && (
-            <p className="mt-0.5 text-xs text-white/75">{location}</p>
+            <p className="mt-0.5 text-[11px] text-white/75">{location}</p>
           )}
         </div>
 
         <span
-          className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] text-white ${
+          className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] text-white ${
             profile.type === "have_room" ? "bg-[#B4772A]" : "bg-[#2B4C3F]"
           }`}
         >
@@ -240,20 +240,20 @@ export default function RoommateProfileCard({
         </span>
 
         {profile.idVerified && (
-          <span className="absolute right-3 top-3">
+          <span className="absolute right-2 top-2">
             <VerifiedBadge />
           </span>
         )}
       </button>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex flex-1 flex-col gap-2 p-3">
         {profile.bio && (
-          <p className="line-clamp-2 text-sm leading-snug text-[#4A4740]">
+          <p className="line-clamp-2 text-xs leading-snug text-[#4A4740]">
             {profile.bio}
           </p>
         )}
 
-        <p className="text-xs text-[#7A766C]">
+        <p className="text-[11px] text-[#7A766C]">
           {profile.occupation && OCCUPATION_LABEL[profile.occupation]}
           {profile.occupation && profile.workSchedule && " · "}
           {profile.workSchedule &&
@@ -261,11 +261,11 @@ export default function RoommateProfileCard({
         </p>
 
         {chips.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1">
             {chips.map((chip) => (
               <span
                 key={chip}
-                className="rounded-full border border-[#E7E4DC] px-2 py-0.5 text-[11px] text-[#4A4740]"
+                className="rounded-full border border-[#E7E4DC] px-1.5 py-0.5 text-[10px] text-[#4A4740]"
               >
                 {chip}
               </span>
@@ -273,19 +273,19 @@ export default function RoommateProfileCard({
           </div>
         )}
 
-        <div className="mt-auto flex items-center justify-between pt-2">
+        <div className="mt-auto flex items-center justify-between pt-1">
           <div>
             {price && (
-              <p className="text-sm font-medium text-[#1C1B19]">{price}</p>
+              <p className="text-xs font-medium text-[#1C1B19]">{price}</p>
             )}
             {!profile.isComplete && (
-              <p className="text-[11px] text-[#B4772A]">
+              <p className="text-[10px] text-[#B4772A]">
                 Profile still being filled in
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {typeof profile.matchScore === "number" && (
               <MatchRing score={profile.matchScore} />
             )}
@@ -294,11 +294,11 @@ export default function RoommateProfileCard({
               onClick={() => onSave?.(profile._id)}
               aria-pressed={saved}
               aria-label={saved ? "Remove from saved" : "Save profile"}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E7E4DC] text-[#4A4740] transition-colors hover:border-[#B4772A] hover:text-[#B4772A]"
+              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E7E4DC] text-[#4A4740] transition-colors hover:border-[#B4772A] hover:text-[#B4772A]"
             >
               <svg
-                width="16"
-                height="16"
+                width="14"
+                height="14"
                 viewBox="0 0 20 20"
                 fill={saved ? "#B4772A" : "none"}
               >
