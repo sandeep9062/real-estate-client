@@ -205,7 +205,7 @@ export default function RoommateProfileCard({
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-[#E7E4DC] bg-white transition-shadow hover:shadow-[0_8px_24px_-12px_rgba(28,27,25,0.25)]">
       <button
         type="button"
-        onClick={() => onView?.(profile._id)}
+        onClick={() => onView?.(`/flatmate/${profile._id}`)}
         className="relative aspect-[4/5] w-full overflow-hidden bg-[#EDEAE3] text-left"
       >
         {photo ? (
