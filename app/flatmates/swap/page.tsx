@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useSearchSwapMatchesQuery } from "@/services/roommatesApi";
-import ListingCard from "../../../components/flatmates/ListingCardFlat";
+import ListingCard from "../../../components/flatmates/RoommateProfileCard";
 
 const BRAND = "#4161df";
 const INK = "#161A2E";

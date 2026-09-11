@@ -21,10 +21,14 @@ import {
 } from "lucide-react";
 import {
   useBrowseRoomsAndFlatsQuery,
+  useSearchSeekersQuery,
+  useGetOwnProfileQuery,
+  type RoommateProfile,
   type BrowseResult,
 } from "@/services/roommatesApi";
 import type { MapMarker } from "@/components/Map";
-import ListingCard from "../../../components/flatmates/ListingCardFlat";
+import ListingCard from "../../../components/flatmates/RoommateProfileCard";
+import SeekerProfileCard from "../../../components/flatmates/SeekerProfileCard";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -97,6 +101,28 @@ export default function BrowsePage() {
     isLoading: loading,
     error,
   } = useBrowseRoomsAndFlatsQuery(params);
+
+  // Seeker profiles (people looking for a room, type "no_room") — rendered
+  // as profile cards below the room listings. Only the city filter applies;
+  // rent/roomType filters are property-side concerns.
+  const { data: seekers = [], isLoading: seekersLoading } =
+    useSearchSeekersQuery(applied.city ? { city: applied.city } : undefined);
+
+  // Every roommate profile on this page = have_room posters (already shown on
+  // the room listing cards above) + these no_room seekers. Hide the viewer's
+  // own profile card and put the best compatibility matches first.
+  const { data: myProfile } = useGetOwnProfileQuery(undefined, {
+    skip: seekers.length === 0,
+  });
+  const visibleSeekers = useMemo(() => {
+    const list = seekers.filter(
+      (s) => !myProfile || s.profile._id !== myProfile._id,
+    );
+    // Null scores sort last (?? -1).
+    return [...list].sort(
+      (a, b) => (b.matchScore ?? -1) - (a.matchScore ?? -1),
+    );
+  }, [seekers, myProfile]);
 
   function runSearch(e?: React.FormEvent) {
     e?.preventDefault();
@@ -523,6 +549,52 @@ export default function BrowsePage() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* Roommate profiles — every no_room roommate, best match first */}
+          {seekersLoading && (
+            <div className="mt-10 flex items-center gap-2">
+              <Loader2
+                className="h-4 w-4 animate-spin"
+                style={{ color: BRAND }}
+              />
+              <p className="text-xs" style={{ color: INK_SOFT }}>
+                Loading roommate profiles…
+              </p>
+            </div>
+          )}
+
+          {!seekersLoading && visibleSeekers.length > 0 && (
+            <section className="mt-10">
+              <div className="mb-4 flex items-baseline justify-between gap-2">
+                <div>
+                  <h2
+                    className="text-base font-semibold"
+                    style={{ color: INK }}
+                  >
+                    Roommate profiles
+                  </h2>
+                  <p className="mt-0.5 text-xs" style={{ color: INK_SOFT }}>
+                    People looking for a place
+                    {applied.city ? ` in ${applied.city}` : ""} — check
+                    lifestyle, budget and preferences before connecting.
+                  </p>
+                </div>
+                <span className="text-xs sm:text-sm text-gray-500">
+                  {visibleSeekers.length} profile
+                  {visibleSeekers.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {visibleSeekers.map(({ profile, matchScore }) => (
+                  <SeekerProfileCard
+                    key={profile._id}
+                    profile={profile}
+                    matchScore={matchScore}
+                  />
+                ))}
+              </div>
+            </section>
           )}
         </div>
       </main>
