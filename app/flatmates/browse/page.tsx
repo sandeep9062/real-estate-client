@@ -11,7 +11,6 @@ import {
   MapPin,
   Map as MapIcon,
   List as ListIcon,
-  BedDouble,
   RotateCcw,
   SlidersHorizontal,
   ChevronDown,
@@ -20,15 +19,14 @@ import {
   IndianRupee,
 } from "lucide-react";
 import {
-  useBrowseRoomsAndFlatsQuery,
   useSearchSeekersQuery,
-  useGetOwnProfileQuery,
   type RoommateProfile,
-  type BrowseResult,
 } from "@/services/roommatesApi";
 import type { MapMarker } from "@/components/Map";
-import ListingCard from "../../../components/flatmates/RoommateProfileCard";
-import SeekerProfileCard from "../../../components/flatmates/SeekerProfileCard";
+import RoommateProfileCard, {
+  type RoommateProfileCardData,
+  type RoommateProfileCardUser,
+} from "@/components/flatmates/RoommateProfileCard";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -37,45 +35,46 @@ const INK = "#161A2E";
 const INK_SOFT = "#5C5F73";
 const BORDER = "#E5E7F2";
 
-const EMPTY_RESULT: BrowseResult = {
-  matchedListings: [],
-  sharingAllowedProperties: [],
-};
-
-const ROOM_TYPE_OPTIONS = [
-  { value: "", label: "Any type" },
-  { value: "private_room", label: "Private room" },
-  { value: "shared_room", label: "Shared room" },
-  { value: "entire_flat", label: "Entire flat" },
-];
-
-const RENT_PRESETS = [
+const BUDGET_PRESETS = [
   { label: "Under ₹5k", min: "", max: "5000" },
   { label: "₹5k – ₹10k", min: "5000", max: "10000" },
   { label: "₹10k – ₹20k", min: "10000", max: "20000" },
   { label: "₹20k+", min: "20000", max: "" },
 ];
 
+// useSearchSeekersQuery hits /v1/roommates/seekers, which — per its name —
+// only ever returns no_room profiles (people looking for a room). It's the
+// people-side counterpart to useBrowseRoomsAndFlatsQuery (which browses
+// RoomFlat listings). This page is the "browse flatmates" half of that pair.
+//
+// RoommateProfile.user on the wire is typed as a bare id, same as roomFlat
+// before population. The seekers endpoint needs to send it populated (at
+// least _id/name/avatarUrl) for this page to have anything to render —
+// flagged here rather than silently assumed.
+interface SeekerResult {
+  profile: Omit<RoommateProfile, "user"> & { user: RoommateProfileCardUser };
+  matchScore: number | null;
+}
+
 export default function BrowsePage() {
   const [filters, setFilters] = useState({
     city: "",
-    minRent: "",
-    maxRent: "",
-    roomType: "",
+    minBudget: "",
+    maxBudget: "",
   });
   const [applied, setApplied] = useState({
     city: "",
-    minRent: "",
-    maxRent: "",
-    roomType: "",
+    minBudget: "",
+    maxBudget: "",
   });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"list" | "map">("list");
   const [laptopMapOpen, setLaptopMapOpen] = useState(false);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
   const activeFiltersCount = useMemo(
     () =>
-      [filters.city, filters.minRent, filters.maxRent, filters.roomType].filter(
+      [filters.city, filters.minBudget, filters.maxBudget].filter(
         (v) => v !== "",
       ).length,
     [filters],
@@ -83,7 +82,7 @@ export default function BrowsePage() {
 
   const appliedCount = useMemo(
     () =>
-      [applied.city, applied.minRent, applied.maxRent, applied.roomType].filter(
+      [applied.city, applied.minBudget, applied.maxBudget].filter(
         (v) => v !== "",
       ).length,
     [applied],
@@ -91,38 +90,18 @@ export default function BrowsePage() {
 
   const params = {
     city: applied.city || undefined,
-    minRent: applied.minRent || undefined,
-    maxRent: applied.maxRent || undefined,
-    roomType: applied.roomType || undefined,
+    minBudget: applied.minBudget || undefined,
+    maxBudget: applied.maxBudget || undefined,
   };
 
   const {
-    data: results = EMPTY_RESULT,
+    data: rawResults,
     isLoading: loading,
     error,
-  } = useBrowseRoomsAndFlatsQuery(params);
+  } = useSearchSeekersQuery(params);
 
-  // Seeker profiles (people looking for a room, type "no_room") — rendered
-  // as profile cards below the room listings. Only the city filter applies;
-  // rent/roomType filters are property-side concerns.
-  const { data: seekers = [], isLoading: seekersLoading } =
-    useSearchSeekersQuery(applied.city ? { city: applied.city } : undefined);
-
-  // Every roommate profile on this page = have_room posters (already shown on
-  // the room listing cards above) + these no_room seekers. Hide the viewer's
-  // own profile card and put the best compatibility matches first.
-  const { data: myProfile } = useGetOwnProfileQuery(undefined, {
-    skip: seekers.length === 0,
-  });
-  const visibleSeekers = useMemo(() => {
-    const list = seekers.filter(
-      (s) => !myProfile || s.profile._id !== myProfile._id,
-    );
-    // Null scores sort last (?? -1).
-    return [...list].sort(
-      (a, b) => (b.matchScore ?? -1) - (a.matchScore ?? -1),
-    );
-  }, [seekers, myProfile]);
+  // See SeekerResult note above: this assumes `user` arrives populated.
+  const seekers = (rawResults ?? []) as unknown as SeekerResult[];
 
   function runSearch(e?: React.FormEvent) {
     e?.preventDefault();
@@ -131,53 +110,76 @@ export default function BrowsePage() {
   }
 
   function clearFilters() {
-    const cleared = { city: "", minRent: "", maxRent: "", roomType: "" };
+    const cleared = { city: "", minBudget: "", maxBudget: "" };
     setFilters(cleared);
     setApplied(cleared);
   }
 
-  function removeAppliedChip(key: "city" | "minRent" | "maxRent" | "roomType") {
+  function removeAppliedChip(key: "city" | "minBudget" | "maxBudget") {
     const next = { ...applied, [key]: "" };
     setApplied(next);
     setFilters((f) => ({ ...f, [key]: "" }));
   }
 
-  const allResults = useMemo(
-    () => [...results.matchedListings, ...results.sharingAllowedProperties],
-    [results],
+  function toggleSaved(id: string) {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const profiles: RoommateProfileCardData[] = useMemo(
+    () =>
+      seekers.map(({ profile, matchScore }) => ({
+        _id: profile._id,
+        type: profile.type,
+        user: profile.user,
+        photos: profile.photos,
+        bio: profile.bio,
+        occupation: profile.occupation,
+        workSchedule: profile.workSchedule,
+        habits: profile.habits,
+        searchArea: profile.searchArea,
+        budgetRange: profile.budgetRange,
+        idVerified: profile.idVerified,
+        isComplete: profile.isComplete,
+        matchScore,
+      })),
+    [seekers],
   );
 
-  // One pin per listing that actually has lat/lng.
-  // Backend stores GeoJSON { type:"Point", coordinates:[lng,lat] } on both
-  // RoomFlat.location.coordinates and Property.location.coordinates.
+  // Seekers only ever carry searchArea (no_room), never a roomFlat.
   const markers: MapMarker[] = useMemo(() => {
     const pins: MapMarker[] = [];
-    for (const r of allResults) {
-      const listing: any = r.listing;
-      const coords = listing?.location?.coordinates?.coordinates;
+    for (const p of profiles) {
+      const coords = p.searchArea?.location?.coordinates;
       if (!Array.isArray(coords) || coords.length < 2) continue;
       const lng = Number(coords[0]);
       const lat = Number(coords[1]);
       // Skip missing/default [0,0] pins.
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
       if (Math.abs(lat) < 1e-6 && Math.abs(lng) < 1e-6) continue;
-      const isRoomFlat = r.source === "room_flat";
-      const rent = isRoomFlat ? listing?.rentAmount : listing?.price;
+
+      const rent = p.budgetRange?.max;
       pins.push({
         lat,
         lng,
-        id: String(listing?._id || listing?.id || `${lat},${lng}`),
-        title: listing?.title || "Listing",
+        id: p._id,
+        title: p.user.name,
         subtitle: [
-          typeof rent === "number" ? `₹${rent.toLocaleString("en-IN")}/mo` : "",
-          listing?.location?.city || "",
+          typeof rent === "number"
+            ? `Up to ₹${rent.toLocaleString("en-IN")}/mo`
+            : "",
+          p.searchArea?.city || "",
         ]
           .filter(Boolean)
           .join(" · "),
       });
     }
     return pins;
-  }, [allResults]);
+  }, [profiles]);
 
   return (
     <div className="w-full bg-gray-50 min-h-screen relative">
@@ -240,11 +242,11 @@ export default function BrowsePage() {
       <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 pb-12">
         <div className="w-full text-center">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
-            Find Your Perfect Roommate or Flatmate in Tricity
+            Find a Flatmate for Your Room in Tricity
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 px-2">
-            Discover rooms, flat-shares and verified flatmates for rent in
-            Chandigarh, Panchkula, Mohali &amp; more.
+            Browse verified people looking for a room in Chandigarh, Panchkula,
+            Mohali &amp; more.
           </p>
         </div>
         <div className="mt-4 flex justify-center">
@@ -270,7 +272,7 @@ export default function BrowsePage() {
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-gray-900">
-                    Search rooms
+                    Search seekers
                   </h2>
                   <p className="hidden text-[11px] text-gray-500 sm:block">
                     {appliedCount > 0
@@ -313,7 +315,7 @@ export default function BrowsePage() {
           </div>
 
           <div className={`${filtersOpen ? "block" : "hidden"} p-4 md:block`}>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_auto]">
               <label className="block">
                 <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
                   <MapPin className="h-3.5 w-3.5" />
@@ -334,15 +336,15 @@ export default function BrowsePage() {
               <label className="block">
                 <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
                   <IndianRupee className="h-3.5 w-3.5" />
-                  Min rent
+                  Min budget
                 </span>
                 <input
                   type="number"
                   min={0}
                   placeholder="₹ min"
-                  value={filters.minRent}
+                  value={filters.minBudget}
                   onChange={(e) =>
-                    setFilters((f) => ({ ...f, minRent: e.target.value }))
+                    setFilters((f) => ({ ...f, minBudget: e.target.value }))
                   }
                   className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
                 />
@@ -350,44 +352,18 @@ export default function BrowsePage() {
               <label className="block">
                 <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
                   <IndianRupee className="h-3.5 w-3.5" />
-                  Max rent
+                  Max budget
                 </span>
                 <input
                   type="number"
                   min={0}
                   placeholder="₹ max"
-                  value={filters.maxRent}
+                  value={filters.maxBudget}
                   onChange={(e) =>
-                    setFilters((f) => ({ ...f, maxRent: e.target.value }))
+                    setFilters((f) => ({ ...f, maxBudget: e.target.value }))
                   }
                   className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
                 />
-              </label>
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <BedDouble className="h-3.5 w-3.5" />
-                  Room type
-                </span>
-                <span className="relative block">
-                  <select
-                    value={filters.roomType}
-                    onChange={(e) =>
-                      setFilters((f) => ({ ...f, roomType: e.target.value }))
-                    }
-                    className={`h-10 w-full appearance-none rounded-lg border bg-white pl-3 pr-8 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20 ${
-                      filters.roomType
-                        ? "border-[#4161df]/30 font-medium text-[#4161df]"
-                        : "border-gray-200 text-gray-700"
-                    }`}
-                  >
-                    {ROOM_TYPE_OPTIONS.map((o) => (
-                      <option key={o.value || "any"} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
-                </span>
               </label>
               <div className="flex items-end">
                 <button
@@ -444,13 +420,13 @@ export default function BrowsePage() {
                 <MapPin className="h-4 w-4 shrink-0" style={{ color: BRAND }} />
                 <p className="text-xs" style={{ color: INK_SOFT }}>
                   {markers.length}{" "}
-                  {markers.length === 1 ? "listing" : "listings"} with map
+                  {markers.length === 1 ? "profile has" : "profiles have"} a map
                   location — tap the Map button on the right to view.
                 </p>
               </div>
             )}
 
-          {!loading && markers.length === 0 && allResults.length > 0 && (
+          {!loading && markers.length === 0 && profiles.length > 0 && (
             <div
               className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3"
               style={{ borderColor: BORDER }}
@@ -460,25 +436,25 @@ export default function BrowsePage() {
                 style={{ color: "#9CA3AF" }}
               />
               <p className="text-xs" style={{ color: INK_SOFT }}>
-                These listings don&apos;t have a map location saved yet — ask
-                posters to drop a pin during onboarding.
+                These profiles don&apos;t have a map location saved yet — ask
+                them to add one during onboarding.
               </p>
             </div>
           )}
 
-          {!loading && allResults.length === 0 && (
+          {!loading && profiles.length === 0 && (
             <div
               className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
               style={{ borderColor: BORDER }}
             >
               <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
               <p className="text-sm" style={{ color: INK_SOFT }}>
-                No listings match yet — try widening the city or rent range.
+                No seekers match yet — try widening the city or budget range.
               </p>
             </div>
           )}
 
-          {!loading && allResults.length > 0 && (
+          {!loading && profiles.length > 0 && (
             <div
               className={`grid grid-cols-1 gap-6 items-start ${laptopMapOpen ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}
             >
@@ -488,8 +464,8 @@ export default function BrowsePage() {
               >
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="text-sm font-medium text-gray-700">
-                    {allResults.length} listing
-                    {allResults.length !== 1 ? "s" : ""}
+                    {profiles.length} seeker
+                    {profiles.length !== 1 ? "s" : ""}
                   </p>
                   <span className="text-xs sm:text-sm text-gray-500">
                     {markers.length > 0
@@ -497,12 +473,16 @@ export default function BrowsePage() {
                       : "No map locations yet"}
                   </span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                  {allResults.map((r) => (
-                    <ListingCard
-                      key={r.listing._id || r.listing.id}
-                      source={r.source}
-                      listing={r.listing}
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {profiles.map((p) => (
+                    <RoommateProfileCard
+                      key={p._id}
+                      profile={p}
+                      saved={savedIds.has(p._id)}
+                      onView={(id) => {
+                        window.location.href = `/flatmates/${id}`;
+                      }}
+                      onSave={toggleSaved}
                     />
                   ))}
                 </div>
@@ -524,10 +504,10 @@ export default function BrowsePage() {
                       >
                         <MapPin className="h-4 w-4" style={{ color: BRAND }} />
                         {markers.length}{" "}
-                        {markers.length === 1 ? "listing" : "listings"} on map
+                        {markers.length === 1 ? "seeker" : "seekers"} on map
                       </p>
                       <p className="text-xs" style={{ color: INK_SOFT }}>
-                        Click a pin for rent &amp; area
+                        Click a pin for budget &amp; area
                       </p>
                     </div>
                     <div className="p-3">
@@ -550,52 +530,6 @@ export default function BrowsePage() {
               </div>
             </div>
           )}
-
-          {/* Roommate profiles — every no_room roommate, best match first */}
-          {seekersLoading && (
-            <div className="mt-10 flex items-center gap-2">
-              <Loader2
-                className="h-4 w-4 animate-spin"
-                style={{ color: BRAND }}
-              />
-              <p className="text-xs" style={{ color: INK_SOFT }}>
-                Loading roommate profiles…
-              </p>
-            </div>
-          )}
-
-          {!seekersLoading && visibleSeekers.length > 0 && (
-            <section className="mt-10">
-              <div className="mb-4 flex items-baseline justify-between gap-2">
-                <div>
-                  <h2
-                    className="text-base font-semibold"
-                    style={{ color: INK }}
-                  >
-                    Roommate profiles
-                  </h2>
-                  <p className="mt-0.5 text-xs" style={{ color: INK_SOFT }}>
-                    People looking for a place
-                    {applied.city ? ` in ${applied.city}` : ""} — check
-                    lifestyle, budget and preferences before connecting.
-                  </p>
-                </div>
-                <span className="text-xs sm:text-sm text-gray-500">
-                  {visibleSeekers.length} profile
-                  {visibleSeekers.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {visibleSeekers.map(({ profile, matchScore }) => (
-                  <SeekerProfileCard
-                    key={profile._id}
-                    profile={profile}
-                    matchScore={matchScore}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
         </div>
       </main>
     </div>
@@ -610,26 +544,16 @@ function BrowseFilterExtras({
   appliedCount,
   onRemoveChip,
 }: {
-  filters: { city: string; minRent: string; maxRent: string; roomType: string };
+  filters: { city: string; minBudget: string; maxBudget: string };
   setFilters: React.Dispatch<
-    React.SetStateAction<{
-      city: string;
-      minRent: string;
-      maxRent: string;
-      roomType: string;
-    }>
+    React.SetStateAction<{ city: string; minBudget: string; maxBudget: string }>
   >;
-  applied: { city: string; minRent: string; maxRent: string; roomType: string };
+  applied: { city: string; minBudget: string; maxBudget: string };
   setApplied: React.Dispatch<
-    React.SetStateAction<{
-      city: string;
-      minRent: string;
-      maxRent: string;
-      roomType: string;
-    }>
+    React.SetStateAction<{ city: string; minBudget: string; maxBudget: string }>
   >;
   appliedCount: number;
-  onRemoveChip: (key: "city" | "minRent" | "maxRent" | "roomType") => void;
+  onRemoveChip: (key: "city" | "minBudget" | "maxBudget") => void;
 }) {
   return (
     <>
@@ -637,15 +561,19 @@ function BrowseFilterExtras({
         <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
           Popular:
         </span>
-        {RENT_PRESETS.map((p) => {
+        {BUDGET_PRESETS.map((p) => {
           const isActive =
-            filters.minRent === p.min && filters.maxRent === p.max;
+            filters.minBudget === p.min && filters.maxBudget === p.max;
           return (
             <button
               key={p.label}
               type="button"
               onClick={() =>
-                setFilters((f) => ({ ...f, minRent: p.min, maxRent: p.max }))
+                setFilters((f) => ({
+                  ...f,
+                  minBudget: p.min,
+                  maxBudget: p.max,
+                }))
               }
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 isActive
@@ -666,22 +594,13 @@ function BrowseFilterExtras({
               onRemove={() => onRemoveChip("city")}
             />
           )}
-          {applied.roomType && (
+          {(applied.minBudget || applied.maxBudget) && (
             <FilterChip
-              label={
-                ROOM_TYPE_OPTIONS.find((o) => o.value === applied.roomType)
-                  ?.label || applied.roomType
-              }
-              onRemove={() => onRemoveChip("roomType")}
-            />
-          )}
-          {(applied.minRent || applied.maxRent) && (
-            <FilterChip
-              label={`Rent: ${applied.minRent ? `₹${Number(applied.minRent).toLocaleString("en-IN")}` : "₹0"} – ${applied.maxRent ? `₹${Number(applied.maxRent).toLocaleString("en-IN")}` : "Any"}`}
+              label={`Budget: ${applied.minBudget ? `₹${Number(applied.minBudget).toLocaleString("en-IN")}` : "₹0"} – ${applied.maxBudget ? `₹${Number(applied.maxBudget).toLocaleString("en-IN")}` : "Any"}`}
               onRemove={() => {
-                const next = { ...applied, minRent: "", maxRent: "" };
+                const next = { ...applied, minBudget: "", maxBudget: "" };
                 setApplied(next);
-                setFilters((f) => ({ ...f, minRent: "", maxRent: "" }));
+                setFilters((f) => ({ ...f, minBudget: "", maxBudget: "" }));
               }}
             />
           )}

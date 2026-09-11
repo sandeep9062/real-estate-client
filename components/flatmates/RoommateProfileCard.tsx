@@ -1,463 +1,318 @@
 "use client";
 
-import React, { memo } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowRight,
-  BedDouble,
-  Sofa,
-  CalendarDays,
-  MapPin,
-  ShieldCheck,
-  Sparkles,
-  Users,
-  Home,
-  ImageIcon,
-} from "lucide-react";
+import { useState } from "react";
 import type { RoomFlat } from "@/services/roommatesApi";
 
-const BRAND = "#4161df";
+/**
+ * RoommateProfileCard
+ *
+ * One tile in a flatmate browse grid — e.g. the seekers list on
+ * /flatmates/browse. Field shapes here are kept in lockstep with the real
+ * `RoommateProfile` / `RoomFlat` types in services/roommatesApi.ts (nesting
+ * included), so no `as any` casts are needed to plot a pin or read a city.
+ *
+ * Note on `user`: the roommatesApi `RoommateProfile.user` is typed as a
+ * plain string id (like `roomFlat` before it's populated). This card needs
+ * a display name and photo, so it expects the browse/seekers endpoint to
+ * populate `user` down to at least { _id, name, avatarUrl } — same
+ * convention already used for `roomFlat`. If the backend doesn't populate
+ * it yet, that's the thing to fix upstream rather than in this card.
+ *
+ * `dateOfBirth` isn't exposed on RoommateProfile at all (unlike the Mongo
+ * schema it's derived from), so this card doesn't show age.
+ *
+ * Deliberately does not render `documents` — that field is select:false
+ * on the backend and typed as write-only (`RoommateDocument`) precisely so
+ * it never ends up in a browse payload in the first place.
+ */
 
-interface PropertyListing {
-  _id?: string;
-  id?: string;
-  title?: string;
-  price?: number;
-  image?: string[];
-  location?: { address?: string; city?: string; state?: string; [key: string]: any };
-  [key: string]: any;
+type YesNo = "yes" | "no";
+type FoodPreference = "veg" | "non_veg" | "eggetarian" | "vegan";
+type CleanlinessLevel = "very_tidy" | "moderately_tidy" | "relaxed";
+type Occupation =
+  | "student"
+  | "working_professional"
+  | "self_employed"
+  | "other";
+
+export interface RoommateProfileCardUser {
+  _id: string;
+  name: string;
+  avatarUrl?: string;
 }
 
-interface ListingCardProps {
-  source: "room_flat" | "property";
-  // room_flat cards receive a RoomFlat; "property" cards receive a plain
-  // property listing with a different shape.
-  listing: RoomFlat | PropertyListing;
+export interface RoommateProfileCardData {
+  _id: string;
+  type: "have_room" | "no_room";
+  user: RoommateProfileCardUser;
+  photos?: string[];
+  bio?: string;
+  occupation?: Occupation;
+  workSchedule?: string;
+  habits?: {
+    smoking?: YesNo;
+    drinking?: YesNo;
+    foodPreference?: FoodPreference;
+    cleanlinessLevel?: CleanlinessLevel;
+  };
+  // Mirrors SearchArea from roommatesApi.ts — set on no_room profiles.
+  searchArea?: {
+    locality?: string;
+    city?: string;
+    location?: { coordinates?: [number, number] };
+  };
+  budgetRange?: {
+    min?: number;
+    max?: number;
+  };
+  // Populated RoomFlat — set on have_room profiles. Note the extra nesting
+  // vs searchArea: coordinates live at roomFlat.location.coordinates.coordinates.
+  roomFlat?: Pick<RoomFlat, "rentAmount" | "location">;
+  idVerified?: boolean;
+  isComplete?: boolean;
+  matchScore?: number | null;
 }
 
-const formatInr = (n?: number) =>
-  `₹${(Number(n) || 0).toLocaleString("en-IN")}`;
-
-function humanize(str: string) {
-  return str.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+interface RoommateProfileCardProps {
+  profile: RoommateProfileCardData;
+  onView?: (id: string) => void;
+  onSave?: (id: string) => void;
+  saved?: boolean;
 }
 
-function isVideoUrl(url: string) {
-  const lower = String(url).toLowerCase();
+const OCCUPATION_LABEL: Record<Occupation, string> = {
+  student: "Student",
+  working_professional: "Working professional",
+  self_employed: "Self-employed",
+  other: "Occupation not set",
+};
+
+const SCHEDULE_LABEL: Record<string, string> = {
+  wfh: "Works from home",
+  office: "Works from office",
+  hybrid: "Hybrid schedule",
+  flexible: "Flexible hours",
+  irregular: "Irregular hours",
+};
+
+const FOOD_LABEL: Record<FoodPreference, string> = {
+  veg: "Veg",
+  non_veg: "Non-veg",
+  eggetarian: "Eggetarian",
+  vegan: "Vegan",
+};
+
+const CLEAN_LABEL: Record<CleanlinessLevel, string> = {
+  very_tidy: "Very tidy",
+  moderately_tidy: "Moderately tidy",
+  relaxed: "Relaxed about mess",
+};
+
+function formatINR(amount?: number): string | null {
+  if (amount === undefined || amount === null) return null;
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+function locationLine(profile: RoommateProfileCardData): string | null {
+  if (profile.type === "have_room") {
+    const loc = profile.roomFlat?.location;
+    return [loc?.sector, loc?.city].filter(Boolean).join(", ") || null;
+  }
+  const area = profile.searchArea;
+  return [area?.locality, area?.city].filter(Boolean).join(", ") || null;
+}
+
+function priceLine(profile: RoommateProfileCardData): string | null {
+  if (profile.type === "have_room") {
+    const rent = formatINR(profile.roomFlat?.rentAmount);
+    return rent ? `${rent}/mo` : null;
+  }
+  const { min, max } = profile.budgetRange || {};
+  if (min && max) return `${formatINR(min)}–${formatINR(max)}/mo`;
+  if (max) return `Up to ${formatINR(max)}/mo`;
+  return null;
+}
+
+function VerifiedBadge() {
   return (
-    lower.endsWith(".mp4") ||
-    lower.endsWith(".webm") ||
-    lower.endsWith(".ogg") ||
-    lower.startsWith("data:video/")
+    <span
+      title="ID verified"
+      className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F1] px-2 py-0.5 text-[11px] text-[#2B4C3F]"
+    >
+      <svg width="11" height="11" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="9" fill="#2B4C3F" />
+        <path
+          d="M6 10.2l2.4 2.4L14.2 7"
+          stroke="#F3F4F1"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      Verified
+    </span>
   );
 }
 
-function locationLineOf(location?: {
-  address?: string;
-  sector?: string;
-  city?: string;
-}) {
-  return [location?.address, location?.sector, location?.city]
-    .filter(Boolean)
-    .join(", ");
-}
-
-function CardShellTop({
-  topLeftBadges,
-  typePill,
-  mediaCount,
-}: {
-  topLeftBadges: React.ReactNode;
-  typePill?: string;
-  mediaCount: number;
-}) {
+function MatchRing({ score }: { score: number }) {
+  const angle = Math.max(0, Math.min(100, score)) * 3.6;
   return (
-    <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between p-3 sm:p-4">
-      <div className="flex flex-wrap items-center gap-2">
-        {topLeftBadges}
-        {typePill && (
-          <span className="hidden rounded-md bg-white/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white ring-1 ring-white/25 backdrop-blur-sm sm:inline-flex">
-            {typePill}
-          </span>
-        )}
+    <div
+      className="relative flex h-11 w-11 items-center justify-center rounded-full"
+      style={{
+        background: `conic-gradient(#B4772A ${angle}deg, #E7E4DC ${angle}deg)`,
+      }}
+    >
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[11px] font-medium text-[#1C1B19]">
+        {score}%
       </div>
-      {mediaCount > 1 && (
-        <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
-          <ImageIcon className="h-3 w-3" />
-          {mediaCount}
-        </span>
-      )}
     </div>
   );
 }
 
-function CardShellBody({
-  priceLabel,
-  price,
-  priceSuffix,
-  sideBadge,
-  title,
-  locationLine,
-  statePart,
-  statPills,
-  footer,
-}: {
-  priceLabel: string;
-  price: string;
-  priceSuffix?: string;
-  sideBadge?: string;
-  title?: string;
-  locationLine: string;
-  statePart: string;
-  statPills: { key: string; icon: React.ReactNode; label: string }[];
-  footer: React.ReactNode;
-}) {
-  return (
-    <div className="flex shrink-0 flex-col gap-3 p-4 pt-4 sm:p-5">
-      <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
-        <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
-            {priceLabel}
-          </p>
-          <p className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.4rem]">
-            {price}
-            {priceSuffix && (
-              <span className="ml-1 text-base font-medium text-slate-500">
-                {priceSuffix}
-              </span>
-            )}
-          </p>
-        </div>
-        {sideBadge && (
-          <div className="flex flex-col items-end gap-1">
-            <span className="max-w-44 truncate rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-center text-[11px] font-medium text-slate-700">
-              {sideBadge}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="min-h-0 space-y-2">
-        <h3 className="truncate text-base font-semibold leading-snug text-slate-900 transition-colors group-hover:text-[#4161df] sm:text-[1.02rem]">
-          {title || "Untitled listing"}
-        </h3>
-        <div className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/80 px-2 py-1.5">
-          <MapPin className="shrink-0 text-slate-500" aria-hidden />
-          <p className="min-w-0 truncate whitespace-nowrap text-xs font-normal leading-relaxed text-slate-600">
-            {locationLine}
-            {statePart}
-          </p>
-        </div>
-      </div>
-
-      {statPills.length > 0 && (
-        <div className="mt-auto flex flex-nowrap gap-2 overflow-hidden border-t border-slate-100 pt-4">
-          {statPills.map((s) => (
-            <span
-              key={s.key}
-              className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700"
-            >
-              {React.cloneElement(s.icon as React.ReactElement, {
-                className: "size-3.5 text-slate-600",
-              })}
-              <span className="truncate">{s.label}</span>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {footer}
-    </div>
-  );
-}
-
-function CardMedia({
-  media,
-  mediaAlt,
-  bottomBadge,
-}: {
-  media?: string;
-  mediaAlt: string;
-  bottomBadge?: React.ReactNode;
-}) {
-  const showVideo = !!media && isVideoUrl(media);
-  const hasMedia = !!media && String(media).trim() !== "";
-  return (
-    <div className="relative min-h-[12.5rem] w-full flex-1 basis-0 overflow-hidden sm:min-h-[14rem]">
-      {hasMedia ? (
-        showVideo ? (
-          <video
-            src={media}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-          />
-        ) : (
-          <Image
-            src={media as string}
-            alt={mediaAlt}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-          />
-        )
-      ) : (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-slate-100">
-          <Home className="size-10 text-slate-300" aria-hidden />
-          <span className="text-xs font-medium text-slate-500">
-            Image not available
-          </span>
-        </div>
-      )}
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/40 via-slate-950/5 to-transparent transition-opacity duration-300 group-hover:from-slate-950/50"
-        aria-hidden
-      />
-      {bottomBadge && (
-        <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-wrap items-end justify-between gap-2 p-3 sm:p-4">
-          <div className="ml-auto flex flex-col items-end gap-1.5">
-            {bottomBadge}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function FlatmateFooter({
+export default function RoommateProfileCard({
   profile,
-  profileHref,
-}: {
-  profile?: RoomFlat["roommateProfile"];
-  profileHref: string;
-}) {
-  const p =
-    profile && typeof profile === "object"
-      ? (profile as {
-          occupation?: string;
-          habits?: { foodPreference?: string };
-          idVerified?: boolean;
-        })
-      : undefined;
-  const traits = [
-    p?.occupation && humanize(p.occupation),
-    p?.habits?.foodPreference && humanize(p.habits.foodPreference),
-    typeof p?.idVerified === "boolean" &&
-      (p.idVerified ? "ID verified" : null),
+  onView,
+  onSave,
+  saved = false,
+}: RoommateProfileCardProps) {
+  const [imgError, setImgError] = useState(false);
+  const photo = !imgError ? profile.photos?.[0] : undefined;
+  const location = locationLine(profile);
+  const price = priceLine(profile);
+
+  const chips = [
+    profile.habits?.foodPreference && FOOD_LABEL[profile.habits.foodPreference],
+    profile.habits?.smoking === "yes"
+      ? "Smokes"
+      : profile.habits?.smoking === "no"
+        ? "Non-smoker"
+        : null,
+    profile.habits?.drinking === "yes"
+      ? "Drinks"
+      : profile.habits?.drinking === "no"
+        ? "Doesn't drink"
+        : null,
+    profile.habits?.cleanlinessLevel &&
+      CLEAN_LABEL[profile.habits.cleanlinessLevel],
   ].filter(Boolean) as string[];
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {traits.map((t) => (
-        <span
-          key={t}
-          className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700"
-        >
-          {t === "ID verified" ? (
-            <ShieldCheck className="size-3.5 text-emerald-600" aria-hidden />
-          ) : (
-            <Sparkles className="size-3.5 text-slate-500" aria-hidden />
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-[#E7E4DC] bg-white transition-shadow hover:shadow-[0_8px_24px_-12px_rgba(28,27,25,0.25)]">
+      <button
+        type="button"
+        onClick={() => onView?.(profile._id)}
+        className="relative aspect-[4/5] w-full overflow-hidden bg-[#EDEAE3] text-left"
+      >
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photo}
+            alt={profile.user.name}
+            onError={() => setImgError(true)}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center font-serif text-4xl text-[#B7B2A6]">
+            {profile.user.name.charAt(0).toUpperCase()}
+          </div>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-4 pb-3 pt-10 text-white">
+          <span className="font-serif text-lg leading-none">
+            {profile.user.name}
+          </span>
+          {location && (
+            <p className="mt-0.5 text-xs text-white/75">{location}</p>
           )}
-          <span className="truncate">{t}</span>
+        </div>
+
+        <span
+          className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] text-white ${
+            profile.type === "have_room" ? "bg-[#B4772A]" : "bg-[#2B4C3F]"
+          }`}
+        >
+          {profile.type === "have_room" ? "Has a room" : "Looking for a room"}
         </span>
-      ))}
-      <Link
-        href={profileHref}
-        onClick={(e) => e.stopPropagation()}
-        className="ml-auto inline-flex items-center gap-1 text-sm font-semibold transition-colors hover:opacity-80"
-        style={{ color: BRAND }}
-      >
-        View profile
-        <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
-    </div>
-  );
-}
 
-function RoomFlatCard({ listing }: { listing: RoomFlat }) {
-  const profile = listing.roommateProfile;
-  const profileId =
-    typeof profile === "object" && profile && "_id" in profile
-      ? String((profile as { _id: string })._id)
-      : typeof listing.roommateProfile === "string"
-        ? listing.roommateProfile
-        : "";
-  const profileHref = `/flatmates/profile/${profileId || listing._id}`;
-  const line = locationLineOf(listing.location) || "Location on request";
-  const statePart = listing.location?.state ? `, ${listing.location.state}` : "";
+        {profile.idVerified && (
+          <span className="absolute right-3 top-3">
+            <VerifiedBadge />
+          </span>
+        )}
+      </button>
 
-  const pills: { key: string; icon: React.ReactNode; label: string }[] = [];
-  if (listing.roomType) {
-    pills.push({
-      key: "room",
-      icon: <BedDouble aria-hidden />,
-      label: humanize(listing.roomType),
-    });
-  }
-  if (listing.furnishing) {
-    pills.push({
-      key: "furn",
-      icon: <Sofa aria-hidden />,
-      label: humanize(listing.furnishing),
-    });
-  }
-  if (listing.availableFrom) {
-    const d = new Date(listing.availableFrom);
-    pills.push({
-      key: "avail",
-      icon: <CalendarDays aria-hidden />,
-      label: Number.isNaN(d.getTime())
-        ? "Available soon"
-        : `From ${d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`,
-    });
-  }
-  const pObj =
-    typeof profile === "object" && profile
-      ? (profile as { occupation?: string })
-      : undefined;
-  if (pObj?.occupation) {
-    pills.push({
-      key: "who",
-      icon: <Users aria-hidden />,
-      label: humanize(pObj.occupation),
-    });
-  }
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        {profile.bio && (
+          <p className="line-clamp-2 text-sm leading-snug text-[#4A4740]">
+            {profile.bio}
+          </p>
+        )}
 
-  const media = (listing.photos || [])[0];
-  const mediaCount = (listing.photos || []).length;
-  const listingBadge =
-    listing.openToSwap
-      ? "Open to swap"
-      : listing.openToTemporaryStay
-        ? "Temporary stay"
-        : "Flatmate wanted";
+        <p className="text-xs text-[#7A766C]">
+          {profile.occupation && OCCUPATION_LABEL[profile.occupation]}
+          {profile.occupation && profile.workSchedule && " · "}
+          {profile.workSchedule &&
+            (SCHEDULE_LABEL[profile.workSchedule] || profile.workSchedule)}
+        </p>
 
-  return (
-    <article className="group relative flex h-full min-h-[460px] w-full max-w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:border-slate-300 hover:shadow-md">
-      <Link
-        href={profileHref}
-        aria-label={listing.title || "Listing photo"}
-        className="flex h-full min-h-0 flex-1 flex-col"
-      >
-        <CardMedia
-          media={media}
-          mediaAlt={listing.title || "Listing photo"}
-          bottomBadge={
-            <span className="inline-flex rounded-md border border-white/25 bg-black/50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
-              {listingBadge}
-            </span>
-          }
-        />
-        <CardShellTop
-          topLeftBadges={
-            <span className="inline-flex items-center rounded-md bg-slate-800 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm">
-              For sharing
-            </span>
-          }
-          typePill={listing.roomType ? humanize(listing.roomType) : undefined}
-          mediaCount={mediaCount}
-        />
-        <CardShellBody
-          priceLabel="Monthly rental"
-          price={formatInr(listing.rentAmount)}
-          priceSuffix="per month"
-          sideBadge={listing.location?.city}
-          title={listing.title}
-          locationLine={line}
-          statePart={statePart}
-          statPills={pills}
-          footer={
-            <FlatmateFooter
-              profile={listing.roommateProfile}
-              profileHref={profileHref}
-            />
-          }
-        />
-      </Link>
-    </article>
-  );
-}
-
-function SharingPropertyCard({ listing }: { listing: PropertyListing }) {
-  const id = String(listing._id || listing.id || "");
-  const href = `/properties/${id}`;
-  const media = (listing.image || [])[0];
-  const mediaCount = (listing.image || []).length;
-  const line =
-    [listing.location?.address, listing.location?.city]
-      .filter(Boolean)
-      .join(", ") || "Location on request";
-  const statePart =
-    listing.location?.state && line !== "Location on request"
-      ? `, ${listing.location.state}`
-      : listing.location?.state || "";
-
-  return (
-    <article className="group relative flex h-full min-h-[460px] w-full max-w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:border-slate-300 hover:shadow-md">
-      <Link
-        href={href}
-        aria-label={listing.title || "Listing photo"}
-        className="flex h-full min-h-0 flex-1 flex-col"
-      >
-        <CardMedia
-          media={media}
-          mediaAlt={listing.title || "Listing photo"}
-          bottomBadge={
-            <span className="inline-flex rounded-md border border-white/25 bg-black/50 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
-              Contact owner directly
-            </span>
-          }
-        />
-        <CardShellTop
-          topLeftBadges={
-            <>
-              <span className="inline-flex items-center rounded-md bg-slate-800 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm">
-                For rent
-              </span>
-              <span className="inline-flex items-center rounded-md bg-amber-500/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm">
-                Owner allows sharing
-              </span>
-            </>
-          }
-          mediaCount={mediaCount}
-        />
-        <CardShellBody
-          priceLabel="Monthly rental"
-          price={formatInr(listing.price)}
-          priceSuffix="per month"
-          sideBadge={listing.location?.city}
-          title={listing.title}
-          locationLine={line}
-          statePart={statePart}
-          statPills={[]}
-          footer={
-            <div className="flex items-center">
+        {chips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {chips.map((chip) => (
               <span
-                className="ml-auto inline-flex items-center gap-1 text-sm font-semibold transition-colors group-hover:opacity-80"
-                style={{ color: BRAND }}
+                key={chip}
+                className="rounded-full border border-[#E7E4DC] px-2 py-0.5 text-[11px] text-[#4A4740]"
               >
-                View listing
-                <ArrowRight className="h-3.5 w-3.5" />
+                {chip}
               </span>
-            </div>
-          }
-        />
-      </Link>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <div>
+            {price && (
+              <p className="text-sm font-medium text-[#1C1B19]">{price}</p>
+            )}
+            {!profile.isComplete && (
+              <p className="text-[11px] text-[#B4772A]">
+                Profile still being filled in
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {typeof profile.matchScore === "number" && (
+              <MatchRing score={profile.matchScore} />
+            )}
+            <button
+              type="button"
+              onClick={() => onSave?.(profile._id)}
+              aria-pressed={saved}
+              aria-label={saved ? "Remove from saved" : "Save profile"}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E7E4DC] text-[#4A4740] transition-colors hover:border-[#B4772A] hover:text-[#B4772A]"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 20 20"
+                fill={saved ? "#B4772A" : "none"}
+              >
+                <path
+                  d="M5 3.5h10a1 1 0 011 1V17l-6-3.4L4 17V4.5a1 1 0 011-1z"
+                  stroke={saved ? "#B4772A" : "#4A4740"}
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
     </article>
   );
 }
-
-export default function ListingCardFlat({
-  source,
-  listing,
-}: ListingCardProps) {
-  if (source === "room_flat") {
-    return <RoomFlatCard listing={listing as RoomFlat} />;
-  }
-  return <SharingPropertyCard listing={listing as PropertyListing} />;
-}
-
-export const MemoListingCardFlat = memo(ListingCardFlat);
