@@ -17,6 +17,14 @@ import {
   ChevronUp,
   X,
   IndianRupee,
+  BadgeCheck,
+  Users,
+  Home,
+  Briefcase,
+  Cigarette,
+  Wine,
+  UtensilsCrossed,
+  Sparkles,
 } from "lucide-react";
 import {
   useSearchSeekersQuery,
@@ -39,8 +47,72 @@ const BUDGET_PRESETS = [
   { label: "Under ₹5k", min: "", max: "5000" },
   { label: "₹5k – ₹10k", min: "5000", max: "10000" },
   { label: "₹10k – ₹20k", min: "10000", max: "20000" },
-  { label: "₹20k+", min: "20000", max: "" },
+  { label: "₹20k – ₹30k", min: "20000", max: "30000" },
+  { label: "₹30k+", min: "30000", max: "" },
 ];
+
+const PROFILE_TYPES = [
+  { value: "", label: "All profiles", icon: Users },
+  { value: "have_room", label: "Has a room", icon: Home },
+  { value: "no_room", label: "Looking for a room", icon: Search },
+];
+
+const GENDERS = [
+  { value: "", label: "Any gender" },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
+];
+
+const OCCUPATIONS = [
+  { value: "", label: "Any occupation" },
+  { value: "student", label: "Student" },
+  { value: "working_professional", label: "Working professional" },
+  { value: "self_employed", label: "Self-employed" },
+];
+
+const FOOD_PREFS = [
+  { value: "", label: "Any food habit" },
+  { value: "veg", label: "Veg" },
+  { value: "non_veg", label: "Non-veg" },
+  { value: "eggetarian", label: "Eggetarian" },
+  { value: "vegan", label: "Vegan" },
+];
+
+const CLEAN_LEVELS = [
+  { value: "", label: "Any cleanliness" },
+  { value: "very_tidy", label: "Very tidy" },
+  { value: "moderately_tidy", label: "Moderately tidy" },
+  { value: "relaxed", label: "Relaxed" },
+];
+
+export interface BrowseFilters {
+  city: string;
+  type: string;
+  gender: string;
+  occupation: string;
+  smoking: string;
+  drinking: string;
+  foodPreference: string;
+  cleanliness: string;
+  idVerified: boolean;
+  minBudget: string;
+  maxBudget: string;
+}
+
+const EMPTY_FILTERS: BrowseFilters = {
+  city: "",
+  type: "",
+  gender: "",
+  occupation: "",
+  smoking: "",
+  drinking: "",
+  foodPreference: "",
+  cleanliness: "",
+  idVerified: false,
+  minBudget: "",
+  maxBudget: "",
+};
 
 // useSearchSeekersQuery hits /v1/roommates/seekers, which returns all active
 // roommate profiles — both have_room (people with a room to share) and
@@ -59,16 +131,8 @@ interface SeekerResult {
 }
 
 export default function BrowsePage() {
-  const [filters, setFilters] = useState({
-    city: "",
-    minBudget: "",
-    maxBudget: "",
-  });
-  const [applied, setApplied] = useState({
-    city: "",
-    minBudget: "",
-    maxBudget: "",
-  });
+  const [filters, setFilters] = useState<BrowseFilters>({ ...EMPTY_FILTERS });
+  const [applied, setApplied] = useState<BrowseFilters>({ ...EMPTY_FILTERS });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"list" | "map">("list");
   const [laptopMapOpen, setLaptopMapOpen] = useState(false);
@@ -76,22 +140,30 @@ export default function BrowsePage() {
 
   const activeFiltersCount = useMemo(
     () =>
-      [filters.city, filters.minBudget, filters.maxBudget].filter(
-        (v) => v !== "",
+      Object.values(filters).filter(
+        (v) => v !== "" && v !== false,
       ).length,
     [filters],
   );
 
   const appliedCount = useMemo(
     () =>
-      [applied.city, applied.minBudget, applied.maxBudget].filter(
-        (v) => v !== "",
+      Object.values(applied).filter(
+        (v) => v !== "" && v !== false,
       ).length,
     [applied],
   );
 
   const params = {
     city: applied.city || undefined,
+    type: applied.type || undefined,
+    gender: applied.gender || undefined,
+    occupation: applied.occupation || undefined,
+    smoking: applied.smoking || undefined,
+    drinking: applied.drinking || undefined,
+    foodPreference: applied.foodPreference || undefined,
+    cleanliness: applied.cleanliness || undefined,
+    idVerified: applied.idVerified ? "true" : undefined,
     minBudget: applied.minBudget || undefined,
     maxBudget: applied.maxBudget || undefined,
   };
@@ -112,15 +184,21 @@ export default function BrowsePage() {
   }
 
   function clearFilters() {
-    const cleared = { city: "", minBudget: "", maxBudget: "" };
-    setFilters(cleared);
-    setApplied(cleared);
+    setFilters({ ...EMPTY_FILTERS });
+    setApplied({ ...EMPTY_FILTERS });
   }
 
-  function removeAppliedChip(key: "city" | "minBudget" | "maxBudget") {
-    const next = { ...applied, [key]: "" };
-    setApplied(next);
-    setFilters((f) => ({ ...f, [key]: "" }));
+  function updateFilter<K extends keyof BrowseFilters>(
+    key: K,
+    value: BrowseFilters[K],
+  ) {
+    setFilters((f) => ({ ...f, [key]: value }));
+  }
+
+  function removeAppliedChip(key: keyof BrowseFilters) {
+    const resetValue = typeof filters[key] === "boolean" ? false : "";
+    setApplied((a) => ({ ...a, [key]: resetValue }));
+    setFilters((f) => ({ ...f, [key]: resetValue }));
   }
 
   function toggleSaved(id: string) {
@@ -329,9 +407,7 @@ export default function BrowsePage() {
                   <input
                     placeholder="e.g. Mohali, Chandigarh…"
                     value={filters.city}
-                    onChange={(e) =>
-                      setFilters((f) => ({ ...f, city: e.target.value }))
-                    }
+                    onChange={(e) => updateFilter("city", e.target.value)}
                     className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
                   />
                 </span>
@@ -346,9 +422,7 @@ export default function BrowsePage() {
                   min={0}
                   placeholder="₹ min"
                   value={filters.minBudget}
-                  onChange={(e) =>
-                    setFilters((f) => ({ ...f, minBudget: e.target.value }))
-                  }
+                  onChange={(e) => updateFilter("minBudget", e.target.value)}
                   className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
                 />
               </label>
@@ -362,9 +436,7 @@ export default function BrowsePage() {
                   min={0}
                   placeholder="₹ max"
                   value={filters.maxBudget}
-                  onChange={(e) =>
-                    setFilters((f) => ({ ...f, maxBudget: e.target.value }))
-                  }
+                  onChange={(e) => updateFilter("maxBudget", e.target.value)}
                   className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
                 />
               </label>
@@ -378,14 +450,188 @@ export default function BrowsePage() {
                 </button>
               </div>
             </div>
-            <BrowseFilterExtras
-              filters={filters}
-              setFilters={setFilters}
-              applied={applied}
-              setApplied={setApplied}
-              appliedCount={appliedCount}
-              onRemoveChip={removeAppliedChip}
-            />
+
+            {/* Row 2: Profile type + Gender + Occupation */}
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Users className="h-3.5 w-3.5" />
+                  Profile type
+                </span>
+                <select
+                  value={filters.type}
+                  onChange={(e) => updateFilter("type", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {PROFILE_TYPES.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  Gender
+                </span>
+                <select
+                  value={filters.gender}
+                  onChange={(e) => updateFilter("gender", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {GENDERS.map((g) => (
+                    <option key={g.value} value={g.value}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  Occupation
+                </span>
+                <select
+                  value={filters.occupation}
+                  onChange={(e) => updateFilter("occupation", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {OCCUPATIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {/* Row 3: Lifestyle */}
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Cigarette className="h-3.5 w-3.5" />
+                  Smoking
+                </span>
+                <select
+                  value={filters.smoking}
+                  onChange={(e) => updateFilter("smoking", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  <option value="">Any</option>
+                  <option value="yes">Smoker</option>
+                  <option value="no">Non-smoker</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Wine className="h-3.5 w-3.5" />
+                  Drinking
+                </span>
+                <select
+                  value={filters.drinking}
+                  onChange={(e) => updateFilter("drinking", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  <option value="">Any</option>
+                  <option value="yes">Drinks</option>
+                  <option value="no">Non-drinker</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <UtensilsCrossed className="h-3.5 w-3.5" />
+                  Food habit
+                </span>
+                <select
+                  value={filters.foodPreference}
+                  onChange={(e) =>
+                    updateFilter("foodPreference", e.target.value)
+                  }
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {FOOD_PREFS.map((f) => (
+                    <option key={f.value} value={f.value}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Cleanliness
+                </span>
+                <select
+                  value={filters.cleanliness}
+                  onChange={(e) => updateFilter("cleanliness", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {CLEAN_LEVELS.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {/* Row 4: Verified + Budget presets */}
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 h-10 transition-colors hover:border-[#4161df]/30">
+                <input
+                  type="checkbox"
+                  checked={filters.idVerified}
+                  onChange={(e) => updateFilter("idVerified", e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 accent-[#4161df]"
+                />
+                <BadgeCheck className="h-3.5 w-3.5 text-[#4161df]" />
+                <span className="text-sm font-medium text-gray-700">
+                  Verified only
+                </span>
+              </label>
+              <div className="hidden h-6 w-px bg-gray-200 sm:block" />
+              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+                Budget:
+              </span>
+              {BUDGET_PRESETS.map((p) => {
+                const isActive =
+                  filters.minBudget === p.min && filters.maxBudget === p.max;
+                return (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() =>
+                      setFilters((f) => ({
+                        ...f,
+                        minBudget: p.min,
+                        maxBudget: p.max,
+                      }))
+                    }
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      isActive
+                        ? "border-[#4161df] bg-[#4161df]/5 text-[#4161df]"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active filter chips */}
+            {appliedCount > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
+                <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+                  Active:
+                </span>
+                <ActiveFilterChips
+                  applied={applied}
+                  onRemoveChip={removeAppliedChip}
+                  onClearAll={clearFilters}
+                />
+              </div>
+            )}
           </div>
         </form>
 
@@ -452,7 +698,7 @@ export default function BrowsePage() {
             >
               <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
               <p className="text-sm" style={{ color: INK_SOFT }}>
-                No seekers match yet — try widening the city or budget range.
+                No profiles match yet — try widening the city or budget range.
               </p>
             </div>
           )}
@@ -467,7 +713,7 @@ export default function BrowsePage() {
               >
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="text-sm font-medium text-gray-700">
-                    {profiles.length} seeker
+                    {profiles.length} profile
                     {profiles.length !== 1 ? "s" : ""}
                   </p>
                   <span className="text-xs sm:text-sm text-gray-500">
@@ -507,7 +753,7 @@ export default function BrowsePage() {
                       >
                         <MapPin className="h-4 w-4" style={{ color: BRAND }} />
                         {markers.length}{" "}
-                        {markers.length === 1 ? "seeker" : "seekers"} on map
+                        {markers.length === 1 ? "profile" : "profiles"} on map
                       </p>
                       <p className="text-xs" style={{ color: INK_SOFT }}>
                         Click a pin for budget &amp; area
@@ -539,99 +785,108 @@ export default function BrowsePage() {
   );
 }
 
-function BrowseFilterExtras({
-  filters,
-  setFilters,
+const FILTER_LABELS: Record<string, string> = {
+  city: "City",
+  type: "Type",
+  gender: "Gender",
+  occupation: "Occupation",
+  smoking: "Smoking",
+  drinking: "Drinking",
+  foodPreference: "Food",
+  cleanliness: "Cleanliness",
+  idVerified: "Verified",
+  minBudget: "Min budget",
+  maxBudget: "Max budget",
+};
+
+const FILTER_VALUE_LABELS: Record<string, Record<string, string>> = {
+  type: { have_room: "Has room", no_room: "Looking" },
+  gender: { male: "Male", female: "Female", other: "Other" },
+  occupation: {
+    student: "Student",
+    working_professional: "Working",
+    self_employed: "Self-employed",
+  },
+  smoking: { yes: "Smoker", no: "Non-smoker" },
+  drinking: { yes: "Drinks", no: "Non-drinker" },
+  foodPreference: {
+    veg: "Veg",
+    non_veg: "Non-veg",
+    eggetarian: "Eggetarian",
+    vegan: "Vegan",
+  },
+  cleanliness: {
+    very_tidy: "Very tidy",
+    moderately_tidy: "Moderate",
+    relaxed: "Relaxed",
+  },
+};
+
+function ActiveFilterChips({
   applied,
-  setApplied,
-  appliedCount,
   onRemoveChip,
+  onClearAll,
 }: {
-  filters: { city: string; minBudget: string; maxBudget: string };
-  setFilters: React.Dispatch<
-    React.SetStateAction<{ city: string; minBudget: string; maxBudget: string }>
-  >;
-  applied: { city: string; minBudget: string; maxBudget: string };
-  setApplied: React.Dispatch<
-    React.SetStateAction<{ city: string; minBudget: string; maxBudget: string }>
-  >;
-  appliedCount: number;
-  onRemoveChip: (key: "city" | "minBudget" | "maxBudget") => void;
+  applied: BrowseFilters;
+  onRemoveChip: (key: keyof BrowseFilters) => void;
+  onClearAll: () => void;
 }) {
+  const chips: { key: keyof BrowseFilters; label: string }[] = [];
+
+  (Object.keys(applied) as (keyof BrowseFilters)[]).forEach((key) => {
+    const value = applied[key];
+    if (value === "" || value === false) return;
+
+    if (key === "idVerified") {
+      chips.push({ key, label: "Verified only" });
+      return;
+    }
+
+    if (key === "minBudget" || key === "maxBudget") {
+      // Handle budget as a single chip
+      if (key === "maxBudget" && applied.minBudget) return; // Already handled with minBudget
+      const min = applied.minBudget;
+      const max = applied.maxBudget;
+      if (min || max) {
+        const label = `Budget: ${min ? `₹${Number(min).toLocaleString("en-IN")}` : "₹0"} – ${max ? `₹${Number(max).toLocaleString("en-IN")}` : "Any"}`;
+        chips.push({ key: "minBudget", label });
+      }
+      return;
+    }
+
+    const label = FILTER_VALUE_LABELS[key]?.[value as string] || value;
+    chips.push({ key, label: `${FILTER_LABELS[key]}: ${label}` });
+  });
+
+  if (chips.length === 0) return null;
+
   return (
     <>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
-          Popular:
+      {chips.map((chip) => (
+        <span
+          key={chip.key}
+          className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/20 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-xs font-medium text-[#4161df]"
+        >
+          {chip.label}
+          <button
+            type="button"
+            onClick={() => onRemoveChip(chip.key)}
+            aria-label={`Remove ${chip.key} filter`}
+            className="flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-[#4161df]/15"
+          >
+            <X className="h-3 w-3" />
+          </button>
         </span>
-        {BUDGET_PRESETS.map((p) => {
-          const isActive =
-            filters.minBudget === p.min && filters.maxBudget === p.max;
-          return (
-            <button
-              key={p.label}
-              type="button"
-              onClick={() =>
-                setFilters((f) => ({
-                  ...f,
-                  minBudget: p.min,
-                  maxBudget: p.max,
-                }))
-              }
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                isActive
-                  ? "border-[#4161df] bg-[#4161df]/5 text-[#4161df]"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              {p.label}
-            </button>
-          );
-        })}
-      </div>
-      {appliedCount > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
-          {applied.city && (
-            <FilterChip
-              label={`City: ${applied.city}`}
-              onRemove={() => onRemoveChip("city")}
-            />
-          )}
-          {(applied.minBudget || applied.maxBudget) && (
-            <FilterChip
-              label={`Budget: ${applied.minBudget ? `₹${Number(applied.minBudget).toLocaleString("en-IN")}` : "₹0"} – ${applied.maxBudget ? `₹${Number(applied.maxBudget).toLocaleString("en-IN")}` : "Any"}`}
-              onRemove={() => {
-                const next = { ...applied, minBudget: "", maxBudget: "" };
-                setApplied(next);
-                setFilters((f) => ({ ...f, minBudget: "", maxBudget: "" }));
-              }}
-            />
-          )}
-        </div>
-      )}
-    </>
-  );
-}
-
-function FilterChip({
-  label,
-  onRemove,
-}: {
-  label: string;
-  onRemove: () => void;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/20 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-xs font-medium text-[#4161df]">
-      {label}
+      ))}
       <button
         type="button"
-        onClick={onRemove}
-        aria-label={`Remove ${label}`}
-        className="flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-[#4161df]/15"
+        onClick={onClearAll}
+        className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-500 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600"
       >
-        <X className="h-3 w-3" />
+        <RotateCcw className="h-3 w-3" />
+        Clear all
       </button>
-    </span>
+    </>
   );
 }
 
