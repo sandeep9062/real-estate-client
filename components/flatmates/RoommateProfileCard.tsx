@@ -78,6 +78,7 @@ interface RoommateProfileCardProps {
   onView?: (id: string) => void;
   onSave?: (id: string) => void;
   onConnect?: (id: string) => void;
+  onCancel?: (id: string) => void;
   saved?: boolean;
   connected?: boolean;
 }
@@ -181,6 +182,7 @@ export default function RoommateProfileCard({
   onView,
   onSave,
   onConnect,
+  onCancel,
   saved = false,
   connected = false,
 }: RoommateProfileCardProps) {
@@ -209,7 +211,7 @@ export default function RoommateProfileCard({
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-[#E7E4DC] bg-white transition-shadow hover:shadow-[0_8px_24px_-12px_rgba(28,27,25,0.25)]">
       <button
         type="button"
-        onClick={() => onView?.(`/flatmates/profile/${profile._id}`)}
+        onClick={() => onView?.(`/flatmates/${profile._id}`)}
         className="relative aspect-[3/2] w-full overflow-hidden bg-[#EDEAE3] text-left"
       >
         {photo ? (
@@ -250,7 +252,7 @@ export default function RoommateProfileCard({
         )}
       </button>
 
-      <div className="flex flex-1 flex-col gap-2 p-3">
+      <div className="flex flex-1 flex-col gap-2.5 p-3">
         {profile.bio && (
           <p className="line-clamp-2 text-xs leading-snug text-[#4A4740]">
             {profile.bio}
@@ -269,7 +271,7 @@ export default function RoommateProfileCard({
             {chips.map((chip) => (
               <span
                 key={chip}
-                className="rounded-full border border-[#E7E4DC] px-1.5 py-0.5 text-[10px] text-[#4A4740]"
+                className="rounded-full border border-[#E7E4DC] bg-[#FAFAF8] px-2 py-0.5 text-[10px] font-medium text-[#5C5F73]"
               >
                 {chip}
               </span>
@@ -277,56 +279,11 @@ export default function RoommateProfileCard({
           </div>
         )}
 
-        {/* Lets Connect Button */}
-        <button
-          type="button"
-          onClick={() => onConnect?.(profile._id)}
-          disabled={connected}
-          className={`mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
-            connected
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-[#4161df] text-white hover:bg-[#3451c9]"
-          }`}
-        >
-          {connected ? (
-            <>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Request Sent
-            </>
-          ) : (
-            <>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-              </svg>
-              Let's Connect
-            </>
-          )}
-        </button>
-
-        <div className="mt-auto flex items-center justify-between pt-1">
+        {/* Price and Match Score Row */}
+        <div className="flex items-center justify-between">
           <div>
             {price && (
-              <p className="text-xs font-medium text-[#1C1B19]">{price}</p>
+              <p className="text-sm font-semibold text-[#1C1B19]">{price}</p>
             )}
             {!profile.isComplete && (
               <p className="text-[10px] text-[#B4772A]">
@@ -335,7 +292,7 @@ export default function RoommateProfileCard({
             )}
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             {typeof profile.matchScore === "number" && (
               <MatchRing score={profile.matchScore} />
             )}
@@ -344,7 +301,11 @@ export default function RoommateProfileCard({
               onClick={() => onSave?.(profile._id)}
               aria-pressed={saved}
               aria-label={saved ? "Remove from saved" : "Save profile"}
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E7E4DC] text-[#4A4740] transition-colors hover:border-[#B4772A] hover:text-[#B4772A]"
+              className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all ${
+                saved
+                  ? "border-[#B4772A] bg-[#B4772A]/10 text-[#B4772A]"
+                  : "border-[#E7E4DC] text-[#4A4740] hover:border-[#B4772A] hover:text-[#B4772A]"
+              }`}
             >
               <svg
                 width="14"
@@ -361,6 +322,67 @@ export default function RoommateProfileCard({
               </svg>
             </button>
           </div>
+        </div>
+
+        {/* Let's Connect Button - Primary CTA at bottom */}
+        <div className="mt-auto pt-1">
+          <button
+            type="button"
+            onClick={() => onConnect?.(profile._id)}
+            disabled={connected}
+            className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold uppercase tracking-wide transition-all duration-200 ${
+              connected
+                ? "bg-emerald-50 text-emerald-700 border-2 border-emerald-200 cursor-default"
+                : "bg-gradient-to-r from-[#4161df] to-[#5a7af0] text-white shadow-md shadow-[#4161df]/20 hover:shadow-lg hover:shadow-[#4161df]/30 hover:from-[#3451c9] hover:to-[#4161df] active:scale-[0.98]"
+            }`}
+          >
+            {connected ? (
+              <>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Connection Request Sent
+              </>
+            ) : (
+              <>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+                Let's Connect
+              </>
+            )}
+          </button>
+
+          {/* Cancel Request Link */}
+          {connected && (
+            <button
+              type="button"
+              onClick={() => onCancel?.(profile._id)}
+              className="mt-1.5 w-full text-center text-[11px] font-medium text-rose-500 underline decoration-rose-300 underline-offset-2 hover:text-rose-600 hover:decoration-rose-400 transition-colors"
+            >
+              Cancel Request
+            </button>
+          )}
         </div>
       </div>
     </article>

@@ -26,9 +26,12 @@ import {
   UtensilsCrossed,
   Sparkles,
 } from "lucide-react";
+import { toast } from "sonner";
 import {
   useSearchSeekersQuery,
   useSendConnectionRequestMutation,
+  useRespondToConnectionRequestMutation,
+  useListMyConnectionsQuery,
   type RoommateProfile,
 } from "@/services/roommatesApi";
 import type { MapMarker } from "@/components/Map";
@@ -142,6 +145,8 @@ export default function BrowsePage() {
   const [connectError, setConnectError] = useState<string | null>(null);
 
   const [sendConnectionRequest] = useSendConnectionRequestMutation();
+  const [respondToConnectionRequest] = useRespondToConnectionRequestMutation();
+  const { data: connectionsData } = useListMyConnectionsQuery();
 
   const activeFiltersCount = useMemo(
     () =>
@@ -221,8 +226,46 @@ export default function BrowsePage() {
     try {
       await sendConnectionRequest({ toProfileId: id }).unwrap();
       setConnectedIds((prev) => new Set(prev).add(id));
+      toast.success("Connection request sent!", {
+        description: "They'll be notified about your request.",
+      });
     } catch (err) {
-      setConnectError(getErrorMessage(err));
+      const errorMsg = getErrorMessage(err);
+      setConnectError(errorMsg);
+      toast.error("Failed to send request", {
+        description: errorMsg,
+      });
+    }
+  }
+
+  async function handleCancelConnection(id: string) {
+    if (!connectedIds.has(id)) return;
+    try {
+      // Find the connection ID for this profile
+      const connection = connectionsData?.find((c) => {
+        const toProfileId =
+          typeof c.toProfile === "string"
+            ? c.toProfile
+            : (c.toProfile as { _id: string })._id;
+        return toProfileId === id;
+      });
+      if (connection) {
+        await respondToConnectionRequest({
+          id: connection._id,
+          status: "withdrawn",
+        }).unwrap();
+        setConnectedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        toast.success("Connection request cancelled");
+      }
+    } catch (err) {
+      const errorMsg = getErrorMessage(err);
+      toast.error("Failed to cancel request", {
+        description: errorMsg,
+      });
     }
   }
 
@@ -750,6 +793,7 @@ export default function BrowsePage() {
                       }}
                       onSave={toggleSaved}
                       onConnect={handleConnect}
+                      onCancel={handleCancelConnection}
                     />
                   ))}
                 </div>
