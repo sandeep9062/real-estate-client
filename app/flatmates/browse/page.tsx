@@ -42,17 +42,19 @@ const BUDGET_PRESETS = [
   { label: "₹20k+", min: "20000", max: "" },
 ];
 
-// useSearchSeekersQuery hits /v1/roommates/seekers, which — per its name —
-// only ever returns no_room profiles (people looking for a room). It's the
-// people-side counterpart to useBrowseRoomsAndFlatsQuery (which browses
-// RoomFlat listings). This page is the "browse flatmates" half of that pair.
+// useSearchSeekersQuery hits /v1/roommates/seekers, which returns all active
+// roommate profiles — both have_room (people with a room to share) and
+// no_room (people looking for a room). It's the people-side counterpart to
+// useBrowseRoomsAndFlatsQuery (which browses RoomFlat listings).
 //
-// RoommateProfile.user on the wire is typed as a bare id, same as roomFlat
-// before population. The seekers endpoint needs to send it populated (at
-// least _id/name/avatarUrl) for this page to have anything to render —
-// flagged here rather than silently assumed.
+// The endpoint populates `user` (at least _id/name/avatarUrl) and `roomFlat`
+// (for have_room profiles' location and rent) so the cards have everything
+// they need to render.
 interface SeekerResult {
-  profile: Omit<RoommateProfile, "user"> & { user: RoommateProfileCardUser };
+  profile: Omit<RoommateProfile, "user" | "roomFlat"> & {
+    user: RoommateProfileCardUser;
+    roomFlat?: RoommateProfileCardData["roomFlat"];
+  };
   matchScore: number | null;
 }
 
@@ -143,6 +145,7 @@ export default function BrowsePage() {
         habits: profile.habits,
         searchArea: profile.searchArea,
         budgetRange: profile.budgetRange,
+        roomFlat: profile.roomFlat,
         idVerified: profile.idVerified,
         isComplete: profile.isComplete,
         matchScore,
@@ -150,11 +153,14 @@ export default function BrowsePage() {
     [seekers],
   );
 
-  // Seekers only ever carry searchArea (no_room), never a roomFlat.
+  // no_room profiles carry searchArea; have_room profiles carry roomFlat.
   const markers: MapMarker[] = useMemo(() => {
     const pins: MapMarker[] = [];
     for (const p of profiles) {
-      const coords = p.searchArea?.location?.coordinates;
+      const coords =
+        p.type === "have_room"
+          ? p.roomFlat?.location?.coordinates
+          : p.searchArea?.location?.coordinates;
       if (!Array.isArray(coords) || coords.length < 2) continue;
       const lng = Number(coords[0]);
       const lat = Number(coords[1]);
@@ -162,7 +168,14 @@ export default function BrowsePage() {
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
       if (Math.abs(lat) < 1e-6 && Math.abs(lng) < 1e-6) continue;
 
-      const rent = p.budgetRange?.max;
+      const rent =
+        p.type === "have_room"
+          ? p.roomFlat?.rentAmount
+          : p.budgetRange?.max;
+      const city =
+        p.type === "have_room"
+          ? p.roomFlat?.location?.city
+          : p.searchArea?.city;
       pins.push({
         lat,
         lng,
@@ -170,9 +183,9 @@ export default function BrowsePage() {
         title: p.user.name,
         subtitle: [
           typeof rent === "number"
-            ? `Up to ₹${rent.toLocaleString("en-IN")}/mo`
+            ? `₹${rent.toLocaleString("en-IN")}/mo`
             : "",
-          p.searchArea?.city || "",
+          city || "",
         ]
           .filter(Boolean)
           .join(" · "),
@@ -242,22 +255,12 @@ export default function BrowsePage() {
       <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 pb-12">
         <div className="w-full text-center">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4">
-            Find a Flatmate for Your Room in Tricity
+            Find a Flatmate in Tricity
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 px-2">
-            Browse verified people looking for a room in Chandigarh, Panchkula,
-            Mohali &amp; more.
+            Browse verified flatmates in Chandigarh, Panchkula, Mohali &amp;
+            more.
           </p>
-        </div>
-        <div className="mt-4 flex justify-center">
-          <Link
-            href="/flatmates/swap"
-            className="inline-flex items-center gap-1.5 rounded-full border bg-white px-4 py-2 text-sm font-semibold transition-colors hover:bg-[#EEF1FC]"
-            style={{ borderColor: BORDER, color: INK }}
-          >
-            <ArrowLeftRight className="h-3.5 w-3.5" />
-            Looking to swap instead?
-          </Link>
         </div>
 
         <form
