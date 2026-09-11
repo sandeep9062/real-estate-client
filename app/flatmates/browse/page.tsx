@@ -146,7 +146,8 @@ export default function BrowsePage() {
 
   const [sendConnectionRequest] = useSendConnectionRequestMutation();
   const [respondToConnectionRequest] = useRespondToConnectionRequestMutation();
-  const { data: connectionsData } = useListMyConnectionsQuery();
+  const { data: connectionsData, isFetching: connectionsFetching } =
+    useListMyConnectionsQuery();
 
   // Sync connectedIds with existing connections (sent requests)
   useEffect(() => {
@@ -165,6 +166,23 @@ export default function BrowsePage() {
       setConnectedIds(sentProfileIds);
     }
   }, [connectionsData]);
+
+  // Check if a profile has a pending outgoing request using fresh connection data
+  const hasPendingRequest = (id: string): boolean => {
+    if (connectedIds.has(id)) return true;
+    // Fall back to scanning the live connection list for any pending outgoing
+    // request to this profile. This covers the window between sendConnectionRequest
+    // succeeding and the sync useEffect re-running with the updated response.
+    if (!connectionsData || connectionsData.length === 0) return false;
+    return connectionsData.some((c) => {
+      if (c.status !== "pending") return false;
+      const toProfileId =
+        typeof c.toProfile === "string"
+          ? c.toProfile
+          : (c.toProfile as { _id: string })?._id;
+      return toProfileId === id;
+    });
+  };
 
   const activeFiltersCount = useMemo(
     () =>
@@ -239,7 +257,7 @@ export default function BrowsePage() {
   }
 
   async function handleConnect(id: string) {
-    if (connectedIds.has(id)) return;
+    if (hasPendingRequest(id)) return;
     setConnectError(null);
     try {
       await sendConnectionRequest({ toProfileId: id }).unwrap();
@@ -257,7 +275,7 @@ export default function BrowsePage() {
   }
 
   async function handleCancelConnection(id: string) {
-    if (!connectedIds.has(id)) return;
+    if (!hasPendingRequest(id)) return;
     try {
       // Find the connection ID for this profile
       const connection = connectionsData?.find((c) => {
@@ -805,7 +823,7 @@ export default function BrowsePage() {
                       key={p._id}
                       profile={p}
                       saved={savedIds.has(p._id)}
-                      connected={connectedIds.has(p._id)}
+                      connected={hasPendingRequest(p._id)}
                       onView={(id) => {
                         window.location.href = `/flatmates/profile/${id}`;
                       }}
