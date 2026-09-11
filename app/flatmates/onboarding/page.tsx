@@ -134,6 +134,27 @@ function buildRoomFlatRequestBody(draft: RoomFlatDraft) {
   return formData;
 }
 
+/**
+ * The profile endpoint accepts both JSON and multipart — same dual pattern as
+ * RoomFlat. When newly-picked File objects are present (profile photos chosen
+ * on Step 1), send FormData with the JSON body stringified in `payload` and
+ * the files attached as `photos` (uploaded to Cloudinary by the backend's
+ * multer middleware).
+ */
+function buildProfileRequestBody(body: Record<string, any>) {
+  const photos = Array.isArray(body.photos) ? body.photos : [];
+  const keptUrls = photos.filter((p): p is string => typeof p === "string");
+  const files = photos.filter((p): p is File => p instanceof File);
+
+  const jsonPayload = { ...body, photos: keptUrls };
+  if (!files.length) return jsonPayload;
+
+  const formData = new FormData();
+  formData.append("payload", JSON.stringify(jsonPayload));
+  files.forEach((file) => formData.append("photos", file));
+  return formData;
+}
+
 /** Backend sends ISO date-times; date <input>s need plain YYYY-MM-DD. */
 function toDateInput(value?: string): string {
   if (!value) return "";
@@ -162,6 +183,7 @@ function profileToDraft(p: RoommateProfile): ProfileDraft {
     workSchedule: p.workSchedule ?? "",
     sleepSchedule: p.sleepSchedule ?? "",
     languages: Array.isArray(p.languages) ? [...p.languages] : [],
+    photos: Array.isArray(p.photos) ? [...p.photos] : [],
     habits: {
       smoking: p.habits?.smoking ?? "",
       drinking: p.habits?.drinking ?? "",
@@ -325,6 +347,7 @@ function OnboardingContent() {
     workSchedule: "",
     sleepSchedule: "",
     languages: [],
+    photos: [],
     habits: {
       smoking: "",
       drinking: "",
@@ -638,6 +661,7 @@ function OnboardingContent() {
                 .map((s: string) => s.trim())
                 .filter((s: string) => s.length > 0)
             : [],
+        photos: Array.isArray(profile.photos) ? [...profile.photos] : [],
         habits: profile.habits,
         lookingFor: {
           ...profile.lookingFor,
@@ -679,7 +703,7 @@ function OnboardingContent() {
       };
 
       if (isEditMode && existingProfile) {
-        await updateProfile(profileBody as any).unwrap();
+        await updateProfile(buildProfileRequestBody(profileBody) as any).unwrap();
 
         if (needsProperty) {
           const draft = roomFlatOverride ?? roomFlat;
@@ -712,13 +736,13 @@ function OnboardingContent() {
       }
 
       try {
-        await createProfile(profileBody as any).unwrap();
+        await createProfile(buildProfileRequestBody(profileBody) as any).unwrap();
       } catch (err) {
         // 409 = the user already has a profile (re-entering onboarding
         // without ?edit=1) — update it instead, same rule as edit mode.
         const e = err as { status?: number };
         if (e.status !== 409) throw err;
-        await updateProfile(profileBody as any).unwrap();
+        await updateProfile(buildProfileRequestBody(profileBody) as any).unwrap();
       }
 
       if (needsProperty) {

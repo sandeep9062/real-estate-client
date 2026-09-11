@@ -13,6 +13,7 @@ import {
 
 import { OPTIONS, enumData } from "./options";
 import type { ProfileDraft } from "./types";
+import ProfilePhotosUploader from "@/components/flatmates/ProfilePhotosUploader";
 
 export interface AboutYouStepProps {
   profile: ProfileDraft;
@@ -105,6 +106,16 @@ export default function AboutYouStep({
         placeholder="A couple of lines about you"
         value={profile.bio}
         onChange={(e) => onField("bio", e.currentTarget.value)}
+      />
+
+      <Divider my="sm" />
+
+      <Text fw={700} size="md" mb={8}>
+        Your photos
+      </Text>
+      <ProfilePhotosUploader
+        value={profile.photos ?? []}
+        onChange={(next) => onField("photos", next)}
       />
 
       <Divider my="sm" />

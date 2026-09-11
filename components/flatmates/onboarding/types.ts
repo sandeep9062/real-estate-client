@@ -45,6 +45,9 @@ export interface ProfileDraft {
   workSchedule: string;
   sleepSchedule: string;
   languages: string[];
+  // Public profile pictures (the person) — kept URLs or newly-picked Files,
+  // same shape as RoomFlatDraft.photos used by PhotosLocationFlat.
+  photos?: (string | File)[];
   habits: HabitsDraft;
   lookingFor: LookingForDraft;
   searchArea: SearchAreaDraft;

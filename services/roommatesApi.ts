@@ -45,6 +45,9 @@ export interface RoommateProfile {
   moveInDate?: string;
   stayDurationMonths?: number;
   bio?: string;
+  // Public Cloudinary URLs of the user's profile pictures (the person — the
+  // property photos live on RoomFlat.photos).
+  photos?: string[];
   gender?: "male" | "female" | "other" | "prefer_not_to_say";
   occupation?: "student" | "working_professional" | "self_employed" | "other";
   workSchedule?: string;
@@ -151,7 +154,10 @@ export const roommatesApi = createApi({
       providesTags: (result, error, id) => [{ type: "RoommateProfile", id }],
     }),
 
-    createProfile: builder.mutation<RoommateProfile, Partial<RoommateProfile>>({
+    createProfile: builder.mutation<
+      RoommateProfile,
+      Partial<RoommateProfile> | FormData
+    >({
       query: (profileData) => ({
         url: "/v1/roommates/profile",
         method: "POST",
@@ -160,7 +166,10 @@ export const roommatesApi = createApi({
       invalidatesTags: [{ type: "RoommateProfile", id: "ME" }],
     }),
 
-    updateProfile: builder.mutation<RoommateProfile, Partial<RoommateProfile>>({
+    updateProfile: builder.mutation<
+      RoommateProfile,
+      Partial<RoommateProfile> | FormData
+    >({
       query: (update) => ({
         url: "/v1/roommates/profile",
         method: "PATCH",

@@ -234,6 +234,22 @@ export default function PublicProfilePage() {
               {profile.bio}
             </p>
           )}
+
+          {profile.photos?.length ? (
+            <div className="mt-4 flex flex-wrap gap-2.5">
+              {profile.photos.map((photo, index) => (
+                <img
+                  key={`${photo.slice(0, 48)}-${index}`}
+                  src={photo}
+                  alt={`${profile.gender ? humanize(profile.gender) : "Roommate"} photo ${index + 1}`}
+                  className="h-20 w-20 shrink-0 cursor-pointer rounded-xl border object-cover transition-transform hover:scale-105"
+                  style={{ borderColor: BORDER }}
+                  loading="lazy"
+                  onClick={() => window.open(photo, "_blank")}
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
 
