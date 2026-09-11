@@ -81,6 +81,8 @@ interface RoommateProfileCardProps {
   onCancel?: (id: string) => void;
   saved?: boolean;
   connected?: boolean;
+  liked?: boolean;
+  onLike?: (id: string) => void;
 }
 
 const OCCUPATION_LABEL: Record<Occupation, string> = {
@@ -185,6 +187,8 @@ export default function RoommateProfileCard({
   onCancel,
   saved = false,
   connected = false,
+  liked = false,
+  onLike,
 }: RoommateProfileCardProps) {
   const [imgError, setImgError] = useState(false);
   const photo = !imgError ? profile.photos?.[0] : undefined;
@@ -250,6 +254,34 @@ export default function RoommateProfileCard({
             <VerifiedBadge />
           </span>
         )}
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onLike?.(profile._id);
+          }}
+          aria-pressed={liked}
+          aria-label={liked ? "Unlike this profile" : "Like this profile"}
+          className={`absolute right-2 top-7 flex h-8 w-8 items-center justify-center rounded-full border transition-all ${
+            liked
+              ? "border-rose-400 bg-rose-50 text-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.25)]"
+              : "border-gray-200 bg-white/90 text-gray-500 hover:border-rose-300 hover:text-rose-400 hover:bg-rose-50/60"
+          }`}
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill={liked ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
       </button>
 
       <div className="flex flex-1 flex-col gap-2.5 p-3">
@@ -296,31 +328,6 @@ export default function RoommateProfileCard({
             {typeof profile.matchScore === "number" && (
               <MatchRing score={profile.matchScore} />
             )}
-            <button
-              type="button"
-              onClick={() => onSave?.(profile._id)}
-              aria-pressed={saved}
-              aria-label={saved ? "Remove from saved" : "Save profile"}
-              className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all ${
-                saved
-                  ? "border-[#B4772A] bg-[#B4772A]/10 text-[#B4772A]"
-                  : "border-[#E7E4DC] text-[#4A4740] hover:border-[#B4772A] hover:text-[#B4772A]"
-              }`}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 20 20"
-                fill={saved ? "#B4772A" : "none"}
-              >
-                <path
-                  d="M5 3.5h10a1 1 0 011 1V17l-6-3.4L4 17V4.5a1 1 0 011-1z"
-                  stroke={saved ? "#B4772A" : "#4A4740"}
-                  strokeWidth="1.4"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
           </div>
         </div>
 

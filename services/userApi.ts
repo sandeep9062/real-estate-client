@@ -19,6 +19,7 @@ export interface User {
   resetPasswordExpire?: string;
   createdAt: string;
   favProperties: any[];
+  favRoommateProfiles: any[];
   bookedVisits: any[];
   ownedProperties: any[];
 }

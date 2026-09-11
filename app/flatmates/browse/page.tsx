@@ -32,8 +32,11 @@ import {
   useSendConnectionRequestMutation,
   useRespondToConnectionRequestMutation,
   useListMyConnectionsQuery,
+  useToggleFavRoommateProfileMutation,
   type RoommateProfile,
 } from "@/services/roommatesApi";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/store/authSlice";
 import type { MapMarker } from "@/components/Map";
 import RoommateProfileCard, {
   type RoommateProfileCardData,
@@ -141,6 +144,7 @@ export default function BrowsePage() {
   const [activeTab, setActiveTab] = useState<"list" | "map">("list");
   const [laptopMapOpen, setLaptopMapOpen] = useState(false);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
   const [connectError, setConnectError] = useState<string | null>(null);
 
@@ -148,6 +152,8 @@ export default function BrowsePage() {
   const [respondToConnectionRequest] = useRespondToConnectionRequestMutation();
   const { data: connectionsData, isFetching: connectionsFetching } =
     useListMyConnectionsQuery();
+  const [toggleFavRoommateProfile] = useToggleFavRoommateProfileMutation();
+  const currentUser = useSelector(selectUser);
 
   // Sync connectedIds with existing connections (sent requests)
   useEffect(() => {
@@ -253,6 +259,25 @@ export default function BrowsePage() {
       else next.add(id);
       return next;
     });
+  }
+
+  async function toggleLiked(id: string) {
+    if (!currentUser) {
+      toast.error("You must be logged in to like a profile");
+      window.location.href = "/login";
+      return;
+    }
+    try {
+      await toggleFavRoommateProfile({ profileId: id }).unwrap();
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } catch (error: any) {
+      toast.error(error?.data?.message || error?.error || "Failed to toggle like");
+    }
   }
 
   async function handleConnect(id: string) {
@@ -819,11 +844,13 @@ export default function BrowsePage() {
                       key={p._id}
                       profile={p}
                       saved={savedIds.has(p._id)}
+                      liked={likedIds.has(p._id)}
                       connected={hasPendingRequest(p._id)}
                       onView={(id) => {
                         window.location.href = `/flatmates/profile/${id}`;
                       }}
                       onSave={toggleSaved}
+                      onLike={toggleLiked}
                       onConnect={handleConnect}
                       onCancel={handleCancelConnection}
                     />

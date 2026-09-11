@@ -299,6 +299,19 @@ export const roommatesApi = createApi({
             ]
           : [{ type: "FlatmateConnection", id: "LIST" }],
     }),
+
+    // ✅ Toggle Favourite Roommate Profile
+    toggleFavRoommateProfile: builder.mutation<
+      { favRoommateProfiles: string[] },
+      { profileId: string }
+    >({
+      query: ({ profileId }) => ({
+        url: `/v1/roommates/favourite/${profileId}`,
+        method: "POST",
+      }),
+      extraOptions: { poll: 0 },
+      invalidatesTags: [{ type: "RoommateProfile", id: "LIST" }],
+    }),
   }),
 });
 
@@ -317,4 +330,5 @@ export const {
   useSendConnectionRequestMutation,
   useRespondToConnectionRequestMutation,
   useListMyConnectionsQuery,
+  useToggleFavRoommateProfileMutation,
 } = roommatesApi;

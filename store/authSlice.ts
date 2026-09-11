@@ -11,6 +11,7 @@ interface User {
   isActive?: boolean;
   isBanned?: boolean;
   favProperties: any[];
+  favRoommateProfiles: any[];
   bookedVisits: any[];
   ownedProperties: any[];
   createdAt?: string;
