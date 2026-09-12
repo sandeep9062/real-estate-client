@@ -244,7 +244,7 @@ const differentiators = [
 const faqs = [
   {
     q: "Is PropertyBulbul free to use?",
-    a: "Searching and messaging agents costs nothing, always. Agents can list up to 5 properties free. Pro plans start at ₹499/month for agents and ₹299/month for seekers wanting direct, brokerage-free landlord access.",
+    a: "Searching and messaging agents costs nothing, always. Agents can list up to 5 properties free. Pro plans start at ₹1499/month for agents, ₹599/month for landlords and  ₹299/month for seekers wanting direct, brokerage-free landlord access.",
   },
   {
     q: "What kinds of properties are listed?",
