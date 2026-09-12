@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Search,
@@ -138,8 +139,19 @@ interface SeekerResult {
 }
 
 export default function BrowsePage() {
-  const [filters, setFilters] = useState<BrowseFilters>({ ...EMPTY_FILTERS });
-  const [applied, setApplied] = useState<BrowseFilters>({ ...EMPTY_FILTERS });
+  const searchParams = useSearchParams();
+  const urlCity = searchParams.get("city") || "";
+
+  // Seed the city filter from the ?city= URL param so links like
+  // /flatmates/browse?city=Mohali (home page chips) pre-apply the city.
+  const [filters, setFilters] = useState<BrowseFilters>({
+    ...EMPTY_FILTERS,
+    city: urlCity,
+  });
+  const [applied, setApplied] = useState<BrowseFilters>({
+    ...EMPTY_FILTERS,
+    city: urlCity,
+  });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"list" | "map">("list");
   const [laptopMapOpen, setLaptopMapOpen] = useState(false);
@@ -172,6 +184,14 @@ export default function BrowsePage() {
       setConnectedIds(sentProfileIds);
     }
   }, [connectionsData]);
+
+  // Keep the city filter in sync with the ?city= URL param. This covers
+  // in-app navigation between city chips (the page component stays mounted),
+  // so the applied city always matches the URL.
+  useEffect(() => {
+    setFilters((f) => (f.city === urlCity ? f : { ...f, city: urlCity }));
+    setApplied((a) => (a.city === urlCity ? a : { ...a, city: urlCity }));
+  }, [urlCity]);
 
   const activeFiltersCount = useMemo(
     () =>
@@ -353,7 +373,9 @@ export default function BrowsePage() {
     for (const p of profiles) {
       const coords =
         p.type === "have_room"
-          ? p.roomFlat?.location?.coordinates
+          // RoomFlat stores GeoJSON — the array is nested one level deeper:
+          // location.coordinates.coordinates. (searchArea keeps a plain array.)
+          ? p.roomFlat?.location?.coordinates?.coordinates
           : p.searchArea?.location?.coordinates;
       if (!Array.isArray(coords) || coords.length < 2) continue;
       const lng = Number(coords[0]);
