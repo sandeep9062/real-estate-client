@@ -120,9 +120,14 @@ function PropertiesClientInner({
     [router, searchParams],
   );
 
-  // ─── Fetch a single page and append unique items ───────────────
+  // ─── Fetch a single page and replace/append unique items ──────
   const [trigger] = useLazyGetAllPropertiesQuery();
   const isMountedRef = useRef(true);
+  // Monotonically increasing request id. Any response that comes back with an
+  // id different from the latest one is stale (triggered under an old filter
+  // or an old page) and is discarded — this kills the "filter changed but old
+  // unfiltered results still get appended" race.
+  const requestSeqRef = useRef(0);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -133,6 +138,7 @@ function PropertiesClientInner({
 
   const fetchPage = useCallback(
     async (pageToFetch: number, currentQuery: Record<string, string>) => {
+      const seq = ++requestSeqRef.current;
       if (!isMountedRef.current) return;
       setLoading(true);
       setError(null);
@@ -144,14 +150,17 @@ function PropertiesClientInner({
           limit: "100",
         }).unwrap();
 
-        if (!isMountedRef.current) return;
+        // Discard stale responses (old filter / old page resolved late).
+        if (!isMountedRef.current || seq !== requestSeqRef.current) return;
 
         const dataArray: any[] = result?.data ?? result ?? [];
         const pagination = result?.pagination;
 
-        // Append, deduplicating by id/_id. Inactive properties are
-        // dropped entirely so they never render a card.
+        // Page 1 replaces the list (after a filter change); later pages append,
+        // deduplicating by id/_id. Inactive properties are dropped entirely so
+        // they never render a card.
         setProperties((prev) => {
+          if (pageToFetch === 1) return dataArray.filter(isPubliclyVisible);
           const seen = new Set(prev.map((p) => p._id || p.id));
           const fresh = dataArray.filter(
             (item) =>
@@ -167,15 +176,19 @@ function PropertiesClientInner({
         } else {
           // No pagination object → assume this page is the last.
           setHasMore(false);
-          setTotal((t) => Math.max(t, dataArray.length));
+          setTotal((t) =>
+            pageToFetch === 1
+              ? dataArray.length
+              : Math.max(t, dataArray.length),
+          );
         }
       } catch (err: any) {
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current || seq !== requestSeqRef.current) return;
         setError(
           err?.data?.message || err?.message || "Failed to fetch properties",
         );
       } finally {
-        if (isMountedRef.current) {
+        if (isMountedRef.current && seq === requestSeqRef.current) {
           setLoading(false);
         }
       }
@@ -183,42 +196,59 @@ function PropertiesClientInner({
     [trigger],
   );
 
-  // ─── Watch filters: reset state, refetch from page 1 via trigger ──
+  // ─── Watch filters: reset state, refetch from page 1 ───────────
   const filterKey = useMemo(() => JSON.stringify(query), [query]);
+  // True right after a filter change, so the pagination effect ignores the
+  // stale `page` value captured in the same render commit (otherwise it would
+  // re-request the old page number against the NEW filters — the bug that
+  // produced out-of-order / duplicated filtered results).
+  const pendingResetRef = useRef(false);
 
   useEffect(() => {
     if (filterKeyRef.current === "") {
-      // First mount: nothing to do, the SSG seed is already in `properties`.
+      // First mount. The SSG seed was generated with NO URL filters, so if the
+      // page was opened directly on a filtered URL (journal/sector link, map
+      // "search this area", or a refreshed filtered view) we must replace the
+      // unfiltered seed with the correctly filtered first page right away.
       filterKeyRef.current = filterKey;
+      if (Object.keys(query).length > 0) {
+        pendingResetRef.current = true;
+        requestSeqRef.current += 1;
+        setProperties([]);
+        setTotal(0);
+        setHasMore(true);
+        setError(null);
+        setPage(1);
+        fetchPage(1, query);
+      }
       return;
     }
 
     if (filterKeyRef.current === filterKey) return;
 
-    // Filter changed — reset and refetch from page 1.
+    // Filter changed — invalidate in-flight requests, reset, and fetch page 1.
     filterKeyRef.current = filterKey;
+    pendingResetRef.current = true;
+    requestSeqRef.current += 1;
     setProperties([]);
     setTotal(0);
     setHasMore(true);
     setError(null);
     setPage(1);
-    // Page 1 will be fetched by the next effect run (page=1).
+    fetchPage(1, query);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterKey]);
 
   // ─── Core pagination effect: when `page` changes, fetch it ─────
   useEffect(() => {
-    // Don't fetch page 1 via this effect — page 1 is provided by SSG
-    // (or refetched fresh on filter change via a separate effect).
-    if (page === 1) return;
+    if (pendingResetRef.current) {
+      // `page` in this commit is stale (pre-reset). Page 1 was already fetched
+      // by the filter-change effect above, so just clear the flag.
+      pendingResetRef.current = false;
+      return;
+    }
+    if (page <= 1) return;
     fetchPage(page, query);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filterKey]);
-
-  // ─── Filter change → refetch page 1 ────────────────────────────
-  useEffect(() => {
-    if (filterKeyRef.current === "") return;
-    if (page !== 1) return;
-    fetchPage(1, query);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, filterKey]);
 
