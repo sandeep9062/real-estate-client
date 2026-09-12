@@ -43,7 +43,7 @@ const testimonials: TestimonialItem[] = [
   },
   {
     id: 2,
-    name: "Mandeep Singh",
+    name: "Anjali Dhull",
     role: "Commercial Buyer",
     location: "Mohali",
     text: "I found exactly the commercial space I was looking for through PropertyBulbul. Verified listings and smooth communication made the entire process effortless, start to finish.",
@@ -410,7 +410,7 @@ const Testimonial: React.FC = () => {
           {/* Prev button */}
           <button
             onClick={handlePrev}
-            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 z-30 bg-white p-2.5 rounded-full shadow-md transition-all duration-200 hidden sm:flex items-center justify-center"
+            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 bg-white p-2.5 rounded-full shadow transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
             style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = BRAND;
@@ -430,7 +430,7 @@ const Testimonial: React.FC = () => {
           {/* Next button */}
           <button
             onClick={handleNext}
-            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 z-30 bg-white p-2.5 rounded-full shadow-md transition-all duration-200 hidden sm:flex items-center justify-center"
+            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 bg-white p-2.5 rounded-full shadow transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
             style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = BRAND;
