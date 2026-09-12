@@ -15,6 +15,13 @@ const INK_SOFT = "#5C5F73";
 const TINT_BG = "#EEF1FC";
 const TINT_LINE = "#DCE1F7";
 
+const AUTOPLAY_DELAY = 4500;
+
+/** Native horizontal scroller (same pattern as Residencies) —
+ *  swiping left/right and the arrow buttons both scroll smoothly. */
+const scrollContainerClass =
+  "flex gap-3 overflow-x-auto snap-x snap-mandatory py-1 select-none cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
 interface TestimonialItem {
   id: number;
   name: string;
@@ -28,7 +35,7 @@ interface TestimonialItem {
 const testimonials: TestimonialItem[] = [
   {
     id: 1,
-    name: "Rajat Sharma",
+    name: "Sneha Jamwal",
     role: "Home Buyer",
     location: "Chandigarh",
     text: "PropertyBulbul made my home-buying journey incredibly simple. They helped me compare the right localities and connect with a trusted agent — finally found the perfect home for my family.",
@@ -44,7 +51,7 @@ const testimonials: TestimonialItem[] = [
   },
   {
     id: 3,
-    name: "Priya Patel",
+    name: "Priya Sharma",
     role: "Real Estate Investor",
     location: "Zirakpur",
     text: "PropertyBulbul helped me identify high-return investment properties faster than ever. Their data-driven insights genuinely stand out in a market full of guesswork.",
@@ -68,7 +75,7 @@ const testimonials: TestimonialItem[] = [
   },
   {
     id: 6,
-    name: "Vikram Reddy",
+    name: "Vikram Mehra",
     role: "Luxury Property Buyer",
     location: "Chandigarh",
     text: "An exceptional experience end to end. Curated listings, premium service, and real attention to detail — exactly what I look for as a high-end buyer.",
@@ -196,53 +203,130 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
 }
 
 const Testimonial: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(1);
-  const [isPaused, setIsPaused] = useState(false);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const stepRef = useRef(0);
+  const isDragRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollRef = useRef(0);
+  const dragMovedRef = useRef(false);
+  const [paused, setPaused] = useState(false);
+  const [seq, setSeq] = useState(0); // bumped to restart the autoplay timer after manual nav
+  const [visiblePerPage, setVisiblePerPage] = useState(1);
+  const [activePage, setActivePage] = useState(0);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsPerView(window.innerWidth >= 768 ? 2 : 1);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+  const count = testimonials.length;
+  const pages = Math.max(1, count - visiblePerPage + 1);
+
+  const measure = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const first = el.querySelector<HTMLElement>("[data-slide]");
+    if (!first) return;
+    const gap = parseFloat(getComputedStyle(el).columnGap || "0") || 0;
+    const step = first.offsetWidth + gap;
+    const perPage = Math.max(1, Math.round(el.clientWidth / step));
+    stepRef.current = step;
+    setVisiblePerPage(perPage);
   }, []);
 
-  const totalPages = Math.ceil(testimonials.length / itemsPerView);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure, count]);
 
-  const handleNext = useCallback(() => {
-    setCurrentPage((prev) => (prev + 1) % totalPages);
-  }, [totalPages]);
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el || !stepRef.current) return;
+    setActivePage(
+      Math.min(
+        Math.max(0, Math.round(el.scrollLeft / stepRef.current)),
+        pages - 1,
+      ),
+    );
+  }, [pages]);
+
+  const scrollToPage = useCallback((page: number) => {
+    const el = scrollRef.current;
+    if (!el || !stepRef.current) return;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    el.scrollTo({
+      left: Math.max(0, Math.min(page * stepRef.current, maxScroll)),
+      behavior: "smooth",
+    });
+    setSeq((s) => s + 1);
+  }, []);
+
+  // Mouse drag-to-scroll (touch/devices use native overflow scrolling)
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return; // let touch do native scroll
+    const el = scrollRef.current;
+    if (!el) return;
+    isDragRef.current = true;
+    dragMovedRef.current = false;
+    dragStartXRef.current = e.clientX;
+    dragStartScrollRef.current = el.scrollLeft;
+    el.style.scrollBehavior = "auto"; // keep drag pixel-accurate
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el || !isDragRef.current) return;
+    const dx = e.clientX - dragStartXRef.current;
+    if (!dragMovedRef.current && Math.abs(dx) > 6) {
+      dragMovedRef.current = true;
+    }
+    if (dragMovedRef.current) {
+      el.scrollLeft = dragStartScrollRef.current - dx;
+    }
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragRef.current) return;
+    const el = scrollRef.current;
+    if (el) {
+      el.style.scrollBehavior = "";
+    }
+    isDragRef.current = false;
+    void e;
+  };
+
+  const handleClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (dragMovedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragMovedRef.current = false;
+    }
+  };
+
+  // Soft autoplay — advances one card step, pauses while hovered
+  useEffect(() => {
+    if (paused || count <= 1) return;
+    const id = window.setInterval(() => {
+      const el = scrollRef.current;
+      if (!el || !stepRef.current) return;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (maxScroll <= 0) return;
+      const nearest = Math.round(el.scrollLeft / stepRef.current);
+      const next = (nearest + 1) * stepRef.current;
+      el.scrollTo({
+        left: next >= maxScroll ? 0 : Math.min(next, maxScroll),
+        behavior: "smooth",
+      });
+    }, AUTOPLAY_DELAY);
+    return () => window.clearInterval(id);
+  }, [paused, seq, count]);
 
   const handlePrev = useCallback(() => {
-    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
-  }, [totalPages]);
+    scrollToPage(Math.max(0, activePage - 1));
+  }, [activePage, scrollToPage]);
 
-  // Auto-play — pauses on hover/focus
-  useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(handleNext, 4000);
-    return () => clearInterval(interval);
-  }, [handleNext, isPaused]);
-
-  // Clamp page index when itemsPerView changes
-  useEffect(() => {
-    if (currentPage >= totalPages) setCurrentPage(0);
-  }, [totalPages, currentPage]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
-    };
-    el.addEventListener("keydown", onKey);
-    return () => el.removeEventListener("keydown", onKey);
-  }, [handleNext, handlePrev]);
+  const handleNext = useCallback(() => {
+    scrollToPage(Math.min(activePage + 1, pages - 1));
+  }, [activePage, pages, scrollToPage]);
 
   return (
     <section
@@ -280,41 +364,53 @@ const Testimonial: React.FC = () => {
 
         {/* Carousel */}
         <div
-          ref={trackRef}
           className="relative focus:outline-none"
           tabIndex={0}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-          onFocus={() => setIsPaused(true)}
-          onBlur={() => setIsPaused(false)}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)}
+          onBlur={() => setPaused(false)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              handlePrev();
+            }
+            if (e.key === "ArrowRight") {
+              e.preventDefault();
+              handleNext();
+            }
+          }}
         >
-          {/* Viewport */}
-          <div className="overflow-hidden rounded-2xl">
-            <div
-              className="flex transition-transform duration-700 ease-in-out"
-              style={{ transform: `translateX(-${currentPage * 100}%)` }}
-              aria-live="polite"
-            >
-              {testimonials.map((t) => (
-                <div
-                  key={t.id}
-                  className="w-full shrink-0 md:w-1/2 p-2 sm:p-3"
-                  aria-hidden={
-                    Math.floor(t.id / itemsPerView) !== currentPage
-                      ? "true"
-                      : undefined
-                  }
-                >
-                  <TestimonialCard testimonial={t} />
-                </div>
-              ))}
-            </div>
+          <div className="pointer-events-none absolute inset-y-2 left-0 z-20 w-5 rounded-l-2xl bg-gradient-to-r from-white via-white/90 to-transparent sm:w-8" />
+          <div className="pointer-events-none absolute inset-y-2 right-0 z-20 w-5 rounded-r-2xl bg-gradient-to-l from-white via-white/90 to-transparent sm:w-8" />
+
+          {/* Native horizontal scroller */}
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            onClickCapture={handleClickCapture}
+            className={scrollContainerClass}
+            aria-live="polite"
+          >
+            {testimonials.map((t) => (
+              <div
+                key={t.id}
+                data-slide
+                className="shrink-0 snap-start w-[min(calc(100%-2rem),26rem)] sm:w-[calc(50%-0.375rem)]"
+              >
+                <TestimonialCard testimonial={t} />
+              </div>
+            ))}
           </div>
 
           {/* Prev button */}
           <button
             onClick={handlePrev}
-            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 bg-white p-2.5 rounded-full shadow transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            className="absolute top-1/2 -left-3 sm:-left-5 -translate-y-1/2 z-30 bg-white p-2.5 rounded-full shadow-md transition-all duration-200 hidden sm:flex items-center justify-center"
             style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = BRAND;
@@ -334,7 +430,7 @@ const Testimonial: React.FC = () => {
           {/* Next button */}
           <button
             onClick={handleNext}
-            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 bg-white p-2.5 rounded-full shadow transition-all duration-200 z-10 hidden sm:flex items-center justify-center"
+            className="absolute top-1/2 -right-3 sm:-right-5 -translate-y-1/2 z-30 bg-white p-2.5 rounded-full shadow-md transition-all duration-200 hidden sm:flex items-center justify-center"
             style={{ border: `1px solid ${TINT_LINE}`, color: INK_SOFT }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = BRAND;
@@ -358,17 +454,17 @@ const Testimonial: React.FC = () => {
           role="tablist"
           aria-label="Testimonial pages"
         >
-          {Array.from({ length: totalPages }).map((_, i) => (
+          {Array.from({ length: pages }).map((_, i) => (
             <button
               key={i}
               role="tab"
-              aria-selected={i === currentPage}
+              aria-selected={i === activePage}
               aria-label={`Page ${i + 1}`}
-              onClick={() => setCurrentPage(i)}
+              onClick={() => scrollToPage(i)}
               className="rounded-full transition-all duration-300"
               style={{
-                background: i === currentPage ? BRAND : TINT_LINE,
-                width: i === currentPage ? "24px" : "12px",
+                background: i === activePage ? BRAND : TINT_LINE,
+                width: i === activePage ? "24px" : "12px",
                 height: "12px",
               }}
             />
