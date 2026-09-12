@@ -112,7 +112,7 @@ const Footer = () => {
 
                 ["FAQ", "/faq"],
                 // ["Register as Landlord", "/landlords/register"],
-                //["Pricing", "/pricing"],
+                ["Pricing", "/pricing"],
                 // ["Agents", "/agents"],
                 ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
