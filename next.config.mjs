@@ -22,6 +22,7 @@ const nextConfig = {
         permanent: true, // 301 Redirect: Google ko batayega ki 'www' hi asli version hai
       },
 
+      // changed these url redirect for better SEO
       // --- Zero-brokerage cluster: merge into the most comprehensive one ---
       {
         source:
