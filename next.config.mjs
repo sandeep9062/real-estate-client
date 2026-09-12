@@ -78,13 +78,12 @@ const nextConfig = {
         permanent: true,
       },
 
-      // --- Broken slug (has a literal colon in the URL) — also brand-vanity, so send it to About ---
-      {
-        source:
-          "/journal/the-tricity-real-estate-disruption:-why-propertybulbul-is-leaving-legacy-portals-far-behind",
-        destination: "/about-us",
-        permanent: true,
-      },
+      // NOTE: The colon-slug redirect ("the-tricity-real-estate-disruption:-why...")
+      // is intentionally NOT here. next.config.js redirects are parsed by
+      // path-to-regexp, which treats ":" as the start of a named route
+      // parameter (e.g. /:slug) even when escaped as "\:" — so it does not
+      // match reliably across Next.js versions. That one redirect is handled
+      // in middleware.ts instead, which compares the raw pathname directly.
 
       // --- Product how-to, belongs in FAQ/Help, not Journal ---
       {
