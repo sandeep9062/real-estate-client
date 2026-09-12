@@ -141,3 +141,12 @@ const Footer = () => {
 };
 
 export default Footer;
+
+// Popular Searches
+// 2 BHK for Rent in Chandigarh   → https://www.propertybulbul.com/properties/chandigarh/for-rent-2bhk
+// 1 BHK for Rent in Chandigarh   → https://www.propertybulbul.com/properties/chandigarh/for-rent-1bhk
+// 3 BHK for Rent in Chandigarh   → https://www.propertybulbul.com/properties/chandigarh/for-rent-3bhk
+// PG in Chandigarh               → https://www.propertybulbul.com/properties/chandigarh/pg
+// PG for Boys in Chandigarh      → https://www.propertybulbul.com/properties/chandigarh/pg-boys
+// 2 BHK for Rent in Mohali       → https://www.propertybulbul.com/properties/mohali/for-rent-2bhk
+// 1 BHK for Rent in Mohali       → https://www.propertybulbul.com/properties/mohali/for-rent-1bhk
