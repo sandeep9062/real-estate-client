@@ -15,6 +15,7 @@ import PropertyGrid from "@/components/PropertyGrid";
 import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
 import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 import { useLazyGetAllPropertiesQuery } from "@/services/propertiesApi";
+import { buildSeoHrefFromFilters } from "@/lib/filterSlug";
 import { Map, List as ListIcon, Loader2 } from "lucide-react";
 
 interface PropertiesClientProps {
@@ -89,6 +90,17 @@ function PropertiesClientInner({
   }, [searchParams]);
 
   const handleApplyFilters = (filters: any) => {
+    // Internal link equity: when the applied filters exactly match one of the
+    // programmatic SEO page patterns, navigate to the crawlable path URL
+    // (/properties/{city}[/{sector}]/{filter}) instead of a query-string URL.
+    // Only when nothing is left over that the SEO page can't represent in its
+    // path (price, furnishing, …) — those stay on the query-string URL so no
+    // filter silently stops working.
+    const seoHref = buildSeoHrefFromFilters(filters);
+    if (seoHref && !seoHref.includes("?")) {
+      router.push(seoHref);
+      return;
+    }
     const params = new URLSearchParams();
     for (const key in filters) {
       if (filters[key] != null && filters[key] !== "") {
@@ -110,6 +122,14 @@ function PropertiesClientInner({
           merged[k] = String(v);
         }
       });
+      // Same SEO-path rewrite as handleApplyFilters: after a merge, if the
+      // resulting filter set matches a programmatic page pattern exactly,
+      // land on the crawlable URL.
+      const seoHref = buildSeoHrefFromFilters(merged);
+      if (seoHref && !seoHref.includes("?")) {
+        router.push(seoHref);
+        return;
+      }
       const params = new URLSearchParams();
       Object.entries(merged).forEach(([k, v]) => {
         if (v === "") return;

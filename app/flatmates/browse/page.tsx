@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -138,7 +138,7 @@ interface SeekerResult {
   matchScore: number | null;
 }
 
-export default function BrowsePage() {
+function BrowsePage() {
   const searchParams = useSearchParams();
   const urlCity = searchParams.get("city") || "";
 
@@ -1045,5 +1045,17 @@ function getErrorMessage(error: unknown): string {
     e.error ||
     e.message ||
     "Something went wrong. Please try again."
+  );
+}
+
+/**
+ * `useSearchParams` in `BrowsePage` needs a Suspense boundary or the page
+ * cannot be statically prerendered (build fails with a CSR bailout).
+ */
+export default function FlatmatesBrowsePage() {
+  return (
+    <Suspense fallback={null}>
+      <BrowsePage />
+    </Suspense>
   );
 }

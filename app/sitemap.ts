@@ -1,8 +1,22 @@
 import { MetadataRoute } from "next";
+import { buildSeoPath, eligibleSeoCombos } from "../lib/filterSlug";
 
 interface ApiProperty {
   _id: string;
   slug?: string;
+  updatedAt?: string;
+}
+
+interface ApiPropertyFull {
+  _id: string;
+  isActive?: boolean;
+  deletedAt?: string | null;
+  deal?: string;
+  propertyCategory?: string;
+  title?: string;
+  description?: string;
+  location?: { city?: string; sector?: string };
+  facilities?: { bedrooms?: number | string };
   updatedAt?: string;
 }
 
@@ -42,6 +56,32 @@ async function fetchJson(url: string): Promise<unknown> {
     return null;
   }
   return res.json();
+}
+
+/**
+ * Fetch every property document (paginated) so the programmatic SEO landing
+ * page URLs can be derived from live inventory. Runs on every build/deploy —
+ * combinations that drop below MIN_LISTINGS_FOR_SEO_PAGE automatically fall
+ * out of the sitemap (and 404 on the site), so this list is never
+ * hand-maintained.
+ */
+async function fetchAllPropertiesForSeo(
+  base: string,
+): Promise<ApiPropertyFull[]> {
+  const LIMIT = 100;
+  const MAX_PAGES = 50; // safety cap: 5,000 listings
+  const all: ApiPropertyFull[] = [];
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const payload = (await fetchJson(
+      `${base}/properties?limit=${LIMIT}&page=${page}&sort=-createdAt`,
+    )) as ApiSitemapResponse | null;
+    const batch = Array.isArray(payload?.data)
+      ? (payload.data as ApiPropertyFull[])
+      : [];
+    all.push(...batch);
+    if (batch.length < LIMIT) break;
+  }
+  return all;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -240,14 +280,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap: Failed to fetch developers —", error);
   }
 
+  // --- Programmatic SEO landing pages (/properties/{city}[/{sector}]/{filter}) ---
+  // Same `eligibleSeoCombos` logic the pages use for the 3-listing guardrail,
+  // so the sitemap can never list a URL the site itself would 404.
+  let seoLandingUrls: MetadataRoute.Sitemap = [];
+  try {
+    const allProperties = await fetchAllPropertiesForSeo(API_BASE);
+    const combos = eligibleSeoCombos(allProperties);
+    seoLandingUrls = combos.map((c) => ({
+      url: `${baseUrl}${buildSeoPath(c.city, c.spec, c.sectorSlug)}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: c.sectorSlug ? 0.9 : 0.8,
+    }));
+    console.log(
+      `Sitemap: Fetched ${allProperties.length} properties — ${combos.length} SEO landing pages eligible`,
+    );
+  } catch (error) {
+    console.error(
+      "Sitemap: Failed to derive SEO landing page URLs —",
+      error,
+    );
+  }
+
   const totalUrls =
     staticRoutes.length +
     propertyUrls.length +
     journalUrls.length +
     projectUrls.length +
-    developerUrls.length;
+    developerUrls.length +
+    seoLandingUrls.length;
   console.log(
-    `Sitemap: Total URLs generated — ${totalUrls} (static: ${staticRoutes.length}, properties: ${propertyUrls.length}, journals: ${journalUrls.length}, projects: ${projectUrls.length}, developers: ${developerUrls.length})`,
+    `Sitemap: Total URLs generated — ${totalUrls} (static: ${staticRoutes.length}, properties: ${propertyUrls.length}, journals: ${journalUrls.length}, projects: ${projectUrls.length}, developers: ${developerUrls.length}, seo-landings: ${seoLandingUrls.length})`,
   );
 
   return [
@@ -256,5 +320,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...journalUrls,
     ...projectUrls,
     ...developerUrls,
+    ...seoLandingUrls,
   ];
 }
