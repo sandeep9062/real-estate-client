@@ -191,6 +191,17 @@ export const journalApi = createApi({
       providesTags: (result, error, slug) => [{ type: "Journal", slug }],
     }),
 
+    // Track a view when the journal detail page is opened
+    trackJournalView: builder.mutation<
+      { success: boolean; views: number },
+      string
+    >({
+      query: (slug) => ({
+        url: `/v1/journals/${slug}/view`,
+        method: "POST",
+      }),
+    }),
+
     // Create a new journal post
     createJournal: builder.mutation<Journal, Partial<Journal>>({
       query: (journalData) => {
@@ -252,6 +263,7 @@ export const {
   useGetJournalByIdQuery,
   useGetJournalBySlugQuery,
   useGetJournalCategoriesQuery,
+  useTrackJournalViewMutation,
   useCreateJournalMutation,
   useUpdateJournalMutation,
   useDeleteJournalMutation,

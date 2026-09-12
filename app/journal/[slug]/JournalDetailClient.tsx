@@ -18,6 +18,7 @@ import {
 import {
   useGetJournalBySlugQuery,
   useGetJournalsQuery,
+  useTrackJournalViewMutation,
 } from "@/services/journalApi";
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
 import {
@@ -29,7 +30,7 @@ import {
 } from "@tabler/icons-react";
 import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 interface JournalDetailClientProps {
   slug: string;
@@ -92,6 +93,21 @@ export default function JournalDetailClient({
   // The backend now returns a paginated response: { success, count, total, pagination, data: [...] }
   // Support both the new shape (relatedProps.data) and the legacy array format (relatedProps)
   const relatedProperties = relatedProps?.data ?? relatedProps ?? [];
+
+  // Count a view once per page open. A ref guard keeps this to exactly one
+  // request per mount (also protects against React StrictMode's dev
+  // double-invoke of effects). Fires from the client so SSR/metadata fetches
+  // and crawlers don't inflate the count.
+  const [trackJournalView] = useTrackJournalViewMutation();
+  const viewTrackedRef = useRef(false);
+
+  useEffect(() => {
+    if (viewTrackedRef.current) return;
+    viewTrackedRef.current = true;
+    trackJournalView(slug).catch(() => {
+      // Tracking is fire-and-forget; never surface errors to the reader.
+    });
+  }, [slug, trackJournalView]);
 
   if (journalLoading)
     return (
