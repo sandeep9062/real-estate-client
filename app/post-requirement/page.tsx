@@ -202,103 +202,6 @@ const CITIES = [
   "Noida",
 ];
 
-const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-:root{
-  --blue:#4161DF;--blue-dk:#2D4BC4;--blue-lt:#EEF1FD;--blue-mid:#C9D4FB;
-  --navy:#0E1B4D;--navy2:#1A2B6B;
-  --ink:#111827;--ink2:#4B5563;--ink3:#9CA3AF;
-  --bg:#F3F5FF;--white:#FFFFFF;--border:#E5E9F7;
-  --green:#16A34A;--green-lt:#DCFCE7;
-  --sh:0 4px 20px rgba(14,27,77,.10);--sh-lg:0 12px 40px rgba(14,27,77,.14);
-}
-.pb{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:var(--ink);}
-.pb-hero{background:linear-gradient(135deg,#1e3a5f 0%,#4161df 100%);padding:3rem 1.5rem 5.5rem;text-align:center;position:relative;overflow:hidden;}
-.pb-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(65,97,223,.25) 0%,transparent 70%);}
-.pb-hero-dots{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
-.pb-hero-circle{position:absolute;border-radius:50%;background:white;pointer-events:none;}
-.pb-hero-wave{position:absolute;bottom:0;left:0;width:100%;overflow:hidden;line-height:0;pointer-events:none;}
-.pb-hero-wave svg{fill:var(--bg);}
-.pb-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:1.75rem;position:relative;}
-.pb-logo-icon{width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
-.pb-logo-text{font-size:1.2rem;font-weight:700;color:#fff;}
-.pb-logo-text span{color:var(--blue-mid);}
-.pb-hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:.35rem 1rem;font-size:.72rem;color:rgba(255,255,255,.85);letter-spacing:.08em;text-transform:uppercase;font-weight:500;margin-bottom:1.25rem;position:relative;}
-.pb-hero h1{font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;color:#fff;line-height:1.15;letter-spacing:-.02em;margin-bottom:.75rem;position:relative;}
-.pb-hero h1 em{font-style:normal;background:linear-gradient(90deg,#93A8FF,#C4D0FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.pb-hero p{color:rgba(255,255,255,.6);font-size:.9rem;font-weight:300;line-height:1.7;position:relative;}
-.pb-wrap{max-width:700px;margin:-2.5rem auto 0;padding:0 1rem 4rem;position:relative;z-index:10;}
-.pb-pbar{height:4px;background:var(--border);border-radius:99px;margin-bottom:1.75rem;overflow:hidden;}
-.pb-pfill{height:100%;background:linear-gradient(90deg,var(--blue),#7B93F5);border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1);}
-.pb-snav{display:flex;align-items:center;margin-bottom:1.75rem;padding:0 .25rem;}
-.pb-sdot{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
-.pb-dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ink3);transition:all .3s;position:relative;z-index:1;box-shadow:0 1px 3px rgba(14,27,77,.08);}
-.pb-dot-a{background:var(--blue)!important;border-color:var(--blue)!important;color:#fff!important;box-shadow:0 0 0 4px rgba(65,97,223,.18)!important;}
-.pb-dot-d{background:var(--green)!important;border-color:var(--green)!important;color:#fff!important;}
-.pb-dlabel{font-size:10px;color:var(--ink3);text-align:center;font-weight:500;letter-spacing:.02em;}
-.pb-dlabel-a{color:var(--blue)!important;}
-.pb-dlabel-d{color:var(--green)!important;}
-.pb-sline{flex:1;height:2px;background:var(--border);margin-top:-19px;max-width:40px;transition:background .3s;}
-.pb-sline-d{background:var(--green)!important;}
-.pb-card{background:var(--white);border-radius:20px;padding:2rem;box-shadow:var(--sh-lg);border:1px solid rgba(65,97,223,.08);}
-.pb-sh{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.5rem;}
-.pb-snum{width:32px;height:32px;border-radius:10px;background:var(--blue-lt);border:1.5px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;}
-.pb-stitle{font-size:1.15rem;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
-.pb-ssub{font-size:.8rem;color:var(--ink3);margin-top:2px;}
-.pb-g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-@media(max-width:520px){.pb-g2{grid-template-columns:1fr;}}
-.pb-f{display:flex;flex-direction:column;gap:6px;}
-.pb-lbl{font-size:.75rem;font-weight:600;color:var(--ink2);letter-spacing:.04em;text-transform:uppercase;}
-.pb-req{color:var(--blue);margin-left:2px;}
-.pb-in,.pb-sel,.pb-ta{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:.7rem 1rem;font-size:.88rem;font-family:'Inter',sans-serif;color:var(--ink);outline:none;transition:all .2s;width:100%;}
-.pb-in:focus,.pb-sel:focus,.pb-ta:focus{border-color:var(--blue);background:var(--blue-lt);box-shadow:0 0 0 3px rgba(65,97,223,.12);}
-.pb-in::placeholder,.pb-ta::placeholder{color:var(--ink3);}
-.pb-sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239CA3AF' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 12px) center;padding-right:2.25rem;cursor:pointer;}
-.pb-ta{resize:vertical;min-height:90px;}
-.pb-err{font-size:.73rem;color:#DC2626;margin-top:2px;font-weight:500;}
-.pb-pg{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:6px;}
-.pb-pill{display:inline-flex;align-items:center;gap:5px;padding:.45rem .9rem;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:.82rem;color:var(--ink2);cursor:pointer;transition:all .18s;font-weight:500;user-select:none;}
-.pb-pill:hover{border-color:var(--blue-mid);background:var(--blue-lt);color:var(--blue);}
-.pb-pill-a{background:var(--blue-lt)!important;border-color:var(--blue)!important;color:var(--blue)!important;font-weight:600;}
-.pb-bg{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem;}
-@media(max-width:420px){.pb-bg{grid-template-columns:1fr;}}
-.pb-bc{border:1.5px solid var(--border);background:var(--bg);border-radius:14px;padding:1.1rem 1rem;cursor:pointer;transition:all .2s;text-align:center;}
-.pb-bc:hover{border-color:var(--blue-mid);background:var(--blue-lt);}
-.pb-bc-a{background:var(--blue-lt)!important;border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(65,97,223,.1);}
-.pb-bamt{font-size:1.15rem;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
-.pb-bamt-a{color:var(--blue)!important;}
-.pb-bsub{font-size:.72rem;color:var(--ink3);margin-top:4px;}
-.pb-ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:.5rem;}
-.pb-ac{border:1.5px solid var(--border);background:var(--bg);border-radius:12px;padding:.65rem .5rem;text-align:center;cursor:pointer;transition:all .18s;font-size:.73rem;color:var(--ink2);display:flex;flex-direction:column;align-items:center;gap:5px;user-select:none;font-weight:500;}
-.pb-ac:hover{border-color:var(--blue-mid);background:var(--blue-lt);}
-.pb-ac-a{background:var(--blue-lt)!important;border-color:var(--blue)!important;color:var(--blue)!important;font-weight:600;}
-.pb-aic{font-size:19px;line-height:1;}
-.pb-acnt{font-size:.78rem;color:var(--green);font-weight:600;margin-top:.6rem;}
-.pb-nav{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;}
-.pb-btn-back{background:none;border:1.5px solid var(--border);border-radius:10px;padding:.65rem 1.4rem;font-size:.87rem;font-family:'Inter',sans-serif;color:var(--ink2);cursor:pointer;transition:all .2s;font-weight:500;}
-.pb-btn-back:hover{border-color:var(--ink3);color:var(--ink);}
-.pb-btn-next{background:var(--blue);border:none;border-radius:10px;padding:.7rem 2rem;font-size:.9rem;font-family:'Inter',sans-serif;color:#fff;font-weight:600;cursor:pointer;transition:all .2s;}
-.pb-btn-next:hover{background:var(--blue-dk);transform:translateY(-1px);box-shadow:0 6px 20px rgba(65,97,223,.35);}
-.pb-btn-submit{background:linear-gradient(135deg,var(--navy),var(--navy2));border:none;border-radius:10px;padding:.75rem 2.5rem;font-size:.9rem;font-family:'Inter',sans-serif;color:#fff;font-weight:600;cursor:pointer;transition:all .2s;}
-.pb-btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(14,27,77,.3);}
-.pb-btn-submit:disabled{background:var(--border);color:var(--ink3);cursor:not-allowed;transform:none;box-shadow:none;}
-.pb-div{height:1px;background:var(--border);margin:1.5rem 0;}
-.pb-cr{display:flex;align-items:flex-start;gap:.75rem;cursor:pointer;}
-.pb-cr input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);flex-shrink:0;margin-top:3px;cursor:pointer;}
-.pb-cr span{font-size:.83rem;color:var(--ink2);line-height:1.6;}
-.pb-cbox{background:var(--blue-lt);border:1.5px solid var(--blue-mid);border-radius:12px;padding:1rem 1.25rem;margin:1.5rem 0;}
-.pb-ctext{font-size:.76rem;color:var(--ink2);line-height:1.65;}
-.pb-trust{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:1.25rem;flex-wrap:wrap;}
-.pb-ti{font-size:.75rem;color:var(--ink3);display:flex;align-items:center;gap:4px;font-weight:500;}
-.pb-done{text-align:center;padding:3rem 1rem;}
-.pb-done-ring{width:88px;height:88px;border-radius:50%;background:var(--green-lt);border:3px solid #BBF7D0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 1.25rem;}
-.pb-done h2{font-size:1.75rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:.6rem;}
-.pb-done p{color:var(--ink2);font-size:.9rem;line-height:1.75;max-width:340px;margin:0 auto;}
-.pb-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-lt);color:var(--green);border:1px solid #BBF7D0;border-radius:50px;padding:.4rem 1.1rem;font-size:.8rem;font-weight:600;margin-top:1.5rem;}
-.pb-fade{animation:pbFade .35s ease;}
-@keyframes pbFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-`;
-
 const Pill = ({
   active,
   onClick,
@@ -309,7 +212,7 @@ const Pill = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`pb-pill${active ? " pb-pill-a" : ""}`}
+    className={`inline-flex items-center gap-[5px] px-3.5 py-[.45rem] rounded-lg border-[1.5px] border-[#E5E9F7] bg-[#F3F5FF] text-[.82rem] text-[#4B5563] cursor-pointer transition-all font-medium select-none hover:border-[#C9D4FB] hover:bg-[#EEF1FD] hover:text-[#4161DF]${active ? " bg-[#EEF1FD]! border-[#4161DF]! text-[#4161DF]! font-semibold!" : ""}`}
     onClick={onClick}
     role="button"
     tabIndex={0}
@@ -330,13 +233,13 @@ const Field = ({
   error?: string;
   children: React.ReactNode;
 }) => (
-  <div className="pb-f">
-    <label className="pb-lbl">
+  <div className="flex flex-col gap-1.5">
+    <label className="text-xs font-semibold text-[#4B5563] tracking-[.04em] uppercase">
       {label}
-      {required && <span className="pb-req"> *</span>}
+      {required && <span className="text-[#4161DF] ml-0.5"> *</span>}
     </label>
     {children}
-    {error && <div className="pb-err">⚠ {error}</div>}
+    {error && <div className="text-[.73rem] text-[#DC2626] mt-0.5 font-medium">⚠ {error}</div>}
   </div>
 );
 
@@ -349,11 +252,11 @@ const SH = ({
   title: string;
   sub: string;
 }) => (
-  <div className="pb-sh">
-    <div className="pb-snum">{step}</div>
+  <div className="flex items-start gap-3 mb-6">
+    <div className="w-8 h-8 rounded-[10px] bg-[#EEF1FD] border-[1.5px] border-[#C9D4FB] flex items-center justify-center text-[13px] font-bold text-[#4161DF] shrink-0">{step}</div>
     <div>
-      <div className="pb-stitle">{title}</div>
-      <div className="pb-ssub">{sub}</div>
+      <div className="text-lg font-bold text-[#111827] tracking-tight">{title}</div>
+      <div className="text-[.8rem] text-[#9CA3AF] mt-0.5">{sub}</div>
     </div>
   </div>
 );
@@ -522,59 +425,39 @@ export default function DreamHomeEnquiry() {
 
   return (
     <>
-      <style>{CSS}</style>
-      <div className="pb max-w-7xl">
+      <div className="min-h-screen bg-[#F3F5FF] text-[#111827] [font-family:Inter,sans-serif] max-w-7xl">
         {/* Hero */}
-        <div className="pb-hero">
+        <div className="relative overflow-hidden bg-[radial-gradient(ellipse_at_70%_50%,rgba(65,97,223,.25)_0%,transparent_70%),linear-gradient(135deg,#1e3a5f_0%,#4161df_100%)] text-center px-6 pt-12 pb-[5.5rem]">
           {/* Dot grid */}
-          <div className="pb-hero-dots" />
+          <div className="absolute inset-0 opacity-[.07] pointer-events-none bg-[radial-gradient(circle,white_1px,transparent_1px)] [background-size:28px_28px]" />
           {/* Decorative circles */}
           <div
-            className="pb-hero-circle"
-            style={{
-              width: 300,
-              height: 300,
-              top: -100,
-              left: -80,
-              opacity: 0.06,
-            }}
+            className="absolute rounded-full bg-white pointer-events-none w-[300px] h-[300px] -top-[100px] -left-[80px] opacity-[.06]"
           />
           <div
-            className="pb-hero-circle"
-            style={{
-              width: 200,
-              height: 200,
-              top: 20,
-              right: -60,
-              opacity: 0.08,
-            }}
+            className="absolute rounded-full bg-white pointer-events-none w-[200px] h-[200px] top-[20px] -right-[60px] opacity-[.08]"
           />
           <div
-            className="pb-hero-circle"
-            style={{
-              width: 150,
-              height: 150,
-              bottom: -60,
-              left: "40%",
-              opacity: 0.05,
-            }}
+            className="absolute rounded-full bg-white pointer-events-none w-[150px] h-[150px] -bottom-[60px] left-[40%] opacity-[.05]"
           />
 
-          <div className="pb-hero-tag mt-2">
+          <div className="relative inline-flex items-center gap-1.5 bg-white/[.12] border border-white/[.2] rounded-full px-4 py-1.5 text-[.72rem] text-white/[.85] tracking-[.08em] uppercase font-medium mb-5 mt-2">
             🏆 Tricity's Most Trusted Platform
           </div>
-          <h1>
-            Find Your <em>Dream Home</em>
+          <h1 className="relative text-white font-extrabold leading-[1.15] tracking-tight mb-3 text-[clamp(1.75rem,4vw,2.5rem)]">
+            Find Your <em className="bg-[linear-gradient(90deg,#93A8FF,#C4D0FF)] bg-clip-text text-transparent not-italic">
+              Dream Home
+            </em>
             <br />
             Without the Hassle
           </h1>
-          <p>
+          <p className="relative text-white/[.6] text-[.9rem] font-extralight leading-[1.7]">
             No hidden charges · No spam calls · Verified listings · Zero
             brokerage surprises
           </p>
 
           {/* Bottom wave */}
-          <div className="pb-hero-wave">
+          <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none pointer-events-none [&_svg]:fill-[#F3F5FF]">
             <svg
               viewBox="0 0 1440 40"
               preserveAspectRatio="none"
@@ -585,30 +468,30 @@ export default function DreamHomeEnquiry() {
           </div>
         </div>
 
-        <div className="pb-wrap">
-          <div className="pb-pbar">
-            <div className="pb-pfill" style={{ width: `${progress}%` }} />
+        <div className="relative z-10 max-w-[700px] mx-auto -mt-10 px-4 pb-16">
+          <div className="h-1 bg-[#E5E9F7] rounded-full mb-7 overflow-hidden">
+            <div className="h-full bg-[linear-gradient(90deg,#4161DF,#7B93F5)] rounded-full transition-[width_.45s_cubic-bezier(.4,0,.2,1)]" style={{ width: `${progress}%` }} />
           </div>
 
           {!done && (
-            <div className="pb-snav">
+            <div className="flex items-center mb-7 px-1">
               {STEPS.map((label, i) => (
                 <React.Fragment key={label}>
-                  <div className="pb-sdot">
+                  <div className="flex flex-col items-center gap-[5px] flex-1">
                     <div
-                      className={`pb-dot${i === step ? " pb-dot-a" : i < step ? " pb-dot-d" : ""}`}
+                      className={`w-[34px] h-[34px] rounded-full border-2 border-[#E5E9F7] bg-white flex items-center justify-center text-xs font-semibold text-[#9CA3AF] transition-all relative z-10 shadow-[0_1px_3px_rgba(14,27,77,.08)]${i === step ? " bg-[#4161DF]! border-[#4161DF]! text-white! shadow-[0_0_0_4px_rgba(65,97,223,.18)]!" : i < step ? " bg-[#16A34A]! border-[#16A34A]! text-white!" : ""}`}
                     >
                       {i < step ? "✓" : i + 1}
                     </div>
                     <div
-                      className={`pb-dlabel${i === step ? " pb-dlabel-a" : i < step ? " pb-dlabel-d" : ""}`}
+                      className={`text-[10px] text-[#9CA3AF] text-center font-medium tracking-[.02em]${i === step ? " text-[#4161DF]!" : i < step ? " text-[#16A34A]!" : ""}`}
                     >
                       {label}
                     </div>
                   </div>
                   {i < STEPS.length - 1 && (
                     <div
-                      className={`pb-sline${i < step ? " pb-sline-d" : ""}`}
+                      className={`flex-1 h-0.5 bg-[#E5E9F7] -mt-[19px] max-w-[40px] transition-colors${i < step ? " bg-[#16A34A]!" : ""}`}
                     />
                   )}
                 </React.Fragment>
@@ -616,19 +499,19 @@ export default function DreamHomeEnquiry() {
             </div>
           )}
 
-          <div className="pb-card">
+          <div className="bg-white rounded-[20px] p-8 shadow-[0_12px_40px_rgba(14,27,77,.14)] border border-[rgba(65,97,223,.08)]">
             {/* Step 1 */}
             {step === 0 && (
-              <div className="pb-fade">
+              <div className="animate-fade">
                 <SH
                   step="1"
                   title="Nice to meet you!"
                   sub="Let's start with the basics — how can we reach you?"
                 />
-                <div className="pb-g2">
+                <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Full Name" required error={errors.fullName}>
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Rahul Sharma"
                       value={form.fullName}
                       onChange={(e) => set("fullName", e.target.value)}
@@ -636,7 +519,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Mobile Number" required error={errors.phone}>
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="10-digit mobile"
                       type="tel"
                       maxLength={10}
@@ -651,7 +534,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Email Address" required error={errors.email}>
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="you@email.com"
                       type="email"
                       value={form.email}
@@ -659,8 +542,9 @@ export default function DreamHomeEnquiry() {
                     />
                   </Field>
                   <Field label="Preferred City" required error={errors.city}>
+                    <div className="relative">
                     <select
-                      className="pb-sel"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
                       value={form.city}
                       onChange={(e) => set("city", e.target.value)}
                     >
@@ -669,11 +553,23 @@ export default function DreamHomeEnquiry() {
                         <option key={c}>{c}</option>
                       ))}
                     </select>
-                  </Field>
+                    <svg
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
+                      viewBox="0 0 12 8"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    >
+                      <path d="M1 1l5 5 5-5" />
+                    </svg>
+                  </div>
+                </Field>
                 </div>
-                <div className="pb-nav">
+                <div className="flex justify-between items-center mt-8">
                   <span />
-                  <button className="pb-btn-next" onClick={next}>
+                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
                     Continue →
                   </button>
                 </div>
@@ -682,14 +578,14 @@ export default function DreamHomeEnquiry() {
 
             {/* Step 2 */}
             {step === 1 && (
-              <div className="pb-fade">
+              <div className="animate-fade">
                 <SH
                   step="2"
                   title="Describe your dream home"
                   sub="What kind of place are you looking for?"
                 />
                 <Field label="Looking to" required error={errors.deal}>
-                  <div className="pb-pg">
+                  <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                     {[
                       ["🔑", "Rent"],
                       ["💰", "Sale"],
@@ -708,9 +604,9 @@ export default function DreamHomeEnquiry() {
                     ))}
                   </div>
                 </Field>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Property Category" required error={errors.type}>
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["🏘", "Residential"],
                         ["🏙", "Commercial"],
@@ -733,7 +629,7 @@ export default function DreamHomeEnquiry() {
                   required
                   error={errors.propertyCategory}
                 >
-                  <div className="pb-pg">
+                  <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                     {[
                       ["🏢", "Apartment/Flat"],
                       ["🏠", "House/Villa"],
@@ -757,9 +653,9 @@ export default function DreamHomeEnquiry() {
                     ))}
                   </div>
                 </Field>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Bedrooms">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         "1 BHK",
                         "2 BHK",
@@ -778,9 +674,9 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Availability">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["🏠", "Ready to Move"],
                         ["🏗", "Under Construction"],
@@ -796,9 +692,9 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Furnishing">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         "Furnished",
                         "Fully Furnished",
@@ -816,18 +712,18 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Carpet Area (sq.ft) — optional">
-                    <div className="pb-g2">
+                    <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                       <input
-                        className="pb-in"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                         placeholder="Min e.g. 800"
                         type="number"
                         value={form.carpetMin}
                         onChange={(e) => set("carpetMin", e.target.value)}
                       />
                       <input
-                        className="pb-in"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                         placeholder="Max e.g. 2000"
                         type="number"
                         value={form.carpetMax}
@@ -836,9 +732,9 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Purpose of Purchase">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["🏠", "Self-Use"],
                         ["📈", "Investment"],
@@ -856,11 +752,11 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div className="pb-nav">
-                  <button className="pb-btn-back" onClick={back}>
+                <div className="flex justify-between items-center mt-8">
+                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
                     ← Back
                   </button>
-                  <button className="pb-btn-next" onClick={next}>
+                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
                     Continue →
                   </button>
                 </div>
@@ -869,40 +765,41 @@ export default function DreamHomeEnquiry() {
 
             {/* Step 3 */}
             {step === 2 && (
-              <div className="pb-fade">
+              <div className="animate-fade">
                 <SH
                   step="3"
                   title="Let's talk budget"
                   sub="No judgement — this helps us match you perfectly."
                 />
-                <div className="pb-bg">
+                <div className="grid grid-cols-2 gap-3 mb-5 max-sm:grid-cols-1">
                   {(form.deal === "Rent" ? BUDGETS_RENT : BUDGETS_SALE).map(
                     ({ label, sub, val }) => (
                       <div
                         key={val}
-                        className={`pb-bc${form.budget === val ? " pb-bc-a" : ""}`}
+                        className={`border-[1.5px] border-[#E5E9F7] bg-[#F3F5FF] rounded-[14px] p-[1.1rem_1rem] cursor-pointer transition-all text-center hover:border-[#C9D4FB] hover:bg-[#EEF1FD]${form.budget === val ? " bg-[#EEF1FD]! border-[#4161DF]! shadow-[0_0_0_3px_rgba(65,97,223,.1)]!" : ""}`}
                         onClick={() => set("budget", val)}
                       >
                         <div
-                          className={`pb-bamt${form.budget === val ? " pb-bamt-a" : ""}`}
+                          className={`text-lg font-bold text-[#111827] tracking-tight${form.budget === val ? " text-[#4161DF]!" : ""}`}
                         >
                           {label}
                         </div>
-                        <div className="pb-bsub">{sub}</div>
+                        <div className="text-[.72rem] text-[#9CA3AF] mt-1">{sub}</div>
                       </div>
                     ),
                   )}
                 </div>
                 {errors.budget && (
-                  <div className="pb-err" style={{ marginBottom: "1rem" }}>
+                  <div className="text-[.73rem] text-[#DC2626] mt-0.5 font-medium mb-4">
                     ⚠ {errors.budget}
                   </div>
                 )}
-                <div className="pb-div" />
-                <div className="pb-g2">
+                <div className="h-[1px] bg-[#E5E9F7] my-6" />
+                <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Annual Income">
+                    <div className="relative">
                     <select
-                      className="pb-sel"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
                       value={form.income}
                       onChange={(e) => set("income", e.target.value)}
                     >
@@ -916,9 +813,21 @@ export default function DreamHomeEnquiry() {
                         <option key={i}>{i}</option>
                       ))}
                     </select>
-                  </Field>
+                    <svg
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
+                      viewBox="0 0 12 8"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    >
+                      <path d="M1 1l5 5 5-5" />
+                    </svg>
+                  </div>
+                </Field>
                   <Field label="Home Loan Status">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["✅", "Pre-approved"],
                         ["❌", "Not yet"],
@@ -935,11 +844,11 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div className="pb-nav">
-                  <button className="pb-btn-back" onClick={back}>
+                <div className="flex justify-between items-center mt-8">
+                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
                     ← Back
                   </button>
-                  <button className="pb-btn-next" onClick={next}>
+                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
                     Continue →
                   </button>
                 </div>
@@ -948,17 +857,17 @@ export default function DreamHomeEnquiry() {
 
             {/* Step 4 */}
             {step === 3 && (
-              <div className="pb-fade">
+              <div className="animate-fade">
                 <SH
                   step="4"
                   title="What's on your wish list?"
                   sub="Pick every amenity you'd love — go wild!"
                 />
-                <div className="pb-ag">
+                <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(105px,1fr))]">
                   {AMENITIES.map(({ ic, label }) => (
                     <div
                       key={label}
-                      className={`pb-ac${form.amenities.includes(label) ? " pb-ac-a" : ""}`}
+                      className={`border-[1.5px] border-[#E5E9F7] bg-[#F3F5FF] rounded-xl px-2 py-[.65rem] text-center cursor-pointer transition-all text-[.73rem] text-[#4B5563] flex flex-col items-center gap-[5px] select-none font-medium hover:border-[#C9D4FB] hover:bg-[#EEF1FD]${form.amenities.includes(label) ? " bg-[#EEF1FD]! border-[#4161DF]! text-[#4161DF]! font-semibold!" : ""}`}
                       onClick={() => toggleAmenity(label)}
                       role="button"
                       tabIndex={0}
@@ -966,22 +875,22 @@ export default function DreamHomeEnquiry() {
                         e.key === "Enter" && toggleAmenity(label)
                       }
                     >
-                      <span className="pb-aic">{ic}</span>
+                      <span className="text-[19px] leading-none">{ic}</span>
                       <span>{label}</span>
                     </div>
                   ))}
                 </div>
                 {form.amenities.length > 0 && (
-                  <div className="pb-acnt">
+                  <div className="text-[.78rem] text-[#16A34A] font-semibold mt-2.5">
                     ✓ {form.amenities.length} amenit
                     {form.amenities.length === 1 ? "y" : "ies"} selected
                   </div>
                 )}
-                <div className="pb-nav">
-                  <button className="pb-btn-back" onClick={back}>
+                <div className="flex justify-between items-center mt-8">
+                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
                     ← Back
                   </button>
-                  <button className="pb-btn-next" onClick={next}>
+                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
                     Continue →
                   </button>
                 </div>
@@ -990,14 +899,14 @@ export default function DreamHomeEnquiry() {
 
             {/* Step 5 — Details */}
             {step === 4 && (
-              <div className="pb-fade">
+              <div className="animate-fade">
                 <SH
                   step="5"
                   title="Preferences & details"
                   sub="All optional — but every detail helps us match you faster."
                 />
                 <Field label="Ownership Type Preferred">
-                  <div className="pb-pg">
+                  <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                     {[
                       "Freehold",
                       "Leasehold",
@@ -1014,23 +923,16 @@ export default function DreamHomeEnquiry() {
                     ))}
                   </div>
                 </Field>
-                <div className="pb-div" />
+                <div className="h-[1px] bg-[#E5E9F7] my-6" />
                 <div
-                  style={{
-                    fontSize: ".8rem",
-                    fontWeight: 700,
-                    color: "var(--ink2)",
-                    textTransform: "uppercase",
-                    letterSpacing: ".08em",
-                    marginBottom: ".75rem",
-                  }}
+                  className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3"
                 >
                   🛏 Facilities
                 </div>
-                <div className="pb-g2">
+                <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Bedrooms">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 2"
@@ -1045,7 +947,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Bathrooms">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 2"
@@ -1060,7 +962,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Balconies">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 1"
@@ -1075,7 +977,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Servant Rooms">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 0"
@@ -1090,7 +992,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Parkings">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 1"
@@ -1105,7 +1007,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Total Floors">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 12"
@@ -1119,9 +1021,9 @@ export default function DreamHomeEnquiry() {
                     />
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Parking Type">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {["None", "Open", "Covered", "Both"].map((val) => (
                         <Pill
                           key={val}
@@ -1134,9 +1036,9 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Water Supply">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {["Municipal", "Borewell", "Both"].map((val) => (
                         <Pill
                           key={val}
@@ -1149,9 +1051,9 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Security Features">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {["CCTV", "Guard", "Biometric", "Gated"].map((val) => (
                         <Pill
                           key={val}
@@ -1166,78 +1068,71 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <label className="pb-cr" style={{ marginTop: "1rem" }}>
+                <label className="flex items-start gap-3 cursor-pointer mt-4">
                   <input
-                    type="checkbox"
+                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.facilities.powerBackup}
                     onChange={(e) => setFac("powerBackup", e.target.checked)}
                   />
-                  <span>Power backup is a must</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Power backup is a must</span>
                 </label>
-                <div className="pb-div" />
+                <div className="h-[1px] bg-[#E5E9F7] my-6" />
                 <div
-                  style={{
-                    fontSize: ".8rem",
-                    fontWeight: 700,
-                    color: "var(--ink2)",
-                    textTransform: "uppercase",
-                    letterSpacing: ".08em",
-                    marginBottom: ".75rem",
-                  }}
+                  className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3"
                 >
                   📋 House Rules
                 </div>
-                <label className="pb-cr">
+                <label className="flex items-start gap-3 cursor-pointer">
                   <input
-                    type="checkbox"
+                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.petsAllowed}
                     onChange={(e) => set("petsAllowed", e.target.checked)}
                   />
-                  <span>Pets must be allowed in the property</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Pets must be allowed in the property</span>
                 </label>
-                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox"
+                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.ownerLivesOnPremises}
                     onChange={(e) =>
                       setHR("ownerLivesOnPremises", e.target.checked)
                     }
                   />
-                  <span>Owner living on the premises is acceptable</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Owner living on the premises is acceptable</span>
                 </label>
-                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox"
+                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.smokingAllowedOnPremises}
                     onChange={(e) =>
                       setHR("smokingAllowedOnPremises", e.target.checked)
                     }
                   />
-                  <span>Smoking allowed on premises</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Smoking allowed on premises</span>
                 </label>
-                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox"
+                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.drinkingAllowedOnPremises}
                     onChange={(e) =>
                       setHR("drinkingAllowedOnPremises", e.target.checked)
                     }
                   />
-                  <span>Drinking allowed on premises</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Drinking allowed on premises</span>
                 </label>
-                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox"
+                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.hasCurfew}
                     onChange={(e) => setHR("hasCurfew", e.target.checked)}
                   />
-                  <span>Curfew is acceptable</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Curfew is acceptable</span>
                 </label>
                 {form.houseRules.hasCurfew && (
-                  <div style={{ marginTop: ".75rem" }}>
+                  <div className="mt-3">
                     <Field label="Curfew time">
                       <input
-                        className="pb-in"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                         placeholder="e.g. 10:00 PM"
                         value={form.houseRules.curfewTime}
                         onChange={(e) => setHR("curfewTime", e.target.value)}
@@ -1245,9 +1140,9 @@ export default function DreamHomeEnquiry() {
                     </Field>
                   </div>
                 )}
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Opposite Gender Guests">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["allowed", "Allowed"],
                         ["allowed_with_notice", "With Notice"],
@@ -1268,9 +1163,9 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Overnight Guests">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["allowed", "Allowed"],
                         ["allowed_with_notice", "With Notice"],
@@ -1290,23 +1185,16 @@ export default function DreamHomeEnquiry() {
                   </Field>
                 </div>
 
-                <div className="pb-div" />
+                <div className="h-[1px] bg-[#E5E9F7] my-6" />
                 <div
-                  style={{
-                    fontSize: ".8rem",
-                    fontWeight: 700,
-                    color: "var(--ink2)",
-                    textTransform: "uppercase",
-                    letterSpacing: ".08em",
-                    marginBottom: ".75rem",
-                  }}
+                  className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3"
                 >
                   📍 Nearby Places
                 </div>
-                <div className="pb-g2">
+                <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Schools">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.schools}
                       onChange={(e) => setNearby("schools", e.target.value)}
@@ -1314,7 +1202,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Hospitals">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.hospitals}
                       onChange={(e) => setNearby("hospitals", e.target.value)}
@@ -1322,7 +1210,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Metro Stations">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.metroStations}
                       onChange={(e) =>
@@ -1332,7 +1220,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Malls">
                     <input
-                      className="pb-in"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.malls}
                       onChange={(e) => setNearby("malls", e.target.value)}
@@ -1340,11 +1228,11 @@ export default function DreamHomeEnquiry() {
                   </Field>
                 </div>
 
-                <div className="pb-nav">
-                  <button className="pb-btn-back" onClick={back}>
+                <div className="flex justify-between items-center mt-8">
+                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
                     ← Back
                   </button>
-                  <button className="pb-btn-next" onClick={next}>
+                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
                     Continue →
                   </button>
                 </div>
@@ -1353,7 +1241,7 @@ export default function DreamHomeEnquiry() {
 
             {/* Step 6 */}
             {step === 5 && (
-              <div className="pb-fade">
+              <div className="animate-fade">
                 <SH
                   step="6"
                   title="Almost there!"
@@ -1364,7 +1252,7 @@ export default function DreamHomeEnquiry() {
                   required
                   error={errors.timeline}
                 >
-                  <div className="pb-pg">
+                  <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                     {[
                       ["🔥", "Within 1 Month"],
                       ["📅", "Within 3 Months"],
@@ -1380,9 +1268,9 @@ export default function DreamHomeEnquiry() {
                     ))}
                   </div>
                 </Field>
-                <div style={{ marginTop: "1.25rem" }}>
+                <div className="mt-5">
                   <Field label="Best time to call you">
-                    <div className="pb-pg">
+                    <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
                         ["🌅", "Morning"],
                         ["☀️", "Afternoon"],
@@ -1400,84 +1288,93 @@ export default function DreamHomeEnquiry() {
                     </div>
                   </Field>
                 </div>
-                <div className="pb-g2" style={{ marginTop: "1.25rem" }}>
+                <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1 mt-5">
                   <Field label="Anything else to know?">
                     <textarea
-                      className="pb-ta"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] resize-y min-h-[90px]"
                       placeholder="Locality preferences, specific projects, special needs..."
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
                     />
                   </Field>
                   <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "1rem",
-                    }}
+                    className="flex flex-col gap-4"
                   >
                     <Field label="How did you find us?">
-                      <select
-                        className="pb-sel"
-                        value={form.source}
-                        onChange={(e) => set("source", e.target.value)}
-                      >
-                        <option value="">Select</option>
-                        {[
-                          "Google",
-                          "Instagram",
-                          "LinkedIn",
-                          "Friend / Referral",
-                          "Advertisement",
-                          "Other",
-                        ].map((s) => (
-                          <option key={s}>{s}</option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <select
+                          className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
+                          value={form.source}
+                          onChange={(e) => set("source", e.target.value)}
+                        >
+                          <option value="">Select</option>
+                          {[
+                            "Google",
+                            "Instagram",
+                            "LinkedIn",
+                            "Friend / Referral",
+                            "Advertisement",
+                            "Other",
+                          ].map((s) => (
+                            <option key={s}>{s}</option>
+                          ))}
+                        </select>
+                        <svg
+                          aria-hidden="true"
+                          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
+                          viewBox="0 0 12 8"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                        >
+                          <path d="M1 1l5 5 5-5" />
+                        </svg>
+                      </div>
                     </Field>
-                    <label className="pb-cr">
+                    <label className="flex items-start gap-3 cursor-pointer">
                       <input
-                        type="checkbox"
+                        type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                         checked={form.needLoanHelp}
                         onChange={(e) => set("needLoanHelp", e.target.checked)}
                       />
-                      <span>Help me explore home loan options</span>
+                      <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Help me explore home loan options</span>
                     </label>
-                    <label className="pb-cr">
+                    <label className="flex items-start gap-3 cursor-pointer">
                       <input
-                        type="checkbox"
+                        type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                         checked={form.reraOnly}
                         onChange={(e) => set("reraOnly", e.target.checked)}
                       />
-                      <span>Show RERA-registered properties only</span>
+                      <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Show RERA-registered properties only</span>
                     </label>
                   </div>
                 </div>
-                <div className="pb-cbox">
-                  <label className="pb-cr">
+                <div className="bg-[#EEF1FD] border-[1.5px] border-[#C9D4FB] rounded-xl px-5 py-4 my-6">
+                  <label className="flex items-start gap-3 cursor-pointer">
                     <input
-                      type="checkbox"
+                      type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                       checked={form.consentGiven}
                       onChange={(e) => set("consentGiven", e.target.checked)}
                     />
-                    <span className="pb-ctext">
+                    <span className="text-[.76rem]! text-[#4B5563] leading-[1.65]!">
                       By submitting, I agree to be contacted via call, SMS,
                       WhatsApp, or email by PropertyBulbul and its partners.
                       Your data is never sold.
                     </span>
                   </label>
                   {errors.consentGiven && (
-                    <div className="pb-err" style={{ marginTop: 8 }}>
+                    <div className="text-[.73rem] text-[#DC2626] mt-2 font-medium">
                       ⚠ {errors.consentGiven}
                     </div>
                   )}
                 </div>
-                <div className="pb-nav">
-                  <button className="pb-btn-back" onClick={back}>
+                <div className="flex justify-between items-center mt-8">
+                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
                     ← Back
                   </button>
                   <button
-                    className="pb-btn-submit"
+                    className="bg-[linear-gradient(135deg,#0E1B4D,#1A2B6B)] border-none rounded-[10px] px-10 py-3 text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:-translate-y-[1px] hover:shadow-[0_8px_24px_rgba(14,27,77,.3)] disabled:bg-[#E5E9F7] disabled:text-[#9CA3AF] disabled:cursor-not-allowed disabled:shadow-none"
                     disabled={submitting}
                     onClick={submit}
                   >
@@ -1489,30 +1386,30 @@ export default function DreamHomeEnquiry() {
 
             {/* Done */}
             {done && (
-              <div className="pb-fade pb-done">
-                <div className="pb-done-ring">🏡</div>
-                <h2>You're all set!</h2>
-                <p>
+              <div className="animate-fade text-center py-12 px-4">
+                <div className="w-[88px] h-[88px] rounded-full bg-[#DCFCE7] border-[3px] border-[#BBF7D0] flex items-center justify-center text-4xl mx-auto mb-5">🏡</div>
+                <h2 className="text-[1.75rem] font-extrabold text-[#111827] tracking-tight mb-2.5">You're all set!</h2>
+                <p className="text-[#4B5563] text-[.9rem] leading-[1.75] max-w-[340px] mx-auto">
                   Our property advisor will reach out within 24 hours with
                   verified listings that match exactly what you're looking for.
                 </p>
-                <div className="pb-badge">
+                <div className="inline-flex items-center gap-1.5 bg-[#DCFCE7] text-[#16A34A] border border-[#BBF7D0] rounded-full py-[.4rem] px-[1.1rem] text-[.8rem] font-semibold mt-6">
                   ✓ Confirmation sent to your email
                 </div>
-                <div className="pb-trust" style={{ marginTop: "2rem" }}>
-                  <div className="pb-ti">🔒 100% Secure</div>
-                  <div className="pb-ti">✅ RERA Verified</div>
-                  <div className="pb-ti">📞 No Spam Calls</div>
+                <div className="flex items-center justify-center gap-6 mt-8 flex-wrap">
+                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">🔒 100% Secure</div>
+                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">✅ RERA Verified</div>
+                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">📞 No Spam Calls</div>
                 </div>
               </div>
             )}
           </div>
 
           {!done && (
-            <div className="pb-trust">
-              <div className="pb-ti">🔒 Your data is safe & secure</div>
-              <div className="pb-ti">✅ 200+ verified listings</div>
-              <div className="pb-ti">📞 Zero spam calls</div>
+            <div className="flex items-center justify-center gap-6 mt-5 flex-wrap">
+              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">🔒 Your data is safe & secure</div>
+              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">✅ 200+ verified listings</div>
+              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">📞 Zero spam calls</div>
             </div>
           )}
         </div>
