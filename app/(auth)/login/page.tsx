@@ -27,7 +27,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/authSlice";
 import { hasSkippedRoleSelection } from "@/lib/roleSelection";
 import PhoneCaptureModal from "@/components/PhoneCaptureModal";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -70,7 +70,11 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
-  const [pendingRedirect, setPendingRedirect] = useState("/");
+  // Redirect target for after the phone modal. Kept in a ref (not state) so
+  // the modal's onSave callback can never read a stale value — the redirect
+  // is computed inside completeGoogleAuthWithPhone while the modal's save
+  // handler is still awaiting it.
+  const pendingRedirectRef = useRef("/");
   // Google ID token awaiting a phone number (phone is mandatory for every
   // account). The phone-capture modal completes the auth with it.
   const [pendingGoogleIdToken, setPendingGoogleIdToken] = useState<
@@ -291,18 +295,21 @@ const LoginPage = () => {
 
     // Pre-compute the redirect so the modal's onSave can route correctly.
     // New accounts always go through role selection, skip flag or not.
+    // Written to the ref (not state) — see pendingRedirectRef above.
     const isNewUser = Boolean(result.isNewUser);
     const shouldChooseRole =
       isNewUser ||
-      (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
-    setPendingRedirect(shouldChooseRole ? "/choose-role" : "/");
+      ((result.user.role || "user") === "user" && !hasSkippedRoleSelection());
+    pendingRedirectRef.current = shouldChooseRole ? "/choose-role" : "/";
     setPendingGoogleIdToken(null);
   };
 
-  // Phone-capture modal callback — the phone has been saved, resume the redirect
+  // Phone-capture modal callback — the phone has been saved, resume the
+  // redirect. Reads the ref so it always sees the value computed by
+  // completeGoogleAuthWithPhone (a state closure here would be stale).
   const proceedAfterPhoneModal = () => {
     setShowPhoneModal(false);
-    router.push(pendingRedirect);
+    router.push(pendingRedirectRef.current);
   };
 
   return (
