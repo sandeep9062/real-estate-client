@@ -4,20 +4,57 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { selectUser } from "@/store/authSlice";
 
+interface HouseRules {
+  ownerLivesOnPremises: boolean;
+  hasCurfew: boolean;
+  curfewTime: string;
+  oppositeGenderGuestsAllowed: string;
+  overnightGuestsAllowed: string;
+  smokingAllowedOnPremises: boolean;
+  drinkingAllowedOnPremises: boolean;
+}
+
+interface Facilities {
+  bedrooms: string;
+  servantRooms: string;
+  bathrooms: string;
+  parkings: string;
+  balconies: string;
+  parkingType: string;
+  securityFeatures: string[];
+  waterSupply: string;
+  powerBackup: boolean;
+  totalFloors: string;
+}
+
 interface FormData {
   fullName: string;
   phone: string;
   email: string;
   city: string;
-  propertyType: string;
+  deal: string;
+  type: string;
+  propertyCategory: string;
   bedrooms: string;
   purpose: string;
+  availability: string;
+  furnishing: string;
   carpetMin: string;
   carpetMax: string;
   budget: string;
   income: string;
   loanStatus: string;
   amenities: string[];
+  houseRules: HouseRules;
+  petsAllowed: boolean;
+  ownershipType: string;
+  facilities: Facilities;
+  nearbyPlaces: {
+    schools: string;
+    hospitals: string;
+    metroStations: string;
+    malls: string;
+  };
   timeline: string;
   callbackTime: string;
   message: string;
@@ -32,15 +69,48 @@ const INITIAL: FormData = {
   phone: "",
   email: "",
   city: "",
-  propertyType: "",
+  deal: "",
+  type: "",
+  propertyCategory: "",
   bedrooms: "",
   purpose: "",
+  availability: "",
+  furnishing: "Un-Furnished",
   carpetMin: "",
   carpetMax: "",
   budget: "",
   income: "",
   loanStatus: "",
   amenities: [],
+  houseRules: {
+    ownerLivesOnPremises: false,
+    hasCurfew: false,
+    curfewTime: "",
+    oppositeGenderGuestsAllowed: "",
+    overnightGuestsAllowed: "",
+    smokingAllowedOnPremises: false,
+    drinkingAllowedOnPremises: false,
+  },
+  petsAllowed: false,
+  ownershipType: "",
+  facilities: {
+    bedrooms: "",
+    servantRooms: "",
+    bathrooms: "",
+    parkings: "",
+    balconies: "",
+    parkingType: "",
+    securityFeatures: [],
+    waterSupply: "",
+    powerBackup: false,
+    totalFloors: "",
+  },
+  nearbyPlaces: {
+    schools: "",
+    hospitals: "",
+    metroStations: "",
+    malls: "",
+  },
   timeline: "",
   callbackTime: "",
   message: "",
@@ -83,7 +153,7 @@ const AMENITIES = [
   { ic: "🏠", label: "Smart Home" },
 ];
 
-const BUDGETS = [
+const BUDGETS_SALE = [
   { label: "Under ₹1 Cr", sub: "Starter Homes", val: "Less than ₹1 Crore" },
   {
     label: "₹1 – 2 Crore",
@@ -94,7 +164,30 @@ const BUDGETS = [
   { label: "₹5 Cr+", sub: "Ultra Premium", val: "₹5 Crores & Above" },
 ];
 
-const STEPS = ["You", "Home", "Budget", "Wishes", "Almost!"];
+const BUDGETS_RENT = [
+  {
+    label: "Under ₹10k/mo",
+    sub: "Budget Stays",
+    val: "Less than ₹10,000/month",
+  },
+  {
+    label: "₹10k – 25k/mo",
+    sub: "Mid-range Rentals",
+    val: "₹10,000 - ₹25,000/month",
+  },
+  {
+    label: "₹25k – 50k/mo",
+    sub: "Premium Rentals",
+    val: "₹25,000 - ₹50,000/month",
+  },
+  {
+    label: "₹50k+/mo",
+    sub: "Luxury Rentals",
+    val: "₹50,000 & Above/month",
+  },
+];
+
+const STEPS = ["You", "Home", "Budget", "Wishes", "Details", "Almost!"];
 
 const CITIES = [
   "Chandigarh",
@@ -306,6 +399,28 @@ export default function DreamHomeEnquiry() {
     }));
   };
 
+  const setHR = <K extends keyof HouseRules>(key: K, val: HouseRules[K]) =>
+    setForm((f) => ({ ...f, houseRules: { ...f.houseRules, [key]: val } }));
+
+  const setFac = <K extends keyof Facilities>(key: K, val: Facilities[K]) =>
+    setForm((f) => ({ ...f, facilities: { ...f.facilities, [key]: val } }));
+
+  const toggleSecurity = (label: string) =>
+    setForm((f) => ({
+      ...f,
+      facilities: {
+        ...f.facilities,
+        securityFeatures: f.facilities.securityFeatures.includes(label)
+          ? f.facilities.securityFeatures.filter((s) => s !== label)
+          : [...f.facilities.securityFeatures, label],
+      },
+    }));
+
+  const setNearby = (
+    key: keyof FormData["nearbyPlaces"],
+    val: string,
+  ) => setForm((f) => ({ ...f, nearbyPlaces: { ...f.nearbyPlaces, [key]: val } }));
+
   const validate = (s: number): boolean => {
     const errs: Partial<Record<keyof FormData, string>> = {};
     if (s === 0) {
@@ -316,10 +431,14 @@ export default function DreamHomeEnquiry() {
         errs.email = "Please enter a valid email";
       if (!form.city) errs.city = "Please pick a city";
     }
-    if (s === 1 && !form.propertyType)
-      errs.propertyType = "Please pick a property type";
+    if (s === 1) {
+      if (!form.deal) errs.deal = "Are you looking to rent or buy?";
+      if (!form.type) errs.type = "Please pick a property category";
+      if (!form.propertyCategory)
+        errs.propertyCategory = "Please pick a property type";
+    }
     if (s === 2 && !form.budget) errs.budget = "Please select a budget range";
-    if (s === 4) {
+    if (s === 5) {
       if (!form.timeline) errs.timeline = "Please pick a timeline";
       if (!form.consentGiven) errs.consentGiven = "You must agree to continue";
     }
@@ -333,10 +452,65 @@ export default function DreamHomeEnquiry() {
   const back = () => setStep((s) => s - 1);
 
   const submit = async () => {
-    if (!validate(4)) return;
+    if (!validate(5)) return;
     setSubmitting(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/v1/enquiry`, form);
+      const num = (v: string) => (v.trim() === "" ? undefined : Number(v));
+      const list = (v: string) =>
+        v
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      const hr = form.houseRules;
+      // Map form fields onto the backend Enquiry schema.
+      const payload = {
+        ...form,
+        // Legacy keys → schema fields
+        location: form.city,
+        carpetAreaMin: num(form.carpetMin),
+        carpetAreaMax: num(form.carpetMax),
+        purchasePurpose: form.purpose || undefined,
+        preApprovedLoan: form.loanStatus || undefined,
+        needLoanAssistance: form.needLoanHelp,
+        // Property requirement fields
+        propertyCategory: form.propertyCategory || undefined,
+        // Keep the legacy free-text propertyType populated from the category
+        propertyType: form.propertyCategory || undefined,
+        availability: form.availability || undefined,
+        furnishing: form.furnishing || undefined,
+        ownershipType: form.ownershipType || undefined,
+        houseRules: {
+          ownerLivesOnPremises: hr.ownerLivesOnPremises,
+          curfew: { hasCurfew: hr.hasCurfew, time: hr.curfewTime || undefined },
+          oppositeGenderGuestsAllowed:
+            hr.oppositeGenderGuestsAllowed || undefined,
+          overnightGuestsAllowed: hr.overnightGuestsAllowed || undefined,
+          smokingAllowedOnPremises: hr.smokingAllowedOnPremises,
+          drinkingAllowedOnPremises: hr.drinkingAllowedOnPremises,
+        },
+        facilities: {
+          bedrooms: num(form.facilities.bedrooms),
+          servantRooms: num(form.facilities.servantRooms),
+          bathrooms: num(form.facilities.bathrooms),
+          parkings: num(form.facilities.parkings),
+          balconies: num(form.facilities.balconies),
+          parkingType: form.facilities.parkingType || undefined,
+          securityFeatures: form.facilities.securityFeatures,
+          waterSupply: form.facilities.waterSupply || undefined,
+          powerBackup: form.facilities.powerBackup,
+          totalFloors: num(form.facilities.totalFloors),
+        },
+        nearbyPlaces: {
+          schools: list(form.nearbyPlaces.schools),
+          hospitals: list(form.nearbyPlaces.hospitals),
+          metroStations: list(form.nearbyPlaces.metroStations),
+          malls: list(form.nearbyPlaces.malls),
+        },
+      };
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/enquiry`,
+        payload,
+      );
       setDone(true);
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 409)
@@ -517,24 +691,69 @@ export default function DreamHomeEnquiry() {
                   title="Describe your dream home"
                   sub="What kind of place are you looking for?"
                 />
-                <Field
-                  label="Property Type"
-                  required
-                  error={errors.propertyType}
-                >
+                <Field label="Looking to" required error={errors.deal}>
                   <div className="pb-pg">
                     {[
-                      ["🏢", "Flat/Apartment"],
-                      ["🏠", "Independent House"],
-                      ["🏡", "Villa"],
-                      ["🌆", "Penthouse"],
-                      ["📐", "Plot/Land"],
-                      ["🛋", "Studio"],
+                      ["🔑", "Rent"],
+                      ["💰", "Sale"],
                     ].map(([ic, val]) => (
                       <Pill
                         key={val}
-                        active={form.propertyType === val}
-                        onClick={() => set("propertyType", val)}
+                        active={form.deal === val}
+                        onClick={() => {
+                          set("deal", val);
+                          // Budget ranges differ for Rent vs Sale — reset it
+                          if (form.budget) set("budget", "");
+                        }}
+                      >
+                        {ic} {val === "Sale" ? "Buy" : val}
+                      </Pill>
+                    ))}
+                  </div>
+                </Field>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Property Category" required error={errors.type}>
+                    <div className="pb-pg">
+                      {[
+                        ["🏘", "Residential"],
+                        ["🏙", "Commercial"],
+                        ["🏭", "Industrial"],
+                        ["🌾", "Agricultural"],
+                      ].map(([ic, val]) => (
+                        <Pill
+                          key={val}
+                          active={form.type === val}
+                          onClick={() => set("type", val)}
+                        >
+                          {ic} {val}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <Field
+                  label="Property Type"
+                  required
+                  error={errors.propertyCategory}
+                >
+                  <div className="pb-pg">
+                    {[
+                      ["🏢", "Apartment/Flat"],
+                      ["🏠", "House/Villa"],
+                      ["📐", "Land/Plot"],
+                      ["🛋", "Studio Apartment"],
+                      ["🏗", "Builder Floor"],
+                      ["🛏", "PG/Hostel"],
+                      ["🏡", "Farmhouse"],
+                      ["🛍", "Retail"],
+                      ["💼", "Office"],
+                      ["📦", "Warehouse"],
+                      ["🏬", "Shop/Showroom"],
+                    ].map(([ic, val]) => (
+                      <Pill
+                        key={val}
+                        active={form.propertyCategory === val}
+                        onClick={() => set("propertyCategory", val)}
                       >
                         {ic} {val}
                       </Pill>
@@ -557,6 +776,44 @@ export default function DreamHomeEnquiry() {
                           onClick={() => set("bedrooms", b)}
                         >
                           {b}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Availability">
+                    <div className="pb-pg">
+                      {[
+                        ["🏠", "Ready to Move"],
+                        ["🏗", "Under Construction"],
+                      ].map(([ic, val]) => (
+                        <Pill
+                          key={val}
+                          active={form.availability === val}
+                          onClick={() => set("availability", val)}
+                        >
+                          {ic} {val}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Furnishing">
+                    <div className="pb-pg">
+                      {[
+                        "Furnished",
+                        "Fully Furnished",
+                        "Semi Furnished",
+                        "Un-Furnished",
+                      ].map((val) => (
+                        <Pill
+                          key={val}
+                          active={form.furnishing === val}
+                          onClick={() => set("furnishing", val)}
+                        >
+                          {val}
                         </Pill>
                       ))}
                     </div>
@@ -622,7 +879,8 @@ export default function DreamHomeEnquiry() {
                   sub="No judgement — this helps us match you perfectly."
                 />
                 <div className="pb-bg">
-                  {BUDGETS.map(({ label, sub, val }) => (
+                  {(form.deal === "Rent" ? BUDGETS_RENT : BUDGETS_SALE).map(
+                    ({ label, sub, val }) => (
                     <div
                       key={val}
                       className={`pb-bc${form.budget === val ? " pb-bc-a" : ""}`}
@@ -732,11 +990,379 @@ export default function DreamHomeEnquiry() {
               </div>
             )}
 
-            {/* Step 5 */}
+            {/* Step 5 — Details */}
             {step === 4 && (
               <div className="pb-fade">
                 <SH
                   step="5"
+                  title="Preferences & details"
+                  sub="All optional — but every detail helps us match you faster."
+                />
+                <Field label="Ownership Type Preferred">
+                  <div className="pb-pg">
+                    {[
+                      "Freehold",
+                      "Leasehold",
+                      "Co-operative",
+                      "Power of Attorney",
+                    ].map((val) => (
+                      <Pill
+                        key={val}
+                        active={form.ownershipType === val}
+                        onClick={() => set("ownershipType", val)}
+                      >
+                        {val}
+                      </Pill>
+                    ))}
+                  </div>
+                </Field>
+                <div className="pb-div" />
+                <div
+                  style={{
+                    fontSize: ".8rem",
+                    fontWeight: 700,
+                    color: "var(--ink2)",
+                    textTransform: "uppercase",
+                    letterSpacing: ".08em",
+                    marginBottom: ".75rem",
+                  }}
+                >
+                  🛏 Facilities
+                </div>
+                <div className="pb-g2">
+                  <Field label="Bedrooms">
+                    <input
+                      className="pb-in"
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 2"
+                      value={form.facilities.bedrooms}
+                      onChange={(e) =>
+                        setFac(
+                          "bedrooms",
+                          e.target.value.replace(/\D/g, "").slice(0, 2),
+                        )
+                      }
+                    />
+                  </Field>
+                  <Field label="Bathrooms">
+                    <input
+                      className="pb-in"
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 2"
+                      value={form.facilities.bathrooms}
+                      onChange={(e) =>
+                        setFac(
+                          "bathrooms",
+                          e.target.value.replace(/\D/g, "").slice(0, 2),
+                        )
+                      }
+                    />
+                  </Field>
+                  <Field label="Balconies">
+                    <input
+                      className="pb-in"
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 1"
+                      value={form.facilities.balconies}
+                      onChange={(e) =>
+                        setFac(
+                          "balconies",
+                          e.target.value.replace(/\D/g, "").slice(0, 2),
+                        )
+                      }
+                    />
+                  </Field>
+                  <Field label="Servant Rooms">
+                    <input
+                      className="pb-in"
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 0"
+                      value={form.facilities.servantRooms}
+                      onChange={(e) =>
+                        setFac(
+                          "servantRooms",
+                          e.target.value.replace(/\D/g, "").slice(0, 2),
+                        )
+                      }
+                    />
+                  </Field>
+                  <Field label="Parkings">
+                    <input
+                      className="pb-in"
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 1"
+                      value={form.facilities.parkings}
+                      onChange={(e) =>
+                        setFac(
+                          "parkings",
+                          e.target.value.replace(/\D/g, "").slice(0, 2),
+                        )
+                      }
+                    />
+                  </Field>
+                  <Field label="Total Floors">
+                    <input
+                      className="pb-in"
+                      type="number"
+                      min={0}
+                      placeholder="e.g. 12"
+                      value={form.facilities.totalFloors}
+                      onChange={(e) =>
+                        setFac(
+                          "totalFloors",
+                          e.target.value.replace(/\D/g, "").slice(0, 3),
+                        )
+                      }
+                    />
+                  </Field>
+                </div>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Parking Type">
+                    <div className="pb-pg">
+                      {["None", "Open", "Covered", "Both"].map((val) => (
+                        <Pill
+                          key={val}
+                          active={form.facilities.parkingType === val}
+                          onClick={() => setFac("parkingType", val)}
+                        >
+                          {val}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Water Supply">
+                    <div className="pb-pg">
+                      {["Municipal", "Borewell", "Both"].map((val) => (
+                        <Pill
+                          key={val}
+                          active={form.facilities.waterSupply === val}
+                          onClick={() => setFac("waterSupply", val)}
+                        >
+                          {val}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Security Features">
+                    <div className="pb-pg">
+                      {["CCTV", "Guard", "Biometric", "Gated"].map((val) => (
+                        <Pill
+                          key={val}
+                          active={form.facilities.securityFeatures.includes(
+                            val,
+                          )}
+                          onClick={() => toggleSecurity(val)}
+                        >
+                          {val}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <label className="pb-cr" style={{ marginTop: "1rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={form.facilities.powerBackup}
+                    onChange={(e) => setFac("powerBackup", e.target.checked)}
+                  />
+                  <span>Power backup is a must</span>
+                </label>
+                <div className="pb-div" />
+                <div
+                  style={{
+                    fontSize: ".8rem",
+                    fontWeight: 700,
+                    color: "var(--ink2)",
+                    textTransform: "uppercase",
+                    letterSpacing: ".08em",
+                    marginBottom: ".75rem",
+                  }}
+                >
+                  📋 House Rules
+                </div>
+                <label className="pb-cr">
+                  <input
+                    type="checkbox"
+                    checked={form.petsAllowed}
+                    onChange={(e) => set("petsAllowed", e.target.checked)}
+                  />
+                  <span>Pets must be allowed in the property</span>
+                </label>
+                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={form.houseRules.ownerLivesOnPremises}
+                    onChange={(e) =>
+                      setHR("ownerLivesOnPremises", e.target.checked)
+                    }
+                  />
+                  <span>Owner living on the premises is acceptable</span>
+                </label>
+                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={form.houseRules.smokingAllowedOnPremises}
+                    onChange={(e) =>
+                      setHR("smokingAllowedOnPremises", e.target.checked)
+                    }
+                  />
+                  <span>Smoking allowed on premises</span>
+                </label>
+                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={form.houseRules.drinkingAllowedOnPremises}
+                    onChange={(e) =>
+                      setHR("drinkingAllowedOnPremises", e.target.checked)
+                    }
+                  />
+                  <span>Drinking allowed on premises</span>
+                </label>
+                <label className="pb-cr" style={{ marginTop: ".75rem" }}>
+                  <input
+                    type="checkbox"
+                    checked={form.houseRules.hasCurfew}
+                    onChange={(e) => setHR("hasCurfew", e.target.checked)}
+                  />
+                  <span>Curfew is acceptable</span>
+                </label>
+                {form.houseRules.hasCurfew && (
+                  <div style={{ marginTop: ".75rem" }}>
+                    <Field label="Curfew time">
+                      <input
+                        className="pb-in"
+                        placeholder="e.g. 10:00 PM"
+                        value={form.houseRules.curfewTime}
+                        onChange={(e) => setHR("curfewTime", e.target.value)}
+                      />
+                    </Field>
+                  </div>
+                )}
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Opposite Gender Guests">
+                    <div className="pb-pg">
+                      {[
+                        ["allowed", "Allowed"],
+                        ["allowed_with_notice", "With Notice"],
+                        ["not_allowed", "Not Allowed"],
+                      ].map(([val, lbl]) => (
+                        <Pill
+                          key={val}
+                          active={
+                            form.houseRules.oppositeGenderGuestsAllowed ===
+                            val
+                          }
+                          onClick={() =>
+                            setHR("oppositeGenderGuestsAllowed", val)
+                          }
+                        >
+                          {lbl}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+                <div style={{ marginTop: "1.25rem" }}>
+                  <Field label="Overnight Guests">
+                    <div className="pb-pg">
+                      {[
+                        ["allowed", "Allowed"],
+                        ["allowed_with_notice", "With Notice"],
+                        ["not_allowed", "Not Allowed"],
+                      ].map(([val, lbl]) => (
+                        <Pill
+                          key={val}
+                          active={
+                            form.houseRules.overnightGuestsAllowed === val
+                          }
+                          onClick={() =>
+                            setHR("overnightGuestsAllowed", val)
+                          }
+                        >
+                          {lbl}
+                        </Pill>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+
+                <div className="pb-div" />
+                <div
+                  style={{
+                    fontSize: ".8rem",
+                    fontWeight: 700,
+                    color: "var(--ink2)",
+                    textTransform: "uppercase",
+                    letterSpacing: ".08em",
+                    marginBottom: ".75rem",
+                  }}
+                >
+                  📍 Nearby Places
+                </div>
+                <div className="pb-g2">
+                  <Field label="Schools">
+                    <input
+                      className="pb-in"
+                      placeholder="Comma separated"
+                      value={form.nearbyPlaces.schools}
+                      onChange={(e) => setNearby("schools", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Hospitals">
+                    <input
+                      className="pb-in"
+                      placeholder="Comma separated"
+                      value={form.nearbyPlaces.hospitals}
+                      onChange={(e) =>
+                        setNearby("hospitals", e.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Metro Stations">
+                    <input
+                      className="pb-in"
+                      placeholder="Comma separated"
+                      value={form.nearbyPlaces.metroStations}
+                      onChange={(e) =>
+                        setNearby("metroStations", e.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Malls">
+                    <input
+                      className="pb-in"
+                      placeholder="Comma separated"
+                      value={form.nearbyPlaces.malls}
+                      onChange={(e) => setNearby("malls", e.target.value)}
+                    />
+                  </Field>
+                </div>
+
+                <div className="pb-nav">
+                  <button className="pb-btn-back" onClick={back}>
+                    ← Back
+                  </button>
+                  <button className="pb-btn-next" onClick={next}>
+                    Continue →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 6 */}
+            {step === 5 && (
+              <div className="pb-fade">
+                <SH
+                  step="6"
                   title="Almost there!"
                   sub="Last few details and you're all set — we promise."
                 />
