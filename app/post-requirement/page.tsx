@@ -239,7 +239,11 @@ const Field = ({
       {required && <span className="text-[#4161DF] ml-0.5"> *</span>}
     </label>
     {children}
-    {error && <div className="text-[.73rem] text-[#DC2626] mt-0.5 font-medium">⚠ {error}</div>}
+    {error && (
+      <div className="text-[.73rem] text-[#DC2626] mt-0.5 font-medium">
+        ⚠ {error}
+      </div>
+    )}
   </div>
 );
 
@@ -253,9 +257,13 @@ const SH = ({
   sub: string;
 }) => (
   <div className="flex items-start gap-3 mb-6">
-    <div className="w-8 h-8 rounded-[10px] bg-[#EEF1FD] border-[1.5px] border-[#C9D4FB] flex items-center justify-center text-[13px] font-bold text-[#4161DF] shrink-0">{step}</div>
+    <div className="w-8 h-8 rounded-[10px] bg-[#EEF1FD] border-[1.5px] border-[#C9D4FB] flex items-center justify-center text-[13px] font-bold text-[#4161DF] shrink-0">
+      {step}
+    </div>
     <div>
-      <div className="text-lg font-bold text-[#111827] tracking-tight">{title}</div>
+      <div className="text-lg font-bold text-[#111827] tracking-tight">
+        {title}
+      </div>
       <div className="text-[.8rem] text-[#9CA3AF] mt-0.5">{sub}</div>
     </div>
   </div>
@@ -425,27 +433,22 @@ export default function DreamHomeEnquiry() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F3F5FF] text-[#111827] [font-family:Inter,sans-serif] max-w-7xl">
+      <div className="min-h-screen bg-[#F3F5FF] text-[#111827] [font-family:Inter,sans-serif]">
         {/* Hero */}
         <div className="relative overflow-hidden bg-[radial-gradient(ellipse_at_70%_50%,rgba(65,97,223,.25)_0%,transparent_70%),linear-gradient(135deg,#1e3a5f_0%,#4161df_100%)] text-center px-6 pt-12 pb-[5.5rem]">
           {/* Dot grid */}
           <div className="absolute inset-0 opacity-[.07] pointer-events-none bg-[radial-gradient(circle,white_1px,transparent_1px)] [background-size:28px_28px]" />
           {/* Decorative circles */}
-          <div
-            className="absolute rounded-full bg-white pointer-events-none w-[300px] h-[300px] -top-[100px] -left-[80px] opacity-[.06]"
-          />
-          <div
-            className="absolute rounded-full bg-white pointer-events-none w-[200px] h-[200px] top-[20px] -right-[60px] opacity-[.08]"
-          />
-          <div
-            className="absolute rounded-full bg-white pointer-events-none w-[150px] h-[150px] -bottom-[60px] left-[40%] opacity-[.05]"
-          />
+          <div className="absolute rounded-full bg-white pointer-events-none w-[300px] h-[300px] -top-[100px] -left-[80px] opacity-[.06]" />
+          <div className="absolute rounded-full bg-white pointer-events-none w-[200px] h-[200px] top-[20px] -right-[60px] opacity-[.08]" />
+          <div className="absolute rounded-full bg-white pointer-events-none w-[150px] h-[150px] -bottom-[60px] left-[40%] opacity-[.05]" />
 
           <div className="relative inline-flex items-center gap-1.5 bg-white/[.12] border border-white/[.2] rounded-full px-4 py-1.5 text-[.72rem] text-white/[.85] tracking-[.08em] uppercase font-medium mb-5 mt-2">
             🏆 Tricity's Most Trusted Platform
           </div>
           <h1 className="relative text-white font-extrabold leading-[1.15] tracking-tight mb-3 text-[clamp(1.75rem,4vw,2.5rem)]">
-            Find Your <em className="bg-[linear-gradient(90deg,#93A8FF,#C4D0FF)] bg-clip-text text-transparent not-italic">
+            Find Your{" "}
+            <em className="bg-[linear-gradient(90deg,#93A8FF,#C4D0FF)] bg-clip-text text-transparent not-italic">
               Dream Home
             </em>
             <br />
@@ -468,9 +471,12 @@ export default function DreamHomeEnquiry() {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-[700px] mx-auto -mt-10 px-4 pb-16">
+        <div className="relative z-10 max-w-5xl mx-auto -mt-10 px-4 pb-16">
           <div className="h-1 bg-[#E5E9F7] rounded-full mb-7 overflow-hidden">
-            <div className="h-full bg-[linear-gradient(90deg,#4161DF,#7B93F5)] rounded-full transition-[width_.45s_cubic-bezier(.4,0,.2,1)]" style={{ width: `${progress}%` }} />
+            <div
+              className="h-full bg-[linear-gradient(90deg,#4161DF,#7B93F5)] rounded-full transition-[width_.45s_cubic-bezier(.4,0,.2,1)]"
+              style={{ width: `${progress}%` }}
+            />
           </div>
 
           {!done && (
@@ -543,33 +549,36 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Preferred City" required error={errors.city}>
                     <div className="relative">
-                    <select
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
-                      value={form.city}
-                      onChange={(e) => set("city", e.target.value)}
-                    >
-                      <option value="">Select your city</option>
-                      {CITIES.map((c) => (
-                        <option key={c}>{c}</option>
-                      ))}
-                    </select>
-                    <svg
-                      aria-hidden="true"
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
-                      viewBox="0 0 12 8"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    >
-                      <path d="M1 1l5 5 5-5" />
-                    </svg>
-                  </div>
-                </Field>
+                      <select
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
+                        value={form.city}
+                        onChange={(e) => set("city", e.target.value)}
+                      >
+                        <option value="">Select your city</option>
+                        {CITIES.map((c) => (
+                          <option key={c}>{c}</option>
+                        ))}
+                      </select>
+                      <svg
+                        aria-hidden="true"
+                        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
+                        viewBox="0 0 12 8"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                      >
+                        <path d="M1 1l5 5 5-5" />
+                      </svg>
+                    </div>
+                  </Field>
                 </div>
                 <div className="flex justify-between items-center mt-8">
                   <span />
-                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
+                  <button
+                    className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]"
+                    onClick={next}
+                  >
                     Continue →
                   </button>
                 </div>
@@ -753,10 +762,16 @@ export default function DreamHomeEnquiry() {
                   </Field>
                 </div>
                 <div className="flex justify-between items-center mt-8">
-                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
+                  <button
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    onClick={back}
+                  >
                     ← Back
                   </button>
-                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
+                  <button
+                    className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]"
+                    onClick={next}
+                  >
                     Continue →
                   </button>
                 </div>
@@ -784,7 +799,9 @@ export default function DreamHomeEnquiry() {
                         >
                           {label}
                         </div>
-                        <div className="text-[.72rem] text-[#9CA3AF] mt-1">{sub}</div>
+                        <div className="text-[.72rem] text-[#9CA3AF] mt-1">
+                          {sub}
+                        </div>
                       </div>
                     ),
                   )}
@@ -798,34 +815,34 @@ export default function DreamHomeEnquiry() {
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Annual Income">
                     <div className="relative">
-                    <select
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
-                      value={form.income}
-                      onChange={(e) => set("income", e.target.value)}
-                    >
-                      <option value="">Select range</option>
-                      {[
-                        "Below ₹5 LPA",
-                        "₹5–10 LPA",
-                        "₹10–20 LPA",
-                        "₹20+ LPA",
-                      ].map((i) => (
-                        <option key={i}>{i}</option>
-                      ))}
-                    </select>
-                    <svg
-                      aria-hidden="true"
-                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
-                      viewBox="0 0 12 8"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    >
-                      <path d="M1 1l5 5 5-5" />
-                    </svg>
-                  </div>
-                </Field>
+                      <select
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
+                        value={form.income}
+                        onChange={(e) => set("income", e.target.value)}
+                      >
+                        <option value="">Select range</option>
+                        {[
+                          "Below ₹5 LPA",
+                          "₹5–10 LPA",
+                          "₹10–20 LPA",
+                          "₹20+ LPA",
+                        ].map((i) => (
+                          <option key={i}>{i}</option>
+                        ))}
+                      </select>
+                      <svg
+                        aria-hidden="true"
+                        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-2 w-3 text-[#9CA3AF]"
+                        viewBox="0 0 12 8"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                      >
+                        <path d="M1 1l5 5 5-5" />
+                      </svg>
+                    </div>
+                  </Field>
                   <Field label="Home Loan Status">
                     <div className="flex flex-wrap gap-[.45rem] mt-1.5">
                       {[
@@ -845,10 +862,16 @@ export default function DreamHomeEnquiry() {
                   </Field>
                 </div>
                 <div className="flex justify-between items-center mt-8">
-                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
+                  <button
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    onClick={back}
+                  >
                     ← Back
                   </button>
-                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
+                  <button
+                    className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]"
+                    onClick={next}
+                  >
                     Continue →
                   </button>
                 </div>
@@ -887,10 +910,16 @@ export default function DreamHomeEnquiry() {
                   </div>
                 )}
                 <div className="flex justify-between items-center mt-8">
-                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
+                  <button
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    onClick={back}
+                  >
                     ← Back
                   </button>
-                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
+                  <button
+                    className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]"
+                    onClick={next}
+                  >
                     Continue →
                   </button>
                 </div>
@@ -924,9 +953,7 @@ export default function DreamHomeEnquiry() {
                   </div>
                 </Field>
                 <div className="h-[1px] bg-[#E5E9F7] my-6" />
-                <div
-                  className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3"
-                >
+                <div className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3">
                   🛏 Facilities
                 </div>
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
@@ -1070,63 +1097,79 @@ export default function DreamHomeEnquiry() {
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer mt-4">
                   <input
-                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                    type="checkbox"
+                    className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.facilities.powerBackup}
                     onChange={(e) => setFac("powerBackup", e.target.checked)}
                   />
-                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Power backup is a must</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                    Power backup is a must
+                  </span>
                 </label>
                 <div className="h-[1px] bg-[#E5E9F7] my-6" />
-                <div
-                  className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3"
-                >
+                <div className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3">
                   📋 House Rules
                 </div>
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
-                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                    type="checkbox"
+                    className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.petsAllowed}
                     onChange={(e) => set("petsAllowed", e.target.checked)}
                   />
-                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Pets must be allowed in the property</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                    Pets must be allowed in the property
+                  </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                    type="checkbox"
+                    className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.ownerLivesOnPremises}
                     onChange={(e) =>
                       setHR("ownerLivesOnPremises", e.target.checked)
                     }
                   />
-                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Owner living on the premises is acceptable</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                    Owner living on the premises is acceptable
+                  </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                    type="checkbox"
+                    className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.smokingAllowedOnPremises}
                     onChange={(e) =>
                       setHR("smokingAllowedOnPremises", e.target.checked)
                     }
                   />
-                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Smoking allowed on premises</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                    Smoking allowed on premises
+                  </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                    type="checkbox"
+                    className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.drinkingAllowedOnPremises}
                     onChange={(e) =>
                       setHR("drinkingAllowedOnPremises", e.target.checked)
                     }
                   />
-                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Drinking allowed on premises</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                    Drinking allowed on premises
+                  </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer mt-3">
                   <input
-                    type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                    type="checkbox"
+                    className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                     checked={form.houseRules.hasCurfew}
                     onChange={(e) => setHR("hasCurfew", e.target.checked)}
                   />
-                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Curfew is acceptable</span>
+                  <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                    Curfew is acceptable
+                  </span>
                 </label>
                 {form.houseRules.hasCurfew && (
                   <div className="mt-3">
@@ -1186,9 +1229,7 @@ export default function DreamHomeEnquiry() {
                 </div>
 
                 <div className="h-[1px] bg-[#E5E9F7] my-6" />
-                <div
-                  className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3"
-                >
+                <div className="text-[.8rem] font-bold text-[#4B5563] uppercase tracking-[.08em] mb-3">
                   📍 Nearby Places
                 </div>
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
@@ -1229,10 +1270,16 @@ export default function DreamHomeEnquiry() {
                 </div>
 
                 <div className="flex justify-between items-center mt-8">
-                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
+                  <button
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    onClick={back}
+                  >
                     ← Back
                   </button>
-                  <button className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]" onClick={next}>
+                  <button
+                    className="bg-[#4161DF] border-none rounded-[10px] px-8 py-[.7rem] text-[.9rem] text-white font-semibold cursor-pointer transition-all hover:bg-[#2D4BC4] hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(65,97,223,.35)]"
+                    onClick={next}
+                  >
                     Continue →
                   </button>
                 </div>
@@ -1297,9 +1344,7 @@ export default function DreamHomeEnquiry() {
                       onChange={(e) => set("message", e.target.value)}
                     />
                   </Field>
-                  <div
-                    className="flex flex-col gap-4"
-                  >
+                  <div className="flex flex-col gap-4">
                     <Field label="How did you find us?">
                       <div className="relative">
                         <select
@@ -1334,26 +1379,33 @@ export default function DreamHomeEnquiry() {
                     </Field>
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
-                        type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                        type="checkbox"
+                        className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                         checked={form.needLoanHelp}
                         onChange={(e) => set("needLoanHelp", e.target.checked)}
                       />
-                      <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Help me explore home loan options</span>
+                      <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                        Help me explore home loan options
+                      </span>
                     </label>
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
-                        type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                        type="checkbox"
+                        className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                         checked={form.reraOnly}
                         onChange={(e) => set("reraOnly", e.target.checked)}
                       />
-                      <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">Show RERA-registered properties only</span>
+                      <span className="text-[.83rem] text-[#4B5563] leading-[1.6]">
+                        Show RERA-registered properties only
+                      </span>
                     </label>
                   </div>
                 </div>
                 <div className="bg-[#EEF1FD] border-[1.5px] border-[#C9D4FB] rounded-xl px-5 py-4 my-6">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
-                      type="checkbox" className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
+                      type="checkbox"
+                      className="w-4 h-4 accent-[#4161DF] shrink-0 mt-[3px] cursor-pointer"
                       checked={form.consentGiven}
                       onChange={(e) => set("consentGiven", e.target.checked)}
                     />
@@ -1370,7 +1422,10 @@ export default function DreamHomeEnquiry() {
                   )}
                 </div>
                 <div className="flex justify-between items-center mt-8">
-                  <button className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]" onClick={back}>
+                  <button
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    onClick={back}
+                  >
                     ← Back
                   </button>
                   <button
@@ -1387,8 +1442,12 @@ export default function DreamHomeEnquiry() {
             {/* Done */}
             {done && (
               <div className="animate-fade text-center py-12 px-4">
-                <div className="w-[88px] h-[88px] rounded-full bg-[#DCFCE7] border-[3px] border-[#BBF7D0] flex items-center justify-center text-4xl mx-auto mb-5">🏡</div>
-                <h2 className="text-[1.75rem] font-extrabold text-[#111827] tracking-tight mb-2.5">You're all set!</h2>
+                <div className="w-[88px] h-[88px] rounded-full bg-[#DCFCE7] border-[3px] border-[#BBF7D0] flex items-center justify-center text-4xl mx-auto mb-5">
+                  🏡
+                </div>
+                <h2 className="text-[1.75rem] font-extrabold text-[#111827] tracking-tight mb-2.5">
+                  You're all set!
+                </h2>
                 <p className="text-[#4B5563] text-[.9rem] leading-[1.75] max-w-[340px] mx-auto">
                   Our property advisor will reach out within 24 hours with
                   verified listings that match exactly what you're looking for.
@@ -1397,9 +1456,15 @@ export default function DreamHomeEnquiry() {
                   ✓ Confirmation sent to your email
                 </div>
                 <div className="flex items-center justify-center gap-6 mt-8 flex-wrap">
-                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">🔒 100% Secure</div>
-                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">✅ RERA Verified</div>
-                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">📞 No Spam Calls</div>
+                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">
+                    🔒 100% Secure
+                  </div>
+                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">
+                    ✅ RERA Verified
+                  </div>
+                  <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">
+                    📞 No Spam Calls
+                  </div>
                 </div>
               </div>
             )}
@@ -1407,9 +1472,15 @@ export default function DreamHomeEnquiry() {
 
           {!done && (
             <div className="flex items-center justify-center gap-6 mt-5 flex-wrap">
-              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">🔒 Your data is safe & secure</div>
-              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">✅ 200+ verified listings</div>
-              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">📞 Zero spam calls</div>
+              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">
+                🔒 Your data is safe & secure
+              </div>
+              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">
+                ✅ 200+ verified listings
+              </div>
+              <div className="text-[.75rem] text-[#9CA3AF] flex items-center gap-1 font-medium">
+                📞 Zero spam calls
+              </div>
             </div>
           )}
         </div>
