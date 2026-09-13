@@ -1,6 +1,8 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
 import axios from "axios";
+import { selectUser } from "@/store/authSlice";
 
 interface FormData {
   fullName: string;
@@ -101,23 +103,10 @@ const CITIES = [
   "Mohali",
   "Kharar",
   "Zirakpur",
+
   "Delhi",
   "Gurgaon",
   "Noida",
-  "Faridabad",
-  "Mumbai",
-  "Pune",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Kolkata",
-  "Jaipur",
-  "Lucknow",
-  "Surat",
-  "Ahmedabad",
-  "Indore",
-  "Bhopal",
-  "Thane",
 ];
 
 const CSS = `
@@ -277,6 +266,7 @@ const SH = ({
 );
 
 export default function DreamHomeEnquiry() {
+  const user = useSelector(selectUser);
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -284,6 +274,20 @@ export default function DreamHomeEnquiry() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
     {},
   );
+
+  // Auto-fill name, email and phone from the logged-in user (if any).
+  // Only fills empty fields so anything the user has already typed is kept.
+  useEffect(() => {
+    if (!user) return;
+    setForm((f) => ({
+      ...f,
+      fullName: f.fullName || user.name || "",
+      email: f.email || user.email || "",
+      // Stored phones may be E.164 (e.g. +91XXXXXXXXXX) — keep last 10 digits
+      phone:
+        f.phone || (user.phone || "").replace(/\D/g, "").slice(-10),
+    }));
+  }, [user]);
 
   const set = useCallback(
     <K extends keyof FormData>(key: K, val: FormData[K]) => {
