@@ -207,8 +207,13 @@ const LoginPage = () => {
       );
       toast.success("Logged in with Google successfully!");
 
+      // A freshly created Google account must ALWAYS pick a role — the
+      // "skip" flag only applies to returning users who deliberately
+      // deferred role selection on this device.
+      const isNewUser = Boolean(result.isNewUser);
       const shouldChooseRole =
-        (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
+        isNewUser ||
+        ((result.user.role || "user") === "user" && !hasSkippedRoleSelection());
       router.push(shouldChooseRole ? "/choose-role" : "/");
     } else {
       toast.error("Google authentication failed. Please try again.");
@@ -285,7 +290,10 @@ const LoginPage = () => {
     );
 
     // Pre-compute the redirect so the modal's onSave can route correctly.
+    // New accounts always go through role selection, skip flag or not.
+    const isNewUser = Boolean(result.isNewUser);
     const shouldChooseRole =
+      isNewUser ||
       (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
     setPendingRedirect(shouldChooseRole ? "/choose-role" : "/");
     setPendingGoogleIdToken(null);
