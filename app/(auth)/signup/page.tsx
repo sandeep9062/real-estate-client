@@ -33,12 +33,20 @@ import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
 import PhoneCaptureModal from "@/components/PhoneCaptureModal";
 
+// E.164: leading "+" + country code + subscriber number, e.g. "+919876543210"
+const PHONE_RE = /^\+[1-9]\d{7,14}$/;
+
 // Validation schema
 const formSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
-    phone: z.string().min(10, "Phone number is required"),
+    phone: z
+      .string()
+      .regex(
+        PHONE_RE,
+        "Enter a valid phone number with country code, e.g. +919876543210",
+      ),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8, "Please confirm your password"),
   })
@@ -86,6 +94,11 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  // Google ID token awaiting a phone number (phone is mandatory for every
+  // account). The phone-capture modal completes the auth with it.
+  const [pendingGoogleIdToken, setPendingGoogleIdToken] = useState<
+    string | null
+  >(null);
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -175,60 +188,67 @@ const SignupPage = () => {
     }
   };
 
+  // Authenticate with Google. Phone is mandatory (stored WITH country code),
+  // so when the account is new — or a legacy Google user has no phone yet —
+  // the backend answers with code "PHONE_REQUIRED" and the phone-capture
+  // modal completes the auth via completeGoogleAuthWithPhone.
+  const authenticateWithGoogle = async (idToken: string) => {
+    const apiBaseUrl = getApiBaseUrl();
+
+    const res = await fetch(`${apiBaseUrl}/auth/google`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        idToken,
+      }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      if (result.code === "PHONE_REQUIRED") {
+        setPendingGoogleIdToken(idToken);
+        setShowPhoneModal(true);
+        return;
+      }
+      toast.error(result.message || "Google authentication failed");
+      return;
+    }
+
+    if (result.user) {
+      dispatch(
+        loginSuccess({
+          user: {
+            _id: result.user._id,
+            name: result.user.name,
+            email: result.user.email,
+            image: result.user.image || undefined,
+            phone: result.user.phone || "",
+            role: result.user.role || "user",
+            favRoommateProfiles: result.user.favRoommateProfiles || [],
+            favProperties: result.user.favProperties || [],
+            bookedVisits: result.user.bookedVisits || [],
+            ownedProperties: result.user.ownedProperties || [],
+          },
+        }),
+      );
+      toast.success("Signed up with Google successfully!");
+
+      router.push("/choose-role");
+    } else {
+      toast.error("Google authentication failed. Please try again.");
+    }
+  };
+
   // Google Sign In success handler
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setIsGoogleLoading(true);
 
     try {
-      const apiBaseUrl = getApiBaseUrl();
-
-      const res = await fetch(`${apiBaseUrl}/auth/google`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          idToken: credentialResponse.credential,
-        }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok || !result.success) {
-        toast.error(result.message || "Google authentication failed");
-        setIsGoogleLoading(false);
-        return;
-      }
-
-      if (result.user) {
-        dispatch(
-          loginSuccess({
-            user: {
-              _id: result.user._id,
-              name: result.user.name,
-              email: result.user.email,
-              image: result.user.image || undefined,
-              phone: result.user.phone || "",
-              role: result.user.role || "user",
-              favRoommateProfiles: result.user.favRoommateProfiles || [],
-              favProperties: result.user.favProperties || [],
-              bookedVisits: result.user.bookedVisits || [],
-              ownedProperties: result.user.ownedProperties || [],
-            },
-          }),
-        );
-        toast.success("Signed up with Google successfully!");
-
-        // Chain: phone capture (if missing) → then role selection.
-        if (!result.user.phone) {
-          setShowPhoneModal(true);
-        } else {
-          router.push("/choose-role");
-        }
-      } else {
-        toast.error("Google authentication failed. Please try again.");
-      }
+      await authenticateWithGoogle(credentialResponse.credential);
     } catch (error) {
       console.error("Google auth error:", error);
       toast.error("Failed to authenticate with Google.");
@@ -243,7 +263,58 @@ const SignupPage = () => {
     setIsGoogleLoading(false);
   };
 
-  // Phone-capture modal callbacks — save or skip both proceed to role selection
+  // Called by the phone-capture modal — completes Google auth with a phone
+  // number (stored with country code, e.g. +919876543210) and logs the user
+  // in. The redirect happens in the modal's onSave callback.
+  const completeGoogleAuthWithPhone = async (phone: string) => {
+    if (!pendingGoogleIdToken) {
+      throw new Error(
+        "Google session expired. Please sign in with Google again.",
+      );
+    }
+
+    const apiBaseUrl = getApiBaseUrl();
+
+    const res = await fetch(`${apiBaseUrl}/auth/google`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        idToken: pendingGoogleIdToken,
+        phone,
+      }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success || !result.user) {
+      throw new Error(
+        result.message || "Couldn't save your phone. Please try again.",
+      );
+    }
+
+    dispatch(
+      loginSuccess({
+        user: {
+          _id: result.user._id,
+          name: result.user.name,
+          email: result.user.email,
+          image: result.user.image || undefined,
+          phone: result.user.phone || phone,
+          role: result.user.role || "user",
+          favRoommateProfiles: result.user.favRoommateProfiles || [],
+          favProperties: result.user.favProperties || [],
+          bookedVisits: result.user.bookedVisits || [],
+          ownedProperties: result.user.ownedProperties || [],
+        },
+      }),
+    );
+    setPendingGoogleIdToken(null);
+  };
+
+  // Phone-capture modal callback — the phone has been saved, proceed to role selection
   const proceedToRoleSelection = () => {
     setShowPhoneModal(false);
     router.push("/choose-role");
@@ -253,8 +324,8 @@ const SignupPage = () => {
     <div className="min-h-screen flex">
       {showPhoneModal && (
         <PhoneCaptureModal
+          onSubmitPhone={completeGoogleAuthWithPhone}
           onSave={proceedToRoleSelection}
-          onSkip={proceedToRoleSelection}
         />
       )}
       {/* Left side - Image */}

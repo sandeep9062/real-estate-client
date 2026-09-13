@@ -83,6 +83,9 @@ const roleLabels: Record<string, string> = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// E.164: leading "+" + country code + subscriber number, e.g. "+919876543210"
+const PHONE_RE = /^\+[1-9]\d{7,14}$/;
+
 export default function EditProfilePage() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -129,11 +132,18 @@ export default function EditProfilePage() {
       toast.error("Enter a valid email address");
       return;
     }
+    // Phone is required and must include the country code (stored as E.164)
+    if (!PHONE_RE.test(phone.trim())) {
+      toast.error(
+        "Enter a valid phone number with country code, e.g. +919876543210",
+      );
+      return;
+    }
 
     const formData = new FormData();
     formData.append("name", name.trim());
     formData.append("email", email.trim());
-    formData.append("phone", phone || "");
+    formData.append("phone", phone.trim());
     if (imageFile) {
       formData.append("image", imageFile);
     }

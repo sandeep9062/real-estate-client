@@ -71,6 +71,11 @@ const LoginPage = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState("/");
+  // Google ID token awaiting a phone number (phone is mandatory for every
+  // account). The phone-capture modal completes the auth with it.
+  const [pendingGoogleIdToken, setPendingGoogleIdToken] = useState<
+    string | null
+  >(null);
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -153,65 +158,69 @@ const LoginPage = () => {
     }
   };
 
+  // Authenticate with Google. Phone is mandatory (stored WITH country code),
+  // so when a Google user has no phone on file the backend answers with code
+  // "PHONE_REQUIRED" and the phone-capture modal completes the auth via
+  // completeGoogleAuthWithPhone.
+  const authenticateWithGoogle = async (idToken: string) => {
+    const apiBaseUrl = getApiBaseUrl();
+
+    const res = await fetch(`${apiBaseUrl}/auth/google`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        idToken,
+      }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      if (result.code === "PHONE_REQUIRED") {
+        setPendingGoogleIdToken(idToken);
+        setShowPhoneModal(true);
+        return;
+      }
+      toast.error(result.message || "Google authentication failed");
+      return;
+    }
+
+    if (result.user) {
+      dispatch(
+        loginSuccess({
+          user: {
+            _id: result.user._id,
+            name: result.user.name,
+            email: result.user.email,
+            image: result.user.image || undefined,
+            phone: result.user.phone || "",
+            role: result.user.role || "user",
+            favProperties: result.user.favProperties || [],
+            favRoommateProfiles: result.user.favRoommateProfiles || [],
+            bookedVisits: result.user.bookedVisits || [],
+            ownedProperties: result.user.ownedProperties || [],
+          },
+        }),
+      );
+      toast.success("Logged in with Google successfully!");
+
+      const shouldChooseRole =
+        (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
+      router.push(shouldChooseRole ? "/choose-role" : "/");
+    } else {
+      toast.error("Google authentication failed. Please try again.");
+    }
+  };
+
   // Google Sign In success handler
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setIsGoogleLoading(true);
 
     try {
-      const apiBaseUrl = getApiBaseUrl();
-
-      const res = await fetch(`${apiBaseUrl}/auth/google`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          idToken: credentialResponse.credential,
-        }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok || !result.success) {
-        toast.error(result.message || "Google authentication failed");
-        setIsGoogleLoading(false);
-        return;
-      }
-
-      if (result.user) {
-        dispatch(
-          loginSuccess({
-            user: {
-              _id: result.user._id,
-              name: result.user.name,
-              email: result.user.email,
-              image: result.user.image || undefined,
-              phone: result.user.phone || "",
-              role: result.user.role || "user",
-              favProperties: result.user.favProperties || [],
-              favRoommateProfiles: result.user.favRoommateProfiles || [],
-              bookedVisits: result.user.bookedVisits || [],
-              ownedProperties: result.user.ownedProperties || [],
-            },
-          }),
-        );
-        toast.success("Logged in with Google successfully!");
-
-        const shouldChooseRole =
-          (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
-        const next = shouldChooseRole ? "/choose-role" : "/";
-
-        // Chain: phone capture (if missing) → then the normal redirect logic.
-        if (!result.user.phone) {
-          setPendingRedirect(next);
-          setShowPhoneModal(true);
-        } else {
-          router.push(next);
-        }
-      } else {
-        toast.error("Google authentication failed. Please try again.");
-      }
+      await authenticateWithGoogle(credentialResponse.credential);
     } catch (error) {
       console.error("Google auth error:", error);
       toast.error("Failed to authenticate with Google.");
@@ -226,7 +235,63 @@ const LoginPage = () => {
     setIsGoogleLoading(false);
   };
 
-  // Phone-capture modal callbacks — save or skip both resume the redirect
+  // Called by the phone-capture modal — completes Google auth with a phone
+  // number (stored with country code, e.g. +919876543210) and logs the user
+  // in. The redirect happens in the modal's onSave callback.
+  const completeGoogleAuthWithPhone = async (phone: string) => {
+    if (!pendingGoogleIdToken) {
+      throw new Error(
+        "Google session expired. Please sign in with Google again.",
+      );
+    }
+
+    const apiBaseUrl = getApiBaseUrl();
+
+    const res = await fetch(`${apiBaseUrl}/auth/google`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        idToken: pendingGoogleIdToken,
+        phone,
+      }),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success || !result.user) {
+      throw new Error(
+        result.message || "Couldn't save your phone. Please try again.",
+      );
+    }
+
+    dispatch(
+      loginSuccess({
+        user: {
+          _id: result.user._id,
+          name: result.user.name,
+          email: result.user.email,
+          image: result.user.image || undefined,
+          phone: result.user.phone || phone,
+          role: result.user.role || "user",
+          favProperties: result.user.favProperties || [],
+          favRoommateProfiles: result.user.favRoommateProfiles || [],
+          bookedVisits: result.user.bookedVisits || [],
+          ownedProperties: result.user.ownedProperties || [],
+        },
+      }),
+    );
+
+    // Pre-compute the redirect so the modal's onSave can route correctly.
+    const shouldChooseRole =
+      (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
+    setPendingRedirect(shouldChooseRole ? "/choose-role" : "/");
+    setPendingGoogleIdToken(null);
+  };
+
+  // Phone-capture modal callback — the phone has been saved, resume the redirect
   const proceedAfterPhoneModal = () => {
     setShowPhoneModal(false);
     router.push(pendingRedirect);
@@ -236,8 +301,8 @@ const LoginPage = () => {
     <div className="min-h-screen flex">
       {showPhoneModal && (
         <PhoneCaptureModal
+          onSubmitPhone={completeGoogleAuthWithPhone}
           onSave={proceedAfterPhoneModal}
-          onSkip={proceedAfterPhoneModal}
         />
       )}
       {/* Left side - Image */}

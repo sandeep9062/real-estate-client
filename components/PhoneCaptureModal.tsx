@@ -4,61 +4,51 @@ import { useState } from "react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { toast } from "@/hooks/use-toast";
-import { useDispatch } from "react-redux";
-import { useUpdateProfileMutation } from "@/services/authApi";
-import { updateUser } from "@/store/authSlice";
 import { PhoneCall } from "lucide-react";
+
+// E.164: leading "+" + country code + subscriber number, e.g. "+919876543210"
+const PHONE_RE = /^\+[1-9]\d{7,14}$/;
 
 /**
  * Google OAuth phone-capture modal.
  *
- * Shows immediately after Google auth succeeds when the user has no phone on
- * file, BEFORE the role-selection / home redirect. Not blocking: "Skip for
- * now" dismisses it and the caller proceeds straight to the redirect chain.
- * Because the phone stays empty on the server, it keeps asking on next login
- * (WhatsApp-connect depends on it).
+ * Phone numbers are mandatory and stored WITH the country code (E.164,
+ * e.g. "+919876543210"), so a Google account cannot be created without one.
+ * This modal appears when the backend answers /auth/google with code
+ * "PHONE_REQUIRED" (new Google signup, or a legacy Google user with no phone
+ * on file). `onSubmitPhone` re-runs /auth/google with the phone and logs the
+ * user in — only after it succeeds is the user allowed to continue.
  */
 export default function PhoneCaptureModal({
+  onSubmitPhone,
   onSave,
-  onSkip,
 }: {
+  onSubmitPhone: (phone: string) => Promise<void>;
   onSave: () => void;
-  onSkip: () => void;
 }) {
-  const dispatch = useDispatch();
-  const [updateProfile] = useUpdateProfileMutation();
   const [phone, setPhone] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
-    if (!phone || phone.trim().length < 10) {
-      toast.error("Please enter a valid phone number.");
+    if (!PHONE_RE.test(phone)) {
+      toast.error(
+        "Please enter a valid phone number with country code, e.g. +919876543210.",
+      );
       return;
     }
     setIsSaving(true);
     try {
-      const res = await updateProfile({ phone }).unwrap();
-      const updated = (res as any)?.user;
-      if (updated) {
-        dispatch(updateUser({ phone: updated.phone || phone }));
-      }
+      await onSubmitPhone(phone);
       toast.success("Phone number saved.");
       onSave();
-    } catch (err) {
+    } catch (err: any) {
       console.error("phone save error:", err);
       toast.error(
-        (err as any)?.data?.message ||
-          (err as any)?.message ||
-          "Couldn't save your phone. Please try again.",
+        err?.message || "Couldn't save your phone. Please try again.",
       );
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleSkip = () => {
-    toast.success("No problem — you can add it later.");
-    onSkip();
   };
 
   return (
@@ -80,12 +70,13 @@ export default function PhoneCaptureModal({
             What&apos;s your WhatsApp number?
           </h2>
           <p className="mt-1.5 text-center text-sm text-gray-600">
-            We use this to connect you directly with buyers and agents.
+            A phone number is required to finish setting up your account. We
+            use it to connect you directly with buyers and agents.
           </p>
 
           <div className="mt-5">
             <label className="block text-xs font-medium text-gray-700">
-              Phone number
+              Phone number (with country code)
             </label>
             <PhoneInput
               value={phone}
@@ -102,15 +93,6 @@ export default function PhoneCaptureModal({
             className="mt-5 w-full rounded-lg bg-[#4161df] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3759dd] disabled:opacity-60"
           >
             {isSaving ? "Saving…" : "Save number"}
-          </button>
-
-          <button
-            type="button"
-            disabled={isSaving}
-            onClick={handleSkip}
-            className="mt-2 w-full py-2 text-sm font-medium text-gray-500 hover:text-gray-700"
-          >
-            Skip for now
           </button>
         </div>
       </div>
