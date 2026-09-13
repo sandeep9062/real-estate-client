@@ -377,8 +377,7 @@ export default function DreamHomeEnquiry() {
       fullName: f.fullName || user.name || "",
       email: f.email || user.email || "",
       // Stored phones may be E.164 (e.g. +91XXXXXXXXXX) — keep last 10 digits
-      phone:
-        f.phone || (user.phone || "").replace(/\D/g, "").slice(-10),
+      phone: f.phone || (user.phone || "").replace(/\D/g, "").slice(-10),
     }));
   }, [user]);
 
@@ -416,10 +415,8 @@ export default function DreamHomeEnquiry() {
       },
     }));
 
-  const setNearby = (
-    key: keyof FormData["nearbyPlaces"],
-    val: string,
-  ) => setForm((f) => ({ ...f, nearbyPlaces: { ...f.nearbyPlaces, [key]: val } }));
+  const setNearby = (key: keyof FormData["nearbyPlaces"], val: string) =>
+    setForm((f) => ({ ...f, nearbyPlaces: { ...f.nearbyPlaces, [key]: val } }));
 
   const validate = (s: number): boolean => {
     const errs: Partial<Record<keyof FormData, string>> = {};
@@ -526,7 +523,7 @@ export default function DreamHomeEnquiry() {
   return (
     <>
       <style>{CSS}</style>
-      <div className="pb">
+      <div className="pb max-w-7xl">
         {/* Hero */}
         <div className="pb-hero">
           {/* Dot grid */}
@@ -881,19 +878,20 @@ export default function DreamHomeEnquiry() {
                 <div className="pb-bg">
                   {(form.deal === "Rent" ? BUDGETS_RENT : BUDGETS_SALE).map(
                     ({ label, sub, val }) => (
-                    <div
-                      key={val}
-                      className={`pb-bc${form.budget === val ? " pb-bc-a" : ""}`}
-                      onClick={() => set("budget", val)}
-                    >
                       <div
-                        className={`pb-bamt${form.budget === val ? " pb-bamt-a" : ""}`}
+                        key={val}
+                        className={`pb-bc${form.budget === val ? " pb-bc-a" : ""}`}
+                        onClick={() => set("budget", val)}
                       >
-                        {label}
+                        <div
+                          className={`pb-bamt${form.budget === val ? " pb-bamt-a" : ""}`}
+                        >
+                          {label}
+                        </div>
+                        <div className="pb-bsub">{sub}</div>
                       </div>
-                      <div className="pb-bsub">{sub}</div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
                 {errors.budget && (
                   <div className="pb-err" style={{ marginBottom: "1rem" }}>
@@ -1258,8 +1256,7 @@ export default function DreamHomeEnquiry() {
                         <Pill
                           key={val}
                           active={
-                            form.houseRules.oppositeGenderGuestsAllowed ===
-                            val
+                            form.houseRules.oppositeGenderGuestsAllowed === val
                           }
                           onClick={() =>
                             setHR("oppositeGenderGuestsAllowed", val)
@@ -1284,9 +1281,7 @@ export default function DreamHomeEnquiry() {
                           active={
                             form.houseRules.overnightGuestsAllowed === val
                           }
-                          onClick={() =>
-                            setHR("overnightGuestsAllowed", val)
-                          }
+                          onClick={() => setHR("overnightGuestsAllowed", val)}
                         >
                           {lbl}
                         </Pill>
@@ -1322,9 +1317,7 @@ export default function DreamHomeEnquiry() {
                       className="pb-in"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.hospitals}
-                      onChange={(e) =>
-                        setNearby("hospitals", e.target.value)
-                      }
+                      onChange={(e) => setNearby("hospitals", e.target.value)}
                     />
                   </Field>
                   <Field label="Metro Stations">
