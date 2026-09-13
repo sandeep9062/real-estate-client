@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { selectUser } from "@/store/authSlice";
+import router from "next/dist/shared/lib/router/router";
 
 interface HouseRules {
   ownerLivesOnPremises: boolean;
@@ -444,7 +445,7 @@ export default function DreamHomeEnquiry() {
           <div className="absolute rounded-full bg-white pointer-events-none w-[150px] h-[150px] -bottom-[60px] left-[40%] opacity-[.05]" />
 
           <div className="relative inline-flex items-center gap-1.5 bg-white/[.12] border border-white/[.2] rounded-full px-4 py-1.5 text-[.72rem] text-white/[.85] tracking-[.08em] uppercase font-medium mb-5 mt-2">
-            🏆 Tricity's Most Trusted Platform
+            🏆 Tricity's Most Trusted Real Estate Platform
           </div>
           <h1 className="relative text-white font-extrabold leading-[1.15] tracking-tight mb-3 text-[clamp(1.75rem,4vw,2.5rem)]">
             Find Your{" "}
@@ -454,6 +455,7 @@ export default function DreamHomeEnquiry() {
             <br />
             Without the Hassle
           </h1>
+
           <p className="relative text-white/[.6] text-[.9rem] font-extralight leading-[1.7]">
             No hidden charges · No spam calls · Verified listings · Zero
             brokerage surprises

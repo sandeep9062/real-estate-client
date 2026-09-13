@@ -4,6 +4,9 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, FileDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/store/authSlice";
 import { useGetPropertyBrochureQuery } from "@/services/propertiesApi";
 
 interface BrochureDownloadButtonProps {
@@ -19,6 +22,8 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const {
     data: brochureData,
     isLoading,
@@ -29,6 +34,13 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
   );
 
   const handleDownloadBrochure = async () => {
+    // Brochure download is gated — only logged-in users can download.
+    if (!isAuthenticated) {
+      toast.error("Please log in to download the brochure");
+      router.push("/login");
+      return;
+    }
+
     try {
       setIsDownloading(true);
 
@@ -60,7 +72,19 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
       const apiUrl = getApiUrl();
       const response = await fetch(
         `${apiUrl}/properties/${propertyId}/download-brochure`,
+        {
+          // Brochure download is auth-protected server-side — send the
+          // HTTP-only auth cookie with the request.
+          credentials: "include",
+        },
       );
+
+      // Session expired / not authenticated server-side — send to login.
+      if (response.status === 401) {
+        toast.error("Please log in to download the brochure");
+        router.push("/login");
+        return;
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);

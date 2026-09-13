@@ -2,6 +2,8 @@
 import React, { useMemo, memo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/store/authSlice";
 import Heart from "./Heart";
 
 import { Scale, Check } from "lucide-react";
@@ -118,9 +120,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     },
   ].filter(Boolean) as { key: string; icon: React.ReactNode; label: string }[];
 
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
   // MATCHING WHATSAPP LOGIC FROM PROPERTYDETAILS.TSX
+  // Direct WhatsApp contact is gated — only logged-in users can reach the
+  // owner/agent chat. Everyone else is sent to /login first.
   const handleWhatsAppClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!isAuthenticated) {
+      toast.error("Please log in to chat on WhatsApp");
+      router.push("/login");
+      return;
+    }
     if (!displayPhone) return;
 
     const message = `Hi, I saw your property "${card.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${slug}`;

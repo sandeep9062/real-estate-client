@@ -176,7 +176,16 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
 
   const [createLead] = useCreateLeadMutation();
 
-  const handleWhatsAppClick = () => {
+  const handleWhatsAppClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Direct WhatsApp contact is gated — only logged-in users can chat with
+    // the owner/agent. Everyone else is sent to /login first.
+    if (!isAuthenticated) {
+      e.preventDefault();
+      toast.error("Please log in to chat on WhatsApp");
+      router.push("/login");
+      return;
+    }
+
     // Keep existing analytics behavior unchanged.
     if (typeof window !== "undefined" && (window as any).gtag) {
       (window as any).gtag("event", "generate_lead", {

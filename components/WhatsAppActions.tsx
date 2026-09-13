@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/store/authSlice";
 import {
   Group,
   Button,
@@ -45,6 +48,8 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
   const [modalOpened, setModalOpened] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const router = useRouter();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [createWhatsAppLead] = useCreateWhatsAppLeadMutation();
   const { data: brochureData } = useGetPropertyBrochureQuery(propertyId, {
@@ -67,6 +72,13 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
   });
 
   const handleShareToWhatsApp = () => {
+    // WhatsApp actions are gated — only logged-in users can share/continue.
+    if (!isAuthenticated) {
+      toast.error("Please log in to continue on WhatsApp");
+      router.push("/login");
+      return;
+    }
+
     setIsSharing(true);
 
     // Track GA4 lead event
@@ -132,7 +144,19 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
       const apiUrl = getApiUrl();
       const response = await fetch(
         `${apiUrl}/properties/${propertyId}/download-brochure`,
+        {
+          // Brochure download is auth-protected server-side — send the
+          // HTTP-only auth cookie with the request.
+          credentials: "include",
+        },
       );
+
+      // Session expired / not authenticated server-side — send to login.
+      if (response.status === 401) {
+        toast.error("Please log in to download the brochure");
+        router.push("/login");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to download brochure");
@@ -175,7 +199,15 @@ const WhatsAppActions: React.FC<WhatsAppActionsProps> = ({
         {/* Get PDF on WhatsApp Button */}
         <Button
           leftSection={<MessageCircle size={18} />}
-          onClick={() => setModalOpened(true)}
+          onClick={() => {
+            // Gated — only logged-in users can get the brochure on WhatsApp.
+            if (!isAuthenticated) {
+              toast.error("Please log in to get the brochure on WhatsApp");
+              router.push("/login");
+              return;
+            }
+            setModalOpened(true);
+          }}
           className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold"
           size="md"
           radius="md"
