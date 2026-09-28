@@ -33,7 +33,9 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 // Replace with real PropertyBulbul contact details
 const CONTACT_DETAILS: {
-  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+  icon: ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
+  >;
   label: string;
   value: string;
   href?: string;
@@ -41,15 +43,15 @@ const CONTACT_DETAILS: {
   // {
   //   icon: Phone,
   //   label: "Call us",
-  //   value: "+91 98765 43210",
-  //   href: "tel:+919876543210",
+  //   value: "+91 9729907448",
+  //   href: "tel:+91 9729907448",
   // },
-  // {
-  //   icon: Mail,
-  //   label: "Email us",
-  //   value: "hello@propertybulbul.com",
-  //   href: "mailto:hello@propertybulbul.com",
-  // },
+  {
+    icon: Mail,
+    label: "Email us",
+    value: "bulbulproperty@gmail.com",
+    href: "mailto:bulbulproperty@gmail.com",
+  },
   {
     icon: Clock,
     label: "Working hours",
