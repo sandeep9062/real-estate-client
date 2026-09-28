@@ -793,7 +793,7 @@ export default function PricingPage() {
         >
           Questions? WhatsApp us or email{" "}
           <a
-            href="mailto:contact@propertybulbul.com"
+            href="mailto:bulbulproperty@gmail.com"
             style={{
               color: "#4161df",
               textDecoration: "none",

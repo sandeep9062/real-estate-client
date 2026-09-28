@@ -1,5 +1,10 @@
 import { MetadataRoute } from "next";
-import { buildSeoPath, eligibleSeoCombos } from "../lib/filterSlug";
+import {
+  eligiblePriceBucketCombos,
+  eligibleSeoCombos,
+} from "../lib/filterSlug";
+import { seoComboPath } from "../lib/rootSlugPatterns";
+import { eligibleLandmarkSeoCombos } from "../lib/seoListings";
 
 interface ApiProperty {
   _id: string;
@@ -280,22 +285,67 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap: Failed to fetch developers —", error);
   }
 
-  // --- Programmatic SEO landing pages (/properties/{city}[/{sector}]/{filter}) ---
+  // --- Programmatic SEO landing pages (/properties/{city}[/{sector}]/{filter}
+  //     plus the root-level flat URLs: sector+type, landmark, price buckets) ---
   // Same `eligibleSeoCombos` logic the pages use for the 3-listing guardrail,
   // so the sitemap can never list a URL the site itself would 404.
   let seoLandingUrls: MetadataRoute.Sitemap = [];
   try {
     const allProperties = await fetchAllPropertiesForSeo(API_BASE);
     const combos = eligibleSeoCombos(allProperties);
-    seoLandingUrls = combos.map((c) => ({
-      url: `${baseUrl}${buildSeoPath(c.city, c.spec, c.sectorSlug)}`,
-      lastModified: new Date(),
-      changeFrequency: "daily" as const,
-      priority: c.sectorSlug ? 0.9 : 0.8,
-    }));
+    seoLandingUrls = combos
+      .map((c) => ({
+        combo: c,
+        path: seoComboPath(c),
+      }))
+      .filter((e): e is { combo: (typeof combos)[number]; path: string } =>
+        Boolean(e.path),
+      )
+      .map(({ combo: c, path }) => ({
+        url: `${baseUrl}${path}`,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        // bhk/pg combos with a sector are the deepest nested pages;
+        // root-level sector pages carry the same weight.
+        priority: c.sectorSlug || c.landmarkSlug ? 0.9 : 0.8,
+      }));
     console.log(
       `Sitemap: Fetched ${allProperties.length} properties — ${combos.length} SEO landing pages eligible`,
     );
+
+    // --- Root-level landmark pages (one $geoNear aggregation per landmark,
+    //     grouped with the shared specsForProperty helper) ---
+    const landmarkCombos = await eligibleLandmarkSeoCombos();
+    const landmarkUrls: MetadataRoute.Sitemap = landmarkCombos
+      .map((c) => ({ path: seoComboPath(c) }))
+      .filter((e): e is { path: string } => Boolean(e.path))
+      .map(({ path }) => ({
+        url: `${baseUrl}${path}`,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        priority: 0.9,
+      }));
+    seoLandingUrls = [...seoLandingUrls, ...landmarkUrls];
+    console.log(
+      `Sitemap: ${landmarkCombos.length} landmark SEO pages eligible`,
+    );
+
+    // --- Root-level price-bucket pages. Buckets are fixed/enumerable, so
+    //     they don't need combo derivation — but the same
+    //     MIN_LISTINGS_FOR_SEO_PAGE guardrail applies, so a bucket is skipped
+    //     for a city that doesn't have enough matching rent listings. ---
+    const priceCombos = eligiblePriceBucketCombos(allProperties);
+    const priceUrls: MetadataRoute.Sitemap = priceCombos
+      .map((c) => ({ path: seoComboPath(c) }))
+      .filter((e): e is { path: string } => Boolean(e.path))
+      .map(({ path }) => ({
+        url: `${baseUrl}${path}`,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        priority: 0.8,
+      }));
+    seoLandingUrls = [...seoLandingUrls, ...priceUrls];
+    console.log(`Sitemap: ${priceCombos.length} price-bucket pages eligible`);
   } catch (error) {
     console.error(
       "Sitemap: Failed to derive SEO landing page URLs —",

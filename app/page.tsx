@@ -1,4 +1,5 @@
 import { fetchPropertiesServer } from "@/services/propertiesApi";
+import QuickLinks from "@/components/QuickLinks";
 import HomeClient from "./HomeClient";
 
 export default async function Home() {
@@ -11,5 +12,12 @@ export default async function Home() {
     console.error("Failed to fetch featured listings server-side:", err);
   }
 
-  return <HomeClient featuredProperties={featuredProperties} />;
+  return (
+    <>
+      <HomeClient featuredProperties={featuredProperties} />
+      {/* Quick links to the programmatic SEO landing pages — derived from
+          live inventory, never hand-maintained. */}
+      <QuickLinks />
+    </>
+  );
 }

@@ -116,6 +116,7 @@ const Footer = () => {
                 // ["Agents", "/agents"],
                 ["Disclaimer", "/disclaimer"],
                 ["Privacy Policy", "/privacy-policy"],
+                ["Terms & Conditions", "/terms"],
               ].map(([label, link]) => (
                 <Link
                   key={label}

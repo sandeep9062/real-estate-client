@@ -3,9 +3,9 @@ import Script from "next/script";
 
 export const metadata: Metadata = {
   title:
-    "Properties for Sale & Rent in Tricity (Chandigarh, Panchkula, Mohali) | Propertybulbul",
+    "Properties for Sale & Rent in Tricity (Chandigarh, Panchkula, Mohali) | PropertyBulbul",
   description:
-    "Discover premium properties for sale and rent in Tricity including Chandigarh, Panchkula, Mohali, and Kharar. Explore apartments, houses, villas, commercial spaces, and plots. Find your dream home with Propertybulbul's verified listings.",
+    "Discover premium properties for sale and rent in Tricity including Chandigarh, Panchkula, Mohali, and Kharar. Explore apartments, houses, villas, commercial spaces, and plots. Find your dream home with PropertyBulbul's verified listings.",
   alternates: {
     canonical: "https://www.propertybulbul.com/properties",
   },

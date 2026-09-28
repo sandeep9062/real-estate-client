@@ -12,6 +12,9 @@ import {
   parseFilterSlug,
   sectorSlugToDisplay,
 } from "./filterSlug";
+import { buildRootSlug } from "./rootSlugPatterns";
+import type { Landmark } from "./landmarks";
+import type { ResolvedSlug } from "./rootSlugPatterns";
 
 const truncate = (text: string, max: number): string =>
   text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`;
@@ -24,12 +27,19 @@ const dealPhrase = (dealType: "rent" | "sale") =>
 
 const bhkPropertyNoun = (bhk: number) => (bhk === 1 ? "Flat" : "Flats");
 
-/** Place suffix: "Sector 40, Chandigarh" or just "Chandigarh". */
+const inr = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
+
+/**
+ * Place suffix: "Sector 40, Chandigarh", just "Chandigarh", or
+ * "near PGI Hospital (PGIMER), Chandigarh" for landmark pages.
+ */
 export function placeLabel(
   city: SeoCity,
   sectorSlug: string | null,
+  landmark?: Landmark | null,
 ): string {
   const cityDisplay = SEO_CITY_DISPLAY[city];
+  if (landmark) return `near ${landmark.name}, ${cityDisplay}`;
   return sectorSlug
     ? `${sectorSlugToDisplay(sectorSlug)}, ${cityDisplay}`
     : cityDisplay;
@@ -40,19 +50,36 @@ export function placeLabel(
  *   "2 BHK Flats for Rent in Sector 40, Chandigarh"
  *   "PG Accommodation for Boys in Sector 34, Chandigarh"
  *   "PG Accommodation in Kharar" (city-level)
+ *   "Flats for Rent in Sector 12, Chandigarh"              (category)
+ *   "Flats for Rent near PGI Hospital (PGIMER), Chandigarh" (landmark)
+ *   "Property for Rent in Mohali under ₹10,000"            (price bucket)
  */
 export function pageH1(
   city: SeoCity,
   sectorSlug: string | null,
   spec: SeoFilterSpec,
+  landmark?: Landmark | null,
 ): string {
-  const place = placeLabel(city, sectorSlug);
+  const place = placeLabel(city, sectorSlug, landmark);
   if (spec.kind === "pg") {
     return spec.gender
       ? `PG Accommodation for ${
           spec.gender.charAt(0).toUpperCase() + spec.gender.slice(1)
         } in ${place}`
       : `PG Accommodation in ${place}`;
+  }
+  if (spec.kind === "category") {
+    const noun = spec.category === "House/Villa" ? "Houses" : "Flats";
+    return `${noun} for ${dealNoun(spec.dealType)} in ${place}`;
+  }
+  if (spec.kind === "price") {
+    return `Property for ${dealNoun(spec.dealType)} in ${place} under ${inr(spec.maxPrice)}`;
+  }
+  if (spec.kind === "independent-room") {
+    return `Independent Rooms for Rent in ${place}`;
+  }
+  if (spec.kind === "flatmate") {
+    return `Flatmate Rooms for Rent in ${place}`;
   }
   return `${spec.bhk} BHK ${bhkPropertyNoun(spec.bhk)} for ${dealNoun(
     spec.dealType,
@@ -64,8 +91,9 @@ export function seoMetaTitle(
   city: SeoCity,
   sectorSlug: string | null,
   spec: SeoFilterSpec,
+  landmark?: Landmark | null,
 ): string {
-  return truncate(pageH1(city, sectorSlug, spec), 60);
+  return truncate(pageH1(city, sectorSlug, spec, landmark), 60);
 }
 
 /** Meta description — ~155 chars. */
@@ -73,13 +101,40 @@ export function seoMetaDescription(
   city: SeoCity,
   sectorSlug: string | null,
   spec: SeoFilterSpec,
+  landmark?: Landmark | null,
 ): string {
-  const place = placeLabel(city, sectorSlug);
-  const inPlace = sectorSlug ? `in ${place}` : `in ${place}`;
+  const place = placeLabel(city, sectorSlug, landmark);
+  const inPlace = `in ${place}`;
   if (spec.kind === "pg") {
     const who = spec.gender ? ` for ${spec.gender}` : "";
     return truncate(
       `Browse verified PG accommodation${who} in ${place}. No hidden fees, no fake listings. Updated daily on PropertyBulbul.`,
+      155,
+    );
+  }
+  if (spec.kind === "category") {
+    const noun =
+      spec.category === "House/Villa" ? "houses" : "flats & apartments";
+    return truncate(
+      `Browse verified ${noun} for ${dealPhrase(spec.dealType)} ${inPlace}. No hidden fees, no fake listings. Updated daily on PropertyBulbul.`,
+      155,
+    );
+  }
+  if (spec.kind === "price") {
+    return truncate(
+      `Browse verified rental properties ${inPlace} under ${inr(spec.maxPrice)}. No hidden fees, no fake listings. Updated daily on PropertyBulbul.`,
+      155,
+    );
+  }
+  if (spec.kind === "independent-room") {
+    return truncate(
+      `Browse verified independent rooms for rent ${inPlace} (subletting allowed). No hidden fees, no fake listings. Updated daily on PropertyBulbul.`,
+      155,
+    );
+  }
+  if (spec.kind === "flatmate") {
+    return truncate(
+      `Browse verified rooms to share with flatmates ${inPlace}. No hidden fees, no fake listings. Updated daily on PropertyBulbul.`,
       155,
     );
   }
@@ -102,11 +157,26 @@ export function seoIntroParagraph(
   sectorSlug: string | null,
   spec: SeoFilterSpec,
   count: number,
+  landmark?: Landmark | null,
 ): string {
-  const place = placeLabel(city, sectorSlug);
+  const place = placeLabel(city, sectorSlug, landmark);
   if (spec.kind === "pg") {
     const who = spec.gender ? ` for ${spec.gender}` : "";
     return `Looking for PG accommodation${who} in ${place}? PropertyBulbul lists ${count} verified PG in this area, refreshed daily from active Tricity brokers.`;
+  }
+  if (spec.kind === "category") {
+    const noun =
+      spec.category === "House/Villa" ? "houses" : "flats & apartments";
+    return `Looking for ${noun} for ${dealPhrase(spec.dealType)} ${place}? PropertyBulbul lists ${count} verified options in this area, refreshed daily from active Tricity brokers.`;
+  }
+  if (spec.kind === "price") {
+    return `Looking for a rental ${place} under ${inr(spec.maxPrice)}? PropertyBulbul lists ${count} verified properties in this price range, refreshed daily from active Tricity brokers.`;
+  }
+  if (spec.kind === "independent-room") {
+    return `Looking for an independent room for rent ${place}? PropertyBulbul lists ${count} verified rooms in this area, refreshed daily from active Tricity brokers.`;
+  }
+  if (spec.kind === "flatmate") {
+    return `Looking for a room to share with flatmates ${place}? PropertyBulbul lists ${count} verified options in this area, refreshed daily from active Tricity brokers.`;
   }
   return `Looking for a ${spec.bhk} BHK ${
     spec.dealType === "rent" ? "rental" : "property to buy"
@@ -122,6 +192,14 @@ export function relatedPageLabel(spec: SeoFilterSpec): string {
       ? `PG for ${spec.gender.charAt(0).toUpperCase() + spec.gender.slice(1)}`
       : "All PG Accommodation";
   }
+  if (spec.kind === "category") {
+    return spec.category === "House/Villa" ? "Houses" : "Flats";
+  }
+  if (spec.kind === "price") {
+    return `Under ${inr(spec.maxPrice)}`;
+  }
+  if (spec.kind === "independent-room") return "Independent Rooms";
+  if (spec.kind === "flatmate") return "Flatmate Rooms";
   return `${spec.bhk} BHK for ${dealNoun(spec.dealType)}`;
 }
 
@@ -149,6 +227,33 @@ export function buildSeoMetadata(
     openGraph: {
       title: seoMetaTitle(city, sectorSlug, spec),
       description: seoMetaDescription(city, sectorSlug, spec),
+      locale: "en_IN",
+      type: "website",
+    },
+  };
+}
+
+/**
+ * Next.js Metadata for a ROOT-LEVEL SEO landing page
+ * (`app/[slug]/page.tsx`), built from the structured `parseRootSlug` result
+ * instead of route segments. Returns null when the combination has no live
+ * URL (caller 404s).
+ */
+export function buildRootSeoMetadata(
+  resolved: ResolvedSlug,
+  landmark?: Landmark | null,
+): Metadata | null {
+  const { city, sectorSlug, landmarkSlug, spec } = resolved;
+  const rootSlug = buildRootSlug(city, spec, { sectorSlug, landmarkSlug });
+  if (!rootSlug) return null;
+
+  return {
+    title: seoMetaTitle(city, sectorSlug, spec, landmark),
+    description: seoMetaDescription(city, sectorSlug, spec, landmark),
+    alternates: { canonical: `/${rootSlug}` },
+    openGraph: {
+      title: seoMetaTitle(city, sectorSlug, spec, landmark),
+      description: seoMetaDescription(city, sectorSlug, spec, landmark),
       locale: "en_IN",
       type: "website",
     },

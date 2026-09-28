@@ -229,6 +229,44 @@ export async function fetchAllPropertiesServer(
   }
 }
 
+/**
+ * Geo-proximity listings for the root-level landmark SEO pages.
+ *
+ * Hits the dedicated backend endpoint `GET /api/properties/seo/geo-listings`,
+ * which runs a single MongoDB `$geoNear` aggregation against the 2dsphere
+ * index on `location.coordinates` (with an explicit `[0, 0]` exclusion — the
+ * schema default for unset coordinates is a real point in the Gulf of
+ * Guinea, not "missing data"). Distances are computed by MongoDB, never in
+ * JS. Supported narrowing params: deal, propertyCategory, priceMax.
+ */
+export async function fetchGeoListingsServer(
+  params: Record<string, string>,
+): Promise<any[]> {
+  const apiUrl = getApiUrl();
+  const url = new URL(`${apiUrl}/properties/seo/geo-listings`);
+  Object.entries(params).forEach(([key, val]) => {
+    if (val) url.searchParams.set(key, val);
+  });
+
+  try {
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) {
+      console.error(
+        `[propertiesApi] fetchGeoListingsServer failed with ${res.status}`,
+      );
+      return [];
+    }
+    const json = await res.json();
+    return (json?.data ?? json ?? []) as any[];
+  } catch (error) {
+    console.error("[fetchGeoListingsServer] network error:", error);
+    return [];
+  }
+}
+
 export async function getSimilarPropertiesServer(
   propertyId: string,
   limit: number = 8,

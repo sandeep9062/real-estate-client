@@ -12,6 +12,11 @@
  *   /properties/chandigarh/for-rent-2bhk                     (city only)
  *   /properties/chandigarh/sector-40/for-rent-2bhk           (city + sector)
  *
+ * Root-level flat URLs (see `lib/rootSlugPatterns.ts`) reuse the same specs:
+ *   /house-for-rent-in-sector-12-chandigarh                  (category spec)
+ *   /property-for-rent-in-mohali-under-10-thousand           (price spec)
+ *   /flat-for-rent-near-pgi-chandigarh                       (landmark page)
+ *
  * This file is intentionally dependency-free so it can be unit-tested with
  * plain `node --test` (Node ≥ 23.6 strips TS types natively) and imported
  * from both server and client code.
@@ -25,6 +30,17 @@ export const MIN_LISTINGS_FOR_SEO_PAGE = 3;
 /** Maximum BHK value encoded in a filter slug (matches the backend's
  * bedrooms filter, which also supports "5+"). */
 export const MAX_BHK_SLUG = 5;
+
+/**
+ * Fixed rent price buckets for `/property-for-rent-in-{city}-under-{amount}-
+ * {thousand|lakh}` pages. Buckets are a closed list on purpose — free-form
+ * amounts parsed out of URLs would generate near-duplicate thin pages, so
+ * `parseRootSlug` validates `amount * multiplier` against this list and
+ * rejects everything else.
+ */
+export const PRICE_BUCKETS_INR = [
+  5_000, 10_000, 15_000, 20_000, 25_000, 30_000, 40_000, 50_000,
+] as const;
 
 /** Cities that get programmatic SEO pages. */
 export const SEO_CITIES = [
@@ -55,10 +71,29 @@ export type PgGender = "boys" | "girls";
  * - `kind: "pg"` pages target PG/Hostel inventory, optionally narrowed by
  *   gender (boys/girls is derived from listing title/description because the
  *   backend has no dedicated gender field).
+ * - `kind: "category"` pages target one property category (Flats vs Houses)
+ *   for the root-level `/{type}-for-rent-in-sector-{n}-{city}` and
+ *   `/{type}-for-rent-near-{landmark}-{city}` URL families.
+ * - `kind: "price"` pages target `deal=rent AND price <= maxPrice` for the
+ *   root-level `property-for-rent-in-{city}-under-…` URL family.
+ * - `kind: "independent-room"` / `kind: "flatmate"` map to subletting-enabled
+ *   inventory (see `matchesFilterSpec`) for the `independent-room` / `flatmate`
+ *   landmark URL types. NOTE (open decision #1): the mapping
+ *   `allowsSubletting === true` / `allowsSubletting === true AND
+ *   maxPersonsSharing > 1` is provisional — pages for these two kinds 404
+ *   until it is confirmed.
  */
 export type SeoFilterSpec =
   | { kind: "bhk"; dealType: DealType; bhk: number }
-  | { kind: "pg"; gender?: PgGender };
+  | { kind: "pg"; gender?: PgGender }
+  | {
+      kind: "category";
+      dealType: DealType;
+      category: "House/Villa" | "Apartment/Flat";
+    }
+  | { kind: "price"; dealType: DealType; maxPrice: number }
+  | { kind: "independent-room" }
+  | { kind: "flatmate" };
 
 /** Result of `parseFilterSlug` — null when the slug is not a known pattern. */
 export type ParsedFilter = SeoFilterSpec | null;
@@ -92,12 +127,31 @@ export function parseFilterSlug(slug: string): ParsedFilter {
   return null;
 }
 
-/** Inverse of `parseFilterSlug` — build the canonical filter slug. */
+/** Inverse of `parseFilterSlug` — build the canonical filter slug.
+ *
+ * Only `bhk` and `pg` specs are parseable by `parseFilterSlug` (they are the
+ * only kinds that exist as nested `/properties/...` filter segments). The
+ * remaining kinds get canonical key tokens here so combo grouping, related-link
+ * comparisons and debugging all share one slug source of truth — those kinds
+ * are root-URL-only (see `lib/rootSlugPatterns.ts`).
+ */
 export function buildFilterSlug(spec: SeoFilterSpec): string {
   if (spec.kind === "pg") {
     return spec.gender ? `pg-${spec.gender}` : "pg";
   }
-  return `for-${spec.dealType}-${spec.bhk}bhk`;
+  if (spec.kind === "bhk") {
+    return `for-${spec.dealType}-${spec.bhk}bhk`;
+  }
+  if (spec.kind === "category") {
+    return `${spec.category === "House/Villa" ? "house" : "flat"}-for-${spec.dealType}`;
+  }
+  if (spec.kind === "price") {
+    return `for-${spec.dealType}-under-${spec.maxPrice}`;
+  }
+  if (spec.kind === "independent-room") {
+    return "independent-room-for-rent";
+  }
+  return "flatmate-for-rent";
 }
 
 /** URL-safe slug for a sector/locality name, e.g. "Sector 40" → "sector-40". */
@@ -168,6 +222,20 @@ export function filtersToApiParams(
   if (spec.kind === "pg") {
     return { propertyCategory: "PG/Hostel" };
   }
+  if (spec.kind === "category") {
+    return {
+      deal: spec.dealType === "rent" ? "Rent" : "Sale",
+      propertyCategory: spec.category,
+    };
+  }
+  if (spec.kind === "price") {
+    return { deal: "Rent", priceMax: String(spec.maxPrice) };
+  }
+  if (spec.kind === "independent-room" || spec.kind === "flatmate") {
+    // No clean backend params yet (open decision #1) — the geo endpoint
+    // returns nearby rent docs and `matchesFilterSpec` narrows locally.
+    return { deal: "Rent" };
+  }
   return {
     deal: spec.dealType === "rent" ? "Rent" : "Sale",
     bedrooms: String(spec.bhk),
@@ -212,6 +280,38 @@ export function matchesFilterSpec(
     return spec.gender === "boys" ? isBoysPg(property) : isGirlsPg(property);
   }
 
+  if (spec.kind === "category") {
+    return (
+      String(property.deal || "").toLowerCase() === spec.dealType &&
+      String(property.propertyCategory || "") === spec.category
+    );
+  }
+
+  if (spec.kind === "price") {
+    const price = Number(property.price);
+    return (
+      String(property.deal || "").toLowerCase() === spec.dealType &&
+      Number.isFinite(price) &&
+      price <= spec.maxPrice
+    );
+  }
+
+  // Provisional mappings for open decision #1 — do not wire live until
+  // confirmed (pages for these kinds 404 for now).
+  if (spec.kind === "independent-room") {
+    return (
+      String(property.deal || "").toLowerCase() === "rent" &&
+      property.allowsSubletting === true
+    );
+  }
+  if (spec.kind === "flatmate") {
+    return (
+      String(property.deal || "").toLowerCase() === "rent" &&
+      property.allowsSubletting === true &&
+      Number(property.maxPersonsSharing) > 1
+    );
+  }
+
   const deal = String(property.deal || "").toLowerCase();
   if (deal !== spec.dealType) return false;
   // PG/Hostel listings are covered by the dedicated `pg*` slugs — never let
@@ -222,10 +322,66 @@ export function matchesFilterSpec(
   return Number.isFinite(bedrooms) && bedrooms === spec.bhk;
 }
 
+/**
+ * Derive every SEO filter spec a raw property document belongs to.
+ * Extracted from the `eligibleSeoCombos` loop so the sector/city combo
+ * generator and the landmark combo generator (`lib/seoListings.ts`) group
+ * documents identically and can never drift apart.
+ *
+ * Pure function — dependency-free per this file's header convention.
+ */
+export function specsForProperty(property: any): SeoFilterSpec[] {
+  const specs: SeoFilterSpec[] = [];
+  if (!property) return specs;
+
+  const category = String(property.propertyCategory || "");
+  if (category === "PG/Hostel") {
+    // PG listings are covered by the dedicated `pg*` slugs only; gender
+    // variants are derived from title/description text (no backend field).
+    specs.push({ kind: "pg" });
+    if (isBoysPg(property)) specs.push({ kind: "pg", gender: "boys" });
+    if (isGirlsPg(property)) specs.push({ kind: "pg", gender: "girls" });
+    return specs;
+  }
+
+  const deal = String(property.deal || "").toLowerCase();
+  if (deal !== "rent" && deal !== "sale") return specs;
+
+  // TODO(open decision #1): independent-room/flatmate specs are derived so the
+  // mapping can be switched on in one place, but combo generators skip these
+  // kinds until the subletting mapping is confirmed live.
+  if (deal === "rent" && property.allowsSubletting === true) {
+    specs.push({ kind: "independent-room" });
+    if (Number(property.maxPersonsSharing) > 1) {
+      specs.push({ kind: "flatmate" });
+    }
+  }
+
+  const bedrooms = Number(property?.facilities?.bedrooms);
+  if (Number.isFinite(bedrooms) && bedrooms >= 1 && bedrooms <= MAX_BHK_SLUG) {
+    specs.push({ kind: "bhk", dealType: deal as DealType, bhk: bedrooms });
+  }
+
+  if (category === "House/Villa" || category === "Apartment/Flat") {
+    specs.push({
+      kind: "category",
+      dealType: deal as DealType,
+      category: category as "House/Villa" | "Apartment/Flat",
+    });
+  }
+
+  return specs;
+}
+
 export interface SeoCombo {
   city: SeoCity;
   /** null = city-level page, otherwise the sector slug ("sector-40"). */
   sectorSlug: string | null;
+  /**
+   * null = non-landmark page, otherwise the landmark slug. Mutually exclusive
+   * with `sectorSlug` (landmark pages are proximity-based, never sector-scoped).
+   */
+  landmarkSlug: string | null;
   spec: SeoFilterSpec;
   slug: string;
   count: number;
@@ -236,6 +392,9 @@ export interface SeoCombo {
  * and keep only those with at least `MIN_LISTINGS_FOR_SEO_PAGE` listings.
  * Pure function — reused by the sitemap generator so the URL list is always
  * derived from live data, never hand-maintained.
+ *
+ * Spec derivation lives in `specsForProperty` (shared with the landmark combo
+ * generator in `lib/seoListings.ts`) so the two generators cannot drift apart.
  */
 export function eligibleSeoCombos(properties: any[]): SeoCombo[] {
   const counts = new Map<string, SeoCombo>();
@@ -249,36 +408,36 @@ export function eligibleSeoCombos(properties: any[]): SeoCombo[] {
     const sectorRaw = normalizeSector(p?.location?.sector);
     const sectorSlug = sectorRaw ? sectorToSlug(sectorRaw) : null;
 
-    const isPg = String(p.propertyCategory || "") === "PG/Hostel";
-    const specs: SeoFilterSpec[] = [];
-    if (isPg) {
-      specs.push({ kind: "pg" });
-      if (isBoysPg(p)) specs.push({ kind: "pg", gender: "boys" });
-      if (isGirlsPg(p)) specs.push({ kind: "pg", gender: "girls" });
-    } else {
-      const deal = String(p.deal || "").toLowerCase();
-      const bhk = Number(p?.facilities?.bedrooms);
-      if (
-        (deal === "rent" || deal === "sale") &&
-        Number.isFinite(bhk) &&
-        bhk >= 1 &&
-        bhk <= MAX_BHK_SLUG
-      ) {
-        specs.push({ kind: "bhk", dealType: deal as DealType, bhk });
+    for (const spec of specsForProperty(p)) {
+      // TODO(open decision #1): independent-room/flatmate URL types are not
+      // live yet — skip them here so the sitemap never lists a 404.
+      if (spec.kind === "independent-room" || spec.kind === "flatmate") {
+        continue;
       }
-    }
 
-    for (const spec of specs) {
       // Every listing counts toward its city-level combination, and listings
       // with a sector additionally count toward their sector-level one —
       // matching the page queries (city-only filter = citywide results).
+      // City-level combos only exist for kinds with a nested city-level URL
+      // (bhk, pg); category specs are root-URL-only and sector-scoped, which
+      // is what lets sector pages report accurate Flats-only vs Houses-only
+      // counts instead of blended BHK counts.
       const slug = buildFilterSlug(spec);
-      const cityKey = `${city}||${slug}`;
-      const cityCombo = counts.get(cityKey);
-      if (cityCombo) {
-        cityCombo.count += 1;
-      } else {
-        counts.set(cityKey, { city, sectorSlug: null, spec, slug, count: 1 });
+      if (spec.kind === "bhk" || spec.kind === "pg") {
+        const cityKey = `${city}||${slug}`;
+        const cityCombo = counts.get(cityKey);
+        if (cityCombo) {
+          cityCombo.count += 1;
+        } else {
+          counts.set(cityKey, {
+            city,
+            sectorSlug: null,
+            landmarkSlug: null,
+            spec,
+            slug,
+            count: 1,
+          });
+        }
       }
       if (sectorSlug) {
         const sectorKey = `${city}|${sectorSlug}|${slug}`;
@@ -289,6 +448,7 @@ export function eligibleSeoCombos(properties: any[]): SeoCombo[] {
           counts.set(sectorKey, {
             city,
             sectorSlug,
+            landmarkSlug: null,
             spec,
             slug,
             count: 1,
@@ -301,6 +461,60 @@ export function eligibleSeoCombos(properties: any[]): SeoCombo[] {
   return Array.from(counts.values()).filter(
     (c) => c.count >= MIN_LISTINGS_FOR_SEO_PAGE,
   );
+}
+
+/**
+ * City-level price-bucket combos for the root-level
+ * `/property-for-rent-in-{city}-under-{amount}-{thousand|lakh}` URL family.
+ * Pure function over the same raw property documents `eligibleSeoCombos`
+ * consumes, applying the same `MIN_LISTINGS_FOR_SEO_PAGE` guardrail so the
+ * sitemap and `generateStaticParams` can never list a URL the site would 404.
+ * Buckets are the fixed `PRICE_BUCKETS_INR` list — never free-form amounts.
+ */
+export function eligiblePriceBucketCombos(properties: any[]): SeoCombo[] {
+  const counts = new Map<string, { count: number; bucket: number }>();
+
+  for (const p of properties || []) {
+    if (p.isActive === false || p.deletedAt) continue;
+
+    const city = normalizeCity(p?.location?.city);
+    if (!city) continue;
+    if (String(p.deal || "").toLowerCase() !== "rent") continue;
+
+    const price = Number(p.price);
+    if (!Number.isFinite(price)) continue;
+
+    for (const bucket of PRICE_BUCKETS_INR) {
+      if (price > bucket) continue;
+      const key = `${city}||${bucket}`;
+      const entry = counts.get(key);
+      if (entry) {
+        entry.count += 1;
+      } else {
+        counts.set(key, { count: 1, bucket });
+      }
+    }
+  }
+
+  const combos: SeoCombo[] = [];
+  for (const [key, { count, bucket }] of counts) {
+    if (count < MIN_LISTINGS_FOR_SEO_PAGE) continue;
+    const city = key.split("||")[0] as SeoCity;
+    const spec: SeoFilterSpec = {
+      kind: "price",
+      dealType: "rent",
+      maxPrice: bucket,
+    };
+    combos.push({
+      city,
+      sectorSlug: null,
+      landmarkSlug: null,
+      spec,
+      slug: buildFilterSlug(spec),
+      count,
+    });
+  }
+  return combos;
 }
 
 /**

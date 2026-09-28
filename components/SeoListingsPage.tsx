@@ -1,7 +1,8 @@
 /**
  * Shared server component body for the programmatic local-intent landing
- * pages (`/properties/[city]/[filter]` and
- * `/properties/[city]/[sector]/[filter]`).
+ * pages (`/properties/[city]/[filter]`,
+ * `/properties/[city]/[sector]/[filter]` and the root-level flat URLs from
+ * `app/[slug]/page.tsx`, incl. landmark pages).
  *
  * Enforces the thin-content guardrail (`MIN_LISTINGS_FOR_SEO_PAGE`) by
  * calling `notFound()` when too few real listings match.
@@ -15,8 +16,13 @@ import {
   SeoCity,
   SeoFilterSpec,
 } from "@/lib/filterSlug";
+import { getLandmarkBySlug } from "@/lib/landmarks";
 import { pageH1, seoIntroParagraph } from "@/lib/seoCopy";
-import { getListingsForFilter, getRelatedPages } from "@/lib/seoListings";
+import {
+  getListingsForFilter,
+  getListingsForLandmark,
+  getRelatedPages,
+} from "@/lib/seoListings";
 
 /* LOCAL_COLOR_SLOT
  * Hand-written 1–2 sentence local descriptions can be injected per sector
@@ -89,23 +95,45 @@ export function buildItemListSchema(
 interface SeoListingsPageProps {
   city: SeoCity;
   sectorSlug: string | null;
+  /**
+   * Set for root-level landmark pages (`/{type}-for-rent-near-…`), mutually
+   * exclusive with `sectorSlug`. Resolved against the curated LANDMARKS list;
+   * unknown slugs 404.
+   */
+  landmarkSlug?: string | null;
   spec: SeoFilterSpec;
 }
 
 export default async function SeoListingsPage({
   city,
   sectorSlug,
+  landmarkSlug,
   spec,
 }: SeoListingsPageProps) {
-  /* ── Thin-content guardrail ────────────────────────────────────────── */
-  const listings = await getListingsForFilter(city, sectorSlug, spec);
+  /* ── Landmark resolution + thin-content guardrail ──────────────────── */
+  const landmark = landmarkSlug ? getLandmarkBySlug(city, landmarkSlug) : null;
+  if (landmarkSlug && !landmark) {
+    notFound();
+  }
+
+  const listings = landmark
+    ? await getListingsForLandmark(landmark, spec)
+    : await getListingsForFilter(city, sectorSlug, spec);
   if (listings.length < MIN_LISTINGS_FOR_SEO_PAGE) {
     notFound();
   }
 
-  const h1 = pageH1(city, sectorSlug, spec);
-  const intro = seoIntroParagraph(city, sectorSlug, spec, listings.length);
-  const related = await getRelatedPages(city, sectorSlug, spec);
+  const h1 = pageH1(city, sectorSlug, spec, landmark);
+  const intro = seoIntroParagraph(
+    city,
+    sectorSlug,
+    spec,
+    listings.length,
+    landmark,
+  );
+  // Landmark pages are proximity-based, not sector-scoped — their related
+  // links point at city-level filter pages instead.
+  const related = await getRelatedPages(city, landmark ? null : sectorSlug, spec);
 
   const localColor =
     (sectorSlug && LOCAL_SECTOR_DESCRIPTIONS[`${city}/${sectorSlug}`]) ||
@@ -133,7 +161,12 @@ export default async function SeoListingsPage({
       {related.length > 0 && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold text-gray-900">
-            Explore more in {sectorSlug ? "this area" : ""}
+            Explore more{" "}
+            {sectorSlug
+              ? "in this area"
+              : landmark
+                ? `near ${landmark.name}`
+                : ""}
           </h2>
           <ul className="mt-3 flex flex-wrap gap-2">
             {related.map((r) => (
