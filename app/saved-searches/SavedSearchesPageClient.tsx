@@ -9,6 +9,23 @@ import {
 } from "@/services/savedSearchesApi";
 import { buildSavedSearchHref } from "@/lib/cityRouteUtils";
 
+/**
+ * Heading + intro copy, rendered in every state (loading / error / list) so the
+ * route always ships a server-rendered <h1> and descriptive text instead of
+ * only the transient loading placeholder.
+ */
+function SavedSearchesHeader() {
+  return (
+    <>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Saved searches</h1>
+      <p className="text-sm text-gray-600 mb-8">
+        Email and in-app alerts when new listings match your filters. Managed on
+        the backend every 15 minutes.
+      </p>
+    </>
+  );
+}
+
 export default function SavedSearchesPageClient() {
   const { data, isLoading, isError } = useListSavedSearchesQuery();
   const [remove] = useDeleteSavedSearchMutation();
@@ -16,14 +33,30 @@ export default function SavedSearchesPageClient() {
 
   if (isLoading) {
     return (
-      <div className="pt-24 text-center py-20 text-gray-600">Loading…</div>
+      <div className="pt-24 min-h-screen bg-gray-50 pb-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <SavedSearchesHeader />
+          <p className="text-center py-20 text-gray-600">Loading…</p>
+        </div>
+      </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="pt-24 text-center py-20 text-red-600">
-        Sign in to manage saved searches.
+      <div className="pt-24 min-h-screen bg-gray-50 pb-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <SavedSearchesHeader />
+          <p className="text-center py-20 text-red-600">
+            Sign in to manage saved searches.{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-[#4161df] hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     );
   }
@@ -33,13 +66,17 @@ export default function SavedSearchesPageClient() {
   return (
     <div className="pt-24 min-h-screen bg-gray-50 pb-20 px-4">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Saved searches</h1>
-        <p className="text-sm text-gray-600 mb-8">
-          Email and in-app alerts when new listings match your filters. Managed on the backend every 15 minutes.
-        </p>
+        <SavedSearchesHeader />
         {items.length === 0 ? (
           <p className="text-gray-600">
-            No saved searches yet. Use &quot;Save search &amp; alerts&quot; on the properties page.
+            No saved searches yet. Use &quot;Save search &amp; alerts&quot; on the{" "}
+            <Link
+              href="/properties"
+              className="font-semibold text-[#4161df] hover:underline"
+            >
+              properties page
+            </Link>
+            .
           </p>
         ) : (
           <ul className="space-y-3">
