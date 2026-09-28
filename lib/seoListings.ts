@@ -26,7 +26,12 @@ import {
   normalizeSector,
   specsForProperty,
 } from "./filterSlug";
-import { LANDMARKS, LANDMARK_RADIUS_KM, Landmark } from "./landmarks";
+import {
+  LANDMARKS,
+  LANDMARK_RADIUS_KM,
+  Landmark,
+  propertiesNearLandmark,
+} from "./landmarks";
 import { seoComboPath } from "./rootSlugPatterns";
 import { relatedPageLabel } from "./seoCopy";
 
@@ -211,6 +216,13 @@ function geoParamsForSpec(spec: SeoFilterSpec): Record<string, string> {
  * unset coordinates, which is a real point (Gulf of Guinea), not missing
  * data. Results are re-narrowed locally with `matchesFilterSpec`, the same
  * way the sector pages double-check API results.
+ *
+ * Fallback: when the geo endpoint returns no documents at all (unreachable,
+ * still rolling out during a deploy, outage), the same radius is applied
+ * locally to the cached city snapshot — mirroring the endpoint's semantics —
+ * so landmark pages keep rendering instead of 404ing. An empty response that
+ * genuinely means "no inventory nearby" produces the same empty result either
+ * way.
  */
 export async function getListingsForLandmark(
   landmark: Landmark,
@@ -222,7 +234,10 @@ export async function getListingsForLandmark(
     km: String(LANDMARK_RADIUS_KM),
     ...geoParamsForSpec(spec),
   });
-  return docs.filter((p: any) => matchesFilterSpec(p, spec));
+  const nearby = docs.length
+    ? docs
+    : propertiesNearLandmark(landmark, await getCityListings(landmark.city));
+  return nearby.filter((p: any) => matchesFilterSpec(p, spec));
 }
 
 /**
@@ -232,16 +247,29 @@ export async function getListingsForLandmark(
  * specs queries would be far too chatty); the returned documents are then
  * grouped client-side by the shared `specsForProperty` helper so the grouping
  * can never drift from `eligibleSeoCombos`.
+ *
+ * The geo endpoint is a single point of failure — if it is unreachable (e.g.
+ * the backend deploy is still rolling out while the frontend build runs) every
+ * call returns nothing and the landmark quick links / sitemap entries would
+ * silently vanish. When a landmark gets no documents, the same radius is
+ * applied locally to the cached city snapshot via `propertiesNearLandmark`
+ * (identical to what `getListingsForLandmark` falls back to), and a warning is
+ * logged so the unhealthy endpoint is visible in build logs.
  */
 export async function eligibleLandmarkSeoCombos(): Promise<SeoCombo[]> {
   const counts = new Map<string, SeoCombo>();
+  let fallbackLandmarks = 0;
 
   for (const landmark of LANDMARKS) {
-    const docs = await fetchGeoListingsServer({
+    let docs = await fetchGeoListingsServer({
       lat: String(landmark.lat),
       lng: String(landmark.lng),
       km: String(LANDMARK_RADIUS_KM),
     });
+    if (docs.length === 0) {
+      docs = propertiesNearLandmark(landmark, await getCityListings(landmark.city));
+      fallbackLandmarks += 1;
+    }
 
     for (const doc of docs) {
       for (const spec of specsForProperty(doc)) {
@@ -267,6 +295,12 @@ export async function eligibleLandmarkSeoCombos(): Promise<SeoCombo[]> {
         }
       }
     }
+  }
+
+  if (fallbackLandmarks > 0) {
+    console.warn(
+      `[seoListings] geo endpoint returned no documents for ${fallbackLandmarks}/${LANDMARKS.length} landmark(s) — used the local ${LANDMARK_RADIUS_KM} km proximity fallback. Check GET /properties/seo/geo-listings if this is unexpected.`,
+    );
   }
 
   return Array.from(counts.values()).filter(

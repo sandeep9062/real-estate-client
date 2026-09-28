@@ -314,3 +314,98 @@ export function getLandmarkBySlug(city: SeoCity, slug: string): Landmark | null 
 export function landmarksForCity(city: SeoCity): Landmark[] {
   return LANDMARKS.filter((l) => l.city === city);
 }
+
+/* ── Local proximity fallback ──────────────────────────────────────────────
+ * Landmark pages, the sitemap and the homepage quick links all read proximity
+ * data from the backend `$geoNear` endpoint. That endpoint is a single point of
+ * failure: while it is unreachable (backend mid-deploy, outage) it returns no
+ * documents, and every landmark link would silently disappear from the
+ * prerendered pages until the next revalidation/rebuild. The helpers below let
+ * callers fall back to the city property snapshot they already fetch, using
+ * the same radius and the same `[0, 0]`-default exclusion as the backend
+ * query. Pure functions — unit-testable with `node --test`. */
+
+/** Great-circle distance between two WGS84 points, in km (haversine). */
+export function distanceKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const EARTH_RADIUS_KM = 6371;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
+/**
+ * Read a property document's coordinates, tolerating both shapes the API
+ * serves:
+ *   - `GET /properties`                 → `location.coordinates` = { lat, lng }
+ *     (transformed — see the backend's `transformPropertyCoordinates`)
+ *   - `GET /properties/seo/geo-listings` → `location.coordinates.coordinates`
+ *     = [lng, lat] (raw GeoJSON)
+ * Returns null for missing/malformed coordinates and for the `[0, 0]` schema
+ * default (a real point in the Gulf of Guinea, not "missing data" — the
+ * backend `$geoNear` query excludes it explicitly for the same reason).
+ */
+export function coordinatesOf(
+  property: any,
+): { lat: number; lng: number } | null {
+  const coords = property?.location?.coordinates;
+  if (!coords) return null;
+
+  let lat: number;
+  let lng: number;
+  if (Array.isArray(coords.coordinates) && coords.coordinates.length >= 2) {
+    [lng, lat] = [Number(coords.coordinates[0]), Number(coords.coordinates[1])];
+  } else if (
+    Array.isArray(coords) &&
+    coords.length >= 2 // tolerate a flat [lng, lat] array
+  ) {
+    [lng, lat] = [Number(coords[0]), Number(coords[1])];
+  } else if (coords.lat != null && coords.lng != null) {
+    lat = Number(coords.lat);
+    lng = Number(coords.lng);
+  } else {
+    return null;
+  }
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  if (lat === 0 && lng === 0) return null;
+  return { lat, lng };
+}
+
+/**
+ * Properties within `km` of a landmark, nearest-first — the local mirror of
+ * the backend `$geoNear` query: same radius, same `[0, 0]`-default exclusion,
+ * and the same inactive/deleted filtering the other combo generators apply.
+ * Used as a fallback when the geo endpoint returns no documents, so landmark
+ * derivations can never silently collapse to nothing because of one failing
+ * endpoint.
+ */
+export function propertiesNearLandmark(
+  landmark: Landmark,
+  properties: any[],
+  km: number = LANDMARK_RADIUS_KM,
+): any[] {
+  const withDistance: { property: any; distance: number }[] = [];
+
+  for (const property of properties || []) {
+    if (!property || property.isActive === false || property.deletedAt) continue;
+    const coords = coordinatesOf(property);
+    if (!coords) continue;
+    const distance = distanceKm(landmark.lat, landmark.lng, coords.lat, coords.lng);
+    if (!(distance <= km)) continue; // NaN-safe
+    withDistance.push({ property, distance });
+  }
+
+  // Stable nearest-first ordering, matching $geoNear's distance ordering.
+  withDistance.sort((a, b) => a.distance - b.distance);
+  return withDistance.map((entry) => entry.property);
+}
