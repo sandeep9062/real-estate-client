@@ -14,6 +14,7 @@ import PropertiesMapExplorer from "@/components/PropertiesMapExplorer";
 import PropertyGrid from "@/components/PropertyGrid";
 import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
 import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
+import SaveSearchButton from "@/components/SaveSearchButton";
 import { useLazyGetAllPropertiesQuery } from "@/services/propertiesApi";
 import { buildSeoHrefFromFilters } from "@/lib/filterSlug";
 import { Map, List as ListIcon, Loader2 } from "lucide-react";
@@ -363,6 +364,9 @@ function PropertiesClientInner({
             Discover homes, apartments, and commercial spaces for sale and rent
             in Chandigarh, Panchkula, Mohali & more.
           </p>
+        </div>
+        <div className="w-full flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <SaveSearchButton filters={query} />
         </div>
         <div className="w-full">
           <TopSearchBar onApply={handleApplyFilters} initialFilters={query} />
