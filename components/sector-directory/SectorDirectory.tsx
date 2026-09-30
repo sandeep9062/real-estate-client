@@ -8,7 +8,10 @@ import type { CityGroup, SectorMapPoint } from "@/lib/sectorDirectory";
 /**
  * Leaflet can only run in the browser, so the map is client-loaded with an
  * SSR-safe skeleton (same pattern as PropertiesMapExplorer).
+ *
+ *
  */
+
 const SectorMap = dynamic(() => import("./SectorMap"), {
   ssr: false,
   loading: () => <div className="h-[80vh] w-full animate-pulse bg-slate-100" />,
