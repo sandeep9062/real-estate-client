@@ -243,7 +243,8 @@ function gridLabelForListing(
   range: [number, number],
 ): string | null {
   const rawSector = String(listing?.location?.sector ?? "").trim();
-  const num = sectorNumberFromText(rawSector) ?? sectorNumberFromText(listing?.title);
+  const num =
+    sectorNumberFromText(rawSector) ?? sectorNumberFromText(listing?.title);
   if (num) {
     const n = Number(num);
     return n >= range[0] && n <= range[1] ? num : null;
@@ -283,9 +284,12 @@ export function buildCityMapPoints(
       if (!coords) continue;
 
       const key = normalizeLabel(label);
-      const acc =
-        accumulators.get(key) ??
-        { label, latSum: 0, lngSum: 0, count: 0 };
+      const acc = accumulators.get(key) ?? {
+        label,
+        latSum: 0,
+        lngSum: 0,
+        count: 0,
+      };
       acc.latSum += coords.lat;
       acc.lngSum += coords.lng;
       acc.count += 1;
@@ -332,4 +336,122 @@ export function buildCityMapPoints(
       };
     },
   );
+}
+
+/* ── SEO for the /sectors directory page ───────────────────────────────── */
+
+/** Single source of truth for the canonical host — page metadata, JSON-LD and
+ * sitemap URLs all agree instead of re-hardcoding the string. */
+export const SITE_ORIGIN = "https://www.propertybulbul.com";
+
+/** Meta description for /sectors. Declared here (not inline in page.tsx) so the
+ * `description` tag and the CollectionPage JSON-LD can never drift apart. */
+export const SECTORS_DESCRIPTION =
+  "Browse verified properties sector by sector across Chandigarh, Mohali and Panchkula, and by locality in Zirakpur and Kharar. Open any sector to see live listings.";
+
+/**
+ * Human label for one directory entry — "Sector 17" on the numbered grid
+ * cities, the bare locality name ("VIP Road") on the two locality cities.
+ *
+ * Shared by the list UI and the JSON-LD builders so a link can never render
+ * "Sector VIP Road" in one place and "VIP Road" in another.
+ */
+export function sectorDisplayLabel(
+  entry: SectorEntry,
+  layout: SectorLayout,
+): string {
+  return layout === "grid" ? `Sector ${entry.label}` : entry.label;
+}
+
+/** One live directory link, flattened for schema emission. */
+export interface SectorDirectoryLink {
+  /** Absolute URL on the live site. */
+  url: string;
+  /** "Sector 17, Chandigarh properties" — the SERP-facing link text. */
+  name: string;
+  city: CityGroup;
+  entry: SectorEntry;
+}
+
+/**
+ * Flatten every *live* directory entry (those with an `href`) into absolute
+ * URLs, in render order. Filler tiles are excluded on purpose: they are
+ * disabled in the UI, so advertising them in structured data would describe
+ * pages that do not exist.
+ *
+ * `href` values come from `getRootSeoStaticParams` and are always
+ * site-relative, so prefixing SITE_ORIGIN yields a valid absolute URL.
+ */
+export function collectLiveSectorLinks(
+  groups: readonly CityGroup[],
+): SectorDirectoryLink[] {
+  return groups.flatMap((city) =>
+    city.sectors.flatMap((entry) =>
+      entry.href
+        ? [
+            {
+              url: `${SITE_ORIGIN}${entry.href}`,
+              name: `${sectorDisplayLabel(entry, city.layout)}, ${city.name} properties`,
+              city,
+              entry,
+            },
+          ]
+        : [],
+    ),
+  );
+}
+
+/**
+ * `CollectionPage` JSON-LD for /sectors.
+ *
+ * `mainEntity` is the ItemList, so the page is typed both as a collection and
+ * as the list it contains — the pattern the sibling /properties layout uses
+ * for CollectionPage. Mirrors `app/properties/layout.tsx`.
+ */
+export function buildSectorDirectorySchemas(groups: readonly CityGroup[]): {
+  collectionPage: Record<string, unknown>;
+  itemList: Record<string, unknown>;
+} {
+  const links = collectLiveSectorLinks(groups);
+
+  const itemList = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Sector directory",
+    description: SECTORS_DESCRIPTION,
+    numberOfItems: links.length,
+    itemListElement: links.map((link, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: link.name,
+      url: link.url,
+    })),
+  };
+
+  const collectionPage = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${SITE_ORIGIN}/sectors`,
+    name: "Property Listings by Sector in Tricity",
+    description: SECTORS_DESCRIPTION,
+    url: `${SITE_ORIGIN}/sectors`,
+    inLanguage: "en-IN",
+    isPartOf: { "@type": "WebSite", name: "PropertyBulbul", url: SITE_ORIGIN },
+    publisher: {
+      "@type": "Organization",
+      name: "PropertyBulbul",
+      url: SITE_ORIGIN,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_ORIGIN}/propertybulbul.png`,
+      },
+    },
+    about: {
+      "@type": "Place",
+      name: "Tricity (Chandigarh, Mohali, Panchkula, Zirakpur, Kharar)",
+    },
+    mainEntity: itemList,
+  };
+
+  return { collectionPage, itemList };
 }

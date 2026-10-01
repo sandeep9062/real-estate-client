@@ -29,7 +29,7 @@ export default async function SectorsPage() {
   const cities = await getSectorDirectoryData();
   const { points, listingCounts } = await getSectorMapData(cities);
   return (
-    <main className="min-h-screen overflow-x-clip bg-gray-50 pt-24 md:pt-28">
+    <main>
       <SectorDirectory
         cities={cities}
         mapPoints={points}

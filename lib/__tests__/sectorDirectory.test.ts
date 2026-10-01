@@ -5,8 +5,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  SECTORS_DESCRIPTION,
   buildCityMapPoints,
   buildSectorDirectory,
+  buildSectorDirectorySchemas,
+  collectLiveSectorLinks,
+  sectorDisplayLabel,
   sectorNumberFromText,
 } from "../sectorDirectory.ts";
 import type { CityGroup, SectorEntry } from "../sectorDirectory.ts";
@@ -326,4 +330,92 @@ test("locality map pins use curated landmark coordinates and live hrefs", () => 
     empty.find((p) => p.id === "peer-muchalla")?.href,
     "/flat-for-rent-near-peer-muchalla-zirakpur",
   );
+});
+
+/* ── SEO schema for the directory page ─────────────────────────────────── */
+
+test("sectorDisplayLabel names grid sectors and leaves localities bare", () => {
+  const groups = buildSectorDirectory([
+    "flat-for-rent-in-sector-40-chandigarh",
+    "flat-for-rent-near-vip-road-zirakpur",
+  ]);
+  assert.equal(
+    sectorDisplayLabel(entry(groups, "chandigarh", "40"), "grid"),
+    "Sector 40",
+  );
+  assert.equal(
+    sectorDisplayLabel(entry(groups, "zirakpur", "VIP Road"), "list"),
+    "VIP Road",
+    "locality names must never be prefixed with 'Sector'",
+  );
+});
+
+test("live directory links are absolute, keyword-named, and exclude filler tiles", () => {
+  const groups = buildSectorDirectory([
+    "flat-for-rent-in-sector-40-chandigarh",
+    "flat-for-rent-near-vip-road-zirakpur",
+  ]);
+  const links = collectLiveSectorLinks(groups);
+
+  // Only entries that have a live page — the disabled filler tiles are never
+  // advertised, so the schema can never describe a URL that 404s.
+  assert.equal(links.length, 2);
+  for (const link of links) {
+    assert.ok(
+      link.url.startsWith("https://www.propertybulbul.com/"),
+      `${link.url} must be absolute`,
+    );
+    assert.ok(
+      !link.url.includes("undefined"),
+      "no link may leak an undefined path segment",
+    );
+  }
+
+  assert.equal(
+    links[0].url,
+    "https://www.propertybulbul.com/flat-for-rent-in-sector-40-chandigarh",
+  );
+  assert.equal(links[0].name, "Sector 40, Chandigarh properties");
+  assert.equal(links[1].name, "VIP Road, Zirakpur properties");
+});
+
+test("directory schemas are well-formed and count only live entries", () => {
+  const groups = buildSectorDirectory([
+    "flat-for-rent-in-sector-40-chandigarh",
+    "pg-in-sector-66-mohali",
+  ]);
+  const { collectionPage, itemList } = buildSectorDirectorySchemas(groups);
+
+  assert.equal(collectionPage["@type"], "CollectionPage");
+  assert.equal(collectionPage["@id"], "https://www.propertybulbul.com/sectors");
+  assert.equal(collectionPage.url, "https://www.propertybulbul.com/sectors");
+  assert.equal(collectionPage.description, SECTORS_DESCRIPTION);
+
+  assert.equal(itemList["@type"], "ItemList");
+  assert.equal(itemList.numberOfItems, 2);
+  assert.equal(itemList.itemListElement.length, 2);
+
+  // Positions are 1-based and contiguous, as ItemList requires.
+  assert.deepEqual(
+    itemList.itemListElement.map((el: any) => el.position),
+    [1, 2],
+  );
+  for (const el of itemList.itemListElement as any[]) {
+    assert.equal(el["@type"], "ListItem");
+    assert.ok(el.url.startsWith("https://www.propertybulbul.com/"));
+    assert.ok(el.name.length > 0);
+  }
+
+  // The CollectionPage points at the very same ItemList object it embeds.
+  assert.equal(collectionPage.mainEntity, itemList);
+});
+
+test("schemas stay valid with zero live sectors (no empty ListItems)", () => {
+  const { collectionPage, itemList } = buildSectorDirectorySchemas(
+    buildSectorDirectory([]),
+  );
+  assert.equal(itemList.numberOfItems, 0);
+  assert.deepEqual(itemList.itemListElement, []);
+  // CollectionPage is still emitted so the page keeps its entity type.
+  assert.equal(collectionPage["@type"], "CollectionPage");
 });
