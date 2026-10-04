@@ -28,18 +28,21 @@ import EMICalculator from "@/components/EMICalculator";
 import { toast } from "@/hooks/use-toast";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
 import { isVisitDateOnOrBeforeToday } from "@/lib/bookingDate";
+import { formatINR } from "@/lib/formatPrice";
 import { useCreateLeadMutation } from "@/services/leadsApi";
 
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
   loading: () => (
-    <div className="h-[400px] w-full bg-gray-100 animate-pulse rounded-xl" />
+    <div className="h-full min-h-[320px] w-full animate-pulse rounded-2xl bg-slate-100" />
   ),
 });
 
 interface PropertyInteractionsProps {
   data: any;
 }
+
+/* ───────────────────────── Header buttons ───────────────────────── */
 
 export function PropertyHeaderButtons({ data }: PropertyInteractionsProps) {
   const handleShare = async () => {
@@ -48,7 +51,7 @@ export function PropertyHeaderButtons({ data }: PropertyInteractionsProps) {
       if (navigator.share) {
         await navigator.share({
           title: data?.title,
-          text: `Check out this property for Rs ${data?.price}`,
+          text: `Check out this property for ${formatINR(data?.price) || "a great price"} on PropertyBulbul`,
           url: shareUrl,
         });
       } else {
@@ -61,27 +64,75 @@ export function PropertyHeaderButtons({ data }: PropertyInteractionsProps) {
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <button
+        type="button"
         onClick={handleShare}
-        className="p-3 rounded-full border bg-white shadow-sm hover:bg-gray-50 transition-all active:scale-95"
+        aria-label="Share this property"
+        className="grid h-11 w-11 place-items-center rounded-full bg-white text-slate-700 ring-1 ring-slate-900/10 transition hover:bg-slate-50 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]"
       >
-        <FiShare2 size={18} className="text-slate-600" />
+        <FiShare2 size={18} aria-hidden />
       </button>
-      <div className="rounded-full border bg-white shadow-sm">
+      <div className="grid h-11 w-11 place-items-center rounded-full bg-white ring-1 ring-slate-900/10">
         <Heart card={data as any} />
       </div>
     </div>
   );
 }
 
-export function PropertyMainInteractions({ data }: PropertyInteractionsProps) {
+/* ───────────────────── View recording + reviews ───────────────────── */
+
+/**
+ * Records the view client-side. Split out so it can mount once at the foot of
+ * the page while reviews and recently-viewed render independently — the
+ * recording must not run twice.
+ */
+export function PropertyViewRecorder({ data }: PropertyInteractionsProps) {
+  const id = data?._id as string;
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const [recordView] = useRecordPropertyViewMutation();
+
+  useEffect(() => {
+    if (!id) return;
+    pushLocalRecentPropertyId(id);
+    if (isAuthenticated) {
+      recordView(id).catch(() => {});
+    }
+  }, [id, isAuthenticated, recordView]);
+
+  return null;
+}
+
+export function PropertyReviews({ data }: PropertyInteractionsProps) {
   const id = data?._id as string;
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
   const { data: userData } = useGetUserByIdQuery(user?._id as string, {
     skip: !user?._id,
   });
+
+  const bookings = (userData?.bookedVisits ||
+    user?.bookedVisits ||
+    []) as any[];
+  const currentBooking = bookings.find(
+    (b: any) =>
+      String(b?.property?._id || b?.property || b?.property?.id) === id,
+  );
+
+  return (
+    <VisitReviewsSection
+      propertyId={id}
+      bookingId={currentBooking?._id ? String(currentBooking._id) : null}
+      bookingDate={currentBooking?.date}
+      bookingStatus={currentBooking?.status ?? "Pending"}
+      isAuthenticated={isAuthenticated}
+    />
+  );
+}
+
+export function PropertyRecentlyViewed({ data }: PropertyInteractionsProps) {
+  const id = data?._id as string;
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const { data: recentAuth = [] } = useGetRecentlyViewedQuery(undefined, {
     skip: !isAuthenticated,
@@ -95,60 +146,46 @@ export function PropertyMainInteractions({ data }: PropertyInteractionsProps) {
     { skip: isAuthenticated || !recentGuestIds },
   );
 
-  const [recordView] = useRecordPropertyViewMutation();
-
-  useEffect(() => {
-    if (!id) return;
-    pushLocalRecentPropertyId(id);
-    if (isAuthenticated) {
-      recordView(id).catch(() => {});
-    }
-  }, [id, isAuthenticated, recordView]);
-
   const recentList = (
     isAuthenticated
       ? recentAuth.filter((p: any) => String(p._id || p.id) !== id)
       : recentGuest.filter((p: any) => String(p._id || p.id) !== id)
   ).slice(0, 6);
 
-  const bookings = (userData?.bookedVisits ||
-    user?.bookedVisits ||
-    []) as any[];
-  const currentBooking = bookings.find(
-    (b: any) =>
-      String(b?.property?._id || b?.property || b?.property?.id) === id,
-  );
-  const bookingId = currentBooking?._id ? String(currentBooking._id) : null;
-  const bookingStatus = currentBooking?.status ?? "Pending";
-  const bookedDate = currentBooking?.date;
+  if (!recentList.length) return null;
 
   return (
-    <div className="space-y-10">
-      <VisitReviewsSection
-        propertyId={id}
-        bookingId={bookingId}
-        bookingDate={bookedDate}
-        bookingStatus={bookingStatus}
-        isAuthenticated={isAuthenticated}
-      />
+    <section id="recently-viewed">
+      <h2 className="mb-5 font-heading text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
+        Recently viewed
+      </h2>
+      <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2">
+        {recentList.map((p: any) => (
+          <PropertyCard key={p._id || p.id} card={p} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
-      {recentList.length > 0 && (
-        <section className="space-y-4">
-          <h3 className="text-xl font-bold text-slate-900">Recently viewed</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-            {recentList.map((p: any) => (
-              <PropertyCard key={p._id || p.id} card={p} />
-            ))}
-          </div>
-        </section>
-      )}
+/* ─────────────────────────────── Map ─────────────────────────────── */
+
+export function PropertyMap({ data }: PropertyInteractionsProps) {
+  return (
+    <div className="h-full w-full">
+      <Map key={data?._id} location={data?.location?.coordinates} />
     </div>
   );
 }
 
-export function PropertyMap({ data }: PropertyInteractionsProps) {
-  return <Map key={data?._id} location={data?.location?.coordinates} />;
-}
+/* ───────────────────────────── Sidebar ───────────────────────────── */
+
+/** Calm, low-chroma tints so booking states read as information, not alerts. */
+const BOOKING_STATUS_STYLES: Record<string, string> = {
+  Completed: "border-slate-200 bg-slate-50 text-slate-700",
+  Confirmed: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  Pending: "border-amber-200 bg-amber-50 text-amber-900",
+};
 
 export function PropertySidebar({ data }: PropertyInteractionsProps) {
   const router = useRouter();
@@ -203,71 +240,116 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
     }
   };
 
+  const whatsappHref = data?.user?.phone
+    ? `https://wa.me/${data.user.phone}?text=${encodeURIComponent(
+        `Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${data.slug}`,
+      )}`
+    : null;
+
+  const onBookClick = () => {
+    if (!isAuthenticated) return router.push("/login");
+    setModalOpened(true);
+  };
+
+  // Identity of whoever listed the property, shown only when the data has it.
+  const postedBy = (
+    data?.user?.name ||
+    data?.user?.fullName ||
+    data?.agentName ||
+    ""
+  )
+    .toString()
+    .trim();
+  const roleSource = (data?.user?.role || data?.postedBy || "")
+    .toString()
+    .trim()
+    .toLowerCase();
+  const postedByRole =
+    roleSource === "agent"
+      ? "Agent"
+      : roleSource === "builder"
+        ? "Builder"
+        : "Owner";
+
   return (
-    <div className="lg:col-span-1">
-      <div className="sticky top-24 space-y-6">
-        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl">
-          <div className="flex flex-col mb-6">
-            <span className="text-slate-500 text-sm font-medium">
-              Total Price
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-extrabold text-slate-900">
-                Rs {data?.price}
+    <aside className="lg:col-span-1">
+      {/* Sticky so the call to action stays reachable while reading. */}
+      <div className="space-y-5 lg:sticky lg:top-24">
+        <div className="rounded-2xl bg-white p-5 ring-1 ring-slate-900/10 sm:p-6">
+          <h2 className="font-heading text-lg font-bold text-slate-900">
+            Interested in this property?
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Visit it in person or message the{" "}
+            {data?.postedBy === "Agent" ? "agent" : "owner"} directly.
+          </p>
+
+          {/* {postedBy && (
+            <div className="mt-4 flex items-center gap-3 border-t border-slate-200 pt-4">
+              <span
+                aria-hidden
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#4161df]/10 font-heading text-sm font-bold text-[#3049b8]"
+              >
+                {postedBy.slice(0, 1).toUpperCase()}
               </span>
-              {data?.deal === "Rent" && (
-                <span className="text-slate-500">/mo</span>
-              )}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-900">
+                  {postedBy}
+                </p>
+                <p className="flex items-center gap-1.5 text-sm text-slate-500">
+                  {postedByRole}
+                  {(data?.ownerVerified || data?.isVerified) && (
+                    <>
+                      <span aria-hidden className="text-slate-300">
+                        ·
+                      </span>
+                      <span className="font-medium text-[#3049b8]">
+                        Verified
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
+          )} */}
 
-          <div className="space-y-4">
-            <BrochureDownloadButton
-              propertyId={id}
-              propertyTitle={data?.title}
-              className="w-full justify-center py-4 rounded-xl border-2 border-[#4161df] text-[#4161df] font-bold hover:bg-blue-50 transition-colors"
-            />
-
+          <div className="mt-5 space-y-2.5">
             {isBooked ? (
-              <div className="space-y-3">
+              <>
                 <div
-                  className={`rounded-xl border p-3 text-left ${
-                    bookingStatus === "Completed"
-                      ? "bg-slate-50 border-slate-200 text-slate-800"
-                      : bookingStatus === "Confirmed"
-                        ? "bg-emerald-50 border-emerald-100 text-emerald-900"
-                        : "bg-amber-50 border-amber-100 text-amber-950"
+                  className={`rounded-xl border p-4 ${
+                    BOOKING_STATUS_STYLES[bookingStatus] ??
+                    BOOKING_STATUS_STYLES.Pending
                   }`}
                 >
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <FiCalendar
-                      className="mt-0.5 shrink-0 text-lg opacity-90"
+                      className="mt-0.5 shrink-0"
+                      size={18}
                       aria-hidden
                     />
-                    <div className="min-w-0 space-y-1">
-                      <p className="text-xs font-bold uppercase tracking-wide text-slate-600">
-                        Site visit
-                      </p>
+                    <div className="space-y-1">
                       <p className="text-sm font-semibold">
                         {bookedDate
-                          ? `Scheduled for ${bookedDate}`
-                          : "Date to be confirmed"}
+                          ? `Visit on ${bookedDate}`
+                          : "Visit date to be confirmed"}
                       </p>
-                      <p className="text-xs font-medium leading-snug opacity-90">
+                      <p className="text-xs leading-snug opacity-90">
                         {bookingStatus === "Pending" &&
-                          "We’ll confirm this slot with the agent."}
+                          "We'll confirm this slot with the agent."}
                         {bookingStatus === "Confirmed" &&
-                          "Confirmed — ideal time for a walkthrough."}
+                          "Confirmed. Plan for a full walkthrough."}
                         {bookingStatus === "Completed" &&
                           (bookedDate && isVisitDateOnOrBeforeToday(bookedDate)
-                            ? "Visit completed — you can share quick feedback in the reviews section above."
+                            ? "Visit completed. Share feedback in the reviews section."
                             : "Visit marked complete.")}
                       </p>
                     </div>
                   </div>
                 </div>
                 <button
-                  className="w-full text-red-500 font-medium py-2 hover:underline transition-all"
+                  type="button"
+                  className="w-full rounded-xl py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df] disabled:opacity-60"
                   onClick={() =>
                     cancelBooking(id)
                       .unwrap()
@@ -275,39 +357,41 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
                   }
                   disabled={cancelling}
                 >
-                  {cancelling ? "Cancelling..." : "Cancel Booking"}
+                  {cancelling ? "Cancelling…" : "Cancel visit"}
                 </button>
-              </div>
+              </>
             ) : (
               <button
-                className="w-full bg-[#4161df] text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-200 hover:bg-[#3759dd] hover:shadow-blue-300 transition-all active:scale-[0.98]"
-                onClick={() => {
-                  if (!isAuthenticated) return router.push("/login");
-                  setModalOpened(true);
-                }}
+                type="button"
+                onClick={onBookClick}
+                className="w-full rounded-xl bg-[#4161df] py-3.5 text-base font-semibold text-white transition hover:bg-[#3452c0] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]"
               >
-                Book a Visit
+                Book a visit
               </button>
             )}
 
-            {data?.user?.phone && (
+            {whatsappHref && (
               <a
-                href={`https://wa.me/${data.user.phone}?text=${encodeURIComponent(
-                  `Hi, I saw your property "${data.title}" on PropertyBulbul. Is it still available?\n\nProperty link: https://www.propertybulbul.com/property/${data.slug}`,
-                )}`}
+                href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleWhatsAppClick}
-                className="flex items-center justify-center gap-2 w-full bg-green-500 text-white py-4 rounded-xl text-lg shadow-lg shadow-green-200 hover:bg-green-600 hover:shadow-green-300 transition-all active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#128C4A] py-3.5 text-base font-semibold text-white transition hover:bg-[#0f773e] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#128C4A]"
               >
-                <FaWhatsapp size={20} />
+                <FaWhatsapp size={20} aria-hidden />
                 Chat on WhatsApp
               </a>
             )}
+
+            <BrochureDownloadButton
+              propertyId={id}
+              propertyTitle={data?.title}
+              className="w-full justify-center rounded-xl border border-slate-300 bg-white py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+            />
           </div>
 
-          <p className="text-center text-slate-400 text-xs mt-6">
-            No charges for booking a visit. Standard terms apply.
+          <p className="mt-4 text-center text-xs text-slate-500">
+            Free to book. Standard terms apply.
           </p>
         </div>
 
@@ -319,12 +403,44 @@ export function PropertySidebar({ data }: PropertyInteractionsProps) {
         )}
       </div>
 
+      {/*
+        Fixed mobile action bar. The page wrapper reserves `pb-28` so this
+        never covers the last section. Hidden on desktop, where the sticky
+        contact panel above is the call to action.
+      */}
+      {!isBooked && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 flex gap-2.5 border-t border-slate-200 bg-white/95 px-3 pt-3 backdrop-blur lg:hidden"
+          style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        >
+          <button
+            type="button"
+            onClick={onBookClick}
+            className="min-h-12 flex-1 rounded-xl bg-[#4161df] text-base font-semibold text-white transition hover:bg-[#3452c0] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]"
+          >
+            Book a visit
+          </button>
+          {whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleWhatsAppClick}
+              aria-label="Chat on WhatsApp"
+              className="grid min-h-12 w-14 place-items-center rounded-xl bg-[#128C4A] text-white transition hover:bg-[#0f773e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#128C4A]"
+            >
+              <FaWhatsapp size={22} aria-hidden />
+            </a>
+          )}
+        </div>
+      )}
+
       <BookingModal
         opened={modalOpened}
         setOpened={setModalOpened}
         propertyId={id as string}
         email={(user?.email as string) || ""}
       />
-    </div>
+    </aside>
   );
 }

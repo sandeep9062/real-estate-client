@@ -151,7 +151,7 @@ export default function StudentEmployeePage() {
       style={{
         minHeight: "100vh",
         background: "#fafafa",
-        fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
+        fontFamily: "var(--font-inter), system-ui, 'Segoe UI', sans-serif",
         color: "#111827",
       }}
     >

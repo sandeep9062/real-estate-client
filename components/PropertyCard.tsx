@@ -399,8 +399,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <p
               className={
                 carousel
-                  ? "text-lg font-semibold tracking-tight text-slate-900 sm:text-xl"
-                  : "text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.4rem]"
+                  ? "price text-lg tracking-tight text-slate-900 sm:text-xl"
+                  : "price text-2xl tracking-tight text-slate-900 sm:text-[1.4rem]"
               }
             >
               {formatInr(card.price ?? 0)}

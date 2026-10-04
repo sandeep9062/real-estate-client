@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
-
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -20,15 +18,72 @@
   }
 }
 
-.font-\[Playfair_Display\] {
-  font-family: 'Playfair Display', serif;
+/*
+ * Smooth scrolling
+ * ----------------
+ * Driven by Lenis (see components/SmoothScroll.tsx), but these base rules are
+ * what make it cooperate with the rest of the page:
+ *
+ * - `--navbar-height` is the single source of truth for the fixed navbar's
+ *   height. `scroll-padding-top` turns it into anchor clearance for BOTH Lenis
+ *   (it reads scrollPaddingTop when resolving a target) and the native
+ *   scrollIntoView path, so #links never land underneath the header.
+ * - `html.lenis-smooth { scroll-behavior: auto !important }` stops the browser's
+ *   own smooth scrolling from fighting Lenis's animation frame loop.
+ * - `data-lenis-prevent` opts nested scroll containers (carousels, maps,
+ *   modals) out of smoothing so they keep native momentum.
+ */
+:root {
+  --navbar-height: 64px;
 }
 
-.font-\[Poppins\] {
-  font-family: 'Poppins', sans-serif;
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--navbar-height);
 }
 
+/* Lenis takes over scrolling — don't let the UA animate it as well. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
 
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/*
+ * Respect the OS "reduce motion" setting. SmoothScroll skips Lenis entirely in
+ * that case, so fall back to instant scrolling instead of the UA's smooth one.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/*
+ * Typography
+ * ----------
+ * Fonts arrive from next/font as CSS variables on <html>, so nothing here
+ * triggers a network request. `inline` makes the utility reference the
+ * variable directly instead of re-declaring it.
+ *
+ * Only `--font-sans` lives here. The heading stack is a hand-written
+ * `.font-heading` utility further down, NOT a `--font-heading` theme token:
+ * next/font already owns that variable name (Plus Jakarta Sans itself), so a
+ * token of the same name would make the custom property reference itself,
+ * which is invalid CSS and would resolve to nothing.
+ */
+@theme inline {
+  --font-sans:
+    var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -143,6 +198,44 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Comfortable reading measure for the Inter body face. */
+    line-height: 1.6;
+  }
+
+  /*
+   * 16px floor: iOS Safari zooms any form control whose computed font-size
+   * is under 16px on focus, so text-[15px] and smaller on inputs must not
+   * appear anywhere in the app.
+   */
+  input,
+  textarea,
+  select,
+  button {
+    font-size: max(1rem, 1em);
+  }
+
+  /*
+   * Headings carry Plus Jakarta Sans and a slight negative tracking, which
+   * is what makes large display type look set rather than loose. Weight tops
+   * out at 700 (800 reads too heavy in Jakarta); a page's main h1 can opt into
+   * 800 explicitly with font-extrabold.
+   */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  h1,
+  h2 {
+    font-weight: 700;
+  }
+
+  h3,
+  h4 {
+    font-weight: 600;
   }
 
   button:hover {
@@ -151,6 +244,36 @@
 }
 
 @layer utilities {
+  /*
+   * Plus Jakarta Sans for display type. Hand-written rather than a
+   * `--font-heading` theme token because next/font already owns that
+   * variable name — see the note above the @theme block.
+   */
+  .font-heading {
+    font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+  }
+
+  /*
+   * Prices: Plus Jakarta Sans + tabular figures. Tabular digits keep the
+   * numerals on a fixed advance width so columns of prices (and the
+   * lakh/crore groupings inside one price) stay vertically aligned and don't
+   * jitter as values update.
+   */
+  .price {
+    font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* Same numerals, sized for standalone stat tiles rather than price rows. */
+  .stat-number {
+    font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;

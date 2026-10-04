@@ -100,7 +100,7 @@ export default function CompareDrawer() {
                           strokeWidth={2.4}
                         />
                       </div>
-                      <span className="font-[Playfair_Display] text-[12px] font-semibold text-slate-900 leading-none">
+                      <span className="font-heading text-[12px] font-semibold text-slate-900 leading-none">
                         Compare
                       </span>
                       <span

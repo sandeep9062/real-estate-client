@@ -4,7 +4,9 @@ import PropertyStaticContent from "./PropertyStaticContent";
 import {
   PropertyHeaderButtons,
   PropertySidebar,
-  PropertyMainInteractions,
+  PropertyReviews,
+  PropertyRecentlyViewed,
+  PropertyViewRecorder,
   PropertyMap,
 } from "./PropertyInteractions";
 import {
@@ -132,13 +134,20 @@ const PropertyPage = async ({ params }: Props) => {
       {renderSchemaScript("property-faq-jsonld", faqSchema)}
       {renderSchemaScript("property-breadcrumb-jsonld", breadcrumbSchema)}
 
-      <div className="min-h-screen pt-20 bg-gray-50/50 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/*
+        `pb-28` reserves room for the fixed mobile action bar so it can never
+        cover the last section; `lg:pb-20` removes it on desktop where the
+        contact panel is sticky instead.
+      */}
+      <div className="min-h-screen bg-slate-50 pt-20 pb-28 lg:pb-20">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <PropertyStaticContent
             data={data}
             similarProperties={similarProperties}
             headerButtons={<PropertyHeaderButtons data={data} />}
-            mainInteractions={<PropertyMainInteractions data={data} />}
+            reviews={<PropertyReviews data={data} />}
+            recentlyViewed={<PropertyRecentlyViewed data={data} />}
+            viewRecorder={<PropertyViewRecorder data={data} />}
             sidebar={<PropertySidebar data={data} />}
             map={<PropertyMap data={data} />}
           />

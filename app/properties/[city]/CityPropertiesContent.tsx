@@ -9,6 +9,7 @@ import TopSearchBar from "@/components/TopSearchBar";
 import PropertiesMapExplorer from "@/components/PropertiesMapExplorer";
 import GuidedSearchDialog from "@/components/GuidedSearchDialog";
 import SaveSearchButton from "@/components/SaveSearchButton";
+import { scrollToElement } from "@/lib/smooth-scroll";
 import { Map, List as ListIcon } from "lucide-react";
 
 const cityMap: Record<string, string> = {
@@ -85,7 +86,9 @@ const CityPropertiesContent = ({ city }: { city: string }) => {
   React.useEffect(() => {
     if (!selectedId) return;
     const el = document.querySelector(`[data-property-id="${selectedId}"]`);
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // `nearest` preserves the old block:"nearest" behaviour — selecting a
+    // nearby pin shouldn't yank the page when the card is already in view.
+    if (el instanceof HTMLElement) scrollToElement(el, { nearest: true });
   }, [selectedId, properties]);
 
   if (error) {

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "@mantine/core/styles.css";
 import "@mantine/dropzone/styles.css";
@@ -9,6 +8,35 @@ import { Providers } from "./providers";
 import RouteTransitionWrapper from "@/components/RouteTransitionWrapper";
 import { Toaster } from "sonner";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import SmoothScroll from "@/components/SmoothScroll";
+
+/*
+ * Typography system
+ * -----------------
+ * Plus Jakarta Sans -> headings, prices, hero copy, big numbers.
+ * Inter            -> body copy, UI, forms, buttons, nav, tables.
+ *
+ * Both are self-hosted by next/font at build time: preloaded, subset, and
+ * exposed to CSS as a variable, so there is no render-blocking request and
+ * no layout shift.
+ *
+ * NOTE: `latin-ext` is load-bearing, not optional. The Indian Rupee sign
+ * (U+20B9) lives ONLY in Google's latin-ext subset for both families — the
+ * plain `latin` subset does not contain it. Dropping latin-ext would make
+ * every price fall back to a system font for the glyph itself.
+ */
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-heading",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.propertybulbul.com"),
@@ -110,13 +138,13 @@ export default function RootLayout({
   return (
     <html
       lang="en-IN"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      className={`${inter.variable} ${plusJakartaSans.variable}`}
       suppressHydrationWarning={true}
     >
       <head>
         <link rel="preload" href="/real-estate-login.jpg" as="image" />
       </head>
-      <body className="antialiased">
+      <body className="font-sans antialiased">
         {/* Google Analytics 4 */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
@@ -134,86 +162,92 @@ export default function RootLayout({
         </Script>
 
         <RootStructuredData />
-        <Providers>
-          <RouteTransitionWrapper>
-            <LayoutWrapper>
-              {/* <Toaster
-                richColors
-                closeButton
-                position="top-right"
-                expand={false} // Keeps it clean, stacked look
-                duration={3000}
-                toastOptions={{
-                  // Main container styling
-                  style: {
-                    background: "rgba(255, 255, 255, 0.8)", // Semi-transparent white
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(0, 0, 0, 0.05)",
-                    boxShadow:
-                      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                  },
-                  // Tailwind class overrides
-                  className: "rounded-2xl p-4 border border-white/50",
-                  classNames: {
-                    toast: "group", // Allows child element targeting
-                    title:
-                      "text-[14px] font-bold tracking-tight text-slate-900",
-                    description: "text-[12px] text-slate-500 font-medium",
-                    actionButton:
-                      "bg-blue-600 text-white rounded-lg px-3 py-1 text-xs font-bold",
-                    cancelButton:
-                      "bg-slate-100 text-slate-900 rounded-lg px-3 py-1 text-xs font-bold",
-                    // Status-specific color tweaks for better accessibility
-                    success:
-                      "!bg-emerald-50/80 !text-emerald-700 !border-emerald-200/50",
-                    error: "!bg-rose-50/80 !text-rose-700 !border-rose-200/50",
-                    info: "!bg-blue-50/80 !text-blue-700 !border-blue-200/50",
-                    warning:
-                      "!bg-amber-50/80 !text-amber-700 !border-amber-200/50",
-                  },
-                }}
-                style={{ zIndex: 9999 }}
-              /> */}
+        {/* SmoothScroll owns the Lenis instance for the whole app. It sits
+            outside RouteTransitionWrapper so the instance is never torn down
+            and rebuilt during navigation (which would kill any in-flight
+            animation and force a full re-measure of the document). */}
+        <SmoothScroll>
+          <Providers>
+            <RouteTransitionWrapper>
+              <LayoutWrapper>
+                {/* <Toaster
+                  richColors
+                  closeButton
+                  position="top-right"
+                  expand={false} // Keeps it clean, stacked look
+                  duration={3000}
+                  toastOptions={{
+                    // Main container styling
+                    style: {
+                      background: "rgba(255, 255, 255, 0.8)", // Semi-transparent white
+                      backdropFilter: "blur(12px)",
+                      border: "1px solid rgba(0, 0, 0, 0.05)",
+                      boxShadow:
+                        "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                    },
+                    // Tailwind class overrides
+                    className: "rounded-2xl p-4 border border-white/50",
+                    classNames: {
+                      toast: "group", // Allows child element targeting
+                      title:
+                        "text-[14px] font-bold tracking-tight text-slate-900",
+                      description: "text-[12px] text-slate-500 font-medium",
+                      actionButton:
+                        "bg-blue-600 text-white rounded-lg px-3 py-1 text-xs font-bold",
+                      cancelButton:
+                        "bg-slate-100 text-slate-900 rounded-lg px-3 py-1 text-xs font-bold",
+                      // Status-specific color tweaks for better accessibility
+                      success:
+                        "!bg-emerald-50/80 !text-emerald-700 !border-emerald-200/50",
+                      error: "!bg-rose-50/80 !text-rose-700 !border-rose-200/50",
+                      info: "!bg-blue-50/80 !text-blue-700 !border-blue-200/50",
+                      warning:
+                        "!bg-amber-50/80 !text-amber-700 !border-amber-200/50",
+                    },
+                  }}
+                  style={{ zIndex: 9999 }}
+                /> */}
 
-              <Toaster
-                richColors
-                closeButton
-                position="top-right"
-                expand={false}
-                duration={3500}
-                style={
-                  { zIndex: 9999, "--width": "320px" } as React.CSSProperties
-                }
-                toastOptions={{
-                  style: {
-                    background: "#ffffff",
-                    border: "1px solid rgba(22, 26, 46, 0.08)",
-                    boxShadow:
-                      "0 4px 12px -2px rgba(22, 26, 46, 0.12), 0 2px 4px -2px rgba(22, 26, 46, 0.06)",
-                  },
-                  className: "rounded-lg py-3 px-3.5 border-l-[3px]",
-                  classNames: {
-                    toast: "group",
-                    title:
-                      "text-[13px] font-semibold tracking-tight text-[#161A2E]",
-                    description:
-                      "text-[12px] text-[#5C5F73] mt-0.5 leading-snug",
-                    actionButton:
-                      "!bg-[#4161df] !text-white rounded-md px-3 py-1 text-[11px] font-semibold hover:!bg-[#3451c7] transition-colors",
-                    cancelButton:
-                      "!bg-[#F1F2F6] !text-[#161A2E] rounded-md px-3 py-1 text-[11px] font-semibold hover:!bg-[#E5E7F2] transition-colors",
-                    success:
-                      "!bg-white !text-emerald-700 !border-l-emerald-500",
-                    error: "!bg-white !text-rose-700 !border-l-rose-500",
-                    info: "!bg-white !text-[#2b3f9e] !border-l-[#4161df]",
-                    warning: "!bg-white !text-amber-700 !border-l-amber-500",
-                  },
-                }}
-              />
-              {children}
-            </LayoutWrapper>
-          </RouteTransitionWrapper>
-        </Providers>
+                <Toaster
+                  richColors
+                  closeButton
+                  position="top-right"
+                  expand={false}
+                  duration={3500}
+                  style={
+                    { zIndex: 9999, "--width": "320px" } as React.CSSProperties
+                  }
+                  toastOptions={{
+                    style: {
+                      background: "#ffffff",
+                      border: "1px solid rgba(22, 26, 46, 0.08)",
+                      boxShadow:
+                        "0 4px 12px -2px rgba(22, 26, 46, 0.12), 0 2px 4px -2px rgba(22, 26, 46, 0.06)",
+                    },
+                    className: "rounded-lg py-3 px-3.5 border-l-[3px]",
+                    classNames: {
+                      toast: "group",
+                      title:
+                        "text-[13px] font-semibold tracking-tight text-[#161A2E]",
+                      description:
+                        "text-[12px] text-[#5C5F73] mt-0.5 leading-snug",
+                      actionButton:
+                        "!bg-[#4161df] !text-white rounded-md px-3 py-1 text-[11px] font-semibold hover:!bg-[#3451c7] transition-colors",
+                      cancelButton:
+                        "!bg-[#F1F2F6] !text-[#161A2E] rounded-md px-3 py-1 text-[11px] font-semibold hover:!bg-[#E5E7F2] transition-colors",
+                      success:
+                        "!bg-white !text-emerald-700 !border-l-emerald-500",
+                      error: "!bg-white !text-rose-700 !border-l-rose-500",
+                      info: "!bg-white !text-[#2b3f9e] !border-l-[#4161df]",
+                      warning: "!bg-white !text-amber-700 !border-l-amber-500",
+                    },
+                  }}
+                />
+                {children}
+              </LayoutWrapper>
+            </RouteTransitionWrapper>
+          </Providers>
+        </SmoothScroll>
       </body>
     </html>
   );

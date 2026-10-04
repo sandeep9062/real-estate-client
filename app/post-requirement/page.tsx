@@ -434,7 +434,7 @@ export default function DreamHomeEnquiry() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F3F5FF] text-[#111827] [font-family:Inter,sans-serif]">
+      <div className="min-h-screen bg-[#F3F5FF] text-[#111827]">
         {/* Hero */}
         <div className="relative overflow-hidden bg-[radial-gradient(ellipse_at_70%_50%,rgba(65,97,223,.25)_0%,transparent_70%),linear-gradient(135deg,#1e3a5f_0%,#4161df_100%)] text-center px-6 pt-12 pb-[5.5rem]">
           {/* Dot grid */}
@@ -447,7 +447,7 @@ export default function DreamHomeEnquiry() {
           <div className="relative inline-flex items-center gap-1.5 bg-white/[.12] border border-white/[.2] rounded-full px-4 py-1.5 text-[.72rem] text-white/[.85] tracking-[.08em] uppercase font-medium mb-5 mt-2">
             🏆 Tricity's Most Trusted Real Estate Platform
           </div>
-          <h1 className="relative text-white font-extrabold leading-[1.15] tracking-tight mb-3 text-[clamp(1.75rem,4vw,2.5rem)]">
+          <h1 className="relative text-white font-heading leading-[1.15] tracking-tight mb-3 text-[clamp(1.75rem,4vw,2.5rem)]">
             Find Your{" "}
             <em className="bg-[linear-gradient(90deg,#93A8FF,#C4D0FF)] bg-clip-text text-transparent not-italic">
               Dream Home
@@ -519,7 +519,7 @@ export default function DreamHomeEnquiry() {
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Full Name" required error={errors.fullName}>
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Rahul Sharma"
                       value={form.fullName}
                       onChange={(e) => set("fullName", e.target.value)}
@@ -527,7 +527,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Mobile Number" required error={errors.phone}>
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="10-digit mobile"
                       type="tel"
                       maxLength={10}
@@ -542,7 +542,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Email Address" required error={errors.email}>
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="you@email.com"
                       type="email"
                       value={form.email}
@@ -552,7 +552,7 @@ export default function DreamHomeEnquiry() {
                   <Field label="Preferred City" required error={errors.city}>
                     <div className="relative">
                       <select
-                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
                         value={form.city}
                         onChange={(e) => set("city", e.target.value)}
                       >
@@ -727,14 +727,14 @@ export default function DreamHomeEnquiry() {
                   <Field label="Carpet Area (sq.ft) — optional">
                     <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                       <input
-                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                         placeholder="Min e.g. 800"
                         type="number"
                         value={form.carpetMin}
                         onChange={(e) => set("carpetMin", e.target.value)}
                       />
                       <input
-                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                         placeholder="Max e.g. 2000"
                         type="number"
                         value={form.carpetMax}
@@ -765,7 +765,7 @@ export default function DreamHomeEnquiry() {
                 </div>
                 <div className="flex justify-between items-center mt-8">
                   <button
-                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium hover:border-[#9CA3AF] hover:text-[#111827]"
                     onClick={back}
                   >
                     ← Back
@@ -818,7 +818,7 @@ export default function DreamHomeEnquiry() {
                   <Field label="Annual Income">
                     <div className="relative">
                       <select
-                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
                         value={form.income}
                         onChange={(e) => set("income", e.target.value)}
                       >
@@ -865,7 +865,7 @@ export default function DreamHomeEnquiry() {
                 </div>
                 <div className="flex justify-between items-center mt-8">
                   <button
-                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium hover:border-[#9CA3AF] hover:text-[#111827]"
                     onClick={back}
                   >
                     ← Back
@@ -913,7 +913,7 @@ export default function DreamHomeEnquiry() {
                 )}
                 <div className="flex justify-between items-center mt-8">
                   <button
-                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium hover:border-[#9CA3AF] hover:text-[#111827]"
                     onClick={back}
                   >
                     ← Back
@@ -961,7 +961,7 @@ export default function DreamHomeEnquiry() {
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Bedrooms">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 2"
@@ -976,7 +976,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Bathrooms">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 2"
@@ -991,7 +991,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Balconies">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 1"
@@ -1006,7 +1006,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Servant Rooms">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 0"
@@ -1021,7 +1021,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Parkings">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 1"
@@ -1036,7 +1036,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Total Floors">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       type="number"
                       min={0}
                       placeholder="e.g. 12"
@@ -1177,7 +1177,7 @@ export default function DreamHomeEnquiry() {
                   <div className="mt-3">
                     <Field label="Curfew time">
                       <input
-                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                        className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                         placeholder="e.g. 10:00 PM"
                         value={form.houseRules.curfewTime}
                         onChange={(e) => setHR("curfewTime", e.target.value)}
@@ -1237,7 +1237,7 @@ export default function DreamHomeEnquiry() {
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
                   <Field label="Schools">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.schools}
                       onChange={(e) => setNearby("schools", e.target.value)}
@@ -1245,7 +1245,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Hospitals">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.hospitals}
                       onChange={(e) => setNearby("hospitals", e.target.value)}
@@ -1253,7 +1253,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Metro Stations">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.metroStations}
                       onChange={(e) =>
@@ -1263,7 +1263,7 @@ export default function DreamHomeEnquiry() {
                   </Field>
                   <Field label="Malls">
                     <input
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)]"
                       placeholder="Comma separated"
                       value={form.nearbyPlaces.malls}
                       onChange={(e) => setNearby("malls", e.target.value)}
@@ -1273,7 +1273,7 @@ export default function DreamHomeEnquiry() {
 
                 <div className="flex justify-between items-center mt-8">
                   <button
-                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium hover:border-[#9CA3AF] hover:text-[#111827]"
                     onClick={back}
                   >
                     ← Back
@@ -1340,7 +1340,7 @@ export default function DreamHomeEnquiry() {
                 <div className="grid grid-cols-2 gap-4 max-sm:grid-cols-1 mt-5">
                   <Field label="Anything else to know?">
                     <textarea
-                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] resize-y min-h-[90px]"
+                      className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] resize-y min-h-[90px]"
                       placeholder="Locality preferences, specific projects, special needs..."
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
@@ -1350,7 +1350,7 @@ export default function DreamHomeEnquiry() {
                     <Field label="How did you find us?">
                       <div className="relative">
                         <select
-                          className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full [font-family:Inter,sans-serif] placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
+                          className="bg-[#F3F5FF] border-[1.5px] border-[#E5E9F7] rounded-[10px] px-4 py-[.7rem] text-[.88rem] text-[#111827] outline-none transition-all w-full placeholder:text-[#9CA3AF] focus:border-[#4161DF] focus:bg-[#EEF1FD] focus:shadow-[0_0_0_3px_rgba(65,97,223,.12)] appearance-none pr-9 cursor-pointer"
                           value={form.source}
                           onChange={(e) => set("source", e.target.value)}
                         >
@@ -1425,7 +1425,7 @@ export default function DreamHomeEnquiry() {
                 </div>
                 <div className="flex justify-between items-center mt-8">
                   <button
-                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium [font-family:Inter,sans-serif] hover:border-[#9CA3AF] hover:text-[#111827]"
+                    className="bg-transparent border-[1.5px] border-[#E5E9F7] rounded-[10px] px-[1.4rem] py-[.65rem] text-[.87rem] text-[#4B5563] cursor-pointer transition-all font-medium hover:border-[#9CA3AF] hover:text-[#111827]"
                     onClick={back}
                   >
                     ← Back
@@ -1447,7 +1447,7 @@ export default function DreamHomeEnquiry() {
                 <div className="w-[88px] h-[88px] rounded-full bg-[#DCFCE7] border-[3px] border-[#BBF7D0] flex items-center justify-center text-4xl mx-auto mb-5">
                   🏡
                 </div>
-                <h2 className="text-[1.75rem] font-extrabold text-[#111827] tracking-tight mb-2.5">
+                <h2 className="font-heading text-[1.75rem] text-[#111827] tracking-tight mb-2.5">
                   You're all set!
                 </h2>
                 <p className="text-[#4B5563] text-[.9rem] leading-[1.75] max-w-[340px] mx-auto">

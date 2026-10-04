@@ -4,8 +4,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Star } from "lucide-react";
 
-// Fonts: Space Grotesk (display) + IBM Plex Sans (body), loaded the same
-// way as RoommateBanner — swap in next/font variables in the app shell.
+// Typography: headings/display use Plus Jakarta Sans, body copy uses Inter,
+// both inherited from the app shell via next/font. No fonts are loaded here.
 
 export default function AppDownloadBanner() {
   const handleStoreRedirect = (platform: "android" | "ios") => {
@@ -31,12 +31,6 @@ export default function AppDownloadBanner() {
 
   return (
     <section className="w-full py-14 sm:py-16 md:py-20 bg-[#F6F3EC]">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-        .font-display { font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
-        .font-body { font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; }
-      `}</style>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -70,7 +64,7 @@ export default function AppDownloadBanner() {
 
           {/* Reference stamp */}
           <div className="absolute top-3 right-8 sm:top-6 sm:right-10 -rotate-6 border-2 border-[#C1602E]/70 rounded-sm px-2.5 py-1">
-            <span className="font-display text-[10px] tracking-[0.06em] text-[#C1602E] font-semibold">
+            <span className="font-heading text-[10px] tracking-[0.06em] text-[#C1602E] font-semibold">
               Live · rev 2.0
             </span>
           </div>
@@ -80,12 +74,12 @@ export default function AppDownloadBanner() {
             <div className="lg:col-span-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-6 h-px bg-[#C1602E]/80" />
-                <span className="font-body text-[11px] tracking-wide text-[#C1602E] font-medium">
+                <span className="text-[11px] tracking-wide text-[#C1602E] font-medium">
                   PropertyBulbul mobile
                 </span>
               </div>
 
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-[2.6rem] font-semibold text-[#F4F1E8] leading-[1.1] tracking-tight">
+              <h2 className="font-heading text-3xl sm:text-4xl lg:text-[2.6rem] font-semibold text-[#F4F1E8] leading-[1.1] tracking-tight">
                 Every sector.
                 <br />
                 Every street.
@@ -93,7 +87,7 @@ export default function AppDownloadBanner() {
                 Now on your phone.
               </h2>
 
-              <p className="font-body text-sm sm:text-[15px] text-[#9FB2C7] leading-relaxed mt-4 max-w-sm">
+              <p className="text-sm sm:text-[15px] text-[#9FB2C7] leading-relaxed mt-4 max-w-sm">
                 Search verified flats and PGs across Chandigarh, Mohali and
                 Panchkula, message owners directly, and get notified the moment
                 a new listing lands near you.
@@ -107,20 +101,20 @@ export default function AppDownloadBanner() {
                       i > 0 ? "border-l border-[#F4F1E8]/15" : ""
                     }`}
                   >
-                    <div className="font-display flex items-center gap-1 text-xl sm:text-2xl font-semibold text-[#F4F1E8]">
+                    <div className="font-heading flex items-center gap-1 text-xl sm:text-2xl font-semibold text-[#F4F1E8]">
                       {s.val}
                       {s.star && (
                         <Star className="w-3.5 h-3.5 text-[#D9A02D] fill-[#D9A02D] mb-0.5" />
                       )}
                     </div>
-                    <div className="font-body text-[11px] text-[#7C93A8] mt-0.5">
+                    <div className="text-[11px] text-[#7C93A8] mt-0.5">
                       {s.label}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 mt-7 font-body text-[11px] text-[#7C93A8]">
+              <div className="flex items-center gap-2 mt-7 text-[11px] text-[#7C93A8]">
                 <ShieldCheck
                   className="w-3.5 h-3.5 text-[#7B9E8C]"
                   strokeWidth={1.75}
@@ -212,7 +206,6 @@ export default function AppDownloadBanner() {
                   x="86"
                   y="317"
                   textAnchor="middle"
-                  className="font-body"
                   fontSize="8.5"
                   fill="#7C93A8"
                 >
@@ -232,10 +225,10 @@ export default function AppDownloadBanner() {
               </svg>
 
               <div className="absolute top-[42px] left-[178px] w-[130px]">
-                <div className="font-display text-[11px] font-semibold text-[#F4F1E8]">
+                <div className="font-heading text-[11px] font-semibold text-[#F4F1E8]">
                   Sector 21 · 3BHK
                 </div>
-                <div className="font-body text-[10px] text-[#9FB2C7]">
+                <div className="text-[10px] text-[#9FB2C7]">
                   ₹22,000/mo · Verified
                 </div>
               </div>
@@ -265,10 +258,10 @@ export default function AppDownloadBanner() {
                   />
                 </svg>
                 <div className="text-left flex-1">
-                  <div className="font-body text-[9px] font-medium text-[#0E2438]/60">
+                  <div className="text-[9px] font-medium text-[#0E2438]/60">
                     Get it on
                   </div>
-                  <div className="font-display text-[15px] font-semibold text-[#0E2438]">
+                  <div className="font-heading text-[15px] font-semibold text-[#0E2438]">
                     Google Play
                   </div>
                 </div>
@@ -293,10 +286,10 @@ export default function AppDownloadBanner() {
                   />
                 </svg>
                 <div className="text-left flex-1">
-                  <div className="font-body text-[9px] font-medium text-[#F4F1E8]/50">
+                  <div className="text-[9px] font-medium text-[#F4F1E8]/50">
                     Download on the
                   </div>
-                  <div className="font-display text-[15px] font-semibold text-[#F4F1E8]">
+                  <div className="font-heading text-[15px] font-semibold text-[#F4F1E8]">
                     App Store
                   </div>
                 </div>
@@ -306,7 +299,7 @@ export default function AppDownloadBanner() {
                 {cities.map((city) => (
                   <span
                     key={city.name}
-                    className="flex items-center gap-1.5 font-body text-[11px] text-[#9FB2C7]"
+                    className="flex items-center gap-1.5 text-[11px] text-[#9FB2C7]"
                   >
                     <span
                       className="w-2 h-2"

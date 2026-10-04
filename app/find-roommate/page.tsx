@@ -406,7 +406,7 @@ function MarketplaceContent() {
                       <MapPin className="w-3 h-3 text-[#4161DF] shrink-0" />{" "}
                       <span className="truncate">{user.location}</span>
                     </span>
-                    <span className="font-extrabold text-[#4161DF] bg-blue-50/80 px-1.5 py-0.5 rounded border border-blue-100/30 shrink-0">
+                    <span className="price text-[#4161DF] bg-blue-50/80 px-1.5 py-0.5 rounded border border-blue-100/30 shrink-0">
                       {user.budget}
                     </span>
                   </div>

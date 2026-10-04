@@ -467,7 +467,7 @@ export default function AgentsPage() {
   return (
     <div
       className="min-h-screen bg-[#f9fafb]"
-      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+      style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
     >
       {/* ── HERO ── */}
       <div
@@ -525,7 +525,7 @@ export default function AgentsPage() {
             </span>
           </div>
 
-          <h1 className="text-center text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[1.05] mb-4">
+          <h1 className="font-heading text-center text-4xl sm:text-5xl md:text-6xl text-white leading-[1.05] mb-4">
             Meet Tricity's{" "}
             <span className="relative">
               <span style={{ color: "#93a8f8" }}>Top Agents</span>
@@ -734,7 +734,7 @@ export default function AgentsPage() {
         }}
       >
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">
+          <h2 className="font-heading text-2xl sm:text-3xl text-white mb-3">
             Are you a property agent in Tricity?
           </h2>
           <p className="text-blue-100 text-sm sm:text-base mb-8 leading-relaxed max-w-xl mx-auto">

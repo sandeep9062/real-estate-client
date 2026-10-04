@@ -72,7 +72,7 @@ export default function ProfileCompletenessBanner({
         {/* Big-number treatment: the completeness percentage is genuinely
             the stat this banner exists to show */}
         <div className="shrink-0">
-          <span className="font-serif text-[34px] font-medium leading-none tabular-nums text-[#4161df] sm:text-4xl">
+          <span className="stat-number text-[34px] leading-none text-[#4161df] sm:text-4xl">
             {clamped}%
           </span>
         </div>

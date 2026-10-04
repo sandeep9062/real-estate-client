@@ -227,13 +227,13 @@ export default function RoommateProfileCard({
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-serif text-3xl text-[#B7B2A6]">
+          <div className="flex h-full w-full items-center justify-center font-heading text-3xl text-[#B7B2A6]">
             {profile.user.name.charAt(0).toUpperCase()}
           </div>
         )}
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-3 pb-2 pt-6 text-white">
-          <span className="font-serif text-base leading-none">
+          <span className="font-heading text-base leading-none">
             {profile.user.name}
           </span>
           {location && (

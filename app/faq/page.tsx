@@ -245,7 +245,7 @@ const FAQPage = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-slate-900"
+              className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-slate-900"
             >
               Frequently Asked <span className="text-[#4161df]">Questions</span>
             </motion.h1>
@@ -507,7 +507,7 @@ const FAQPage = () => {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl text-white">
               Still Have Questions?
             </h2>
             <p className="text-blue-100 mt-2 sm:mt-3 text-sm sm:text-base md:text-lg max-w-2xl mx-auto">

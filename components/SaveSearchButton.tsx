@@ -158,6 +158,7 @@ export default function SaveSearchButton({
             role="dialog"
             aria-modal="true"
             aria-labelledby="save-search-title"
+            data-lenis-prevent
             className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white shadow-2xl ring-1 ring-slate-900/5 sm:rounded-3xl"
           >
             {/* Header */}

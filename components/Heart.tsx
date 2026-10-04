@@ -54,20 +54,20 @@ const Heart: React.FC<HeartProps> = ({ card }) => {
       }}
       aria-label={favourited ? "Remove from favourites" : "Add to favourites"}
       className={[
-        "group rounded-full p-2 transition-all duration-300",
-        "backdrop-blur-md  cursor-pointer",
+        // Calmed down from the old glow/shrink treatment: a plain round
+        // target that inherits the surface it sits on.
+        "grid h-9 w-9 shrink-0 place-items-center rounded-full border transition-colors",
         favourited
-          ? "bg-rose-50/60 border-rose-300 shadow-[0_0_12px_rgba(255,87,87,0.25)]"
-          : "bg-white/60 border-gray-300 hover:border-gray-400 hover:bg-white/80",
+          ? "border-rose-200 bg-rose-50"
+          : "border-slate-900/10 bg-white hover:bg-slate-50",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]",
       ].join(" ")}
-      style={{
-        transform: favourited ? "scale(1.07)" : "scale(1)",
-      }}
     >
       <AiFillHeart
-        size={22}
-        className="transition-all duration-300 group-hover:scale-110"
-        color={favourited ? "#ff3b5c" : "#9ca3af"}
+        size={20}
+        aria-hidden
+        className="transition-colors"
+        color={favourited ? "#e11d48" : "#94a3b8"}
       />
     </button>
   );

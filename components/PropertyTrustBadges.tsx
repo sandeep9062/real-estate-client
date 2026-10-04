@@ -53,8 +53,8 @@ export function PropertyTrustBadges({
     items.push({
       key: "rera",
       label: `RERA ${property.reraNumber}`,
-      icon: <span className="text-[10px] font-black">R</span>,
-      className: "bg-slate-900 text-white border-slate-800",
+      icon: <span className="text-[10px] font-semibold">R</span>,
+      className: "bg-slate-800 text-white border-slate-700",
     });
   }
   if (property.isVerified && !property.bulbulVerified) {
@@ -75,7 +75,7 @@ export function PropertyTrustBadges({
       {items.map((b) => (
         <span
           key={b.key}
-          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${b.className}`}
+          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${b.className}`}
           title={b.label}
         >
           {b.icon}
@@ -109,7 +109,7 @@ export function ListingAvailabilityPill({
   };
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${styles[v] || styles.Available}`}
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles[v] || styles.Available}`}
     >
       {labels[v] || v}
     </span>
@@ -179,7 +179,7 @@ export function ListingPostedByTag({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-bold ${styles}`}
+      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles}`}
       title={label}
     >
       {icon}

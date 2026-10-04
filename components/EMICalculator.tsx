@@ -93,16 +93,16 @@ export default function EMICalculator({
 
   return (
     <div
-      className={`bg-white rounded-3xl border border-slate-100 shadow-xl p-6 sm:p-8 ${className}`}
+      className={`rounded-2xl bg-white p-5 ring-1 ring-slate-900/10 sm:p-6 ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#4161df]/10 flex items-center justify-center">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#4161df]/10">
             <FiPieChart className="text-[#4161df]" size={20} />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">EMI Calculator</h3>
+            <h2 className="font-heading text-lg font-bold text-slate-900">EMI calculator</h2>
             <p className="text-xs text-slate-500">
               Estimate your home loan EMI
             </p>
@@ -121,7 +121,7 @@ export default function EMICalculator({
       <div className="space-y-6">
         {/* Loan Amount */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between gap-3">
             <label className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
               <FiTrendingUp size={14} className="text-[#4161df]" />
               Loan Amount
@@ -151,7 +151,7 @@ export default function EMICalculator({
 
         {/* Interest Rate */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between gap-3">
             <label className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
               <FiInfo size={14} className="text-[#4161df]" />
               Interest Rate
@@ -177,7 +177,7 @@ export default function EMICalculator({
 
         {/* Tenure */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between gap-3">
             <label className="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
               <FiTrendingUp size={14} className="text-[#4161df]" />
               Loan Tenure
@@ -203,7 +203,7 @@ export default function EMICalculator({
       </div>
 
       {/* Result Card */}
-      <div className="mt-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white">
+      <div className="mt-6 rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-900/10">
         <div className="flex flex-col sm:flex-row items-center gap-6">
           {/* Donut Chart */}
           <div className="relative w-32 h-32 flex-shrink-0">
@@ -213,7 +213,7 @@ export default function EMICalculator({
                 cy="60"
                 r={radius}
                 fill="none"
-                stroke="rgba(255,255,255,0.1)"
+                stroke="#e2e8f0"
                 strokeWidth="10"
               />
               <circle
@@ -221,7 +221,7 @@ export default function EMICalculator({
                 cy="60"
                 r={radius}
                 fill="none"
-                stroke="#60a5fa"
+                stroke="#4161df"
                 strokeWidth="10"
                 strokeDasharray={circumference}
                 strokeDashoffset={interestOffset}
@@ -230,31 +230,31 @@ export default function EMICalculator({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] text-slate-500">
                 EMI
               </span>
-              <span className="text-sm font-black">{formatCurrency(emi)}</span>
+              <span className="price text-sm">{formatCurrency(emi)}</span>
               <span className="text-[9px] text-slate-400">/month</span>
             </div>
           </div>
 
           {/* Stats */}
           <div className="flex-1 w-full space-y-3">
-            <div className="flex justify-between items-center pb-2 border-b border-white/10">
-              <span className="text-sm text-slate-300">Principal Amount</span>
-              <span className="text-sm font-bold">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-2">
+              <span className="text-sm text-slate-600">Principal Amount</span>
+              <span className="price text-sm">
                 {formatCurrency(principal)}
               </span>
             </div>
-            <div className="flex justify-between items-center pb-2 border-b border-white/10">
-              <span className="text-sm text-slate-300">Total Interest</span>
-              <span className="text-sm font-bold text-blue-300">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-2">
+              <span className="text-sm text-slate-600">Total Interest</span>
+              <span className="price text-sm text-[#3049b8]">
                 {formatCurrency(totalInterest)}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-300">Total Payment</span>
-              <span className="text-lg font-black">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-slate-600">Total Payment</span>
+              <span className="price text-lg">
                 {formatCurrency(totalAmount)}
               </span>
             </div>
@@ -262,23 +262,23 @@ export default function EMICalculator({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-white/10">
+        <div className="mt-4 flex items-center justify-center gap-6 border-t border-slate-200 pt-4">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-white/20" />
-            <span className="text-xs text-slate-400">
+            <div className="h-2.5 w-2.5 rounded-full bg-slate-300" />
+            <span className="text-xs text-slate-500">
               Principal ({principalPercent.toFixed(1)}%)
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-400" />
-            <span className="text-xs text-slate-400">
+            <div className="h-2.5 w-2.5 rounded-full bg-[#4161df]" />
+            <span className="text-xs text-slate-500">
               Interest ({interestPercent.toFixed(1)}%)
             </span>
           </div>
         </div>
       </div>
 
-      <p className="text-center text-[11px] text-slate-400 mt-4">
+      <p className="mt-4 text-center text-[11px] text-slate-500">
         * Calculated at {rate}% annual interest. Actual rates may vary by bank.
       </p>
     </div>

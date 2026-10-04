@@ -99,7 +99,7 @@ const PrivacyPolicy = () => {
               <AlertTriangle size={18} />
               Privacy & Security
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
+            <h1 className="font-heading text-4xl md:text-5xl mb-6">
               Privacy Policy
             </h1>
             <p className="text-gray-900 text-lg leading-relaxed">

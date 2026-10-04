@@ -121,7 +121,7 @@ export default function DevelopersContent({
   return (
     <div
       className="min-h-screen bg-[#f9fafb]"
-      style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+      style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
     >
       {/* ── HERO SECTION ── */}
       <div

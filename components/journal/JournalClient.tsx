@@ -205,7 +205,7 @@ export default function JournalClient({
     return (
       <div className="min-h-screen bg-white font-sans text-[#201d1a]">
         <div className="px-5 py-[72px] text-center">
-          <h3 className="font-serif text-[1.4rem] font-semibold">Offline</h3>
+          <h3 className="font-heading text-[1.4rem]">Offline</h3>
           <p className="text-sm text-[#6e6b63]">
             Unable to load PropertyBulbul intelligence.
           </p>
@@ -230,7 +230,7 @@ export default function JournalClient({
 
         {/* Header Title */}
         <div className="border-b border-[#d8d2c4] pb-[22px] pt-[26px]">
-          <h1 className="mb-[10px] font-serif text-[clamp(2.2rem,6vw,4rem)] font-semibold leading-[0.98] tracking-[-0.01em]">
+          <h1 className="mb-[10px] font-heading text-[clamp(2.2rem,6vw,4rem)] leading-[0.98] tracking-[-0.01em]">
             The Journal
           </h1>
           <p className="max-w-[540px] text-[15px] leading-[1.55] text-[#6e6b63]">
@@ -345,7 +345,7 @@ export default function JournalClient({
           </>
         ) : (
           <div className="px-5 py-[72px] text-center">
-            <h3 className="font-serif text-[1.4rem] font-semibold">
+            <h3 className="font-heading text-[1.4rem]">
               No matching insights found
             </h3>
             <p className="text-sm text-[#6e6b63]">

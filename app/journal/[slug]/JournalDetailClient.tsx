@@ -227,7 +227,7 @@ export default function JournalDetailClient({
               ),
               h1: ({ node, ...props }) => (
                 <h1
-                  className="text-2xl sm:text-3xl md:text-4xl font-extrabold my-4 sm:my-6"
+                  className="font-heading text-2xl sm:text-3xl md:text-4xl my-4 sm:my-6"
                   {...props}
                 />
               ),

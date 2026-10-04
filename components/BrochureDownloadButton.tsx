@@ -21,7 +21,6 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
   className,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const {
@@ -124,60 +123,27 @@ const BrochureDownloadButton: React.FC<BrochureDownloadButtonProps> = ({
     <Button
       onClick={handleDownloadBrochure}
       disabled={isDownloading}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className={`
-        group relative overflow-hidden
-        bg-gradient-to-br from-[#4161df] via-[#4161df] to-[#4161df]
-        hover:from-[#4161df] hover:via-blue-800 hover:to-indigo-900
-        text-white font-semibold tracking-wide
-        shadow-lg hover:shadow-xl
-        transform hover:scale-105 transition-all duration-300
-        border border-white/20 hover:border-white/40
-        before:absolute before:inset-0 before:bg-white/0 
-        before:transition-all before:duration-300
-        hover:before:bg-white/10
-        after:absolute after:inset-0 after:bg-gradient-to-t 
-        after:from-transparent after:via-white/5 after:to-transparent
-        after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-300
-        focus-visible:ring-4 focus-visible:ring-blue-300/50 dark:focus-visible:ring-blue-400/30
-        disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100
-        disabled:hover:shadow-lg
+        font-semibold
+        transition-colors duration-150
+        disabled:cursor-not-allowed disabled:opacity-60
         ${className}
       `}
       size="lg"
     >
-      {/* Animated background shimmer effect */}
-      <div
-        className={`
-        absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
-        transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]
-        transition-transform duration-1000 ease-out
-        opacity-0 group-hover:opacity-100
-      `}
-      />
-
-      {/* Content */}
-      <div className="relative flex items-center z-10">
+      <span className="flex items-center">
         {isDownloading ? (
           <>
-            <Download className="mr-3 h-5 w-5 text-white animate-spin transition-transform duration-200 group-hover:scale-110" />
-            <span className="tracking-wide text-white ">
-              Downloading Brochure...
-            </span>
+            <Download className="mr-2 h-4 w-4" aria-hidden />
+            <span>Downloading…</span>
           </>
         ) : (
           <>
-            <FileDown className="mr-3 text-white h-5 w-5 transition-transform duration-200 group-hover:scale-110 group-hover:rotate-12" />
-            <span className="tracking-wide text-white">Download Brochure</span>
+            <FileDown className="mr-2 h-4 w-4" aria-hidden />
+            <span>Download brochure</span>
           </>
         )}
-      </div>
-
-      {/* Download progress overlay */}
-      {isDownloading && (
-        <div className="absolute bottom-0 left-0 h-1 bg-white/30 animate-pulse w-full" />
-      )}
+      </span>
     </Button>
   );
 };

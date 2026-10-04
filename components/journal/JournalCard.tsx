@@ -58,7 +58,7 @@ export default function JournalCard({
             </span>
           )}
           <h2
-            className={`mb-2 font-serif font-semibold leading-[1.14] ${
+            className={`mb-2 font-heading leading-[1.14] ${
               isLead ? "text-[clamp(1.5rem,3vw,2rem)]" : "text-[1.3rem]"
             }`}
           >
@@ -102,7 +102,7 @@ export default function JournalCard({
           {post.category}
         </span>
       )}
-      <h3 className="mb-2 font-serif text-[1.1rem] font-semibold leading-[1.14]">
+      <h3 className="mb-2 font-heading text-[1.1rem] leading-[1.14]">
         {post.title}
       </h3>
       {post.excerpt && (

@@ -17,6 +17,7 @@ import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 import SaveSearchButton from "@/components/SaveSearchButton";
 import { useLazyGetAllPropertiesQuery } from "@/services/propertiesApi";
 import { buildSeoHrefFromFilters } from "@/lib/filterSlug";
+import { scrollToElement } from "@/lib/smooth-scroll";
 import { Map, List as ListIcon, Loader2 } from "lucide-react";
 
 interface PropertiesClientProps {
@@ -284,7 +285,9 @@ function PropertiesClientInner({
   useEffect(() => {
     if (!selectedId) return;
     const el = document.querySelector(`[data-property-id="${selectedId}"]`);
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // `nearest` preserves the old block:"nearest" behaviour — selecting a
+    // nearby pin shouldn't yank the page when the card is already in view.
+    if (el instanceof HTMLElement) scrollToElement(el, { nearest: true });
   }, [selectedId, properties]);
 
   if (error) {

@@ -44,7 +44,7 @@ export default function AgentLandlordCTA() {
             <Sparkles size={12} />
             Grow with PropertyBulbul
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-[Poppins] font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold text-slate-900 dark:text-white leading-tight tracking-tight">
             Are you an{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-[#4161df]">Agent</span>
@@ -71,7 +71,7 @@ export default function AgentLandlordCTA() {
                   <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
                 )}
                 <div className="text-center">
-                  <p className="text-base sm:text-lg font-bold font-[Poppins] text-slate-900 dark:text-white leading-none">
+                  <p className="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white leading-none">
                     {s.value}
                   </p>
                   <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 tracking-wide">
@@ -109,7 +109,7 @@ export default function AgentLandlordCTA() {
                   </span>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-[Poppins] font-bold text-slate-900 dark:text-white mb-1.5">
+                <h3 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white mb-1.5">
                   Register as Agent
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
@@ -170,7 +170,7 @@ export default function AgentLandlordCTA() {
                   </span>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-[Poppins] font-bold text-slate-900 dark:text-white mb-1.5">
+                <h3 className="text-xl sm:text-2xl font-heading font-bold text-slate-900 dark:text-white mb-1.5">
                   Register as Landlord
                 </h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">

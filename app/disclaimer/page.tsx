@@ -74,7 +74,7 @@ const DisclaimerPage = () => {
               <AlertTriangle size={18} />
               Legal Information
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
+            <h1 className="font-heading text-4xl md:text-5xl mb-6">
               Disclaimer
             </h1>
             <p className=" text-gray-900 text-lg leading-relaxed">

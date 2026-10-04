@@ -223,7 +223,7 @@ export default function PricingPage() {
       style={{
         minHeight: "100vh",
         background: "#f9fafb",
-        fontFamily: "'Georgia', 'Times New Roman', serif",
+        fontFamily: "var(--font-inter), system-ui, sans-serif",
         padding: "0 0 80px",
       }}
     >
@@ -356,7 +356,7 @@ export default function PricingPage() {
             borderRadius: 100,
             padding: "6px 18px",
             fontSize: 12,
-            fontFamily: "'Arial', sans-serif",
+            fontFamily: "var(--font-inter), system-ui, sans-serif",
             letterSpacing: "0.1em",
             color: "rgba(255,255,255,0.9)",
             marginBottom: 20,
@@ -386,7 +386,7 @@ export default function PricingPage() {
             maxWidth: 480,
             margin: "0 auto",
             lineHeight: 1.7,
-            fontFamily: "'Arial', sans-serif",
+            fontFamily: "var(--font-inter), system-ui, sans-serif",
             fontStyle: "italic",
           }}
         >
@@ -425,7 +425,7 @@ export default function PricingPage() {
               color: activeTab === tab.key ? "white" : "#374151",
               fontSize: 14,
               fontWeight: 600,
-              fontFamily: "'Arial', sans-serif",
+              fontFamily: "var(--font-inter), system-ui, sans-serif",
               cursor: "pointer",
               boxShadow:
                 activeTab === tab.key
@@ -488,7 +488,7 @@ export default function PricingPage() {
                     color: "white",
                     fontSize: 10,
                     fontWeight: 700,
-                    fontFamily: "'Arial', sans-serif",
+                    fontFamily: "var(--font-inter), system-ui, sans-serif",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     padding: "4px 10px",
@@ -517,7 +517,7 @@ export default function PricingPage() {
                     borderRadius: 100,
                     padding: "3px 12px",
                     fontSize: 11,
-                    fontFamily: "'Arial', sans-serif",
+                    fontFamily: "var(--font-inter), system-ui, sans-serif",
                     fontWeight: 600,
                     color: plan.color,
                     marginBottom: 12,
@@ -543,7 +543,7 @@ export default function PricingPage() {
                   style={{
                     fontSize: 13,
                     color: "#6b7280",
-                    fontFamily: "'Arial', sans-serif",
+                    fontFamily: "var(--font-inter), system-ui, sans-serif",
                     lineHeight: 1.5,
                     marginBottom: 20,
                   }}
@@ -573,7 +573,7 @@ export default function PricingPage() {
                         style={{
                           fontSize: 14,
                           color: "#6b7280",
-                          fontFamily: "'Arial', sans-serif",
+                          fontFamily: "var(--font-inter), system-ui, sans-serif",
                           marginBottom: 4,
                         }}
                       >
@@ -594,7 +594,7 @@ export default function PricingPage() {
                         style={{
                           fontSize: 13,
                           color: "#9ca3af",
-                          fontFamily: "'Arial', sans-serif",
+                          fontFamily: "var(--font-inter), system-ui, sans-serif",
                         }}
                       >
                         /{plan.period}
@@ -608,7 +608,7 @@ export default function PricingPage() {
                     style={{
                       fontSize: 11,
                       color: "#9ca3af",
-                      fontFamily: "'Arial', sans-serif",
+                      fontFamily: "var(--font-inter), system-ui, sans-serif",
                       marginTop: 4,
                     }}
                   >
@@ -626,7 +626,7 @@ export default function PricingPage() {
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    fontFamily: "'Arial', sans-serif",
+                    fontFamily: "var(--font-inter), system-ui, sans-serif",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     color: "#9ca3af",
@@ -693,7 +693,7 @@ export default function PricingPage() {
                         className="pricing-feature-text"
                         style={{
                           fontSize: 13,
-                          fontFamily: "'Arial', sans-serif",
+                          fontFamily: "var(--font-inter), system-ui, sans-serif",
                           color: f.included ? "#374151" : "#9ca3af",
                           lineHeight: 1.4,
                         }}
@@ -719,7 +719,7 @@ export default function PricingPage() {
                     color: plan.highlight ? "white" : plan.color,
                     fontSize: 14,
                     fontWeight: 700,
-                    fontFamily: "'Arial', sans-serif",
+                    fontFamily: "var(--font-inter), system-ui, sans-serif",
                     cursor: "pointer",
                     letterSpacing: "0.01em",
                     boxShadow: plan.highlight
@@ -774,7 +774,7 @@ export default function PricingPage() {
                 gap: 6,
                 fontSize: 13,
                 color: "#374151",
-                fontFamily: "'Arial', sans-serif",
+                fontFamily: "var(--font-inter), system-ui, sans-serif",
               }}
             >
               <span>{item.icon}</span>
@@ -788,7 +788,7 @@ export default function PricingPage() {
             marginTop: 24,
             fontSize: 13,
             color: "#9ca3af",
-            fontFamily: "'Arial', sans-serif",
+            fontFamily: "var(--font-inter), system-ui, sans-serif",
           }}
         >
           Questions? WhatsApp us or email{" "}

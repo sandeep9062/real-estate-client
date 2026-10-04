@@ -20,9 +20,9 @@ import {
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
-// Fonts — Poppins for display/headings (loaded globally in globals.css and
-// used across the homepage via the `font-[Poppins]` utility). Body copy uses
-// the app's default sans (Geist Sans from the root layout).
+// Fonts — Plus Jakarta Sans for display/headings via the `font-heading`
+// utility (loaded in the root layout with next/font). Body copy uses the app
+// default sans (Inter, also from the root layout).
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -110,7 +110,7 @@ function Hero() {
     <section className="mx-auto max-w-[1400px] px-6 pb-16 pt-36 lg:px-10 lg:pb-20 lg:pt-40">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.75fr_0.75fr] lg:gap-7">
         <div className="flex flex-col justify-center rounded-2xl border border-slate-200 bg-white/60 px-8 py-12 lg:px-12 lg:py-16">
-          <h1 className="font-[Poppins] text-[2.6rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-[3.1rem]">
+          <h1 className="font-heading text-[2.6rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-[3.1rem]">
             Zameen Se, <span className="text-[#4161df]">Sapno Ke Ghar Tak</span>
           </h1>
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-slate-600">
@@ -179,7 +179,7 @@ function ListingPreviewCard({
           />
           <span className="text-sm text-slate-500">{eyebrow}</span>
         </div>
-        <h3 className="mt-5 font-[Poppins] text-2xl font-semibold text-slate-900">
+        <h3 className="mt-5 font-heading text-2xl font-semibold text-slate-900">
           {name}
         </h3>
         <p className="mt-3 text-[15px] leading-snug text-slate-600">
@@ -229,7 +229,7 @@ function ContractorPreviewCard() {
           />
           <span className="text-sm text-white/60">Verified contractor</span>
         </div>
-        <h3 className="mt-5 font-[Poppins] text-2xl font-semibold">
+        <h3 className="mt-5 font-heading text-2xl font-semibold">
           Anand Buildcon
         </h3>
         <p className="mt-3 text-[15px] leading-snug text-white/70">
@@ -277,7 +277,7 @@ function CategoryGrid() {
       className="mx-auto max-w-[1400px] px-6 pb-24 pt-4 lg:px-10"
     >
       <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-[Poppins] text-[1.9rem] font-bold tracking-tight text-slate-900">
+        <h2 className="font-heading text-[1.9rem] font-bold tracking-tight text-slate-900">
           What are you looking for?
         </h2>
         <a
@@ -350,7 +350,7 @@ function TrustStrip() {
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-[#4161df] text-white">
               <Icon className="h-5 w-5" strokeWidth={1.75} />
             </span>
-            <h3 className="font-[Poppins] text-lg font-semibold text-slate-900">
+            <h3 className="font-heading text-lg font-semibold text-slate-900">
               {title}
             </h3>
             <p className="max-w-xs text-[15px] leading-relaxed text-slate-600">

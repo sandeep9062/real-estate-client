@@ -116,8 +116,13 @@ export default function ChatbotWidget() {
               </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 px-2.5 sm:px-3 py-2.5 sm:py-3 overflow-y-auto bg-gray-50 space-y-2.5 sm:space-y-3">
+            {/* Messages. data-lenis-prevent keeps Lenis from hijacking wheel
+                events here — this is its own scroll container, and without the
+                tag the page would scroll instead of the chat history. */}
+            <div
+              data-lenis-prevent
+              className="flex-1 px-2.5 sm:px-3 py-2.5 sm:py-3 overflow-y-auto bg-gray-50 space-y-2.5 sm:space-y-3"
+            >
               {messages.map((m, i) => (
                 <div
                   key={i}

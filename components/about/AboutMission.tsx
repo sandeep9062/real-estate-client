@@ -56,7 +56,7 @@ export default function AboutMission() {
         >
           <span
             aria-hidden
-            className="block font-serif leading-none select-none mb-2"
+            className="block font-heading leading-none select-none mb-2"
             style={{
               fontSize: "clamp(56px, 10vw, 96px)",
               color: "rgba(255,255,255,0.18)",

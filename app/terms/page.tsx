@@ -210,7 +210,7 @@ const TermsAndConditions = () => {
               <FileText size={18} />
               Legal Agreement
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
+            <h1 className="font-heading text-4xl md:text-5xl mb-6">
               Terms & Conditions
             </h1>
             <p className="text-gray-900 text-lg leading-relaxed">

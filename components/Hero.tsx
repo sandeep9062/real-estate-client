@@ -145,7 +145,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               initial={{ y: "2rem", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 1.2, type: "spring" }}
-              className="font-extrabold text-[1.625rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter leading-[1.1] text-slate-900"
+              className="font-heading font-extrabold text-[1.625rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter leading-[1.1] text-slate-900"
             >
               Tricity&apos;s
               <br className="hidden sm:block" /> Most Helpful

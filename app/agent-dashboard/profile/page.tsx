@@ -243,7 +243,7 @@ export default function AgentProfilePage() {
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4161df]/8 text-[#4161df]">
           <Briefcase className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
+        <h1 className="font-heading text-2xl text-stone-900 sm:text-[28px]">
           Agent profile
         </h1>
         <p className="text-sm text-stone-500">
@@ -265,7 +265,7 @@ export default function AgentProfilePage() {
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100 text-stone-400">
           <Briefcase className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
+        <h1 className="font-heading text-2xl text-stone-900 sm:text-[28px]">
           Agent profile
         </h1>
         <p className="text-sm text-stone-500">
@@ -307,7 +307,7 @@ export default function AgentProfilePage() {
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
           <AlertTriangle className="h-7 w-7" aria-hidden />
         </span>
-        <h1 className="font-serif text-2xl font-medium text-stone-900 sm:text-[28px]">
+        <h1 className="font-heading text-2xl text-stone-900 sm:text-[28px]">
           Something went wrong
         </h1>
         <p className="text-sm text-stone-500">
@@ -352,7 +352,7 @@ export default function AgentProfilePage() {
 
         <div className="relative max-w-md">
           <p className="text-[13px] font-medium text-white/70">Agent profile</p>
-          <h1 className="mt-1.5 font-serif text-[28px] font-medium leading-tight tracking-tight sm:text-4xl">
+          <h1 className="mt-1.5 font-heading text-[28px] leading-tight tracking-tight sm:text-4xl">
             {displayName ? `Hello, ${displayName}` : "Edit your profile"}
           </h1>
           <p className="mt-2.5 text-sm leading-relaxed text-white/80 sm:text-base">

@@ -237,7 +237,14 @@ const cardStyle = {
   border: "1px solid #e8eaf0",
   boxShadow: "0 2px 12px rgba(15,23,42,.05)",
 };
-const serif = { fontFamily: "'Instrument Serif', serif" };
+/**
+ * Display face for agent names/headings — Plus Jakarta Sans, loaded once in
+ * the root layout via next/font. Kept under the name `serif` so the ~12 call
+ * sites below read as a display token rather than a repeated raw font stack.
+ */
+const serif = {
+  fontFamily: "var(--font-heading), var(--font-inter), system-ui, sans-serif",
+};
 const inputCls =
   "w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-[#4161df] focus:bg-white transition placeholder-slate-400";
 
@@ -589,8 +596,6 @@ export default function AgentProfilePage({ params }: PageProps) {
 
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');`}</style>
-
       <div className="min-h-screen mt-20" style={{ background: "#f7f5f0" }}>
         {/* ── STICKY TOP CTA ── */}
         {stickyCtaVisible && (

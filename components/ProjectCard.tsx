@@ -142,7 +142,7 @@ export const ProjectCard = ({ project }: { project: any }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs">Starting from</p>
-                <p className="text-blue-600 font-bold text-xl tracking-tight">
+                <p className="price text-blue-600 text-xl tracking-tight">
                   ₹{project.pricing.from.toLocaleString("en-IN")}
                 </p>
               </div>

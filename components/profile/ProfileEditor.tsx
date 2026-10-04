@@ -354,7 +354,7 @@ function AvatarSection({
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="font-serif text-[17px] font-medium text-stone-900">
+          <p className="font-heading text-[17px] text-stone-900">
             {name ?? "Your profile"}
           </p>
           <p className="mt-0.5 text-[12.5px] text-stone-500">
@@ -549,7 +549,7 @@ export default function ProfileEditor({
                   </span>
                 )}
                 <div className="min-w-0 flex-1 pt-0.5">
-                  <h2 className="font-serif text-[17px] font-medium text-stone-900">
+                  <h2 className="font-heading text-[17px] text-stone-900">
                     {section.title}
                   </h2>
                   {section.description && (

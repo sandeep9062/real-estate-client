@@ -158,7 +158,9 @@ const Map = ({ setLocation, location, markers }: MapProps) => {
     };
   }, []);
 
-  return <div ref={mapRef} style={{ height: "400px", width: "100%" }} />;
+  // Fill whatever box the parent gives us. The previous fixed 400px forced
+  // every caller to fight overflow, so the height is now the container's job.
+  return <div ref={mapRef} className="h-full w-full" />;
 };
 
 export default Map;

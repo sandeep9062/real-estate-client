@@ -807,7 +807,7 @@ function FilterSelect({
               onClick={() => setIsOpen(false)}
             />
             <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md border border-gray-200 shadow-lg z-20 overflow-hidden">
-              <div className="max-h-40 overflow-y-auto py-0.5">
+              <div data-lenis-prevent className="max-h-40 overflow-y-auto py-0.5">
                 <button
                   onClick={() => {
                     onChange("");

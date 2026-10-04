@@ -37,28 +37,51 @@ export default function BookingModal({
   if (!opened) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-1200 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm">
-        <h2 className="text-lg font-semibold mb-4">Select your visit date</h2>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-modal-title"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 p-4"
+    >
+      {/* Backdrop click closes; Esc is handled below. */}
+      <button
+        type="button"
+        aria-label="Close booking dialog"
+        tabIndex={-1}
+        onClick={() => setOpened(false)}
+        className="absolute inset-0 cursor-default"
+      />
+      <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg">
+        <h2
+          id="booking-modal-title"
+          className="font-heading text-lg font-bold text-slate-900"
+        >
+          Select your visit date
+        </h2>
 
-        <input
-          type="date"
-          className="w-full border p-2 rounded-lg text-sm"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          min={dayjs().format("YYYY-MM-DD")}
-        />
+        <label className="mt-4 block">
+          <span className="sr-only">Visit date</span>
+          <input
+            type="date"
+            className="min-h-11 w-full rounded-xl border border-slate-300 p-2.5 text-base text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            min={dayjs().format("YYYY-MM-DD")}
+          />
+        </label>
 
         <button
-          className="w-full bg-blue-600 text-white py-2 rounded-lg mt-4 disabled:opacity-50"
+          type="button"
+          className="mt-4 min-h-11 w-full rounded-xl bg-[#4161df] text-base font-semibold text-white transition hover:bg-[#3452c0] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df] disabled:opacity-50"
           disabled={!value || isLoading}
           onClick={handleBook}
         >
-          Book Visit
+          {isLoading ? "Booking…" : "Book visit"}
         </button>
 
         <button
-          className="w-full border text-gray-600 py-2 rounded-lg mt-2"
+          type="button"
+          className="mt-2 min-h-11 w-full rounded-xl text-base font-medium text-slate-600 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df]"
           onClick={() => setOpened(false)}
         >
           Cancel
