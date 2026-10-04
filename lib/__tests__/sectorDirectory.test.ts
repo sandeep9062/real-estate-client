@@ -337,15 +337,15 @@ test("locality map pins use curated landmark coordinates and live hrefs", () => 
 test("sectorDisplayLabel names grid sectors and leaves localities bare", () => {
   const groups = buildSectorDirectory([
     "flat-for-rent-in-sector-40-chandigarh",
-    "flat-for-rent-near-vip-road-zirakpur",
+    "flat-for-rent-near-peer-muchalla-zirakpur",
   ]);
   assert.equal(
     sectorDisplayLabel(entry(groups, "chandigarh", "40"), "grid"),
     "Sector 40",
   );
   assert.equal(
-    sectorDisplayLabel(entry(groups, "zirakpur", "VIP Road"), "list"),
-    "VIP Road",
+    sectorDisplayLabel(entry(groups, "zirakpur", "Peer Muchalla"), "list"),
+    "Peer Muchalla",
     "locality names must never be prefixed with 'Sector'",
   );
 });
@@ -353,7 +353,10 @@ test("sectorDisplayLabel names grid sectors and leaves localities bare", () => {
 test("live directory links are absolute, keyword-named, and exclude filler tiles", () => {
   const groups = buildSectorDirectory([
     "flat-for-rent-in-sector-40-chandigarh",
-    "flat-for-rent-near-vip-road-zirakpur",
+    // Peer Muchalla — a registered Zirakpur landmark. A slug whose landmark
+    // is unknown (e.g. "vip-road") is rejected by parseRootSlug, so it must
+    // never be treated as a live link.
+    "flat-for-rent-near-peer-muchalla-zirakpur",
   ]);
   const links = collectLiveSectorLinks(groups);
 
@@ -376,7 +379,7 @@ test("live directory links are absolute, keyword-named, and exclude filler tiles
     "https://www.propertybulbul.com/flat-for-rent-in-sector-40-chandigarh",
   );
   assert.equal(links[0].name, "Sector 40, Chandigarh properties");
-  assert.equal(links[1].name, "VIP Road, Zirakpur properties");
+  assert.equal(links[1].name, "Peer Muchalla, Zirakpur properties");
 });
 
 test("directory schemas are well-formed and count only live entries", () => {
@@ -397,10 +400,10 @@ test("directory schemas are well-formed and count only live entries", () => {
 
   // Positions are 1-based and contiguous, as ItemList requires.
   assert.deepEqual(
-    itemList.itemListElement.map((el: any) => el.position),
+    itemList.itemListElement.map((el) => el.position),
     [1, 2],
   );
-  for (const el of itemList.itemListElement as any[]) {
+  for (const el of itemList.itemListElement) {
     assert.equal(el["@type"], "ListItem");
     assert.ok(el.url.startsWith("https://www.propertybulbul.com/"));
     assert.ok(el.name.length > 0);

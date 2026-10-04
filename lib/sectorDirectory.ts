@@ -401,6 +401,50 @@ export function collectLiveSectorLinks(
   );
 }
 
+/** One `ListItem` entry of the /sectors `ItemList`. */
+export interface SectorListItemSchema {
+  "@type": "ListItem";
+  /** 1-based, contiguous — what `ItemList` requires. */
+  position: number;
+  name: string;
+  url: string;
+}
+
+/** The `ItemList` of live directory links embedded in the CollectionPage. */
+export interface SectorItemListSchema {
+  "@context": "https://schema.org";
+  "@type": "ItemList";
+  name: string;
+  description: string;
+  numberOfItems: number;
+  itemListElement: SectorListItemSchema[];
+}
+
+/** `CollectionPage` JSON-LD for /sectors, with the ItemList as `mainEntity`. */
+export interface SectorCollectionPageSchema {
+  "@context": "https://schema.org";
+  "@type": "CollectionPage";
+  "@id": string;
+  name: string;
+  description: string;
+  url: string;
+  inLanguage: string;
+  isPartOf: { "@type": "WebSite"; name: string; url: string };
+  publisher: {
+    "@type": "Organization";
+    name: string;
+    url: string;
+    logo: { "@type": "ImageObject"; url: string };
+  };
+  about: { "@type": "Place"; name: string };
+  mainEntity: SectorItemListSchema;
+}
+
+export interface SectorDirectorySchemas {
+  collectionPage: SectorCollectionPageSchema;
+  itemList: SectorItemListSchema;
+}
+
 /**
  * `CollectionPage` JSON-LD for /sectors.
  *
@@ -408,13 +452,12 @@ export function collectLiveSectorLinks(
  * as the list it contains — the pattern the sibling /properties layout uses
  * for CollectionPage. Mirrors `app/properties/layout.tsx`.
  */
-export function buildSectorDirectorySchemas(groups: readonly CityGroup[]): {
-  collectionPage: Record<string, unknown>;
-  itemList: Record<string, unknown>;
-} {
+export function buildSectorDirectorySchemas(
+  groups: readonly CityGroup[],
+): SectorDirectorySchemas {
   const links = collectLiveSectorLinks(groups);
 
-  const itemList = {
+  const itemList: SectorItemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "Sector directory",
@@ -428,7 +471,7 @@ export function buildSectorDirectorySchemas(groups: readonly CityGroup[]): {
     })),
   };
 
-  const collectionPage = {
+  const collectionPage: SectorCollectionPageSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "@id": `${SITE_ORIGIN}/sectors`,
