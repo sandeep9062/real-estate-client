@@ -37,14 +37,14 @@ type Occupation =
 
 export interface RoommateProfileCardUser {
   _id: string;
-  name: string;
+  name?: string;
   avatarUrl?: string;
 }
 
 export interface RoommateProfileCardData {
   _id: string;
   type: "have_room" | "no_room";
-  user: RoommateProfileCardUser;
+  user?: RoommateProfileCardUser | null;
   photos?: string[];
   bio?: string;
   occupation?: Occupation;
@@ -191,6 +191,8 @@ export default function RoommateProfileCard({
   onLike,
 }: RoommateProfileCardProps) {
   const [imgError, setImgError] = useState(false);
+  const displayName = profile?.user?.name?.trim() || "Flatmate";
+  const displayInitial = (displayName.charAt(0) || "F").toUpperCase();
   const photo = !imgError ? profile.photos?.[0] : undefined;
   const location = locationLine(profile);
   const price = priceLine(profile);
@@ -222,19 +224,19 @@ export default function RoommateProfileCard({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={photo}
-            alt={profile.user.name}
+            alt={displayName}
             onError={() => setImgError(true)}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center font-heading text-3xl text-[#B7B2A6]">
-            {profile.user.name.charAt(0).toUpperCase()}
+            {displayInitial}
           </div>
         )}
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent px-3 pb-2 pt-6 text-white">
           <span className="font-heading text-base leading-none">
-            {profile.user.name}
+            {displayName}
           </span>
           {location && (
             <p className="mt-0.5 text-[11px] text-white/75">{location}</p>

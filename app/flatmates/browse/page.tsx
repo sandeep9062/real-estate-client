@@ -348,22 +348,27 @@ function BrowsePage() {
 
   const profiles: RoommateProfileCardData[] = useMemo(
     () =>
-      seekers.map(({ profile, matchScore }) => ({
-        _id: profile._id,
-        type: profile.type,
-        user: profile.user,
-        photos: profile.photos,
-        bio: profile.bio,
-        occupation: profile.occupation,
-        workSchedule: profile.workSchedule,
-        habits: profile.habits,
-        searchArea: profile.searchArea,
-        budgetRange: profile.budgetRange,
-        roomFlat: profile.roomFlat,
-        idVerified: profile.idVerified,
-        isComplete: profile.isComplete,
-        matchScore,
-      })),
+      seekers
+        .filter(({ profile }) => profile != null && profile._id != null)
+        .map(({ profile, matchScore }) => ({
+          _id: profile._id,
+          type: profile.type,
+          user:
+            profile.user != null
+              ? profile.user
+              : { _id: profile._id, name: "Flatmate" },
+          photos: profile.photos,
+          bio: profile.bio,
+          occupation: profile.occupation,
+          workSchedule: profile.workSchedule,
+          habits: profile.habits,
+          searchArea: profile.searchArea,
+          budgetRange: profile.budgetRange,
+          roomFlat: profile.roomFlat,
+          idVerified: profile.idVerified,
+          isComplete: profile.isComplete,
+          matchScore,
+        })),
     [seekers],
   );
 
@@ -396,7 +401,7 @@ function BrowsePage() {
         lat,
         lng,
         id: p._id,
-        title: p.user.name,
+        title: p.user?.name ?? "Flatmate",
         subtitle: [
           typeof rent === "number"
             ? `₹${rent.toLocaleString("en-IN")}/mo`
