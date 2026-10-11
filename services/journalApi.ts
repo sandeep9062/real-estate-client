@@ -1,27 +1,30 @@
+import { cache } from "react";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./api";
 import { getApiUrl } from "./propertiesApi";
 
-export async function getJournalBySlugServer(
-  slug: string,
-): Promise<Journal | null> {
-  const apiUrl = getApiUrl();
-  try {
-    const response = await fetch(`${apiUrl}/v1/journals/slug/${slug}`, {
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-    if (response.status === 404) return null;
-    if (!response.ok) {
-      console.error(`Journal API Error [${response.status}]`);
+// Cached so generateMetadata and the page share a single backend request
+// for the same slug within one render pass.
+export const getJournalBySlugServer = cache(
+  async (slug: string): Promise<Journal | null> => {
+    const apiUrl = getApiUrl();
+    try {
+      const response = await fetch(`${apiUrl}/v1/journals/slug/${slug}`, {
+        headers: { "Content-Type": "application/json" },
+        next: { revalidate: 300, tags: ["journal", `journal-${slug}`] },
+      });
+      if (response.status === 404) return null;
+      if (!response.ok) {
+        console.error(`Journal API Error [${response.status}]`);
+        return null;
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("getJournalBySlugServer error:", error);
       return null;
     }
-    return await response.json();
-  } catch (error) {
-    console.error("getJournalBySlugServer error:", error);
-    return null;
-  }
-}
+  },
+);
 
 /**
  * Interface matching the backend's PaginatedJournalsResponse.
@@ -188,7 +191,25 @@ export const journalApi = createApi({
     // Fetch single journal by Slug (Crucial for SEO-friendly URLs)
     getJournalBySlug: builder.query<Journal, string>({
       query: (slug) => `/v1/journals/slug/${slug}`,
-      providesTags: (result, error, slug) => [{ type: "Journal", slug }],
+      providesTags: (result) =>
+        result
+          ? [{ type: "Journal", id: result._id }]
+          : [{ type: "Journal", id: "LIST" }],
+    }),
+
+    // Public related-articles query: same category, excluding the current
+    // article. Hits the public GET /v1/journals (NOT the admin-only /all).
+    getPublicJournals: builder.query<
+      PaginatedJournalsResponse,
+      { category?: string; exclude?: string; limit?: number }
+    >({
+      query: (params) => ({
+        url: "/v1/journals",
+        params: {
+          limit: 4,
+          ...params,
+        },
+      }),
     }),
 
     // Track a view when the journal detail page is opened
@@ -262,6 +283,7 @@ export const {
   useLazyGetJournalsPageQuery,
   useGetJournalByIdQuery,
   useGetJournalBySlugQuery,
+  useGetPublicJournalsQuery,
   useGetJournalCategoriesQuery,
   useTrackJournalViewMutation,
   useCreateJournalMutation,
@@ -280,8 +302,10 @@ interface Journal {
   targetSector: string;
   location?: string;
   coverImage: string;
+  altText?: string;
   slug: string;
   metaTitle: string;
   keywords: string[];
   createdAt: string;
+  updatedAt?: string;
 }

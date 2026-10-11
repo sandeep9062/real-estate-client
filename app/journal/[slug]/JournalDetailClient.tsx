@@ -1,12 +1,9 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import {
   Container,
   Title,
   Text,
-  Image,
   Stack,
   Badge,
   Group,
@@ -17,7 +14,7 @@ import {
 } from "@mantine/core";
 import {
   useGetJournalBySlugQuery,
-  useGetJournalsQuery,
+  useGetPublicJournalsQuery,
   useTrackJournalViewMutation,
 } from "@/services/journalApi";
 import { useGetAllPropertiesQuery } from "@/services/propertiesApi";
@@ -29,65 +26,75 @@ import {
   IconChevronRight,
 } from "@tabler/icons-react";
 import PropertyCard from "@/components/PropertyCard";
+import JournalContent, {
+  AUTHOR_FALLBACK,
+} from "@/components/journal/JournalContent";
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 
 interface JournalDetailClientProps {
   slug: string;
-}
-
-// Ensure blank lines between markdown block elements (headers, lists, paragraphs)
-// Markdown requires \n\n (double newline) to recognize block-level elements
-function ensureMarkdownSpacing(content: string): string {
-  return (
-    content
-      // Ensure double newline BEFORE any heading line
-      .replace(/\n(#{1,6} .+)/g, "\n\n$1")
-      // Ensure double newline AFTER any heading line
-      .replace(/(#{1,6} .+)\n(?!\n)/g, "$1\n\n")
-      // Ensure double newline BEFORE any list item (starts with -, *, or number.)
-      .replace(/\n((?:[-*]|\d+\.) .+)/g, "\n\n$1")
-      // Ensure double newline AFTER any list item if next line is NOT also a list item
-      .replace(
-        /((?:[-*]|\d+\.) .+)\n(?!\n)(?!(?:\s*(?:[-*]|\d+\.) ))/g,
-        "$1\n\n",
-      )
-      // Normalize triple+ newlines to just double newlines
-      .replace(/\n{3,}/g, "\n\n")
-      // Trim leading/trailing whitespace
-      .trim()
-  );
+  initialJournal?: any;
 }
 
 export default function JournalDetailClient({
   slug,
+  initialJournal,
 }: JournalDetailClientProps) {
-  // 1. Fetch Journal Content
-  const { data: journal, isLoading: journalLoading } =
-    useGetJournalBySlugQuery(slug);
+  // 1. Fetch Journal Content -- skipped when the server already provided it,
+  // so the article HTML ships in the first server response, not a skeleton.
+  const { data: fetchedJournal, isLoading: journalLoading } =
+    useGetJournalBySlugQuery(slug, { skip: !!initialJournal });
+  const journal = initialJournal ?? fetchedJournal;
 
-  // 2. Fetch Related Journals (same category, excluding current)
-  const { data: allJournalsData } = useGetJournalsQuery({});
-
-  const allJournals = allJournalsData?.journals ?? [];
+  // 2. Fetch Related Journals via the PUBLIC endpoint (same category,
+  // excluding the current article server-side). Shows up to 3.
+  const { data: relatedData } = useGetPublicJournalsQuery(
+    {
+      category: journal?.category,
+      exclude: slug,
+      limit: 4,
+    },
+    { skip: !journal?.category },
+  );
 
   const relatedJournals = useMemo(() => {
-    if (!allJournals.length || !journal) return [];
-    return allJournals
-      .filter(
-        (j: any) => j._id !== journal._id && j.category === journal.category,
-      )
+    const list = relatedData?.journals ?? [];
+    return list
+      .filter((j: any) => j.slug !== slug && j._id !== journal?._id)
       .slice(0, 3);
-  }, [allJournals, journal]);
+  }, [relatedData, slug, journal]);
 
-  // 3. Fetch Related Properties (using the sector/city from the journal)
+  // 3. Fetch Related Properties (first comma-separated part of targetSector)
+  // NOTE: Use `sector` param instead of `search` because the backend's `sector`
+  // parameter does exact regex matching on `location.sector`, while `search` does
+  // a multi-token AND search across ALL text fields (too restrictive for sector
+  // queries like "Sector 16").
+  //
+  // targetSector can be in various formats:
+  //   - "Sector 16"                          → just a sector
+  //   - "Sector 16, Chandigarh"              → sector + city
+  //   - "Phase 2, Sector 16"                 → multiple sectors (pick correct one)
+  //   - "Cyber City Mohali"                  → place name
+  //   - "Mohali Sector 115"                  → city + sector
+  //
+  // Strategy: prefer the explicit "Sector <number>" pattern if present,
+  // otherwise fall back to the first comma-separated part, then the full string.
+  const targetSector = journal?.targetSector?.trim();
+  const sectorRegex = /Sector\s*\d+(?:[-–]\s*\d+)?/i;
+  const sectorQuery =
+    targetSector && sectorRegex.test(targetSector)
+      ? targetSector.match(sectorRegex)?.[0]
+      : targetSector
+      ? targetSector.split("," )[0]?.trim()
+      : undefined;
   const { data: relatedProps, isLoading: propsLoading } =
     useGetAllPropertiesQuery(
       {
-        search: journal?.targetSector,
+        sector: sectorQuery,
         limit: 3,
       },
-      { skip: !journal?.targetSector },
+      { skip: !sectorQuery },
     );
 
   // The backend now returns a paginated response: { success, count, total, pagination, data: [...] }
@@ -197,71 +204,30 @@ export default function JournalDetailClient({
           </Group>
           <Group gap={5} wrap="nowrap">
             <IconUser size={16} />
-            <Text size="sm">PropertyBulbul Editorial</Text>
+            <Text size="sm">{journal.author || AUTHOR_FALLBACK}</Text>
           </Group>
         </Group>
 
         <div className="w-full rounded-md overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={
               journal.coverImage ||
               "https://images.unsplash.com/photo-1590066305974-26999a08ec40?q=80&w=1200"
             }
-            alt={journal.title}
-            className="w-full h-auto block"
+            alt={journal.altText || journal.title}
+            width={1200}
+            height={630}
+            fetchPriority="high"
+            decoding="async"
+            className="block h-auto w-full"
+            style={{ aspectRatio: "1200 / 630", objectFit: "cover" }}
           />
         </div>
 
-        {/* Render journal content as markdown with responsive Tailwind styling */}
+        {/* Render journal content with the shared markdown renderer */}
         <div className="w-full max-w-none">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              a: ({ node, ...props }) => (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                  {...props}
-                />
-              ),
-              h1: ({ node, ...props }) => (
-                <h1
-                  className="font-heading text-2xl sm:text-3xl md:text-4xl my-4 sm:my-6"
-                  {...props}
-                />
-              ),
-              h2: ({ node, ...props }) => (
-                <h2
-                  className="text-xl sm:text-2xl md:text-3xl font-bold my-3 sm:my-5 border-b pb-2"
-                  {...props}
-                />
-              ),
-              h3: ({ node, ...props }) => (
-                <h3
-                  className="text-lg sm:text-xl md:text-2xl font-semibold my-3 sm:my-4"
-                  {...props}
-                />
-              ),
-              p: ({ node, ...props }) => (
-                <p
-                  className="text-sm sm:text-base text-gray-700 leading-relaxed my-3 sm:my-4"
-                  {...props}
-                />
-              ),
-              ul: ({ node, ...props }) => (
-                <ul
-                  className="list-disc ml-4 sm:ml-6 my-3 sm:my-4 space-y-1 sm:space-y-2"
-                  {...props}
-                />
-              ),
-              li: ({ node, ...props }) => (
-                <li className="text-sm sm:text-base text-gray-700" {...props} />
-              ),
-            }}
-          >
-            {ensureMarkdownSpacing(journal.content)}
-          </ReactMarkdown>
+          <JournalContent content={journal.content} />
         </div>
 
         <Divider my={50} label="Related Listings" labelPosition="center" />
@@ -271,18 +237,27 @@ export default function JournalDetailClient({
           <Title order={2} mb="xl" ta="center" className="text-xl sm:text-2xl">
             Properties in {journal.targetSector || "this area"}
           </Title>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {relatedProperties?.map((prop: any) => (
-              <PropertyCard key={prop._id} card={prop} />
-            ))}
-            {!propsLoading && relatedProperties?.length === 0 && (
-              <div className="col-span-full">
-                <Text ta="center" c="dimmed">
-                  No active listings in this sector currently.
-                </Text>
-              </div>
-            )}
-          </div>
+          {sectorQuery && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {relatedProperties?.map((prop: any) => (
+                <PropertyCard key={prop._id} card={prop} />
+              ))}
+              {relatedProperties?.length === 0 && (
+                <div className="col-span-full">
+                  <Text ta="center" c="dimmed">
+                    No active listings in this sector currently.
+                  </Text>
+                </div>
+              )}
+            </div>
+          )}
+          {!sectorQuery && (
+            <div className="col-span-full">
+              <Text ta="center" c="dimmed">
+                Search for a journal article to find properties in that sector.
+              </Text>
+            </div>
+          )}
         </div>
         {/* Related Journals */}
         {relatedJournals.length > 0 && (
@@ -360,7 +335,7 @@ export default function JournalDetailClient({
             radius="md"
             color="#4161df"
             component={Link}
-            href={`/properties?sector=${journal.targetSector}`}
+            href={`/properties?sector=${encodeURIComponent(journal.targetSector)}`}
             className="w-full sm:w-auto"
           >
             Explore All Listings

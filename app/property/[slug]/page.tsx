@@ -111,10 +111,9 @@ const PropertyPage = async ({ params }: Props) => {
 
   // Generate all schemas for property page
   const realEstateSchema = generateRealEstateSchema(data, canonicalSlug);
-  const faqSchema = generateFAQSchema(
-    data.description,
-    data?.location?.sector || data?.location?.city,
-  );
+  // FAQ schema now only renders when the article body contains a visible
+  // FAQ section; location-based common questions are no longer emitted.
+  const faqSchema = generateFAQSchema(data.description);
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "Home", item: "https://www.propertybulbul.com" },
     { name: "Properties", item: "https://www.propertybulbul.com/properties" },

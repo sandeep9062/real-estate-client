@@ -75,6 +75,7 @@ export function generateArticleSchema(journal: any, slug: string) {
   const canonicalUrl = `https://propertybulbul.com/journal/${slug}`;
   const imageUrl =
     journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
+  const authorName = journal.author || "PropertyBulbul Editorial";
 
   return {
     "@context": "https://schema.org",
@@ -88,7 +89,7 @@ export function generateArticleSchema(journal: any, slug: string) {
     dateModified: journal.updatedAt || journal.createdAt,
     author: {
       "@type": "Organization",
-      name: journal.author || "PropertyBulbul Editorial",
+      name: authorName,
       url: "https://propertybulbul.com",
     },
     publisher: {
@@ -108,36 +109,17 @@ export function generateArticleSchema(journal: any, slug: string) {
 }
 
 /**
- * Generate FAQPage Schema
- * Auto extracts FAQs from content or uses default location based questions
+ * Generate FAQPage Schema.
+ *
+ * Only emits output when the article markdown itself contains a visible
+ * "Frequently Asked Questions" section whose question headings are paired
+ * with their answers. Otherwise returns null (no invented FAQs -- emitting
+ * schema for questions that are not visible on the page is an SEO risk).
  */
-export function generateFAQSchema(content: string, location?: string) {
+export function generateFAQSchema(content: string) {
   if (!isServer) return null;
 
-  const faqs: Array<{ question: string; answer: string }> = [];
-
-  // Auto extract FAQ items from content if they exist
-  const extractedFaqs = extractFAQsFromContent(content);
-  faqs.push(...extractedFaqs);
-
-  // Add location specific common questions
-  if (location) {
-    faqs.push(
-      {
-        question: `Is ${location} safe to live?`,
-        answer: `${location} is considered one of the safest localities with excellent infrastructure, good connectivity, and low crime rates. It's a preferred residential area for families and professionals.`,
-      },
-      {
-        question: `What are property prices in ${location}?`,
-        answer: `Property prices in ${location} vary depending on property type, size, and amenities. Current rates range from ₹4,500 to ₹8,000 per sq ft for residential apartments.`,
-      },
-      {
-        question: `What facilities are available in ${location}?`,
-        answer: `${location} offers excellent amenities including schools, hospitals, shopping centers, parks, good road connectivity, and public transport facilities.`,
-      },
-    );
-  }
-
+  const faqs = extractFAQsFromVisibleSection(content);
   if (faqs.length === 0) return null;
 
   return {
@@ -195,27 +177,65 @@ function sanitizeText(text: string): string {
 }
 
 /**
- * Helper: Extract FAQ items from content looking for common patterns
+ * Helper: Extract FAQ items only from a visible "Frequently Asked Questions"
+ * markdown section. Question headings (### / #### / bold lines ending with ?)
+ * are paired with the paragraph(s) that follow them. Returns [] when there
+ * is no such section, so callers emit no FAQ schema.
  */
-function extractFAQsFromContent(
+function extractFAQsFromVisibleSection(
   content: string,
 ): Array<{ question: string; answer: string }> {
   const faqs: Array<{ question: string; answer: string }> = [];
   if (!content) return faqs;
 
-  // Look for Q: / A: patterns or FAQ sections
-  const faqRegex =
-    /(?:Q:|Question:|FAQ:)\s*(.*?)(?:\n|$)(?:A:|Answer:)\s*(.*?)(?=\n\n|\nQ:|\nQuestion:|$)/gis;
-  let match;
+  const lines = content.split("\n");
+  let inFaq = false;
+  let currentQuestion: string | null = null;
+  let currentAnswer: string[] = [];
 
-  while ((match = faqRegex.exec(content)) !== null) {
-    if (match[1] && match[2]) {
-      faqs.push({
-        question: stripHtml(match[1]).trim(),
-        answer: stripHtml(match[2]).trim(),
-      });
+  const flush = () => {
+    if (currentQuestion) {
+      const answer = currentAnswer.join(" ").trim();
+      if (answer) {
+        faqs.push({ question: currentQuestion, answer });
+      }
+    }
+    currentQuestion = null;
+    currentAnswer = [];
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    // A new top-level section ends the FAQ block.
+    if (inFaq && /^#{1,2}\s+/.test(line)) break;
+    if (!inFaq) {
+      if (/^#{2,3}\s+frequently asked questions\s*$/i.test(line)) inFaq = true;
+      continue;
+    }
+    if (!line) continue;
+    // Question: ### / #### heading, or a bold line ending with ?.
+    const headingMatch = line.match(/^#{3,4}\s+(.*)$/);
+    const boldMatch = line.match(/^\*\*(.+)\*\*$/);
+    const candidate = headingMatch
+      ? headingMatch[1].trim()
+      : boldMatch
+        ? boldMatch[1].trim()
+        : null;
+    if (candidate && candidate.endsWith("?")) {
+      flush();
+      currentQuestion = stripHtml(candidate);
+      continue;
+    }
+    if (currentQuestion) {
+      if (/^#{3,4}\s+/.test(line)) {
+        // Non-question sub-heading ends the current pair.
+        flush();
+        continue;
+      }
+      currentAnswer.push(stripHtml(line));
     }
   }
+  flush();
 
   return faqs;
 }
@@ -223,14 +243,16 @@ function extractFAQsFromContent(
 /**
  * Render Schema Script Tag safely
  */
-export function renderSchemaScript(id: string, schema: any) {
+export function renderSchemaScript(id: string, schema: unknown) {
   if (!schema || !isServer) return null;
 
   return (
     <script
       id={id}
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).split("<").join("\\u003c"),
+      }}
     />
   );
 }

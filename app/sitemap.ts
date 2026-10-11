@@ -5,6 +5,7 @@ import {
 } from "../lib/filterSlug";
 import { seoComboPath } from "../lib/rootSlugPatterns";
 import { eligibleLandmarkSeoCombos } from "../lib/seoListings";
+import { slugify } from "../lib/slugify";
 
 interface ApiProperty {
   _id: string;
@@ -215,12 +216,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       console.log(
         `Sitemap: Fetched ${rawJournals.length} journals for sitemap`,
       );
-      journalUrls = (rawJournals as ApiJournal[]).map((j) => ({
-        url: `${baseUrl}/journal/${j.slug}`,
-        lastModified: new Date(j.updatedAt || j.createdAt || Date.now()),
-        changeFrequency: "monthly" as const,
-        priority: 0.7,
-      }));
+      journalUrls = (rawJournals as ApiJournal[]).map((j) => {
+        // Backend stores clean slugs, but re-slugify here so a malformed
+        // char (e.g. a reserved | or trailing space) never leaks into the
+        // sitemap URL. slugify is idempotent, so clean slugs pass through.
+        const safeSlug = slugify(j.slug || j._id);
+        return {
+          url: `${baseUrl}/journal/${safeSlug}`,
+          lastModified: new Date(j.updatedAt || j.createdAt || Date.now()),
+          changeFrequency: "monthly" as const,
+          priority: 0.7,
+        };
+      });
     } else {
       console.warn(
         "Sitemap: journals sitemap-data is not an array. Type:",
