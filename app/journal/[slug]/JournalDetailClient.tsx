@@ -86,8 +86,8 @@ export default function JournalDetailClient({
     targetSector && sectorRegex.test(targetSector)
       ? targetSector.match(sectorRegex)?.[0]
       : targetSector
-      ? targetSector.split("," )[0]?.trim()
-      : undefined;
+        ? targetSector.split(",")[0]?.trim()
+        : undefined;
   const { data: relatedProps, isLoading: propsLoading } =
     useGetAllPropertiesQuery(
       {
@@ -213,7 +213,7 @@ export default function JournalDetailClient({
           <img
             src={
               journal.coverImage ||
-              "https://images.unsplash.com/photo-1590066305974-26999a08ec40?q=80&w=1200"
+              "https://propertybulbul.com/propertybulbul.png"
             }
             alt={journal.altText || journal.title}
             width={1200}
