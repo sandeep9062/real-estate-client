@@ -77,7 +77,7 @@ const PrivacyPolicy = () => {
       content:
         "If you have any questions regarding this Privacy Policy or want to request data changes, please contact us:",
       items: [],
-      email: "propertybulbul@gmail.com",
+      email: "bulbulproperty@gmail.com",
     },
   ];
 
