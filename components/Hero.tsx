@@ -118,7 +118,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
 
   const handleAddPropertyClick = () => {
     if (isAuthenticated) {
-      setModalOpened(true);
+      router.push("/add-property");
     } else {
       router.push("/login");
     }
