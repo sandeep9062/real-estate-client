@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState, Suspense } from "react";
+import type { ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Search,
   AlertCircle,
-  Loader2,
   MapPin,
   Map as MapIcon,
   List as ListIcon,
   RotateCcw,
   SlidersHorizontal,
   ChevronDown,
-  ChevronUp,
   X,
   IndianRupee,
   BadgeCheck,
@@ -24,6 +23,7 @@ import {
   Wine,
   UtensilsCrossed,
   Sparkles,
+  UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -93,6 +93,18 @@ const CLEAN_LEVELS = [
   { value: "relaxed", label: "Relaxed" },
 ];
 
+const SMOKING_OPTIONS = [
+  { value: "", label: "Any" },
+  { value: "yes", label: "Smoker" },
+  { value: "no", label: "Non-smoker" },
+];
+
+const DRINKING_OPTIONS = [
+  { value: "", label: "Any" },
+  { value: "yes", label: "Drinks" },
+  { value: "no", label: "Non-drinker" },
+];
+
 export interface FlatmatesFilters {
   city: string;
   type: string;
@@ -138,13 +150,9 @@ function countFilters(f: FlatmatesFilters): number {
 }
 
 // useSearchSeekersQuery hits /v1/roommates/seekers, which returns all active
-// roommate profiles — both have_room (people with a room to share) and
-// no_room (people looking for a room). It's the people-side counterpart to
-// useBrowseRoomsAndFlatsQuery (which browses RoomFlat listings).
-//
-// The endpoint populates `user` (at least _id/name/avatarUrl) and `roomFlat`
-// (for have_room profiles' location and rent) so the cards have everything
-// they need to render.
+// roommate profiles — both have_room and no_room. The endpoint populates
+// `user` (at least _id/name/avatarUrl) and `roomFlat` (for have_room profiles'
+// location and rent) so the cards have everything they need to render.
 interface SeekerResult {
   profile: Omit<RoommateProfile, "user" | "roomFlat"> & {
     user: RoommateProfileCardUser;
@@ -158,6 +166,88 @@ function getRefId(ref: unknown): string | undefined {
   if (typeof ref === "string") return ref;
   return (ref as { _id?: string })._id;
 }
+
+/* ------------------------------------------------------------------ */
+/* Small presentational helpers                                        */
+/* ------------------------------------------------------------------ */
+
+const FIELD_CLASS =
+  "h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 hover:border-gray-300 focus:border-[#4161df] focus:ring-2 focus:ring-[#4161df]/15";
+
+function FieldLabel({
+  icon,
+  children,
+}: {
+  icon?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <span className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-gray-600">
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+function SelectField({
+  label,
+  icon,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  icon?: ReactNode;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="block">
+      <FieldLabel icon={icon}>{label}</FieldLabel>
+      <span className="relative block">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`${FIELD_CLASS} appearance-none pr-9`}
+        >
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      </span>
+    </label>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div
+      className="overflow-hidden rounded-2xl border bg-white"
+      style={{ borderColor: BORDER }}
+    >
+      <div className="aspect-[4/3] animate-pulse bg-gray-100" />
+      <div className="space-y-3 p-4">
+        <div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" />
+        <div className="h-3 w-full animate-pulse rounded bg-gray-100" />
+        <div className="h-3 w-4/5 animate-pulse rounded bg-gray-100" />
+        <div className="flex gap-2 pt-1">
+          <div className="h-5 w-14 animate-pulse rounded bg-gray-100" />
+          <div className="h-5 w-16 animate-pulse rounded bg-gray-100" />
+          <div className="h-5 w-12 animate-pulse rounded bg-gray-100" />
+        </div>
+        <div className="h-10 w-full animate-pulse rounded-xl bg-gray-100" />
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Page content                                                        */
+/* ------------------------------------------------------------------ */
 
 function FlatmatesContent() {
   const router = useRouter();
@@ -190,9 +280,7 @@ function FlatmatesContent() {
   const [toggleFavRoommateProfile] = useToggleFavRoommateProfileMutation();
   const currentUser = useSelector(selectUser);
 
-  // Keep the city filter in sync with the ?city= URL param. This covers
-  // in-app navigation between city chips (the page component stays mounted),
-  // so the applied city always matches the URL.
+  // Keep the city filter in sync with the ?city= URL param.
   useEffect(() => {
     setFilters((f) => (f.city === urlCity ? f : { ...f, city: urlCity }));
     setApplied((a) => (a.city === urlCity ? a : { ...a, city: urlCity }));
@@ -201,9 +289,23 @@ function FlatmatesContent() {
   const activeFiltersCount = useMemo(() => countFilters(filters), [filters]);
   const appliedCount = useMemo(() => countFilters(applied), [applied]);
 
+  // Advanced filters = everything except city, budget and profile type, which
+  // are always visible. Used for the badge on the "More filters" button.
+  const advancedCount = useMemo(() => {
+    const keys: (keyof FlatmatesFilters)[] = [
+      "gender",
+      "occupation",
+      "smoking",
+      "drinking",
+      "foodPreference",
+      "cleanliness",
+      "idVerified",
+    ];
+    return keys.filter((k) => filters[k] !== "" && filters[k] !== false).length;
+  }, [filters]);
+
   // Profile ids with a pending outgoing request, derived straight from the
-  // live connections list (no effect/state sync needed, and it clears itself
-  // when a request is accepted, declined or withdrawn).
+  // live connections list.
   const pendingIds = useMemo(() => {
     const ids = new Set<string>();
     (connectionsData ?? []).forEach((c) => {
@@ -256,6 +358,12 @@ function FlatmatesContent() {
     value: FlatmatesFilters[K],
   ) {
     setFilters((f) => ({ ...f, [key]: value }));
+  }
+
+  // Profile type tabs apply immediately — no need to press Search.
+  function selectType(value: string) {
+    setFilters((f) => ({ ...f, type: value }));
+    setApplied((a) => ({ ...a, type: value }));
   }
 
   function removeAppliedChip(key: keyof FlatmatesFilters) {
@@ -415,327 +523,166 @@ function FlatmatesContent() {
     return pins;
   }, [profiles]);
 
+  const mapColumnVisible = laptopMapOpen;
+
   return (
-    <div className="relative min-h-screen w-full bg-gray-50">
-      {/* Mobile: list / map toggle — right-center, same as /properties */}
-      <div className="fixed right-4 top-1/2 z-[1000] -translate-y-1/2 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
-          className="flex transform flex-col items-center gap-1 rounded-2xl bg-[#4161df] px-2 py-3 text-white shadow-2xl transition-all hover:bg-[#3451c9] active:scale-95"
-          aria-label={activeTab === "list" ? "Open map view" : "Open list view"}
-        >
-          {activeTab === "list" ? (
-            <>
-              <MapIcon className="h-4 w-4" />
-              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
-                Map
-              </span>
-            </>
-          ) : (
-            <>
-              <ListIcon className="h-4 w-4" />
-              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
-                List
-              </span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Laptop: show / hide map column — right-center, same as /properties */}
-      <div className="fixed right-4 top-1/2 z-[1000] hidden -translate-y-1/2 lg:flex">
-        <button
-          type="button"
-          onClick={() => setLaptopMapOpen((o) => !o)}
-          className="flex transform flex-col items-center gap-1 rounded-2xl bg-[#4161df] px-3 py-4 text-white shadow-2xl transition-all hover:bg-[#3451c9] active:scale-95"
-          aria-label={
-            laptopMapOpen
-              ? "Hide map, expand listings"
-              : "Show map beside listings"
-          }
-        >
-          {laptopMapOpen ? (
-            <>
-              <ListIcon className="h-5 w-5" />
-              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
-                Hide
-              </span>
-            </>
-          ) : (
-            <>
-              <MapIcon className="h-5 w-5" />
-              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
-                Map
-              </span>
-            </>
-          )}
-        </button>
-      </div>
-
-      <main className="mx-auto w-full max-w-full flex flex-col items-center gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12">
-        <div className="w-full text-center">
-          <h1 className="mb-2 text-xl font-bold text-gray-900 sm:mb-3 sm:text-2xl md:mb-4 md:text-3xl">
-            Find a Flatmate in Tricity
+    <div className="relative min-h-screen w-full bg-[#F7F8FC]">
+      {/* ---------------------------------------------------------------- */}
+      {/* Header                                                            */}
+      {/* ---------------------------------------------------------------- */}
+      <header className="border-b bg-white" style={{ borderColor: BORDER }}>
+        <div className="mx-auto w-full max-w-[1400px] px-4 pb-6 pt-8 sm:px-6 md:px-10 md:pb-8 md:pt-12">
+          <h1
+            className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl"
+            style={{ color: INK }}
+          >
+            Find a flatmate in the Tricity
           </h1>
-          <p className="px-2 text-sm text-gray-600 sm:text-base md:text-lg">
-            Browse verified flatmates in Chandigarh, Panchkula, Mohali &amp;
-            more.
+          <p
+            className="mt-2 max-w-2xl text-sm leading-relaxed sm:text-base"
+            style={{ color: INK_SOFT }}
+          >
+            Browse people with a spare room or looking for one in Chandigarh,
+            Panchkula, Mohali and nearby. Filter by budget, lifestyle and ID
+            verification to find a good fit.
           </p>
         </div>
+      </header>
 
+      <main className="mx-auto w-full max-w-[1400px] px-4 pb-24 pt-6 sm:px-6 md:px-10 md:pt-8 lg:pb-12">
+        {/* -------------------------------------------------------------- */}
+        {/* Search panel                                                    */}
+        {/* -------------------------------------------------------------- */}
         <form
           onSubmit={runSearch}
-          className="mt-6 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+          className="rounded-2xl border bg-white shadow-[0_1px_2px_rgba(22,26,46,0.04)]"
+          style={{ borderColor: BORDER }}
         >
-          <div className="border-b border-gray-100 bg-gray-50/50 px-4 py-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4161df]">
-                  <Search className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-gray-900">
-                    Search flatmates
-                  </h2>
-                  <p className="hidden text-[11px] text-gray-500 sm:block">
-                    {appliedCount > 0
-                      ? `${appliedCount} filter${appliedCount > 1 ? "s" : ""} applied`
-                      : "Apply filters to refine your search"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {activeFiltersCount > 0 && (
+          {/* Profile type segmented control */}
+          <div
+            className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-5"
+            style={{ borderColor: BORDER }}
+          >
+            <div
+              role="tablist"
+              aria-label="Profile type"
+              className="inline-flex max-w-full overflow-x-auto rounded-xl bg-[#F1F3FA] p-1"
+            >
+              {PROFILE_TYPES.map((t) => {
+                const Icon = t.icon;
+                const active = filters.type === t.value;
+                return (
                   <button
+                    key={t.value || "all"}
                     type="button"
-                    onClick={clearFilters}
-                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => selectType(t.value)}
+                    className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-colors sm:text-sm ${
+                      active
+                        ? "bg-white text-[#4161df] shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
                   >
-                    <RotateCcw className="h-3 w-3" />
-                    <span className="hidden sm:inline">Clear</span>
+                    <Icon className="h-3.5 w-3.5" />
+                    {t.label}
                   </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setFiltersOpen((o) => !o)}
-                  aria-expanded={filtersOpen}
-                  className="flex items-center gap-1 rounded-md bg-[#4161df] px-3 py-1.5 text-xs font-medium text-white transition-colors md:hidden"
-                >
-                  <SlidersHorizontal className="h-3.5 w-3.5" />
-                  Filters
-                  {activeFiltersCount > 0 && (
-                    <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0.5 text-[10px]">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                  {filtersOpen ? (
-                    <ChevronUp className="ml-1 h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronDown className="ml-1 h-3.5 w-3.5" />
-                  )}
-                </button>
-              </div>
+                );
+              })}
             </div>
+
+            {activeFiltersCount > 0 && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Clear all
+              </button>
+            )}
           </div>
 
-          <div className={`${filtersOpen ? "block" : "hidden"} p-4 md:block`}>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_auto]">
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <MapPin className="h-3.5 w-3.5" />
+          {/* Primary row */}
+          <div className="p-4 sm:p-5">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-[1.6fr_1fr_1fr_auto]">
+              <label className="col-span-2 block lg:col-span-1">
+                <FieldLabel icon={<MapPin className="h-3.5 w-3.5" />}>
                   City
-                </span>
+                </FieldLabel>
                 <span className="relative block">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <input
-                    placeholder="e.g. Mohali, Chandigarh…"
+                    placeholder="e.g. Mohali, Chandigarh"
                     value={filters.city}
                     onChange={(e) => updateFilter("city", e.target.value)}
-                    className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                    className={`${FIELD_CLASS} pl-9`}
                   />
                 </span>
               </label>
               <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <IndianRupee className="h-3.5 w-3.5" />
+                <FieldLabel icon={<IndianRupee className="h-3.5 w-3.5" />}>
                   Min budget
-                </span>
+                </FieldLabel>
                 <input
                   type="number"
                   min={0}
+                  inputMode="numeric"
                   placeholder="₹ min"
                   value={filters.minBudget}
                   onChange={(e) => updateFilter("minBudget", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                  className={FIELD_CLASS}
                 />
               </label>
               <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <IndianRupee className="h-3.5 w-3.5" />
+                <FieldLabel icon={<IndianRupee className="h-3.5 w-3.5" />}>
                   Max budget
-                </span>
+                </FieldLabel>
                 <input
                   type="number"
                   min={0}
+                  inputMode="numeric"
                   placeholder="₹ max"
                   value={filters.maxBudget}
                   onChange={(e) => updateFilter("maxBudget", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                  className={FIELD_CLASS}
                 />
               </label>
-              <div className="flex items-end">
+              <div className="col-span-2 flex items-end gap-2 lg:col-span-1">
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                  aria-expanded={filtersOpen}
+                  aria-controls="advanced-filters"
+                  className="relative inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50 lg:flex-none"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  More filters
+                  {advancedCount > 0 && (
+                    <span className="rounded-full bg-[#4161df] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                      {advancedCount}
+                    </span>
+                  )}
+                  <ChevronDown
+                    className={`h-4 w-4 text-gray-400 transition-transform ${
+                      filtersOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
                 <button
                   type="submit"
-                  className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#3451c9] sm:w-auto"
+                  className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#3451c9] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4161df] lg:flex-none"
                 >
-                  <Search className="h-3.5 w-3.5" />
+                  <Search className="h-4 w-4" />
                   Search
                 </button>
               </div>
             </div>
 
-            {/* Row 2: Profile type + Gender + Occupation */}
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <Users className="h-3.5 w-3.5" />
-                  Profile type
-                </span>
-                <select
-                  value={filters.type}
-                  onChange={(e) => updateFilter("type", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  {PROFILE_TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  Gender
-                </span>
-                <select
-                  value={filters.gender}
-                  onChange={(e) => updateFilter("gender", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  {GENDERS.map((g) => (
-                    <option key={g.value} value={g.value}>
-                      {g.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <Briefcase className="h-3.5 w-3.5" />
-                  Occupation
-                </span>
-                <select
-                  value={filters.occupation}
-                  onChange={(e) => updateFilter("occupation", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  {OCCUPATIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            {/* Row 3: Lifestyle */}
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <Cigarette className="h-3.5 w-3.5" />
-                  Smoking
-                </span>
-                <select
-                  value={filters.smoking}
-                  onChange={(e) => updateFilter("smoking", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  <option value="">Any</option>
-                  <option value="yes">Smoker</option>
-                  <option value="no">Non-smoker</option>
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <Wine className="h-3.5 w-3.5" />
-                  Drinking
-                </span>
-                <select
-                  value={filters.drinking}
-                  onChange={(e) => updateFilter("drinking", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  <option value="">Any</option>
-                  <option value="yes">Drinks</option>
-                  <option value="no">Non-drinker</option>
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <UtensilsCrossed className="h-3.5 w-3.5" />
-                  Food habit
-                </span>
-                <select
-                  value={filters.foodPreference}
-                  onChange={(e) =>
-                    updateFilter("foodPreference", e.target.value)
-                  }
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  {FOOD_PREFS.map((f) => (
-                    <option key={f.value} value={f.value}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Cleanliness
-                </span>
-                <select
-                  value={filters.cleanliness}
-                  onChange={(e) => updateFilter("cleanliness", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
-                >
-                  {CLEAN_LEVELS.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            {/* Row 4: Verified + Budget presets */}
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 transition-colors hover:border-[#4161df]/30">
-                <input
-                  type="checkbox"
-                  checked={filters.idVerified}
-                  onChange={(e) => updateFilter("idVerified", e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 accent-[#4161df]"
-                />
-                <BadgeCheck className="h-3.5 w-3.5 text-[#4161df]" />
-                <span className="text-sm font-medium text-gray-700">
-                  Verified only
-                </span>
-              </label>
-              <div className="hidden h-6 w-px bg-gray-200 sm:block" />
-              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
-                Budget:
+            {/* Budget presets */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-xs font-medium text-gray-500">
+                Quick budget
               </span>
               {BUDGET_PRESETS.map((p) => {
                 const isActive =
@@ -744,16 +691,17 @@ function FlatmatesContent() {
                   <button
                     key={p.label}
                     type="button"
+                    aria-pressed={isActive}
                     onClick={() =>
                       setFilters((f) => ({
                         ...f,
-                        minBudget: p.min,
-                        maxBudget: p.max,
+                        minBudget: isActive ? "" : p.min,
+                        maxBudget: isActive ? "" : p.max,
                       }))
                     }
                     className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                       isActive
-                        ? "border-[#4161df] bg-[#4161df]/5 text-[#4161df]"
+                        ? "border-[#4161df] bg-[#4161df]/10 text-[#4161df]"
                         : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
@@ -763,181 +711,317 @@ function FlatmatesContent() {
               })}
             </div>
 
-            {/* Active filter chips */}
-            {appliedCount > 0 && (
-              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
-                  Active:
-                </span>
-                <ActiveFilterChips
-                  applied={applied}
-                  onRemoveChip={removeAppliedChip}
-                  onClearAll={clearFilters}
+            {/* Advanced filters */}
+            <div
+              id="advanced-filters"
+              className={`${filtersOpen ? "block" : "hidden"} mt-4 border-t pt-4`}
+              style={{ borderColor: BORDER }}
+            >
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <SelectField
+                  label="Gender"
+                  icon={<UserRound className="h-3.5 w-3.5" />}
+                  value={filters.gender}
+                  onChange={(v) => updateFilter("gender", v)}
+                  options={GENDERS}
                 />
+                <SelectField
+                  label="Occupation"
+                  icon={<Briefcase className="h-3.5 w-3.5" />}
+                  value={filters.occupation}
+                  onChange={(v) => updateFilter("occupation", v)}
+                  options={OCCUPATIONS}
+                />
+                <SelectField
+                  label="Food habit"
+                  icon={<UtensilsCrossed className="h-3.5 w-3.5" />}
+                  value={filters.foodPreference}
+                  onChange={(v) => updateFilter("foodPreference", v)}
+                  options={FOOD_PREFS}
+                />
+                <SelectField
+                  label="Cleanliness"
+                  icon={<Sparkles className="h-3.5 w-3.5" />}
+                  value={filters.cleanliness}
+                  onChange={(v) => updateFilter("cleanliness", v)}
+                  options={CLEAN_LEVELS}
+                />
+                <SelectField
+                  label="Smoking"
+                  icon={<Cigarette className="h-3.5 w-3.5" />}
+                  value={filters.smoking}
+                  onChange={(v) => updateFilter("smoking", v)}
+                  options={SMOKING_OPTIONS}
+                />
+                <SelectField
+                  label="Drinking"
+                  icon={<Wine className="h-3.5 w-3.5" />}
+                  value={filters.drinking}
+                  onChange={(v) => updateFilter("drinking", v)}
+                  options={DRINKING_OPTIONS}
+                />
+                <div className="flex items-end sm:col-span-2">
+                  <label className="flex h-10 w-full cursor-pointer items-center gap-2.5 rounded-lg border border-gray-200 bg-white px-3 transition-colors hover:border-[#4161df]/40">
+                    <input
+                      type="checkbox"
+                      checked={filters.idVerified}
+                      onChange={(e) =>
+                        updateFilter("idVerified", e.target.checked)
+                      }
+                      className="h-4 w-4 rounded border-gray-300 accent-[#4161df]"
+                    />
+                    <BadgeCheck className="h-4 w-4 text-[#4161df]" />
+                    <span className="text-sm font-medium text-gray-700">
+                      Show ID-verified profiles only
+                    </span>
+                  </label>
+                </div>
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Applied filter chips */}
+          {appliedCount > 0 && (
+            <div
+              className="flex flex-wrap items-center gap-2 border-t bg-[#FAFBFE] px-4 py-3 sm:px-5"
+              style={{ borderColor: BORDER }}
+            >
+              <span className="text-xs font-medium text-gray-500">
+                Showing results for
+              </span>
+              <ActiveFilterChips
+                applied={applied}
+                onRemoveChip={removeAppliedChip}
+              />
+            </div>
+          )}
         </form>
 
+        {/* -------------------------------------------------------------- */}
+        {/* Error                                                           */}
+        {/* -------------------------------------------------------------- */}
         {error && (
           <div
-            className="mt-4 flex items-center gap-2.5 rounded-xl border-l-[3px] bg-rose-50/70 px-4 py-3"
-            style={{ borderLeftColor: "#e11d48" }}
+            role="alert"
+            className="mt-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3"
           >
-            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-            <p className="text-sm text-rose-700">{getErrorMessage(error)}</p>
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+            <div>
+              <p className="text-sm font-medium text-rose-800">
+                We couldn&apos;t load profiles
+              </p>
+              <p className="text-sm text-rose-700">{getErrorMessage(error)}</p>
+            </div>
           </div>
         )}
 
-        <div className="mt-8">
+        {/* -------------------------------------------------------------- */}
+        {/* Results                                                         */}
+        {/* -------------------------------------------------------------- */}
+        <section className="mt-8" aria-live="polite">
+          {/* Loading skeletons */}
           {loading && (
-            <div className="flex items-center justify-center gap-2.5 py-10">
-              <Loader2
-                className="h-5 w-5 animate-spin"
-                style={{ color: BRAND }}
-              />
-              <p className="text-sm" style={{ color: INK_SOFT }}>
-                Searching…
-              </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
             </div>
           )}
 
-          {!loading &&
-            markers.length > 0 &&
-            activeTab === "list" &&
-            !laptopMapOpen && (
-              <div
-                className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3 lg:hidden"
-                style={{ borderColor: BORDER }}
-              >
-                <MapPin className="h-4 w-4 shrink-0" style={{ color: BRAND }} />
-                <p className="text-xs" style={{ color: INK_SOFT }}>
-                  {markers.length}{" "}
-                  {markers.length === 1 ? "profile has" : "profiles have"} a map
-                  location — tap the Map button on the right to view.
-                </p>
-              </div>
-            )}
-
-          {!loading && markers.length === 0 && profiles.length > 0 && (
-            <div
-              className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3"
-              style={{ borderColor: BORDER }}
-            >
-              <MapPin
-                className="h-4 w-4 shrink-0"
-                style={{ color: "#9CA3AF" }}
-              />
-              <p className="text-xs" style={{ color: INK_SOFT }}>
-                These profiles don&apos;t have a map location saved yet — ask
-                them to add one during onboarding.
-              </p>
-            </div>
-          )}
-
+          {/* Empty state */}
           {!loading && !error && profiles.length === 0 && (
             <div
-              className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
+              className="flex flex-col items-center gap-3 rounded-2xl border border-dashed bg-white px-6 py-16 text-center"
               style={{ borderColor: BORDER }}
             >
-              <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
-              <p className="text-sm" style={{ color: INK_SOFT }}>
-                No profiles match yet — try widening the city or budget range.
-              </p>
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#4161df]/10">
+                <Search className="h-5 w-5 text-[#4161df]" />
+              </span>
+              <div>
+                <p className="text-base font-semibold" style={{ color: INK }}>
+                  No profiles match these filters
+                </p>
+                <p className="mt-1 text-sm" style={{ color: INK_SOFT }}>
+                  Try a nearby city, a wider budget range, or remove a lifestyle
+                  filter.
+                </p>
+              </div>
+              {appliedCount > 0 && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Clear all filters
+                </button>
+              )}
             </div>
           )}
 
           {!loading && profiles.length > 0 && (
-            <div
-              className={`grid grid-cols-1 items-start gap-6 ${laptopMapOpen ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}
-            >
-              {/* List Section */}
-              <div
-                className={`${activeTab === "list" ? "block" : "hidden"} order-2 min-w-0 space-y-3 lg:order-1 lg:block`}
-              >
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-sm font-medium text-gray-700">
-                    {profiles.length} profile
-                    {profiles.length !== 1 ? "s" : ""}
-                  </p>
-                  <span className="text-xs text-gray-500 sm:text-sm">
+            <>
+              {/* Results header */}
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2
+                    className="text-base font-semibold sm:text-lg"
+                    style={{ color: INK }}
+                  >
+                    {profiles.length} profile{profiles.length !== 1 ? "s" : ""}
+                    {applied.city ? ` in ${applied.city}` : ""}
+                  </h2>
+                  <p className="mt-0.5 text-xs" style={{ color: INK_SOFT }}>
                     {markers.length > 0
-                      ? `${markers.length} with map location`
-                      : "No map locations yet"}
-                  </span>
+                      ? `${markers.length} with a map location`
+                      : "None have a map location saved yet"}
+                  </p>
                 </div>
-                {/* Fewer columns when the map column is open so cards don't get cramped */}
-                <div
-                  className={`grid gap-3 sm:grid-cols-2 ${
-                    laptopMapOpen
-                      ? "xl:grid-cols-2"
-                      : "sm:grid-cols-3 xl:grid-cols-4"
-                  }`}
+
+                {/* Desktop map toggle */}
+                <button
+                  type="button"
+                  onClick={() => setLaptopMapOpen((o) => !o)}
+                  aria-pressed={laptopMapOpen}
+                  className="hidden items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 lg:inline-flex"
                 >
-                  {profiles.map((p) => (
-                    <RoommateProfileCard
-                      key={p._id}
-                      profile={p}
-                      saved={savedIds.has(p._id)}
-                      liked={likedIds.has(p._id)}
-                      connected={hasPendingRequest(p._id)}
-                      onView={(id) => router.push(`/flatmates/profile/${id}`)}
-                      onSave={toggleSaved}
-                      onLike={toggleLiked}
-                      onConnect={handleConnect}
-                      onCancel={handleCancelConnection}
-                    />
-                  ))}
-                </div>
+                  {laptopMapOpen ? (
+                    <>
+                      <ListIcon className="h-4 w-4" />
+                      Hide map
+                    </>
+                  ) : (
+                    <>
+                      <MapIcon className="h-4 w-4" />
+                      Show map
+                    </>
+                  )}
+                </button>
               </div>
 
-              {/* Map Section — sticky on desktop, toggled by right-center button */}
               <div
-                className={`${activeTab === "map" ? "block" : "hidden"} ${laptopMapOpen ? "lg:block" : "lg:hidden"} z-10 order-1 w-full min-w-0 self-start lg:sticky lg:top-24 lg:order-2`}
+                className={`grid grid-cols-1 items-start gap-6 ${
+                  mapColumnVisible
+                    ? "lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]"
+                    : "lg:grid-cols-1"
+                }`}
               >
-                {markers.length > 0 ? (
+                {/* List */}
+                <div
+                  className={`${activeTab === "list" ? "block" : "hidden"} min-w-0 lg:order-1 lg:block`}
+                >
                   <div
-                    className="overflow-hidden rounded-2xl border bg-white"
-                    style={{ borderColor: BORDER }}
+                    className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${
+                      mapColumnVisible
+                        ? "2xl:grid-cols-3"
+                        : "lg:grid-cols-3 xl:grid-cols-4"
+                    }`}
                   >
-                    <div className="flex items-center justify-between px-4 pt-3">
-                      <p
-                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
-                        style={{ color: INK }}
-                      >
-                        <MapPin className="h-4 w-4" style={{ color: BRAND }} />
-                        {markers.length}{" "}
-                        {markers.length === 1 ? "profile" : "profiles"} on map
-                      </p>
-                      <p className="text-xs" style={{ color: INK_SOFT }}>
-                        Click a pin for budget &amp; area
-                      </p>
-                    </div>
-                    <div className="p-3">
-                      <div className="w-full overflow-hidden rounded-xl border border-gray-200">
-                        <MapView markers={markers} />
+                    {profiles.map((p) => (
+                      <RoommateProfileCard
+                        key={p._id}
+                        profile={p}
+                        saved={savedIds.has(p._id)}
+                        liked={likedIds.has(p._id)}
+                        connected={hasPendingRequest(p._id)}
+                        onView={(id) => router.push(`/flatmates/profile/${id}`)}
+                        onSave={toggleSaved}
+                        onLike={toggleLiked}
+                        onConnect={handleConnect}
+                        onCancel={handleCancelConnection}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Map — sticky on desktop */}
+                <div
+                  className={`${activeTab === "map" ? "block" : "hidden"} ${
+                    mapColumnVisible ? "lg:block" : "lg:hidden"
+                  } z-10 w-full min-w-0 self-start lg:sticky lg:top-24 lg:order-2`}
+                >
+                  {markers.length > 0 ? (
+                    <div
+                      className="overflow-hidden rounded-2xl border bg-white"
+                      style={{ borderColor: BORDER }}
+                    >
+                      <div className="flex items-center justify-between gap-2 px-4 py-3">
+                        <p
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                          style={{ color: INK }}
+                        >
+                          <MapPin
+                            className="h-4 w-4"
+                            style={{ color: BRAND }}
+                          />
+                          {markers.length}{" "}
+                          {markers.length === 1 ? "profile" : "profiles"} on map
+                        </p>
+                        <p className="text-xs" style={{ color: INK_SOFT }}>
+                          Select a pin for budget and area
+                        </p>
+                      </div>
+                      <div className="px-3 pb-3">
+                        <div className="w-full overflow-hidden rounded-xl border border-gray-200">
+                          <MapView markers={markers} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
-                    style={{ borderColor: BORDER }}
-                  >
-                    <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
-                    <p className="text-sm" style={{ color: INK_SOFT }}>
-                      No map locations for these results yet.
-                    </p>
-                  </div>
-                )}
+                  ) : (
+                    <div
+                      className="flex flex-col items-center gap-2 rounded-2xl border border-dashed bg-white py-14 text-center"
+                      style={{ borderColor: BORDER }}
+                    >
+                      <MapPin className="h-6 w-6 text-gray-400" />
+                      <p className="text-sm" style={{ color: INK_SOFT }}>
+                        None of these profiles have a map location yet.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           )}
-        </div>
+        </section>
       </main>
+
+      {/* Mobile / tablet: floating list-map switch */}
+      {!loading && profiles.length > 0 && (
+        <div className="fixed inset-x-0 bottom-5 z-[1000] flex justify-center lg:hidden">
+          <button
+            type="button"
+            onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
+            className="inline-flex items-center gap-2 rounded-full bg-[#161A2E] px-5 py-3 text-sm font-semibold text-white shadow-xl transition-transform active:scale-95"
+            aria-label={
+              activeTab === "list" ? "Open map view" : "Open list view"
+            }
+          >
+            {activeTab === "list" ? (
+              <>
+                <MapIcon className="h-4 w-4" />
+                Map
+                {markers.length > 0 && (
+                  <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] leading-none">
+                    {markers.length}
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <ListIcon className="h-4 w-4" />
+                List
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Active filter chips                                                 */
+/* ------------------------------------------------------------------ */
 
 const FILTER_LABELS: Record<string, string> = {
   city: "City",
@@ -979,11 +1063,9 @@ const FILTER_VALUE_LABELS: Record<string, Record<string, string>> = {
 function ActiveFilterChips({
   applied,
   onRemoveChip,
-  onClearAll,
 }: {
   applied: FlatmatesFilters;
   onRemoveChip: (key: keyof FlatmatesFilters) => void;
-  onClearAll: () => void;
 }) {
   const chips: { key: keyof FlatmatesFilters; label: string }[] = [];
 
@@ -1018,7 +1100,7 @@ function ActiveFilterChips({
       {chips.map((chip) => (
         <span
           key={chip.key}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/20 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-xs font-medium text-[#4161df]"
+          className="inline-flex items-center gap-1 rounded-full border border-[#4161df]/20 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-xs font-medium text-[#3451c9]"
         >
           {chip.label}
           <button
@@ -1031,14 +1113,6 @@ function ActiveFilterChips({
           </button>
         </span>
       ))}
-      <button
-        type="button"
-        onClick={onClearAll}
-        className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-500 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600"
-      >
-        <RotateCcw className="h-3 w-3" />
-        Clear all
-      </button>
     </>
   );
 }
