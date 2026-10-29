@@ -40,12 +40,12 @@ const CONTACT_DETAILS: {
   value: string;
   href?: string;
 }[] = [
-  // {
-  //   icon: Phone,
-  //   label: "Call us",
-  //   value: "+91 9729907448",
-  //   href: "tel:+91 9729907448",
-  // },
+  {
+    icon: Phone,
+    label: "Call us",
+    value: "+91 9729907448",
+    href: "tel:+91 9729907448",
+  },
   {
     icon: Mail,
     label: "Email us",
