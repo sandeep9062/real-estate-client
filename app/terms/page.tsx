@@ -54,7 +54,7 @@ const TermsAndConditions = () => {
       items: [
         "Keep your login credentials confidential — you are responsible for all activity carried out through your account.",
         "One account per person or business, unless we authorise otherwise in writing.",
-        "Notify us immediately at propertybulbul@gmail.com of any unauthorised use of your account.",
+        "Notify us immediately at bulbulproperty@gmail.com of any unauthorised use of your account.",
         "We may verify your identity, contact details, or business documents (such as RERA registration, GSTIN, or PAN) before enabling certain features.",
       ],
     },
@@ -169,7 +169,7 @@ const TermsAndConditions = () => {
       content:
         "These Terms are governed by and construed in accordance with the laws of India. Subject to applicable law, the courts at Chandigarh shall have exclusive jurisdiction over any dispute arising out of or in connection with the Platform or these Terms.",
       items: [
-        "Before pursuing legal action, both parties agree to attempt to resolve disputes amicably by writing to propertybulbul@gmail.com.",
+        "Before pursuing legal action, both parties agree to attempt to resolve disputes amicably by writing to bulbulproperty@gmail.com.",
       ],
     },
     {
@@ -188,7 +188,7 @@ const TermsAndConditions = () => {
       content:
         "If you have questions, concerns, or complaints about these Terms or the Platform, please reach out to our Grievance Officer designated under the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021:",
       items: [],
-      email: "propertybulbul@gmail.com",
+      email: "bulbulproperty@gmail.com",
     },
   ];
 
