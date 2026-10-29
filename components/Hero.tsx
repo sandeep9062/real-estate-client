@@ -7,7 +7,7 @@ import SearchBar, { SearchFilters } from "./SearchBar";
 import Link from "next/link";
 import Image from "next/image";
 import { getApiUrl } from "../services/propertiesApi";
-import AddPropertyModal from "./AddPropertyModal";
+
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { selectIsAuthenticated, selectUser } from "@/store/authSlice";
@@ -105,7 +105,6 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
 
   const display = stats || { properties: 181, projects: 3, cities: 5 };
   const router = useRouter();
-  const [modalOpened, setModalOpened] = useState(false);
 
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
@@ -227,7 +226,6 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
                 List Your Property
               </button>
             </div>
-            <AddPropertyModal opened={modalOpened} setOpened={setModalOpened} />
 
             {/* CITIES WE COVER */}
             <div className="mt-1 xs:mt-2 sm:mt-2 flex flex-wrap justify-center md:justify-start gap-1.5 xs:gap-2">
