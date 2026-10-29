@@ -531,7 +531,7 @@ function FlatmatesContent() {
       {/* Header                                                            */}
       {/* ---------------------------------------------------------------- */}
       <header className="border-b bg-white" style={{ borderColor: BORDER }}>
-        <div className="mx-auto w-full max-w-[1400px] px-4 pb-6 pt-8 sm:px-6 md:px-10 md:pb-8 md:pt-12">
+        <div className="mx-auto w-full max-w-[1400px] px-4 pb-6 pt-12 sm:px-6 md:px-10 md:pb-8 md:pt-22">
           <h1
             className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl"
             style={{ color: INK }}
