@@ -1,7 +1,10 @@
 "use client";
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { ArrowRight, BellRing, ShieldCheck, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/store/authSlice";
+import page from "@/app/student/[city]/[locality]/page";
 
 const BRAND = "#4161df";
 const BRAND_DARK = "#2b3f9e";
@@ -9,12 +12,33 @@ const BRAND_DARK = "#2b3f9e";
 const GetStarted = () => {
   const router = useRouter();
   const [sector, setSector] = useState("");
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  // Defer the auth-based redirect until hydration is complete so a signed-in
+  // user isn't briefly bounced to /login on the very first render.
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const params = new URLSearchParams({ intent: "sector-alert" });
     if (sector.trim()) params.set("sector", sector.trim());
-    router.push(`/contact?${params.toString()}`);
+
+    // Wait for auth state to hydrate before deciding where to send the user.
+    if (!mounted) return;
+
+    if (!isAuthenticated) {
+      // Not logged in — send to login, preserving the sector-alert intent so
+      // the user is returned to the sector-alert flow after signing in.
+      router.push(`/login?${params.toString()}`);
+      return;
+    }
+
+    // Logged in — go straight to the saved-searches (alerts) hub with the
+    // sector pre-filled.
+    router.push(`/saved-searches?${params.toString()}`);
   };
 
   return (

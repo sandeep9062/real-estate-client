@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/authSlice";
 import { hasSkippedRoleSelection } from "@/lib/roleSelection";
@@ -66,6 +66,7 @@ const PasswordInput = ({ field }: { field: any }) => {
 
 const LoginPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -147,6 +148,18 @@ const LoginPage = () => {
           }),
         );
         toast.success("Logged in successfully!");
+
+        // If the user arrived here from a sector-alert CTA, return them to the
+        // saved-searches (alerts) hub with the sector pre-filled instead of the
+        // default home/role-selection page.
+        const intent = searchParams.get("intent");
+        const sector = searchParams.get("sector");
+        if (intent === "sector-alert") {
+          const alertParams = new URLSearchParams({ intent: "sector-alert" });
+          if (sector) alertParams.set("sector", sector);
+          router.push(`/saved-searches?${alertParams.toString()}`);
+          return;
+        }
 
         const shouldChooseRole =
           (result.user.role || "user") === "user" && !hasSkippedRoleSelection();
