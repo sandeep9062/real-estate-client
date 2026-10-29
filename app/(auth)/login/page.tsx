@@ -27,7 +27,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/store/authSlice";
 import { hasSkippedRoleSelection } from "@/lib/roleSelection";
 import PhoneCaptureModal from "@/components/PhoneCaptureModal";
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -64,7 +64,7 @@ const PasswordInput = ({ field }: { field: any }) => {
   );
 };
 
-const LoginPage = () => {
+const LoginPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
@@ -504,4 +504,13 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+// useSearchParams() cannot be evaluated during static prerendering, so the
+// page must be wrapped in a Suspense boundary (see missing-suspense-with-csr-bailout).
+// The search params (intent/sector) are only read client-side after login.
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageContent />
+    </Suspense>
+  );
+}
