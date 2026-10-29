@@ -1,470 +1,1071 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  Users,
-  Search,
-  Repeat,
-  Clock,
-  CalendarClock,
-  ArrowRight,
-  ShieldCheck,
-  Sparkles,
-  MapPin,
-  ArrowLeftRight,
-  MessagesSquare,
-  UserPlus,
-  CheckCircle2,
-  IndianRupee,
-} from "lucide-react";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Flatmates & Shared Rooms in Tricity",
-  description:
-    "Find a flatmate or list your spare room in Chandigarh, Mohali, Panchkula and Zirakpur. Compatibility matching, verified profiles, swaps and short-term stays.",
-};
+import { useEffect, useMemo, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
+import {
+  Search,
+  AlertCircle,
+  Loader2,
+  MapPin,
+  Map as MapIcon,
+  List as ListIcon,
+  RotateCcw,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  X,
+  IndianRupee,
+  BadgeCheck,
+  Users,
+  Home,
+  Briefcase,
+  Cigarette,
+  Wine,
+  UtensilsCrossed,
+  Sparkles,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  useSearchSeekersQuery,
+  useSendConnectionRequestMutation,
+  useRespondToConnectionRequestMutation,
+  useListMyConnectionsQuery,
+  useToggleFavRoommateProfileMutation,
+  type RoommateProfile,
+} from "@/services/roommatesApi";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/store/authSlice";
+import type { MapMarker } from "@/components/Map";
+import RoommateProfileCard, {
+  type RoommateProfileCardData,
+  type RoommateProfileCardUser,
+} from "@/components/flatmates/RoommateProfileCard";
+
+// Named MapView so it doesn't shadow the global JS `Map`.
+const MapView = dynamic(() => import("@/components/Map"), { ssr: false });
 
 const BRAND = "#4161df";
 const INK = "#161A2E";
 const INK_SOFT = "#5C5F73";
-const TINT_BG = "#EEF1FC";
 const BORDER = "#E5E7F2";
 
-const STEPS = [
-  {
-    icon: UserPlus,
-    title: "Create your profile",
-    description:
-      "Tell us your budget, habits, sleep schedule and what you're looking for. It takes a couple of minutes.",
-  },
-  {
-    icon: Sparkles,
-    title: "Get matched",
-    description:
-      "We score compatibility between profiles so you see the flatmates you're most likely to get along with first.",
-  },
-  {
-    icon: MessagesSquare,
-    title: "Connect and move in",
-    description:
-      "Send a connection request with a short note, chat, then decide — no middlemen involved.",
-  },
+const BUDGET_PRESETS = [
+  { label: "Under ₹5k", min: "", max: "5000" },
+  { label: "₹5k – ₹10k", min: "5000", max: "10000" },
+  { label: "₹10k – ₹20k", min: "10000", max: "20000" },
+  { label: "₹20k – ₹30k", min: "20000", max: "30000" },
+  { label: "₹30k+", min: "30000", max: "" },
 ];
 
-const CITIES = ["Chandigarh", "Mohali", "Panchkula", "Zirakpur"];
-
-const TRUST_POINTS = [
-  { icon: ShieldCheck, label: "Verified profiles" },
-  { icon: Sparkles, label: "Compatibility matching" },
-  { icon: IndianRupee, label: "Connect directly, no middlemen" },
-  { icon: MapPin, label: "Tricity-wide" },
+const PROFILE_TYPES = [
+  { value: "", label: "All profiles", icon: Users },
+  { value: "have_room", label: "Has a room", icon: Home },
+  { value: "no_room", label: "Looking for a room", icon: Search },
 ];
 
-const BANNER_STATS = [
-  { value: "2,400+", label: "Verified profiles" },
-  { value: "1,100+", label: "Successful matches" },
+const GENDERS = [
+  { value: "", label: "Any gender" },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
 ];
 
-function Eyebrow() {
-  return (
-    <span
-      className="inline-flex items-center gap-2 rounded-full border bg-white px-3.5 py-1.5 text-[13px] font-semibold shadow-sm"
-      style={{ borderColor: BORDER, color: INK }}
-    >
-      <span className="relative flex h-2 w-2">
-        <span
-          className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
-          style={{ background: BRAND }}
-        />
-        <span
-          className="relative inline-flex h-2 w-2 rounded-full"
-          style={{ background: BRAND }}
-        />
-      </span>
-      Flatmates &amp; shared rooms in Tricity
-    </span>
-  );
+const OCCUPATIONS = [
+  { value: "", label: "Any occupation" },
+  { value: "student", label: "Student" },
+  { value: "working_professional", label: "Working professional" },
+  { value: "self_employed", label: "Self-employed" },
+];
+
+const FOOD_PREFS = [
+  { value: "", label: "Any food habit" },
+  { value: "veg", label: "Veg" },
+  { value: "non_veg", label: "Non-veg" },
+  { value: "eggetarian", label: "Eggetarian" },
+  { value: "vegan", label: "Vegan" },
+];
+
+const CLEAN_LEVELS = [
+  { value: "", label: "Any cleanliness" },
+  { value: "very_tidy", label: "Very tidy" },
+  { value: "moderately_tidy", label: "Moderately tidy" },
+  { value: "relaxed", label: "Relaxed" },
+];
+
+export interface FlatmatesFilters {
+  city: string;
+  type: string;
+  gender: string;
+  occupation: string;
+  smoking: string;
+  drinking: string;
+  foodPreference: string;
+  cleanliness: string;
+  idVerified: boolean;
+  minBudget: string;
+  maxBudget: string;
 }
 
-/**
- * Hero showcase: a real photo (swap the `src` for your own asset) with a
- * few floating UI cards layered on top for a "product in context" feel.
- * On small screens the floating cards are hidden and only the photo shows;
- * from `sm:` up they reappear, anchored to the image's corners.
- */
-function HeroShowcase() {
+const EMPTY_FILTERS: FlatmatesFilters = {
+  city: "",
+  type: "",
+  gender: "",
+  occupation: "",
+  smoking: "",
+  drinking: "",
+  foodPreference: "",
+  cleanliness: "",
+  idVerified: false,
+  minBudget: "",
+  maxBudget: "",
+};
+
+// Counts filters, treating min + max budget as a single filter so the
+// number matches the chips shown to the user.
+function countFilters(f: FlatmatesFilters): number {
+  let n = 0;
+  (Object.keys(f) as (keyof FlatmatesFilters)[]).forEach((key) => {
+    if (key === "maxBudget") return;
+    if (key === "minBudget") {
+      if (f.minBudget || f.maxBudget) n++;
+      return;
+    }
+    const v = f[key];
+    if (v !== "" && v !== false) n++;
+  });
+  return n;
+}
+
+// useSearchSeekersQuery hits /v1/roommates/seekers, which returns all active
+// roommate profiles — both have_room (people with a room to share) and
+// no_room (people looking for a room). It's the people-side counterpart to
+// useBrowseRoomsAndFlatsQuery (which browses RoomFlat listings).
+//
+// The endpoint populates `user` (at least _id/name/avatarUrl) and `roomFlat`
+// (for have_room profiles' location and rent) so the cards have everything
+// they need to render.
+interface SeekerResult {
+  profile: Omit<RoommateProfile, "user" | "roomFlat"> & {
+    user: RoommateProfileCardUser;
+    roomFlat?: RoommateProfileCardData["roomFlat"];
+  };
+  matchScore: number | null;
+}
+
+function getRefId(ref: unknown): string | undefined {
+  if (!ref) return undefined;
+  if (typeof ref === "string") return ref;
+  return (ref as { _id?: string })._id;
+}
+
+function FlatmatesContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlCity = searchParams.get("city") || "";
+
+  // Seed the city filter from the ?city= URL param so links like
+  // /flatmates?city=Mohali (home page chips) pre-apply the city.
+  const [filters, setFilters] = useState<FlatmatesFilters>({
+    ...EMPTY_FILTERS,
+    city: urlCity,
+  });
+  const [applied, setApplied] = useState<FlatmatesFilters>({
+    ...EMPTY_FILTERS,
+    city: urlCity,
+  });
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"list" | "map">("list");
+  const [laptopMapOpen, setLaptopMapOpen] = useState(false);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  // Optimistic "request sent" ids, shown until the connections list refetches.
+  const [optimisticSentIds, setOptimisticSentIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const [sendConnectionRequest] = useSendConnectionRequestMutation();
+  const [respondToConnectionRequest] = useRespondToConnectionRequestMutation();
+  const { data: connectionsData } = useListMyConnectionsQuery();
+  const [toggleFavRoommateProfile] = useToggleFavRoommateProfileMutation();
+  const currentUser = useSelector(selectUser);
+
+  // Keep the city filter in sync with the ?city= URL param. This covers
+  // in-app navigation between city chips (the page component stays mounted),
+  // so the applied city always matches the URL.
+  useEffect(() => {
+    setFilters((f) => (f.city === urlCity ? f : { ...f, city: urlCity }));
+    setApplied((a) => (a.city === urlCity ? a : { ...a, city: urlCity }));
+  }, [urlCity]);
+
+  const activeFiltersCount = useMemo(() => countFilters(filters), [filters]);
+  const appliedCount = useMemo(() => countFilters(applied), [applied]);
+
+  // Profile ids with a pending outgoing request, derived straight from the
+  // live connections list (no effect/state sync needed, and it clears itself
+  // when a request is accepted, declined or withdrawn).
+  const pendingIds = useMemo(() => {
+    const ids = new Set<string>();
+    (connectionsData ?? []).forEach((c) => {
+      if (c.status !== "pending") return;
+      const id = getRefId(c.toProfile);
+      if (id) ids.add(id);
+    });
+    return ids;
+  }, [connectionsData]);
+
+  const hasPendingRequest = (id: string): boolean =>
+    pendingIds.has(id) || optimisticSentIds.has(id);
+
+  const params = {
+    city: applied.city || undefined,
+    type: applied.type || undefined,
+    gender: applied.gender || undefined,
+    occupation: applied.occupation || undefined,
+    smoking: applied.smoking || undefined,
+    drinking: applied.drinking || undefined,
+    foodPreference: applied.foodPreference || undefined,
+    cleanliness: applied.cleanliness || undefined,
+    idVerified: applied.idVerified ? "true" : undefined,
+    minBudget: applied.minBudget || undefined,
+    maxBudget: applied.maxBudget || undefined,
+  };
+
+  const {
+    data: rawResults,
+    isLoading: loading,
+    error,
+  } = useSearchSeekersQuery(params);
+
+  // See SeekerResult note above: this assumes `user` arrives populated.
+  const seekers = (rawResults ?? []) as unknown as SeekerResult[];
+
+  function runSearch(e?: React.FormEvent) {
+    e?.preventDefault();
+    setApplied(filters);
+    setFiltersOpen(false);
+  }
+
+  function clearFilters() {
+    setFilters({ ...EMPTY_FILTERS });
+    setApplied({ ...EMPTY_FILTERS });
+  }
+
+  function updateFilter<K extends keyof FlatmatesFilters>(
+    key: K,
+    value: FlatmatesFilters[K],
+  ) {
+    setFilters((f) => ({ ...f, [key]: value }));
+  }
+
+  function removeAppliedChip(key: keyof FlatmatesFilters) {
+    const reset = (f: FlatmatesFilters): FlatmatesFilters => {
+      // The budget chip represents both min and max, so clear both.
+      if (key === "minBudget" || key === "maxBudget") {
+        return { ...f, minBudget: "", maxBudget: "" };
+      }
+      return { ...f, [key]: typeof f[key] === "boolean" ? false : "" };
+    };
+    setApplied(reset);
+    setFilters(reset);
+  }
+
+  function toggleSaved(id: string) {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function toggleLiked(id: string) {
+    if (!currentUser) {
+      toast.error("You must be logged in to like a profile");
+      router.push("/login");
+      return;
+    }
+    try {
+      await toggleFavRoommateProfile({ profileId: id }).unwrap();
+      setLikedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } catch (err) {
+      toast.error(getErrorMessage(err) || "Failed to toggle like");
+    }
+  }
+
+  async function handleConnect(id: string) {
+    if (hasPendingRequest(id)) return;
+    if (!currentUser) {
+      toast.error("Please log in to send a connection request");
+      router.push("/login");
+      return;
+    }
+    try {
+      await sendConnectionRequest({ toProfileId: id }).unwrap();
+      setOptimisticSentIds((prev) => new Set(prev).add(id));
+      toast.success("Connection request sent!", {
+        description: "They'll be notified about your request.",
+      });
+    } catch (err) {
+      toast.error("Failed to send request", {
+        description: getErrorMessage(err),
+      });
+    }
+  }
+
+  async function handleCancelConnection(id: string) {
+    if (!hasPendingRequest(id)) return;
+    try {
+      const connection = connectionsData?.find(
+        (c) => c.status === "pending" && getRefId(c.toProfile) === id,
+      );
+      if (!connection) {
+        // Nothing to withdraw on the server; just clear the optimistic flag.
+        setOptimisticSentIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+        return;
+      }
+      await respondToConnectionRequest({
+        id: connection._id,
+        status: "withdrawn",
+      }).unwrap();
+      setOptimisticSentIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      toast.success("Connection request cancelled");
+    } catch (err) {
+      toast.error("Failed to cancel request", {
+        description: getErrorMessage(err),
+      });
+    }
+  }
+
+  const profiles: RoommateProfileCardData[] = useMemo(
+    () =>
+      seekers
+        .filter(({ profile }) => profile != null && profile._id != null)
+        .map(({ profile, matchScore }) => ({
+          _id: profile._id,
+          type: profile.type,
+          user:
+            profile.user != null
+              ? profile.user
+              : { _id: profile._id, name: "Flatmate" },
+          photos: profile.photos,
+          bio: profile.bio,
+          occupation: profile.occupation,
+          workSchedule: profile.workSchedule,
+          habits: profile.habits,
+          searchArea: profile.searchArea,
+          budgetRange: profile.budgetRange,
+          roomFlat: profile.roomFlat,
+          idVerified: profile.idVerified,
+          isComplete: profile.isComplete,
+          matchScore,
+        })),
+    [seekers],
+  );
+
+  // no_room profiles carry searchArea; have_room profiles carry roomFlat.
+  const markers: MapMarker[] = useMemo(() => {
+    const pins: MapMarker[] = [];
+    for (const p of profiles) {
+      const coords =
+        p.type === "have_room"
+          ? // RoomFlat stores GeoJSON — the array is nested one level deeper:
+            // location.coordinates.coordinates. (searchArea keeps a plain array.)
+            p.roomFlat?.location?.coordinates?.coordinates
+          : p.searchArea?.location?.coordinates;
+      if (!Array.isArray(coords) || coords.length < 2) continue;
+      const lng = Number(coords[0]);
+      const lat = Number(coords[1]);
+      // Skip missing/default [0,0] pins.
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      if (Math.abs(lat) < 1e-6 && Math.abs(lng) < 1e-6) continue;
+
+      const rent =
+        p.type === "have_room" ? p.roomFlat?.rentAmount : p.budgetRange?.max;
+      const city =
+        p.type === "have_room"
+          ? p.roomFlat?.location?.city
+          : p.searchArea?.city;
+      pins.push({
+        lat,
+        lng,
+        id: p._id,
+        title: p.user?.name ?? "Flatmate",
+        subtitle: [
+          typeof rent === "number" ? `₹${rent.toLocaleString("en-IN")}/mo` : "",
+          city || "",
+        ]
+          .filter(Boolean)
+          .join(" · "),
+      });
+    }
+    return pins;
+  }, [profiles]);
+
   return (
-    <div className="relative mt-10 lg:mt-0">
-      <div
-        className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border shadow-xl shadow-indigo-100/70 sm:aspect-[16/11] lg:aspect-auto lg:h-[440px]"
-        style={{ borderColor: BORDER }}
-      >
-        {/* Replace with your own photo — e.g. flatmates in a shared living room */}
-        <Image
-          src="/flatmates-hero.png"
-          alt="Flatmates relaxing together in a shared living room"
-          fill
-          sizes="(max-width: 1024px) 100vw, 45vw"
-          className="object-contain"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
-
-        {/* Swap chip — sits directly on the photo, glass effect */}
-        <div
-          className="animate-fade-in-up absolute left-4 top-4 hidden items-center gap-2 rounded-full border bg-white/90 px-3.5 py-2 shadow-md backdrop-blur-sm sm:flex"
-          style={{ borderColor: BORDER, animationDelay: "240ms" }}
+    <div className="relative min-h-screen w-full bg-gray-50">
+      {/* Mobile: list / map toggle — right-center, same as /properties */}
+      <div className="fixed right-4 top-1/2 z-[1000] -translate-y-1/2 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setActiveTab(activeTab === "list" ? "map" : "list")}
+          className="flex transform flex-col items-center gap-1 rounded-2xl bg-[#4161df] px-2 py-3 text-white shadow-2xl transition-all hover:bg-[#3451c9] active:scale-95"
+          aria-label={activeTab === "list" ? "Open map view" : "Open list view"}
         >
-          <ArrowLeftRight
-            className="h-3.5 w-3.5"
-            style={{ color: "#7C3AED" }}
-          />
-          <span className="text-xs font-semibold" style={{ color: INK }}>
-            Flat swap matched
-          </span>
-        </div>
+          {activeTab === "list" ? (
+            <>
+              <MapIcon className="h-4 w-4" />
+              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
+                Map
+              </span>
+            </>
+          ) : (
+            <>
+              <ListIcon className="h-4 w-4" />
+              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
+                List
+              </span>
+            </>
+          )}
+        </button>
       </div>
 
-      {/* Floating match card */}
-      <div
-        className="animate-fade-in-up absolute -right-3 -top-6 hidden w-64 rotate-2 rounded-2xl border bg-white p-4 shadow-lg shadow-indigo-100 sm:block sm:-right-6"
-        style={{ borderColor: BORDER }}
-      >
-        <div className="flex items-center gap-3">
-          <span
-            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-            style={{ background: "linear-gradient(135deg,#4161df,#2b3f9e)" }}
-          >
-            AV
-          </span>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold" style={{ color: INK }}>
-              Working professional
-            </p>
-            <p className="text-xs" style={{ color: INK_SOFT }}>
-              Looking in Mohali
-            </p>
-          </div>
-          <ShieldCheck className="ml-auto h-4 w-4 text-emerald-600" />
+      {/* Laptop: show / hide map column — right-center, same as /properties */}
+      <div className="fixed right-4 top-1/2 z-[1000] hidden -translate-y-1/2 lg:flex">
+        <button
+          type="button"
+          onClick={() => setLaptopMapOpen((o) => !o)}
+          className="flex transform flex-col items-center gap-1 rounded-2xl bg-[#4161df] px-3 py-4 text-white shadow-2xl transition-all hover:bg-[#3451c9] active:scale-95"
+          aria-label={
+            laptopMapOpen
+              ? "Hide map, expand listings"
+              : "Show map beside listings"
+          }
+        >
+          {laptopMapOpen ? (
+            <>
+              <ListIcon className="h-5 w-5" />
+              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
+                Hide
+              </span>
+            </>
+          ) : (
+            <>
+              <MapIcon className="h-5 w-5" />
+              <span className="max-w-16 text-center text-[10px] font-semibold leading-tight">
+                Map
+              </span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <main className="mx-auto w-full max-w-full flex flex-col items-center gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12">
+        <div className="w-full text-center">
+          <h1 className="mb-2 text-xl font-bold text-gray-900 sm:mb-3 sm:text-2xl md:mb-4 md:text-3xl">
+            Find a Flatmate in Tricity
+          </h1>
+          <p className="px-2 text-sm text-gray-600 sm:text-base md:text-lg">
+            Browse verified flatmates in Chandigarh, Panchkula, Mohali &amp;
+            more.
+          </p>
         </div>
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span style={{ color: INK_SOFT }}>Compatibility</span>
-            <span style={{ color: BRAND }}>92%</span>
+
+        <form
+          onSubmit={runSearch}
+          className="mt-6 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+        >
+          <div className="border-b border-gray-100 bg-gray-50/50 px-4 py-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4161df]">
+                  <Search className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    Search flatmates
+                  </h2>
+                  <p className="hidden text-[11px] text-gray-500 sm:block">
+                    {appliedCount > 0
+                      ? `${appliedCount} filter${appliedCount > 1 ? "s" : ""} applied`
+                      : "Apply filters to refine your search"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {activeFiltersCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    <span className="hidden sm:inline">Clear</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                  aria-expanded={filtersOpen}
+                  className="flex items-center gap-1 rounded-md bg-[#4161df] px-3 py-1.5 text-xs font-medium text-white transition-colors md:hidden"
+                >
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0.5 text-[10px]">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                  {filtersOpen ? (
+                    <ChevronUp className="ml-1 h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronDown className="ml-1 h-3.5 w-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100">
+
+          <div className={`${filtersOpen ? "block" : "hidden"} p-4 md:block`}>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_auto]">
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <MapPin className="h-3.5 w-3.5" />
+                  City
+                </span>
+                <span className="relative block">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    placeholder="e.g. Mohali, Chandigarh…"
+                    value={filters.city}
+                    onChange={(e) => updateFilter("city", e.target.value)}
+                    className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                  />
+                </span>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <IndianRupee className="h-3.5 w-3.5" />
+                  Min budget
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="₹ min"
+                  value={filters.minBudget}
+                  onChange={(e) => updateFilter("minBudget", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <IndianRupee className="h-3.5 w-3.5" />
+                  Max budget
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="₹ max"
+                  value={filters.maxBudget}
+                  onChange={(e) => updateFilter("maxBudget", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                />
+              </label>
+              <div className="flex items-end">
+                <button
+                  type="submit"
+                  className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[#4161df] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#3451c9] sm:w-auto"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {/* Row 2: Profile type + Gender + Occupation */}
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Users className="h-3.5 w-3.5" />
+                  Profile type
+                </span>
+                <select
+                  value={filters.type}
+                  onChange={(e) => updateFilter("type", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {PROFILE_TYPES.map((t) => (
+                    <option key={t.value} value={t.value}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  Gender
+                </span>
+                <select
+                  value={filters.gender}
+                  onChange={(e) => updateFilter("gender", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {GENDERS.map((g) => (
+                    <option key={g.value} value={g.value}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  Occupation
+                </span>
+                <select
+                  value={filters.occupation}
+                  onChange={(e) => updateFilter("occupation", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {OCCUPATIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {/* Row 3: Lifestyle */}
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Cigarette className="h-3.5 w-3.5" />
+                  Smoking
+                </span>
+                <select
+                  value={filters.smoking}
+                  onChange={(e) => updateFilter("smoking", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  <option value="">Any</option>
+                  <option value="yes">Smoker</option>
+                  <option value="no">Non-smoker</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Wine className="h-3.5 w-3.5" />
+                  Drinking
+                </span>
+                <select
+                  value={filters.drinking}
+                  onChange={(e) => updateFilter("drinking", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  <option value="">Any</option>
+                  <option value="yes">Drinks</option>
+                  <option value="no">Non-drinker</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <UtensilsCrossed className="h-3.5 w-3.5" />
+                  Food habit
+                </span>
+                <select
+                  value={filters.foodPreference}
+                  onChange={(e) =>
+                    updateFilter("foodPreference", e.target.value)
+                  }
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {FOOD_PREFS.map((f) => (
+                    <option key={f.value} value={f.value}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 flex items-center gap-1 text-xs font-medium text-gray-600">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Cleanliness
+                </span>
+                <select
+                  value={filters.cleanliness}
+                  onChange={(e) => updateFilter("cleanliness", e.target.value)}
+                  className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-[#4161df] focus:ring-1 focus:ring-[#4161df]/20"
+                >
+                  {CLEAN_LEVELS.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            {/* Row 4: Verified + Budget presets */}
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <label className="flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 transition-colors hover:border-[#4161df]/30">
+                <input
+                  type="checkbox"
+                  checked={filters.idVerified}
+                  onChange={(e) => updateFilter("idVerified", e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 accent-[#4161df]"
+                />
+                <BadgeCheck className="h-3.5 w-3.5 text-[#4161df]" />
+                <span className="text-sm font-medium text-gray-700">
+                  Verified only
+                </span>
+              </label>
+              <div className="hidden h-6 w-px bg-gray-200 sm:block" />
+              <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+                Budget:
+              </span>
+              {BUDGET_PRESETS.map((p) => {
+                const isActive =
+                  filters.minBudget === p.min && filters.maxBudget === p.max;
+                return (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() =>
+                      setFilters((f) => ({
+                        ...f,
+                        minBudget: p.min,
+                        maxBudget: p.max,
+                      }))
+                    }
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      isActive
+                        ? "border-[#4161df] bg-[#4161df]/5 text-[#4161df]"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active filter chips */}
+            {appliedCount > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
+                <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+                  Active:
+                </span>
+                <ActiveFilterChips
+                  applied={applied}
+                  onRemoveChip={removeAppliedChip}
+                  onClearAll={clearFilters}
+                />
+              </div>
+            )}
+          </div>
+        </form>
+
+        {error && (
+          <div
+            className="mt-4 flex items-center gap-2.5 rounded-xl border-l-[3px] bg-rose-50/70 px-4 py-3"
+            style={{ borderLeftColor: "#e11d48" }}
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+            <p className="text-sm text-rose-700">{getErrorMessage(error)}</p>
+          </div>
+        )}
+
+        <div className="mt-8">
+          {loading && (
+            <div className="flex items-center justify-center gap-2.5 py-10">
+              <Loader2
+                className="h-5 w-5 animate-spin"
+                style={{ color: BRAND }}
+              />
+              <p className="text-sm" style={{ color: INK_SOFT }}>
+                Searching…
+              </p>
+            </div>
+          )}
+
+          {!loading &&
+            markers.length > 0 &&
+            activeTab === "list" &&
+            !laptopMapOpen && (
+              <div
+                className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3 lg:hidden"
+                style={{ borderColor: BORDER }}
+              >
+                <MapPin className="h-4 w-4 shrink-0" style={{ color: BRAND }} />
+                <p className="text-xs" style={{ color: INK_SOFT }}>
+                  {markers.length}{" "}
+                  {markers.length === 1 ? "profile has" : "profiles have"} a map
+                  location — tap the Map button on the right to view.
+                </p>
+              </div>
+            )}
+
+          {!loading && markers.length === 0 && profiles.length > 0 && (
             <div
-              className="h-full w-[92%] rounded-full"
-              style={{ background: "linear-gradient(90deg,#4161df,#7C3AED)" }}
-            />
-          </div>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {["Veg", "Non-smoker", "Early bird"].map((chip) => (
-            <span
-              key={chip}
-              className="rounded-full px-2 py-0.5 text-[11px] font-medium"
-              style={{ background: TINT_BG, color: "#2b3f9e" }}
+              className="mb-6 flex items-center gap-2.5 rounded-xl border bg-slate-50/70 px-4 py-3"
+              style={{ borderColor: BORDER }}
             >
-              {chip}
-            </span>
-          ))}
-        </div>
-      </div>
+              <MapPin
+                className="h-4 w-4 shrink-0"
+                style={{ color: "#9CA3AF" }}
+              />
+              <p className="text-xs" style={{ color: INK_SOFT }}>
+                These profiles don&apos;t have a map location saved yet — ask
+                them to add one during onboarding.
+              </p>
+            </div>
+          )}
 
-      {/* Floating listing card */}
-      <div
-        className="animate-fade-in-up absolute -bottom-6 -left-3 hidden w-60 -rotate-2 rounded-2xl border bg-white p-4 shadow-lg shadow-indigo-100 sm:block sm:-left-6"
-        style={{ borderColor: BORDER, animationDelay: "120ms" }}
-      >
-        <div className="flex items-center justify-between">
-          <span
-            className="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest"
-            style={{ background: TINT_BG, color: BRAND }}
-          >
-            Private room
-          </span>
-          <span className="text-[11px] font-medium" style={{ color: INK_SOFT }}>
-            Sector 62
-          </span>
+          {!loading && !error && profiles.length === 0 && (
+            <div
+              className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
+              style={{ borderColor: BORDER }}
+            >
+              <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
+              <p className="text-sm" style={{ color: INK_SOFT }}>
+                No profiles match yet — try widening the city or budget range.
+              </p>
+            </div>
+          )}
+
+          {!loading && profiles.length > 0 && (
+            <div
+              className={`grid grid-cols-1 items-start gap-6 ${laptopMapOpen ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}
+            >
+              {/* List Section */}
+              <div
+                className={`${activeTab === "list" ? "block" : "hidden"} order-2 min-w-0 space-y-3 lg:order-1 lg:block`}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    {profiles.length} profile
+                    {profiles.length !== 1 ? "s" : ""}
+                  </p>
+                  <span className="text-xs text-gray-500 sm:text-sm">
+                    {markers.length > 0
+                      ? `${markers.length} with map location`
+                      : "No map locations yet"}
+                  </span>
+                </div>
+                {/* Fewer columns when the map column is open so cards don't get cramped */}
+                <div
+                  className={`grid gap-3 sm:grid-cols-2 ${
+                    laptopMapOpen
+                      ? "xl:grid-cols-2"
+                      : "sm:grid-cols-3 xl:grid-cols-4"
+                  }`}
+                >
+                  {profiles.map((p) => (
+                    <RoommateProfileCard
+                      key={p._id}
+                      profile={p}
+                      saved={savedIds.has(p._id)}
+                      liked={likedIds.has(p._id)}
+                      connected={hasPendingRequest(p._id)}
+                      onView={(id) => router.push(`/flatmates/profile/${id}`)}
+                      onSave={toggleSaved}
+                      onLike={toggleLiked}
+                      onConnect={handleConnect}
+                      onCancel={handleCancelConnection}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Map Section — sticky on desktop, toggled by right-center button */}
+              <div
+                className={`${activeTab === "map" ? "block" : "hidden"} ${laptopMapOpen ? "lg:block" : "lg:hidden"} z-10 order-1 w-full min-w-0 self-start lg:sticky lg:top-24 lg:order-2`}
+              >
+                {markers.length > 0 ? (
+                  <div
+                    className="overflow-hidden rounded-2xl border bg-white"
+                    style={{ borderColor: BORDER }}
+                  >
+                    <div className="flex items-center justify-between px-4 pt-3">
+                      <p
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold"
+                        style={{ color: INK }}
+                      >
+                        <MapPin className="h-4 w-4" style={{ color: BRAND }} />
+                        {markers.length}{" "}
+                        {markers.length === 1 ? "profile" : "profiles"} on map
+                      </p>
+                      <p className="text-xs" style={{ color: INK_SOFT }}>
+                        Click a pin for budget &amp; area
+                      </p>
+                    </div>
+                    <div className="p-3">
+                      <div className="w-full overflow-hidden rounded-xl border border-gray-200">
+                        <MapView markers={markers} />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="flex flex-col items-center gap-2 rounded-2xl border border-dashed py-14 text-center"
+                    style={{ borderColor: BORDER }}
+                  >
+                    <MapPin className="h-6 w-6" style={{ color: "#9CA3AF" }} />
+                    <p className="text-sm" style={{ color: INK_SOFT }}>
+                      No map locations for these results yet.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-        <p className="mt-2 text-lg font-bold" style={{ color: INK }}>
-          ₹9,500
-          <span className="text-xs font-medium" style={{ color: INK_SOFT }}>
-            /month
-          </span>
-        </p>
-        <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
-          <CheckCircle2 className="h-3 w-3" />3 people interested this week
-        </p>
-      </div>
+      </main>
     </div>
   );
 }
 
-/** Full-width photo banner with a headline and stat chips over it. */
-function ShowcaseBanner() {
+const FILTER_LABELS: Record<string, string> = {
+  city: "City",
+  type: "Type",
+  gender: "Gender",
+  occupation: "Occupation",
+  smoking: "Smoking",
+  drinking: "Drinking",
+  foodPreference: "Food",
+  cleanliness: "Cleanliness",
+  idVerified: "Verified",
+  minBudget: "Min budget",
+  maxBudget: "Max budget",
+};
+
+const FILTER_VALUE_LABELS: Record<string, Record<string, string>> = {
+  type: { have_room: "Has room", no_room: "Looking" },
+  gender: { male: "Male", female: "Female", other: "Other" },
+  occupation: {
+    student: "Student",
+    working_professional: "Working",
+    self_employed: "Self-employed",
+  },
+  smoking: { yes: "Smoker", no: "Non-smoker" },
+  drinking: { yes: "Drinks", no: "Non-drinker" },
+  foodPreference: {
+    veg: "Veg",
+    non_veg: "Non-veg",
+    eggetarian: "Eggetarian",
+    vegan: "Vegan",
+  },
+  cleanliness: {
+    very_tidy: "Very tidy",
+    moderately_tidy: "Moderate",
+    relaxed: "Relaxed",
+  },
+};
+
+function ActiveFilterChips({
+  applied,
+  onRemoveChip,
+  onClearAll,
+}: {
+  applied: FlatmatesFilters;
+  onRemoveChip: (key: keyof FlatmatesFilters) => void;
+  onClearAll: () => void;
+}) {
+  const chips: { key: keyof FlatmatesFilters; label: string }[] = [];
+
+  (Object.keys(applied) as (keyof FlatmatesFilters)[]).forEach((key) => {
+    const value = applied[key];
+    if (value === "" || value === false) return;
+
+    if (key === "idVerified") {
+      chips.push({ key, label: "Verified only" });
+      return;
+    }
+
+    if (key === "minBudget" || key === "maxBudget") {
+      // Min and max are shown as one budget chip, emitted once when the
+      // first of the two keys is reached.
+      if (key === "maxBudget" && applied.minBudget) return;
+      const min = applied.minBudget;
+      const max = applied.maxBudget;
+      const label = `Budget: ${min ? `₹${Number(min).toLocaleString("en-IN")}` : "₹0"} – ${max ? `₹${Number(max).toLocaleString("en-IN")}` : "Any"}`;
+      chips.push({ key: "minBudget", label });
+      return;
+    }
+
+    const label = FILTER_VALUE_LABELS[key]?.[value as string] || value;
+    chips.push({ key, label: `${FILTER_LABELS[key]}: ${label}` });
+  });
+
+  if (chips.length === 0) return null;
+
   return (
-    <section className="mt-14">
-      <div
-        className="relative overflow-hidden rounded-3xl border shadow-xl shadow-indigo-100/70"
-        style={{ borderColor: BORDER }}
+    <>
+      {chips.map((chip) => (
+        <span
+          key={chip.key}
+          className="inline-flex items-center gap-1.5 rounded-full border border-[#4161df]/20 bg-[#4161df]/5 py-1 pl-3 pr-1.5 text-xs font-medium text-[#4161df]"
+        >
+          {chip.label}
+          <button
+            type="button"
+            onClick={() => onRemoveChip(chip.key)}
+            aria-label={`Remove ${chip.label} filter`}
+            className="flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-[#4161df]/15"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </span>
+      ))}
+      <button
+        type="button"
+        onClick={onClearAll}
+        className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-500 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600"
       >
-        <div className="relative aspect-[16/10] w-full sm:aspect-[21/9]">
-          {/* Replace with your own photo — e.g. flatmates cooking or moving in together */}
-          <Image
-            src="/flatmates-banner.png"
-            alt="Group of flatmates cooking together in a shared kitchen"
-            fill
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/30 to-black/0" />
-        </div>
-
-        <div className="absolute inset-0 flex flex-col justify-center px-6 py-8 sm:px-10 sm:py-0 md:px-14">
-          <div className="max-w-md">
-            <span className="mb-4 block h-[3px] w-10 rounded-full bg-white" />
-            <h2 className="text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl">
-              Real people, real move-ins — every week
-            </h2>
-            <p className="mt-2 max-w-sm text-sm text-white/85 sm:text-base">
-              Verified, compatibility-scored profiles turn into flatmate matches
-              across the Tricity every month.
-            </p>
-          </div>
-        </div>
-
-        <div className="absolute bottom-4 right-4 hidden gap-3 sm:flex">
-          {BANNER_STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl bg-white/95 px-4 py-2.5 shadow-lg backdrop-blur"
-            >
-              <p className="text-base font-bold" style={{ color: INK }}>
-                {stat.value}
-              </p>
-              <p
-                className="text-[11px] font-medium"
-                style={{ color: INK_SOFT }}
-              >
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+        <RotateCcw className="h-3 w-3" />
+        Clear all
+      </button>
+    </>
   );
 }
 
-export default function FlatmatesLanding() {
+function getErrorMessage(error: unknown): string {
+  if (!error) return "";
+  const e = error as {
+    data?: { message?: string };
+    error?: string;
+    message?: string;
+  };
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 md:px-10">
-      {/* ---------- Hero ---------- */}
-      <section
-        className="relative overflow-hidden rounded-3xl border px-6 py-10 sm:px-10 sm:py-14"
-        style={{
-          borderColor: BORDER,
-          background:
-            "linear-gradient(135deg,#EEF1FC 0%,#FAFBFF 55%,#F3F0FF 100%)",
-        }}
-      >
-        <div
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-40 blur-3xl"
-          style={{
-            background: "radial-gradient(circle,#4161df33,transparent 70%)",
-          }}
-        />
-        <div className="relative grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <Eyebrow />
-            <h1
-              className="mt-5 max-w-xl text-3xl font-bold leading-[1.12] tracking-tight sm:text-4xl md:text-[2.75rem]"
-              style={{ color: INK }}
-            >
-              Find a flatmate who{" "}
-              <span
-                style={{
-                  background: "linear-gradient(90deg,#4161df,#7C3AED)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                actually fits
-              </span>{" "}
-              your lifestyle
-            </h1>
-            <p
-              className="mt-4 max-w-lg text-[15px] leading-relaxed sm:text-base"
-              style={{ color: INK_SOFT }}
-            >
-              Rooms, flat-shares, swaps and short-term stays across Chandigarh,
-              Mohali, Panchkula and Zirakpur — matched by budget, habits and
-              schedule, not just location.
-            </p>
+    e.data?.message ||
+    e.error ||
+    e.message ||
+    "Something went wrong. Please try again."
+  );
+}
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link
-                href="/flatmates/onboarding"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition-transform hover:-translate-y-0.5"
-                style={{
-                  background: `linear-gradient(135deg,${BRAND},#2b3f9e)`,
-                }}
-              >
-                <UserPlus className="h-4 w-4" />
-                Create your free profile
-              </Link>
-              <Link
-                href="/flatmates/browse"
-                className="inline-flex items-center gap-2 rounded-full border bg-white px-6 py-3 text-sm font-semibold transition-colors hover:bg-[#EEF1FC]"
-                style={{ borderColor: BORDER, color: INK }}
-              >
-                <Search className="h-4 w-4" style={{ color: BRAND }} />
-                Browse rooms first
-              </Link>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2.5">
-              {TRUST_POINTS.map((point) => (
-                <span
-                  key={point.label}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium"
-                  style={{ color: INK_SOFT }}
-                >
-                  <point.icon className="h-4 w-4" style={{ color: BRAND }} />
-                  {point.label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <HeroShowcase />
-        </div>
-      </section>
-      {/* ---------- Popular cities ---------- */}
-      <section className="mt-8 flex flex-wrap items-center gap-2">
-        <span
-          className="mr-1 inline-flex items-center gap-1.5 text-[13px] font-semibold"
-          style={{ color: INK_SOFT }}
-        >
-          <MapPin className="h-4 w-4" style={{ color: BRAND }} />
-          Popular right now:
-        </span>
-        {CITIES.map((city) => (
-          <Link
-            key={city}
-            href={`/flatmates/browse?city=${encodeURIComponent(city)}`}
-            className="rounded-full border bg-white px-3.5 py-1.5 text-[13px] font-semibold transition-colors hover:bg-[#EEF1FC]"
-            style={{ borderColor: BORDER, color: INK }}
-          >
-            {city}
-          </Link>
-        ))}
-      </section>
-
-      {/* ---------- Showcase banner ---------- */}
-      <ShowcaseBanner />
-      {/* ---------- How it works ---------- */}
-      <section className="mt-14">
-        <h2
-          className="text-xl font-bold tracking-tight sm:text-2xl"
-          style={{ color: INK }}
-        >
-          How it works
-        </h2>
-        <p className="mt-1 text-sm" style={{ color: INK_SOFT }}>
-          Three steps between you and a flatmate who gets your routine.
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {STEPS.map((step, index) => (
-            <div
-              key={step.title}
-              className="rounded-2xl border bg-white p-5 transition-shadow hover:shadow-md"
-              style={{ borderColor: BORDER }}
-            >
-              <div className="flex items-center justify-between">
-                <span
-                  className="flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: TINT_BG, color: BRAND }}
-                >
-                  <step.icon className="h-5 w-5" strokeWidth={1.9} />
-                </span>
-                <span
-                  className="text-3xl font-bold opacity-15"
-                  style={{ color: BRAND }}
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-              </div>
-              <h3
-                className="mt-4 text-[15px] font-semibold"
-                style={{ color: INK }}
-              >
-                {step.title}
-              </h3>
-              <p
-                className="mt-1.5 text-[13px] leading-relaxed"
-                style={{ color: INK_SOFT }}
-              >
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-      {/* ---------- Quick links ---------- */}
-      <section className="mt-12 grid gap-4 sm:grid-cols-2">
-        <Link
-          href="/flatmates/swap"
-          className="group flex items-center gap-4 rounded-2xl border bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-100/70"
-          style={{ borderColor: BORDER }}
-        >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-            style={{ background: "#F5F3FF", color: "#7C3AED" }}
-          >
-            <ArrowLeftRight className="h-5 w-5" strokeWidth={1.9} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-[15px] font-semibold" style={{ color: INK }}>
-              Swap matches
-            </h3>
-            <p className="mt-0.5 text-[13px]" style={{ color: INK_SOFT }}>
-              Mutual fits where both sides&apos; locations work.
-            </p>
-          </div>
-          <ArrowRight
-            className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1"
-            style={{ color: "#7C3AED" }}
-          />
-        </Link>
-
-        <Link
-          href="/flatmates/connections"
-          className="group flex items-center gap-4 rounded-2xl border bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-100/70"
-          style={{ borderColor: BORDER }}
-        >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-            style={{ background: TINT_BG, color: BRAND }}
-          >
-            <MessagesSquare className="h-5 w-5" strokeWidth={1.9} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-[15px] font-semibold" style={{ color: INK }}>
-              My connection requests
-            </h3>
-            <p className="mt-0.5 text-[13px]" style={{ color: INK_SOFT }}>
-              Track requests you&apos;ve sent and received.
-            </p>
-          </div>
-          <ArrowRight
-            className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1"
-            style={{ color: BRAND }}
-          />
-        </Link>
-      </section>
-    </main>
+/**
+ * `useSearchParams` in `FlatmatesContent` needs a Suspense boundary or the page
+ * cannot be statically prerendered (build fails with a CSR bailout).
+ */
+export default function FlatmatesPage() {
+  return (
+    <Suspense fallback={null}>
+      <FlatmatesContent />
+    </Suspense>
   );
 }

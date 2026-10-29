@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { selectUser } from "@/store/authSlice";
 import {
   useGetOwnProfileQuery,
   useGetPublicProfileQuery,
@@ -78,6 +80,8 @@ function TypeBadge({ type }: { type?: string }) {
 
 export default function PublicProfilePage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const currentUser = useSelector(selectUser);
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -109,6 +113,10 @@ export default function PublicProfilePage() {
   async function handleConnect(e: React.FormEvent) {
     e.preventDefault();
     if (isOwnProfile) return;
+    if (!currentUser) {
+      router.push("/login");
+      return;
+    }
     setSubmitError(null);
     try {
       await sendConnectionRequest({ toProfileId: id, message }).unwrap();
