@@ -24,7 +24,7 @@ const ScrollToTopButton = () => {
   }, []);
 
   return (
-    <div className="fixed bottom-5 right-5 z-[100]">
+    <div className="fixed bottom-20 right-5 z-[100]">
       {isVisible && (
         <button
           type="button"

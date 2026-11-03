@@ -37,34 +37,34 @@ const Companies = () => {
 
           {/* Slider Track — only 2 copies needed for seamless CSS marquee */}
           <div
-            className="flex items-center gap-6 xs:gap-8 md:gap-12 animate-scroll whitespace-nowrap"
+            className="flex items-center gap-4 sm:gap-6 md:gap-8 animate-scroll whitespace-nowrap"
             aria-hidden="true"
           >
             {logos.map((logo, index) => (
               <div
                 key={`a-${index}`}
-                className="flex items-center justify-center h-14 xs:h-16 w-24 xs:w-28 sm:w-36 md:w-40 flex-shrink-0 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                className="flex items-center justify-center h-10 sm:h-11 md:h-12 flex-shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
               >
                 <Image
                   src={logo.src}
                   alt=""
                   width={140}
                   height={60}
-                  className="max-h-8 xs:max-h-10 sm:max-h-12 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                  className="max-h-full w-auto object-contain"
                 />
               </div>
             ))}
             {logos.map((logo, index) => (
               <div
                 key={`b-${index}`}
-                className="flex items-center justify-center h-14 xs:h-16 w-24 xs:w-28 sm:w-36 md:w-40 flex-shrink-0 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
+                className="flex items-center justify-center h-10 sm:h-11 md:h-12 flex-shrink-0 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
               >
                 <Image
                   src={logo.src}
                   alt=""
                   width={140}
                   height={60}
-                  className="max-h-8 xs:max-h-10 sm:max-h-12 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                  className="max-h-full w-auto object-contain"
                 />
               </div>
             ))}

@@ -50,6 +50,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
     <>
       <CompareProvider>
         <Header />
+        {pathname !== "/" && <div className="pt-16" />}
         {children}
         <SocialMediaLinks />
         <Footer />

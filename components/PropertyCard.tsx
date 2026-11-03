@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, memo } from "react";
+import React, { useMemo, memo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -59,6 +59,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   }, [pid]);
 
   const firstMedia = (card.image || [])[0] || "/images/property-tricity.jpg";
+  const [imageFailed, setImageFailed] = useState(false);
 
   const isVideo = useMemo(() => {
     const lower = String(firstMedia).toLowerCase();
@@ -166,10 +167,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         className={
           carousel
             ? "relative h-48 w-full shrink-0 overflow-hidden sm:h-56"
-            : "relative min-h-[12.5rem] w-full flex-1 basis-0 overflow-hidden sm:min-h-[14rem]"
+            : "relative aspect-[4/3] min-h-[12.5rem] w-full flex-1 basis-0 overflow-hidden sm:min-h-[14rem]"
         }
       >
-        {hasValidMedia ? (
+        {imageFailed ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-slate-100">
+            <FaHome className={carousel ? "size-8 text-slate-300" : "size-10 text-slate-300"} aria-hidden />
+            <span className={carousel ? "text-[10px] font-medium text-slate-500" : "text-xs font-medium text-slate-500"}>
+              Image not available
+            </span>
+          </div>
+        ) : hasValidMedia ? (
           isVideo ? (
             <video
               src={firstMedia}
@@ -190,6 +198,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   : "(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
               }
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+              onError={() => setImageFailed(true)}
             />
           )
         ) : (

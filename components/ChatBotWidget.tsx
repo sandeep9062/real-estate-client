@@ -84,7 +84,7 @@ export default function ChatbotWidget() {
   };
 
   return (
-    <div className="fixed bottom-16 right-3 sm:bottom-18 sm:right-5 md:bottom-4 md:right-22 z-50">
+    <div className="fixed bottom-5 right-5 z-50">
       {/* Chat Window */}
       <div
         className={`transition-all duration-300 ease-in-out ${
@@ -181,7 +181,7 @@ export default function ChatbotWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-1.5 sm:gap-2 bg-[#4161df] hover:bg-[#3759dd] text-white py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-5 rounded-full shadow-lg transition-all text-sm sm:text-base"
+          className="flex items-center gap-1.5 sm:gap-2 bg-white border border-slate-200 text-[#4161df] shadow-lg hover:bg-[#4161df]/5 hover:text-[#3654cc] py-2 sm:py-2.5 px-2.5 sm:px-3 md:px-5 rounded-full transition-all text-sm sm:text-base"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

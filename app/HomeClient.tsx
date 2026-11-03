@@ -88,7 +88,7 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
       <Hero setFilter={setFilter} />
 
       {hasFilters && (
-        <section className="container mx-auto px-4 py-8">
+        <section id="search-results" className="container mx-auto px-4 py-8">
           <SearchResultsView
             query={query}
             columns="four"
