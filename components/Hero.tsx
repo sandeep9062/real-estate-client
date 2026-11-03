@@ -287,7 +287,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               className="relative w-36 h-44 xs:w-44 xs:h-52 sm:w-64 sm:h-72 md:w-[21rem] md:h-[25rem] lg:w-[28rem] lg:h-[34rem] overflow-hidden rounded-t-[5rem] xs:rounded-t-[6rem] sm:rounded-t-[10rem] md:rounded-t-[12rem] border-4 sm:border-6 md:border-8 border-border shadow-xl shadow-blue-900/10"
             >
               <Image
-                src="/hero1.png"
+                src="/hero-image.jpg"
                 alt="Tricity property platform"
                 fill
                 priority
