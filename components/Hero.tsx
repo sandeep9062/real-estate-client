@@ -317,7 +317,9 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
           {/* Headline */}
 
           {/* <h1 className="mx-auto max-w-5xl text-balance font-heading text-3xl font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl lg:text-6xl">
-            Tricity's Most Helpul Real Estate Partner
+     Tricity's
+Most Helpful
+Real Estate Partner
           </h1> */}
 
           <h1 className="mx-auto max-w-5xl text-balance font-heading text-3xl font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl lg:text-6xl">
