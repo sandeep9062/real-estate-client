@@ -44,37 +44,6 @@ async function fetchHeroStats(): Promise<HeroStats> {
 
 const CITIES = ["Chandigarh", "Panchkula", "Mohali", "Kharar", "Zirakpur"];
 
-const FEATURES = [
-  {
-    icon: Sparkles,
-    title: "AI Property Match",
-    subtitle: "Exact fit for your needs",
-    accent: "bg-blue-600",
-    iconColor: "text-blue-600",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Verified Listings Only",
-    subtitle: "No fake or expired posts",
-    accent: "bg-blue-600",
-    iconColor: "text-blue-600",
-  },
-  {
-    icon: BadgeIndianRupee,
-    title: "No Hidden Charges",
-    subtitle: "Transparent pricing, no surprises",
-    accent: "bg-green-600",
-    iconColor: "text-green-600",
-  },
-  {
-    icon: FileText,
-    title: "Instant PDF Brochure",
-    subtitle: "One click, share anywhere",
-    accent: "bg-orange-500",
-    iconColor: "text-orange-600",
-  },
-];
-
 const Hero: React.FC<HeroProps> = ({ setFilter }) => {
   const [stats, setStats] = useState<HeroStats | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -160,28 +129,6 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
               region with zero hidden fees and no spam.
             </p>
 
-            {/* LIVE STATS */}
-            {/* <div className="flex items-center justify-center md:justify-start gap-4 xs:gap-5 sm:gap-6 mb-2 xs:mb-3 sm:mb-4">
-              {[
-                { value: display.properties, label: "Properties" },
-                { value: display.projects, label: "Projects" },
-                { value: display.cities, label: "Cities" },
-              ].map((s, i) => (
-                <div
-                  key={s.label}
-                  className={`flex flex-col ${i > 0 ? "pl-4 xs:pl-5 sm:pl-6 border-l border-slate-200" : ""}`}
-                >
-                  <span className="font-extrabold text-base xs:text-lg sm:text-xl text-slate-900 leading-none">
-                    {s.value}
-                    <span className="text-[#4161df]">+</span>
-                  </span>
-                  <span className="text-[9px] xs:text-[10px] sm:text-xs text-muted-foreground mt-0.5">
-                    {s.label}
-                  </span>
-                </div>
-              ))}
-            </div> */}
-
             {/* SEARCH BAR */}
             <div className="w-full flex justify-center md:justify-start">
               <SearchBar onSearch={handleSearch} />
@@ -245,36 +192,6 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
                   {city}
                 </Link>
               ))}
-            </div>
-
-            {/* FEATURE STRIP */}
-            <div className="mt-3 xs:mt-4 sm:mt-6">
-              <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center md:justify-start gap-1.5 xs:gap-2">
-                {FEATURES.map((f) => {
-                  const Icon = f.icon;
-                  return (
-                    <div
-                      key={f.title}
-                      className="flex items-start gap-1.5 xs:gap-2 bg-white/90 backdrop-blur-sm border border-blue-100 rounded-xl xs:rounded-2xl px-2 xs:px-3 py-1.5 xs:py-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all min-w-0 sm:max-w-[11rem]"
-                    >
-                      <div
-                        className={`w-0.5 xs:w-1 self-stretch rounded-full ${f.accent} flex-shrink-0`}
-                      />
-                      <Icon
-                        className={`w-3.5 h-3.5 xs:w-4 xs:h-4 mt-0.5 flex-shrink-0 ${f.iconColor}`}
-                      />
-                      <div className="min-w-0">
-                        <p className="text-[10px] xs:text-xs font-semibold text-slate-900 leading-tight">
-                          {f.title}
-                        </p>
-                        <p className="text-[8px] xs:text-[10px] text-muted-foreground leading-tight mt-0.5 line-clamp-2">
-                          {f.subtitle}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           </div>
 
