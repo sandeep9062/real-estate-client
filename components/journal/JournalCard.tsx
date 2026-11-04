@@ -10,6 +10,7 @@ export interface JournalPost {
   readTime?: string;
   publishedAt?: string;
   coverImage?: string;
+  isFeatured?: boolean;
 }
 
 interface JournalCardProps {
@@ -52,6 +53,11 @@ export default function JournalCard({
           #{formattedIndex}
         </span>
         <div className="relative z-[2]">
+          {post.isFeatured && (
+            <span className="mb-2 inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-white uppercase tracking-wider">
+              Featured
+            </span>
+          )}
           {post.category && (
             <span className="mb-2 inline-block text-[11px] underline decoration-[#e8977e] underline-offset-[3px]">
               {post.category}
@@ -96,6 +102,11 @@ export default function JournalCard({
             className="h-full w-full object-cover"
           />
         </div>
+      )}
+      {post.isFeatured && (
+        <span className="mb-2 inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-[#201d1a] uppercase tracking-wider border border-[#ae4429]/30">
+          Featured
+        </span>
       )}
       {post.category && (
         <span className="mb-2 inline-block text-[11px] text-[#ae4429] underline decoration-[#ae4429] underline-offset-[3px]">
