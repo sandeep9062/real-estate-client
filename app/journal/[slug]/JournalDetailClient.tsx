@@ -65,22 +65,16 @@ export default function JournalDetailClient({
       .slice(0, 3);
   }, [relatedData, slug, journal]);
 
-  // 3. Fetch Related Properties (first comma-separated part of targetSector)
-  // NOTE: Use `sector` param instead of `search` because the backend's `sector`
-  // parameter does exact regex matching on `location.sector`, while `search` does
-  // a multi-token AND search across ALL text fields (too restrictive for sector
-  // queries like "Sector 16").
-  //
-  // targetSector can be in various formats:
-  //   - "Sector 16"                          → just a sector
-  //   - "Sector 16, Chandigarh"              → sector + city
-  //   - "Phase 2, Sector 16"                 → multiple sectors (pick correct one)
-  //   - "Cyber City Mohali"                  → place name
-  //   - "Mohali Sector 115"                  → city + sector
-  //
-  // Strategy: prefer the explicit "Sector <number>" pattern if present,
-  // otherwise fall back to the first comma-separated part, then the full string.
+  // 3. Fetch Related Properties using the journal's "Related listings block":
+  //    targetCity: String, targetSector: String
+  // Show property cards that match BOTH the targeted city and sector so the
+  // listings are exactly relevant to the article's locality.
+  const targetCity = journal?.targetCity?.trim();
   const targetSector = journal?.targetSector?.trim();
+
+  // Derive a clean sector value from targetSector.
+  // Prefer an explicit "Sector <number>" pattern, otherwise fall back to the
+  // first comma-separated part, then the full string.
   const sectorRegex = /Sector\s*\d+(?:[-–]\s*\d+)?/i;
   const sectorQuery =
     targetSector && sectorRegex.test(targetSector)
@@ -91,10 +85,11 @@ export default function JournalDetailClient({
   const { data: relatedProps, isLoading: propsLoading } =
     useGetAllPropertiesQuery(
       {
+        city: targetCity || undefined,
         sector: sectorQuery,
         limit: 3,
       },
-      { skip: !sectorQuery },
+      { skip: !targetCity && !sectorQuery },
     );
 
   // The backend now returns a paginated response: { success, count, total, pagination, data: [...] }
@@ -235,9 +230,12 @@ export default function JournalDetailClient({
         {/* Real-time Properties from the same Sector */}
         <div>
           <Title order={2} mb="xl" ta="center" className="text-xl sm:text-2xl">
-            Properties in {journal.targetSector || "this area"}
+            Properties in{" "}
+            {targetCity && targetSector
+              ? `${targetCity}, ${targetSector}`
+              : targetCity || targetSector || "this area"}
           </Title>
-          {sectorQuery && (
+          {(targetCity || sectorQuery) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {relatedProperties?.map((prop: any) => (
                 <PropertyCard key={prop._id} card={prop} />
@@ -245,16 +243,16 @@ export default function JournalDetailClient({
               {relatedProperties?.length === 0 && (
                 <div className="col-span-full">
                   <Text ta="center" c="dimmed">
-                    No active listings in this sector currently.
+                    No active listings in this area currently.
                   </Text>
                 </div>
               )}
             </div>
           )}
-          {!sectorQuery && (
+          {!targetCity && !sectorQuery && (
             <div className="col-span-full">
               <Text ta="center" c="dimmed">
-                Search for a journal article to find properties in that sector.
+                No target city or sector set for this article.
               </Text>
             </div>
           )}
@@ -325,7 +323,10 @@ export default function JournalDetailClient({
         <Paper bg="#4161df10" p="xl" radius="md" mt={60} ta="center">
           <IconHome size={32} color="#4161df" />
           <Title order={3} mt="md" className="text-lg sm:text-xl">
-            Ready to move to {journal.targetSector}?
+            Ready to move to{" "}
+            {targetCity && targetSector
+              ? `${targetCity}, ${targetSector}`
+              : targetCity || targetSector || "this area"}?
           </Title>
           <Text mb="xl" size="sm" className="sm:text-base">
             Browse our full list of verified properties in this locality.
@@ -335,7 +336,17 @@ export default function JournalDetailClient({
             radius="md"
             color="#4161df"
             component={Link}
-            href={`/properties?sector=${encodeURIComponent(journal.targetSector)}`}
+            href={
+              targetCity
+                ? `/properties/${String(targetCity)
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}?sector=${encodeURIComponent(
+                    targetSector || "",
+                  )}`
+                : sectorQuery
+                  ? `/properties?sector=${encodeURIComponent(sectorQuery)}`
+                  : "/properties"
+            }
             className="w-full sm:w-auto"
           >
             Explore All Listings
