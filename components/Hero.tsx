@@ -133,9 +133,9 @@ const Field: React.FC<{
       disabled ? "bg-slate-50" : "bg-white hover:bg-slate-50"
     }`}
   >
-    <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-      <span className="text-[#4161df]">{icon}</span>
-      {label}
+    <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-slate-500">
+      <span className="shrink-0 text-[#4161df]">{icon}</span>
+      <span className="truncate">{label}</span>
     </span>
     {children}
     <ChevronDown className="pointer-events-none absolute bottom-3.5 right-3 h-4 w-4 text-slate-400 transition-colors group-focus-within:text-[#4161df]" />
@@ -144,10 +144,11 @@ const Field: React.FC<{
 
 // text-base on mobile prevents iOS Safari from zooming the page on focus
 const selectClass =
-  "w-full truncate appearance-none bg-transparent pr-6 text-base font-semibold text-slate-900 focus:outline-none cursor-pointer sm:text-sm";
+  "w-full min-w-0 truncate appearance-none bg-transparent pr-6 text-base font-semibold text-slate-900 focus:outline-none cursor-pointer sm:text-sm";
 
+// slightly taller tap target on mobile (py-2), original size from sm up
 const chipBase =
-  "shrink-0 rounded-full border border-white/30 bg-black/30 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:text-sm";
+  "shrink-0 rounded-full border border-white/30 bg-black/30 px-4 py-2 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:py-1.5 sm:text-sm";
 
 /* ───────────────────────── Component ───────────────────────── */
 
@@ -295,7 +296,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
   ];
 
   return (
-    <section className="relative isolate overflow-hidden bg-slate-900">
+    <section className="relative isolate w-full overflow-hidden bg-slate-900">
       {/* ───────── Background image + overlay (content sits ON TOP of it) ───────── */}
       <Image
         src="/hero-image.jpg"
@@ -308,7 +309,7 @@ const Hero: React.FC<HeroProps> = ({ setFilter }) => {
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
 
       {/* ───────── Content ───────── */}
-      <div className="mx-auto flex min-h-[520px] max-w-7xl flex-col items-center px-4 pb-8 pt-10 text-center sm:px-6 sm:pb-10 sm:pt-14 lg:min-h-[640px] lg:justify-center lg:px-8 lg:pb-14 lg:pt-18">
+      <div className="mx-auto flex min-h-[480px] max-w-7xl flex-col items-center px-4 pb-8 pt-8 text-center sm:min-h-[520px] sm:px-6 sm:pb-10 sm:pt-14 lg:min-h-[640px] lg:justify-center lg:px-8 lg:pb-14 lg:pt-18">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -323,23 +324,26 @@ Most Helpful
 Real Estate Partner
           </h1> */}
 
-          <h1 className="mx-auto max-w-5xl text-balance font-heading text-3xl font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl lg:text-6xl">
+          <h1 className="mx-auto max-w-5xl text-balance break-words font-heading text-[1.65rem] font-extrabold leading-[1.15] tracking-tight text-white drop-shadow-sm min-[380px]:text-3xl sm:text-4xl sm:leading-[1.1] md:text-5xl lg:text-6xl">
             Find your dream home in Chandigarh, Mohali &amp; Panchkula
           </h1>
 
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/90 drop-shadow-sm sm:mt-5 sm:text-lg">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/90 drop-shadow-sm min-[380px]:text-base sm:mt-5 sm:text-lg">
             Buy, rent or list verified properties across the Tricity. Fresh
             listings daily, no spam, zero hidden fees.
           </p>
 
           {/* Trust points */}
-          <ul className="mt-6 flex flex-wrap justify-center gap-x-2 gap-y-2 sm:gap-x-5 sm:gap-y-3">
+          <ul className="mt-5 flex flex-wrap justify-center gap-x-2 gap-y-2 sm:mt-6 sm:gap-x-5 sm:gap-y-3">
             {TRUST_POINTS.map((tp) => (
               <li
                 key={tp.text}
-                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm text-xs font-semibold text-white sm:gap-2.5 sm:px-4 sm:text-sm"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-sm text-xs font-semibold text-white sm:gap-2.5 sm:px-4 sm:text-sm"
               >
-                <tp.icon className="h-4 w-4 text-white" aria-hidden="true" />
+                <tp.icon
+                  className="h-4 w-4 shrink-0 text-white"
+                  aria-hidden="true"
+                />
                 {tp.text}
               </li>
             ))}
@@ -348,7 +352,7 @@ Real Estate Partner
           {/* ───────── Search card ───────── */}
           <form
             onSubmit={runSearch}
-            className="mx-auto mt-8 w-full max-w-4xl rounded-2xl bg-white p-4 text-left shadow-2xl shadow-slate-900/30 sm:mt-10 sm:p-5"
+            className="mx-auto mt-6 w-full max-w-4xl rounded-2xl bg-white p-3 text-left shadow-2xl shadow-slate-900/30 min-[400px]:p-4 sm:mt-10 sm:p-5"
           >
             {/* tabs */}
             <div
@@ -380,7 +384,7 @@ Real Estate Partner
             {/* smart search input */}
             <div className="relative mb-3">
               <Search
-                className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#4161df]"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-[#4161df] sm:left-4"
                 aria-hidden="true"
               />
               <input
@@ -393,13 +397,13 @@ Real Estate Partner
                 onChange={(e) => setSmartQuery(e.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label="Search properties"
-                className="w-full text-ellipsis rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-16 text-base text-slate-900 transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-[#4161df] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#4161df]/15 [&::-webkit-search-cancel-button]:hidden"
+                className="w-full min-w-0 text-ellipsis rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-16 text-base text-slate-900 transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-[#4161df] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#4161df]/15 sm:pl-12 [&::-webkit-search-cancel-button]:hidden"
               />
               {smartQuery && (
                 <button
                   type="button"
                   onClick={() => setSmartQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200/70 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/50"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200/70 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/50 sm:right-3 sm:px-2 sm:py-1"
                   aria-label="Clear search"
                 >
                   Clear
@@ -409,7 +413,7 @@ Real Estate Partner
 
             {/* Filters + CTA */}
             <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
-              <div className="grid flex-1 grid-cols-2 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 lg:grid-cols-4">
+              <div className="grid flex-1 grid-cols-1 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 min-[340px]:grid-cols-2 lg:grid-cols-4">
                 <Field label="City" icon={<MapPin className="h-3.5 w-3.5" />}>
                   <select
                     value={city}
@@ -486,7 +490,7 @@ Real Estate Partner
 
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#4161df] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#4161df]/30 transition-colors hover:bg-[#3654cc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df] focus-visible:ring-offset-2 active:bg-[#3654cc] lg:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#4161df] px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#4161df]/30 transition-colors hover:bg-[#3654cc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df] focus-visible:ring-offset-2 active:bg-[#3654cc] sm:px-8 lg:w-auto"
               >
                 <Search className="h-5 w-5" aria-hidden="true" />
                 {mode === "Rent" ? "Search rentals" : "Search properties"}
@@ -495,7 +499,7 @@ Real Estate Partner
           </form>
 
           {/* Quick searches: one scrolling row on mobile, wrapped on desktop */}
-          <div className="-mx-4 mt-6 flex items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 mt-5 flex items-center gap-2 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:mt-6 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
             <span className="shrink-0 text-xs font-medium text-white/90 sm:text-sm">
               Popular:
             </span>
@@ -514,7 +518,7 @@ Real Estate Partner
           {/* City quick links: scrollable row on mobile, wrapped on desktop */}
           <nav
             aria-label="Browse by city"
-            className="-mx-4 mt-6 flex items-center gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-8 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
+            className="-mx-4 mt-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-8 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0"
           >
             <span className="mr-1 shrink-0 whitespace-nowrap text-xs font-medium text-white/90 sm:text-sm">
               Browse by city:
@@ -531,7 +535,7 @@ Real Estate Partner
             ))}
             <Link
               href="/properties"
-              className="group inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold text-white underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:text-sm"
+              className="group inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold text-white underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 sm:py-1.5 sm:text-sm"
             >
               View all
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
