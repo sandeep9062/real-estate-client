@@ -204,7 +204,7 @@ export default function JournalDetailClient({
           </Group>
           <Group gap={5} wrap="nowrap">
             <IconUser size={16} />
-            <Text size="sm">{journal.author || AUTHOR_FALLBACK}</Text>
+            <Text size="sm">{journal.author?.name || AUTHOR_FALLBACK}</Text>
           </Group>
         </Group>
 

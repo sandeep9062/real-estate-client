@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const author = journal.author || "PropertyBulbul Editorial";
+  const author = journal.author?.name || "PropertyBulbul Editorial";
   const title = withBrandSuffix(journal.metaTitle || journal.title);
   const description =
     journal.excerpt?.substring(0, 160) ||

@@ -307,9 +307,15 @@ interface Journal {
   altText?: string;
   coverImageWidth?: number;
   coverImageHeight?: number;
-  author: string;
+  author: {
+    name: string;
+    role?: string;
+    avatar?: string;
+  };
   targetCity?: string;
   targetSector: string;
+  series?: string;
+  articleNumber?: number;
   metaTitle?: string;
   metaDescription?: string;
   keywords: string[];

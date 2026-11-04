@@ -75,7 +75,7 @@ export function generateArticleSchema(journal: any, slug: string) {
   const canonicalUrl = `https://propertybulbul.com/journal/${slug}`;
   const imageUrl =
     journal.coverImage || "https://propertybulbul.com/property-tricity.jpg";
-  const authorName = journal.author || "PropertyBulbul Editorial";
+  const authorName = journal.author?.name || "PropertyBulbul Editorial";
 
   return {
     "@context": "https://schema.org",
