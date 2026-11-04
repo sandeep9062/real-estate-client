@@ -66,7 +66,10 @@ export default function JournalClient({
       limit: INITIAL_LIMIT,
       category: activeCategory === "All" ? undefined : activeCategory,
     },
-    { skip: isStaticData },
+    // Only skip the client fetch when we already have static (SSR) data to show.
+    // If SSR returned empty (e.g. API unreachable at build time), fetch client-side
+    // so the page is never left blank — "All" should always show all articles.
+    { skip: isStaticData && allJournals.length > 0 },
   );
 
   const [fetchNextPage] = useLazyGetJournalsPageQuery();
