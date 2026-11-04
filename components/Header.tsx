@@ -71,19 +71,21 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("pb-compare-changed", refresh);
   }, []);
 
-  // Close the mobile panel on outside clicks and on Escape.
+  // Close the mobile panel on outside clicks/taps and on Escape.
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
+    const onOutside = (e: MouseEvent | TouchEvent) => {
       if (!menuOpened || !headerRef.current) return;
       if (!headerRef.current.contains(e.target as Node)) closeMenu();
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeMenu();
     };
-    document.addEventListener("mousedown", onClick);
+    document.addEventListener("mousedown", onOutside);
+    document.addEventListener("touchstart", onOutside, { passive: true });
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("mousedown", onOutside);
+      document.removeEventListener("touchstart", onOutside);
       document.removeEventListener("keydown", onKey);
     };
   }, [menuOpened, closeMenu]);
@@ -135,7 +137,7 @@ const Header: React.FC = () => {
 
   const mobileItemClasses = (href: string) =>
     cn(
-      "block min-h-[46px] flex items-center rounded-lg px-4 py-3.5 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df] focus-visible:ring-offset-1",
+      "min-h-[46px] flex items-center rounded-lg px-4 py-3.5 text-base font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df] focus-visible:ring-offset-1",
       isActive(href) ? "bg-[#4161df]/10 text-[#4161df] font-semibold" : "",
     );
 
@@ -149,11 +151,11 @@ const Header: React.FC = () => {
           : "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200",
       )}
     >
-      <div className="max-w-[96vw] mx-auto flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2 md:py-1.5">
+      <div className="max-w-[96vw] mx-auto flex items-center justify-between gap-2 px-3 sm:px-4 py-1.5 sm:py-2 md:py-1.5">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-1.5 sm:gap-2 group"
+          className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2 group"
           aria-label="Go to homepage"
         >
           <Image
@@ -163,7 +165,7 @@ const Header: React.FC = () => {
             height={38}
             priority
             className={cn(
-              "w-12 h-12 sm:w-10 sm:h-10 md:w-14 md:h-14 transition-all duration-300 group-hover:scale-[1.04]",
+              "w-10 h-10 sm:w-10 sm:h-10 md:w-14 md:h-14 shrink-0 object-contain transition-all duration-300 group-hover:scale-[1.04]",
               // Only one logo asset exists, so force it white over the hero.
               // Needs a transparent-background PNG; otherwise add a white
               // logo file to /public and switch `src` based on `lightText`.
@@ -252,7 +254,7 @@ const Header: React.FC = () => {
             aria-expanded={menuOpened}
             aria-controls="mobile-menu"
             className={cn(
-              "flex items-center justify-center p-2 sm:p-2.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+              "flex min-h-[44px] min-w-[44px] items-center justify-center p-2 sm:p-2.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
               lightText
                 ? "text-white hover:bg-white/20 focus-visible:ring-white"
                 : "text-slate-700 hover:bg-slate-100 focus-visible:ring-[#4161df]",
@@ -267,9 +269,9 @@ const Header: React.FC = () => {
       {menuOpened && (
         <div
           id="mobile-menu"
-          className="md:hidden border-t border-slate-200 bg-white shadow-lg"
+          className="md:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-slate-200 bg-white shadow-lg"
         >
-          <nav className="flex flex-col gap-1 p-3">
+          <nav className="flex flex-col gap-1 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <Link
               href="/saved-searches"
               className={mobileItemClasses("/saved-searches")}
