@@ -54,7 +54,7 @@ export default function JournalCard({
         </span>
         <div className="relative z-[2]">
           {post.isFeatured && (
-            <span className="mb-2 inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-white uppercase tracking-wider">
+            <span className="absolute left-[18px] top-[16px] z-[2] inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-white uppercase tracking-wider">
               Featured
             </span>
           )}
@@ -104,7 +104,7 @@ export default function JournalCard({
         </div>
       )}
       {post.isFeatured && (
-        <span className="mb-2 inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-[#201d1a] uppercase tracking-wider border border-[#ae4429]/30">
+        <span className="mb-2 inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-white uppercase tracking-wider">
           Featured
         </span>
       )}
