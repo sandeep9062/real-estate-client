@@ -1,10 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useInfiniteProperties } from "../hooks/useInfiniteProperties";
 import PropertyGrid, { type PropertyGridColumns } from "./PropertyGrid";
 import PropertyGridSkeleton from "./PropertyGridSkeleton";
 import InfiniteScrollLoader from "./InfiniteScrollLoader";
+
+// Properties with isActive === false must never render a card in search
+// results. The backend already filters them out for non-admin users, but this
+// client-side guard protects against stale cache / edge cases. Missing `isActive`
+// (older documents) is treated as visible.
+const isPubliclyVisible = (p: any) => p?.isActive !== false;
 
 export interface SearchResultsViewProps {
   query: { [key: string]: string };
@@ -77,6 +83,12 @@ export function SearchResultsView({
 
   const hasFilters = Object.keys(query).length > 0;
 
+  // Drop inactive properties so they never render a card (same guard as /properties).
+  const visibleProperties = useMemo(
+    () => properties.filter(isPubliclyVisible),
+    [properties],
+  );
+
   return (
     <div className="w-full">
       {hasFilters && (
@@ -92,7 +104,7 @@ export function SearchResultsView({
         </div>
       )}
       <PropertyGrid
-        properties={properties}
+        properties={visibleProperties}
         columns={columns}
         variant="carousel"
         selectedId={selectedId}
@@ -102,7 +114,7 @@ export function SearchResultsView({
         loading={loadingMore}
         hasMore={hasMore}
       />
-      {!hasMore && properties.length > 0 && (
+      {!hasMore && visibleProperties.length > 0 && (
         <div className="w-full text-center py-6 text-sm text-gray-400">
           {total > 0
             ? `Showing all ${total} properties`

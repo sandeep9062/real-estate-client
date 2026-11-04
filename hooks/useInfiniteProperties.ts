@@ -24,7 +24,7 @@ interface UseInfinitePropertiesResult {
  */
 export function useInfiniteProperties(
   filters: Record<string, string>,
-  limit = 10,
+  limit = 100,
 ): UseInfinitePropertiesResult {
   const [page, setPage] = useState(1);
   const [allProperties, setAllProperties] = useState<any[]>([]);

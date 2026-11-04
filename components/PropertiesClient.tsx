@@ -16,7 +16,7 @@ import PropertyGridSkeleton from "@/components/PropertyGridSkeleton";
 import InfiniteScrollLoader from "@/components/InfiniteScrollLoader";
 import SaveSearchButton from "@/components/SaveSearchButton";
 import { useLazyGetAllPropertiesQuery } from "@/services/propertiesApi";
-import { buildSeoHrefFromFilters } from "@/lib/filterSlug";
+import { buildSeoHrefFromFilters, normalizeCity } from "@/lib/filterSlug";
 import { scrollToElement } from "@/lib/smooth-scroll";
 import { Map, List as ListIcon, Loader2 } from "lucide-react";
 
@@ -86,7 +86,15 @@ function PropertiesClientInner({
   const query = useMemo(() => {
     const params: { [key: string]: string } = {};
     searchParams.forEach((value, key) => {
-      params[key] = value;
+      // Normalize city the same way search results do (parseSearchQuery → auto-correct + lowercase)
+      // so /properties?city=Chandigarh and /properties?city=chandigarh give identical results.
+      if (key === "city") {
+        const normalized = normalizeCity(value);
+        if (normalized) params[key] = normalized;
+        else params[key] = value;
+      } else {
+        params[key] = value;
+      }
     });
     return params;
   }, [searchParams]);
