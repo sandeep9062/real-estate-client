@@ -89,7 +89,6 @@ export default function JournalClient({
 
   const handleCategoryChange = (val: string) => {
     setActiveCategory(val);
-    setAllJournals([]);
     setPage(1);
     setHasNextPage(false);
     if (val !== "All" || !isStaticData) {
@@ -160,23 +159,32 @@ export default function JournalClient({
     setPage((p) => p + 1);
   }, [loading, hasNextPage]);
 
-  const filteredJournals = useMemo(() => {
-    if (!searchQuery.trim()) return allJournals;
-    const q = searchQuery.toLowerCase();
-    return allJournals.filter(
-      (post) =>
-        post.title?.toLowerCase().includes(q) ||
-        post.excerpt?.toLowerCase().includes(q),
-    );
-  }, [allJournals, searchQuery]);
-
   const categories = useMemo(() => {
-    const serverCategories = categoriesData?.categories || initialCategories;
-    return ["All", ...serverCategories];
+    // Merge server-fetched + client-fetched categories, deduplicate,
+    // and always keep "All" as the first chip.
+    const merged = [
+      ...new Set([...initialCategories, ...(categoriesData?.categories || [])]),
+    ];
+    return ["All", ...merged];
   }, [categoriesData, initialCategories]);
 
   const isFiltered = searchQuery !== "" || activeCategory !== "All";
-  const displayJournals = searchQuery.trim() ? filteredJournals : allJournals;
+  const displayJournals = useMemo(() => {
+    let result = allJournals;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (post) =>
+          post.title?.toLowerCase().includes(q) ||
+          post.excerpt?.toLowerCase().includes(q),
+      );
+    }
+    // Actually filter the feed by the selected category chip.
+    if (activeCategory !== "All") {
+      result = result.filter((post) => post.category === activeCategory);
+    }
+    return result;
+  }, [allJournals, searchQuery, activeCategory]);
 
   if (isLoading && !isStaticData) {
     return (
