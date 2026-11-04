@@ -182,7 +182,9 @@ export const journalApi = createApi({
       query: () => "/v1/journals/categories",
     }),
 
-    // Fetch single journal by ID
+    // Fetch single journal by ID (any status except soft-deleted).
+    // Backend route is now admin-only (protect + checkAdmin); only call from
+    // authenticated admin contexts. Public detail viewing uses getJournalBySlug.
     getJournalById: builder.query<Journal, string>({
       query: (id) => `/v1/journals/${id}`,
       providesTags: (result, error, id) => [{ type: "Journal", id }],
@@ -294,18 +296,34 @@ export const {
 interface Journal {
   _id: string;
   title: string;
-  content: string;
-  excerpt: string;
-  author: string;
-  date: string;
+  slug: string;
+  slugHistory?: string[];
   category: string;
-  targetSector: string;
-  location?: string;
+  tags?: string[];
+  excerpt?: string;
+  content: string;
+  faqs?: Array<{ question: string; answer: string }>;
   coverImage: string;
   altText?: string;
-  slug: string;
-  metaTitle: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
+  author: string;
+  targetCity?: string;
+  targetSector: string;
+  metaTitle?: string;
+  metaDescription?: string;
   keywords: string[];
+  canonicalUrl?: string;
+  noIndex?: boolean;
+  relatedSlugs?: string[];
+  readingTime?: number;
+  wordCount?: number;
+  status: "draft" | "published" | "archived";
+  publishedAt?: string;
+  lastReviewedAt?: string;
+  views: number;
+  isFeatured: boolean;
+  deletedAt?: string | null;
   createdAt: string;
   updatedAt?: string;
 }
