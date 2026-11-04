@@ -41,7 +41,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: var(--navbar-height);
+  scroll-padding-top: 0;
 }
 
 /* Lenis takes over scrolling — don't let the UA animate it as well. */

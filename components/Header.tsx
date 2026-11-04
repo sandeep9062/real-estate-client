@@ -28,9 +28,16 @@ const Header: React.FC = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Transparent ONLY on the homepage while at the top of the page.
-  // Every other route (or homepage once scrolled) uses the solid style.
-  const transparent = pathname === "/" && !scrolled;
+  // Transparent when not scrolled (on any page). Used for the header background.
+  // Solid style appears once the user scrolls past the threshold.
+  const transparent = !scrolled;
+
+  // White text only on the home page "/" while the header is transparent.
+  // On every other route the text stays dark.
+
+  // Routes where the transparent header shows white text (over a dark hero).
+  const LIGHT_TEXT_ROUTES = ["/", "/pricing", "/about"];
+  const lightText = transparent && LIGHT_TEXT_ROUTES.includes(pathname);
 
   const toggleMenu = () => setMenuOpened((prev) => !prev);
   const closeMenu = useCallback(() => setMenuOpened(false), []);
@@ -94,7 +101,7 @@ const Header: React.FC = () => {
   const navLinkClasses = (href: string) =>
     cn(
       "min-h-[44px] flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-      transparent
+      lightText
         ? cn(
             "text-white/90 hover:text-white",
             isActive(href)
@@ -114,14 +121,14 @@ const Header: React.FC = () => {
 
   const outlineButtonClasses = cn(
     "min-h-[44px] px-5 py-2.5 rounded-full text-sm font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.97]",
-    transparent
+    lightText
       ? "border-white text-white bg-transparent hover:bg-white/20 focus-visible:ring-white"
       : "border-slate-300 text-slate-800 bg-transparent hover:bg-slate-100 hover:border-slate-400 focus-visible:ring-[#4161df]",
   );
 
   const ghostButtonClasses = cn(
     "min-h-[44px] px-5 py-2.5 rounded-full text-sm font-medium transition-colors active:scale-[0.97]",
-    transparent
+    lightText
       ? "text-white hover:underline underline-offset-4"
       : "text-slate-600 hover:text-slate-900 hover:underline underline-offset-4",
   );
@@ -159,9 +166,9 @@ const Header: React.FC = () => {
               "w-12 h-12 sm:w-10 sm:h-10 md:w-14 md:h-14 transition-all duration-300 group-hover:scale-[1.04]",
               // Only one logo asset exists, so force it white over the hero.
               // Needs a transparent-background PNG; otherwise add a white
-              // logo file to /public and switch `src` based on `transparent`.
+              // logo file to /public and switch `src` based on `lightText`.
 
-              // transparent && "brightness-0 invert",
+              // lightText && "brightness-0 invert",
             )}
           />
 
@@ -169,7 +176,7 @@ const Header: React.FC = () => {
             <span
               className={cn(
                 "text-[22px] font-extrabold tracking-tight transition-colors duration-300",
-                transparent ? "text-white" : "text-slate-900",
+                lightText ? "text-white" : "text-slate-900",
               )}
             >
               Property
@@ -178,7 +185,7 @@ const Header: React.FC = () => {
             <span
               className={cn(
                 "text-[20px] font-extrabold tracking-tight transition-colors duration-300",
-                transparent ? "text-white" : "text-[#4161df]",
+                lightText ? "text-white" : "text-[#4161df]",
               )}
             >
               Bulbul
@@ -246,7 +253,7 @@ const Header: React.FC = () => {
             aria-controls="mobile-menu"
             className={cn(
               "flex items-center justify-center p-2 sm:p-2.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-              transparent
+              lightText
                 ? "text-white hover:bg-white/20 focus-visible:ring-white"
                 : "text-slate-700 hover:bg-slate-100 focus-visible:ring-[#4161df]",
             )}
