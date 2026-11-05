@@ -322,7 +322,6 @@ interface Journal {
   keywords: string[];
   canonicalUrl?: string;
   noIndex?: boolean;
-  relatedSlugs?: string[];
   readingTime?: number;
   wordCount?: number;
   status: "draft" | "published" | "archived";
