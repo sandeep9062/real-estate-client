@@ -52,12 +52,12 @@ export default function JournalCard({
         <span className="absolute left-[18px] top-[16px] z-[2] font-mono text-[11px] text-white/75">
           #{formattedIndex}
         </span>
+        {post.isFeatured && (
+          <span className="absolute left-[18px] top-[40px] z-[2] inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-white uppercase tracking-wider">
+            Featured
+          </span>
+        )}
         <div className="relative z-[2]">
-          {post.isFeatured && (
-            <span className="absolute left-[18px] top-[16px] z-[2] inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[#ae4429] text-[10px] font-bold text-white uppercase tracking-wider">
-              Featured
-            </span>
-          )}
           {post.category && (
             <span className="mb-2 inline-block text-[11px] underline decoration-[#e8977e] underline-offset-[3px]">
               {post.category}
