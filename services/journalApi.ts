@@ -300,6 +300,7 @@ interface Journal {
   slugHistory?: string[];
   category: string;
   tags?: string[];
+  relatedSlugs?: string[];
   excerpt?: string;
   content: string;
   faqs?: Array<{ question: string; answer: string }>;
