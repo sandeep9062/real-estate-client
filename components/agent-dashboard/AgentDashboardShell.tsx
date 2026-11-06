@@ -85,15 +85,16 @@ export default function AgentDashboardShell({
         {/* Sidebar (desktop) */}
         <aside
           className={cn(
-            "hidden shrink-0 md:block transition-all duration-300 ease-in-out",
+            "hidden shrink-0 md:block transition-all duration-300 ease-in-out flex flex-col",
             collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
+            "bg-white border-r border-gray-200/80 shadow-sm",
           )}
           data-collapsed={collapsed}
         >
-          <div className="sticky top-28 space-y-7">
+          <div className="sticky top-28 flex flex-col h-full">
             {/* Brand */}
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] text-white shadow-md shadow-[#4161df]/25">
+            <div className="flex items-center gap-3 px-3 py-4 border-b border-gray-200/60">
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] text-white shadow-lg shadow-[#4161df]/30">
                 <Building2 className="h-5 w-5" aria-hidden />
               </span>
               {!collapsed && (
@@ -109,7 +110,7 @@ export default function AgentDashboardShell({
             </div>
 
             {/* Primary nav */}
-            <nav className="flex flex-col gap-1" aria-label="Agent dashboard">
+            <nav className="flex flex-col gap-1.5 mx-2" aria-label="Agent dashboard">
               {AGENT_DASHBOARD_NAV.map(({ href, label, icon: Icon }) => {
                 const active =
                   href === "/agent-dashboard"
@@ -120,20 +121,26 @@ export default function AgentDashboardShell({
                     key={href}
                     href={href}
                     aria-current={active ? "page" : undefined}
+                    title={collapsed ? label : undefined}
                     className={cn(
                       "flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all",
                       active
-                        ? "bg-white text-[#4161df] shadow-sm ring-1 ring-gray-200/80"
-                        : "text-gray-600 hover:bg-white/80 hover:text-gray-900 hover:shadow-sm hover:ring-1 hover:ring-gray-200/60",
+                        ? "bg-[#4161df]/10 text-[#4161df] shadow-sm ring-1 ring-[#4161df]/20 border border-transparent"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 hover:ring-1 hover:ring-gray-200/60",
                     )}
                   >
-                    <Icon
-                      className={cn(
-                        "h-[18px] w-[18px] shrink-0",
-                        active ? "text-[#4161df]" : "text-gray-400",
+                    <div className="relative">
+                      <Icon
+                        className={cn(
+                          "h-[18px] w-[18px] shrink-0",
+                          active ? "text-[#4161df]" : "text-gray-400",
+                        )}
+                        aria-hidden
+                      />
+                      {active && (
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#4161df]" />
                       )}
-                      aria-hidden
-                    />
+                    </div>
                     {!collapsed && label}
                   </Link>
                 );
@@ -141,7 +148,7 @@ export default function AgentDashboardShell({
             </nav>
 
             {/* User card */}
-            <div className="rounded-2xl border border-gray-200/80 bg-white p-3 shadow-sm">
+            <div className="mx-2 mt-4 rounded-2xl border border-gray-200/80 bg-white p-3 shadow-sm overflow-hidden">
               <div className="flex items-center gap-3">
                 {avatarUrl ? (
                   <img
@@ -150,7 +157,7 @@ export default function AgentDashboardShell({
                     className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white/80"
                   />
                 ) : (
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-[#4161df]">
+                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#4161df]/10 text-xs font-bold text-[#4161df]">
                     {getInitials(user?.name)}
                   </span>
                 )}
@@ -173,7 +180,7 @@ export default function AgentDashboardShell({
             <button
               onClick={() => setCollapsed((prev) => !prev)}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="flex shrink-0 items-center justify-center rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+              className="mx-2 mt-4 flex shrink-0 items-center justify-center rounded-xl p-1.5 text-gray-400 bg-gray-50 border border-gray-200/80 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm transition-all"
             >
               {collapsed ? (
                 <ChevronRight className="h-4 w-4" aria-hidden />
@@ -189,7 +196,7 @@ export default function AgentDashboardShell({
           <button
             onClick={() => setCollapsed(false)}
             aria-label="Expand sidebar"
-            className="fixed left-2 top-[calc(5.5rem+env(safe-area-inset-top)+1rem)] z-50 flex shrink-0 items-center justify-center rounded-md p-1.5 bg-white border border-gray-200/80 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            className="fixed left-[calc(4rem-1rem)] top-[calc(5.5rem+env(safe-area-inset-top)+1rem)] z-50 flex shrink-0 items-center justify-center rounded-r-xl p-1.5 pl-1 pr-2 bg-white border-l-0 border-t border-b border-r border-gray-200/80 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-900 hover:shadow-md transition-all"
           >
             <ChevronRight className="h-4 w-4" aria-hidden />
           </button>
