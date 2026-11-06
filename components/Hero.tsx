@@ -12,10 +12,10 @@ import {
   BedDouble,
   Building2,
   ChevronDown,
+  House,
   MapPin,
   Search,
   ShieldCheck,
-  Sparkles,
   Wallet,
 } from "lucide-react";
 
@@ -97,11 +97,10 @@ const QUICK_SEARCHES: { label: string; query: string }[] = [
   { label: "Villas in Panchkula", query: "villa sale panchkula" },
   { label: "Office space in Zirakpur", query: "office rent zirakpur" },
 ];
-
 const TRUST_POINTS = [
   { icon: ShieldCheck, text: "Verified listings" },
   { icon: BadgeIndianRupee, text: "Zero hidden fees" },
-  { icon: Sparkles, text: "Fresh, active properties" },
+  { icon: House, text: "Fresh, active properties" },
 ];
 
 const FALLBACK_STATS: HeroStats = { properties: 181, projects: 3, cities: 5 };
