@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
-import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Building2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { selectUser } from "@/store/authSlice";
 import { AGENT_DASHBOARD_NAV } from "./agent-dashboard-nav";
 
-const SIDEBAR_EXPANDED_WIDTH = "w-60";
-const SIDEBAR_COLLAPSED_WIDTH = "w-16";
+const SIDEBAR_EXPANDED_WIDTH = "w-64";
+const SIDEBAR_COLLAPSED_WIDTH = "w-[4.5rem]";
 const SIDEBAR_STORAGE_KEY = "agent-dashboard:sidebar:collapsed";
 
 function getInitials(name?: string | null): string {
@@ -46,8 +46,55 @@ function getApiBaseUrl(): string {
 function getUserImageUrl(imagePath?: string | null): string | undefined {
   if (!imagePath) return undefined;
   if (imagePath.startsWith("http")) return imagePath;
-  const baseUrl = getApiBaseUrl().replace("/api", "");
-  return `${baseUrl}/${imagePath.replace(/\\/g, "/")}`;
+  const baseUrl = getApiBaseUrl().replace(/\/api\/?$/, "");
+  return `${baseUrl}/${imagePath.replace(/\\/g, "/").replace(/^\/+/, "")}`;
+}
+
+function isActivePath(pathname: string, href: string): boolean {
+  if (href === "/agent-dashboard") return pathname === "/agent-dashboard";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function Avatar({
+  url,
+  name,
+  className,
+}: {
+  url?: string;
+  name?: string | null;
+  className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  // Reset the error state if the image URL changes.
+  useEffect(() => setFailed(false), [url]);
+
+  if (url && !failed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={url}
+        alt={`${name ?? "Agent"} profile picture`}
+        onError={() => setFailed(true)}
+        className={cn(
+          "shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm",
+          className,
+        )}
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4161df]/15 to-[#7c93f2]/25 text-xs font-bold text-[#4161df] ring-2 ring-white shadow-sm",
+        className,
+      )}
+    >
+      {getInitials(name)}
+    </span>
+  );
 }
 
 export default function AgentDashboardShell({
@@ -59,174 +106,199 @@ export default function AgentDashboardShell({
   const user = useSelector(selectUser);
   const avatarUrl = getUserImageUrl(user?.image);
 
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
+  const [collapsed, setCollapsed] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
-  // Persist the collapsed state so it survives reloads.
+  // Read the saved state after mount (avoids SSR/client hydration mismatch).
   useEffect(() => {
     try {
-      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(collapsed));
+      setCollapsed(localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true");
     } catch {
       // Ignore storage errors (e.g. private browsing).
     }
-  }, [collapsed]);
+    setHydrated(true);
+  }, []);
+
+  // Persist the collapsed state so it survives reloads.
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(collapsed));
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [collapsed, hydrated]);
 
   return (
-    <div className="min-h-[100dvh] w-full bg-[#f6f8fb]">
+    <div className="min-h-[100dvh] w-full bg-[#f6f8fb] bg-[radial-gradient(60rem_30rem_at_0%_0%,rgba(65,97,223,0.06),transparent_60%),radial-gradient(50rem_30rem_at_100%_100%,rgba(124,147,242,0.06),transparent_60%)]">
       {/* Full-width shell: intentionally NOT using the site-wide centered
-          max-w container that other pages use — only a small gutter (px-2/px-3). */}
-      <div className="flex w-full min-w-0 gap-6 px-2 pb-[max(4rem,env(safe-area-inset-bottom))] pt-[calc(5.5rem+env(safe-area-inset-top))] sm:gap-8 sm:px-3 sm:pt-24 md:pb-16">
+          max-w container that other pages use — only a small gutter. */}
+      <div className="flex w-full min-w-0 items-start gap-5 px-2 pb-[max(4rem,env(safe-area-inset-bottom))] pt-[calc(5.5rem+env(safe-area-inset-top))] sm:gap-6 sm:px-3 sm:pt-24 md:pb-16">
         {/* Sidebar (desktop) */}
         <aside
-          className={cn(
-            "hidden shrink-0 md:block transition-all duration-300 ease-in-out flex flex-col",
-            collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
-            "bg-white border-r border-gray-200/80 shadow-sm",
-          )}
           data-collapsed={collapsed}
+          className={cn(
+            "sticky top-24 hidden shrink-0 md:flex md:flex-col",
+            "max-h-[calc(100dvh-7rem)] overflow-y-auto overflow-x-hidden",
+            "rounded-3xl border border-gray-200/70 bg-white/90 backdrop-blur-sm",
+            "shadow-[0_8px_30px_-12px_rgba(20,30,70,0.12)]",
+            "transition-[width] duration-300 ease-in-out motion-reduce:transition-none",
+            "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
+          )}
         >
-          <div className="sticky top-28 flex flex-col h-full">
-            {/* Brand */}
-            <div className="flex items-center gap-3 px-3 py-4 border-b border-gray-200/60">
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] text-white shadow-lg shadow-[#4161df]/30">
-                <Building2 className="h-5 w-5" aria-hidden />
-              </span>
+          {/* Brand */}
+          <div
+            className={cn(
+              "flex items-center gap-3 border-b border-gray-100 px-4 py-4",
+              collapsed && "justify-center px-0",
+            )}
+          >
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] text-white shadow-lg shadow-[#4161df]/30">
+              <Building2 className="h-5 w-5" aria-hidden />
+            </span>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold tracking-tight text-gray-900">
+                  PropertyBulbul
+                </p>
+                <p className="text-[11px] font-medium uppercase tracking-widest text-gray-400">
+                  Agent workspace
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Primary nav */}
+          <nav
+            className="flex flex-1 flex-col gap-1 p-3"
+            aria-label="Agent dashboard"
+          >
+            {!collapsed && (
+              <p className="px-3 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-400">
+                Menu
+              </p>
+            )}
+            {AGENT_DASHBOARD_NAV.map(({ href, label, icon: Icon }) => {
+              const active = isActivePath(pathname, href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  aria-label={collapsed ? label : undefined}
+                  className={cn(
+                    "group relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/60",
+                    collapsed && "justify-center px-0",
+                    active
+                      ? "bg-[#4161df]/10 text-[#4161df]"
+                      : "text-gray-500 hover:bg-gray-100/80 hover:text-gray-900",
+                  )}
+                >
+                  {/* Active indicator bar */}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[#4161df] transition-all",
+                      active ? "opacity-100" : "h-0 opacity-0",
+                    )}
+                  />
+                  <Icon
+                    className={cn(
+                      "h-[18px] w-[18px] shrink-0 transition-colors",
+                      active
+                        ? "text-[#4161df]"
+                        : "text-gray-400 group-hover:text-gray-700",
+                    )}
+                    aria-hidden
+                  />
+                  {!collapsed && <span className="truncate">{label}</span>}
+
+                  {/* Tooltip (collapsed only) */}
+                  {collapsed && (
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                    >
+                      {label}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Footer: user card + collapse toggle */}
+          <div className="space-y-2 border-t border-gray-100 p-3">
+            <div
+              className={cn(
+                "flex items-center gap-3 rounded-2xl bg-gray-50/80 p-2.5",
+                collapsed && "justify-center bg-transparent p-0",
+              )}
+              title={collapsed ? (user?.name ?? "Agent") : undefined}
+            >
+              <Avatar url={avatarUrl} name={user?.name} className="h-9 w-9" />
               {!collapsed && (
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold tracking-tight text-gray-900">
-                    PropertyBulbul
+                  <p className="truncate text-sm font-semibold text-gray-900">
+                    {user?.name ?? "Agent"}
                   </p>
-                  <p className="text-[11px] font-medium uppercase tracking-widest text-gray-400">
-                    Agent workspace
+                  <p className="truncate text-xs capitalize text-gray-500">
+                    {user?.role ?? "agent"}
                   </p>
                 </div>
               )}
             </div>
 
-            {/* Primary nav */}
-            <nav className="flex flex-col gap-1.5 mx-2" aria-label="Agent dashboard">
-              {AGENT_DASHBOARD_NAV.map(({ href, label, icon: Icon }) => {
-                const active =
-                  href === "/agent-dashboard"
-                    ? pathname === "/agent-dashboard"
-                    : pathname === href || pathname.startsWith(`${href}/`);
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    title={collapsed ? label : undefined}
-                    className={cn(
-                      "flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all",
-                      active
-                        ? "bg-[#4161df]/10 text-[#4161df] shadow-sm ring-1 ring-[#4161df]/20 border border-transparent"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 hover:ring-1 hover:ring-gray-200/60",
-                    )}
-                  >
-                    <div className="relative">
-                      <Icon
-                        className={cn(
-                          "h-[18px] w-[18px] shrink-0",
-                          active ? "text-[#4161df]" : "text-gray-400",
-                        )}
-                        aria-hidden
-                      />
-                      {active && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#4161df]" />
-                      )}
-                    </div>
-                    {!collapsed && label}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* User card */}
-            <div className="mx-2 mt-4 rounded-2xl border border-gray-200/80 bg-white p-3 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-3">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={`${user?.name ?? "Agent"} profile picture`}
-                    className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white/80"
-                  />
-                ) : (
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#4161df]/10 text-xs font-bold text-[#4161df]">
-                    {getInitials(user?.name)}
-                  </span>
-                )}
-                <div className="min-w-0">
-                  {!collapsed && (
-                    <>
-                      <p className="truncate text-sm font-semibold text-gray-900">
-                        {user?.name ?? "Agent"}
-                      </p>
-                      <p className="truncate text-xs capitalize text-gray-500">
-                        {user?.role ?? "agent"}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Collapse toggle */}
             <button
+              type="button"
               onClick={() => setCollapsed((prev) => !prev)}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="mx-2 mt-4 flex shrink-0 items-center justify-center rounded-xl p-1.5 text-gray-400 bg-gray-50 border border-gray-200/80 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm transition-all"
+              aria-expanded={!collapsed}
+              className={cn(
+                "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-gray-500 transition-colors",
+                "hover:bg-gray-100 hover:text-gray-900",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]/60",
+                collapsed && "justify-center px-0",
+              )}
             >
               {collapsed ? (
-                <ChevronRight className="h-4 w-4" aria-hidden />
+                <PanelLeftOpen className="h-4 w-4" aria-hidden />
               ) : (
-                <ChevronLeft className="h-4 w-4" aria-hidden />
+                <>
+                  <PanelLeftClose className="h-4 w-4" aria-hidden />
+                  Collapse
+                </>
               )}
             </button>
           </div>
         </aside>
-
-        {/* Sidebar rail: shown only when collapsed so the sidebar can be re-expanded */}
-        {collapsed && (
-          <button
-            onClick={() => setCollapsed(false)}
-            aria-label="Expand sidebar"
-            className="fixed left-[calc(4rem-1rem)] top-[calc(5.5rem+env(safe-area-inset-top)+1rem)] z-50 flex shrink-0 items-center justify-center rounded-r-xl p-1.5 pl-1 pr-2 bg-white border-l-0 border-t border-b border-r border-gray-200/80 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-900 hover:shadow-md transition-all"
-          >
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </button>
-        )}
 
         {/* Content */}
         <div className="min-w-0 flex-1">
           {/* Section nav (mobile) */}
           <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-[1140] mb-5 rounded-2xl border border-gray-200/70 bg-white/90 p-1.5 shadow-sm shadow-gray-200/60 backdrop-blur-md md:hidden">
             <nav
-              className="flex gap-2 overflow-x-auto [-webkit-overflow-scrolling:touch] [scrollbar-width:none] snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+              className="flex gap-1.5 overflow-x-auto [-webkit-overflow-scrolling:touch] [scrollbar-width:none] snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
               aria-label="Agent dashboard sections"
             >
-              {AGENT_DASHBOARD_NAV.map(({ href, label }) => {
-                const active =
-                  href === "/agent-dashboard"
-                    ? pathname === "/agent-dashboard"
-                    : pathname === href || pathname.startsWith(`${href}/`);
+              {AGENT_DASHBOARD_NAV.map(({ href, label, icon: Icon }) => {
+                const active = isActivePath(pathname, href);
                 return (
                   <Link
                     key={href}
                     href={href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "inline-flex min-h-[44px] shrink-0 snap-start items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]",
+                      "inline-flex min-h-[44px] shrink-0 snap-start items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4161df]",
                       active
-                        ? "bg-[#4161df] text-white shadow-sm"
-                        : "text-gray-700 hover:bg-gray-100",
+                        ? "bg-[#4161df] text-white shadow-sm shadow-[#4161df]/30"
+                        : "text-gray-600 hover:bg-gray-100",
                     )}
                   >
+                    <Icon className="h-4 w-4" aria-hidden />
                     {label}
                   </Link>
                 );
