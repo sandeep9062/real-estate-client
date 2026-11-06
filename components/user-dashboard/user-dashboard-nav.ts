@@ -9,7 +9,11 @@ export type UserDashboardNavItem = {
 
 export const USER_DASHBOARD_NAV: UserDashboardNavItem[] = [
   { href: "/user-dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/user-dashboard/favourites", label: "Favourites", icon: Heart },
-  { href: "/user-dashboard/booking-history", label: "Bookings", icon: CalendarDays },
-  { href: "/user-dashboard/profile", label: "Profile", icon: UserPen },
+  { href: "/favourites", label: "Favourites", icon: Heart },
+  {
+    href: "/bookings",
+    label: "Bookings",
+    icon: CalendarDays,
+  },
+  { href: "/account/profile", label: "Profile", icon: UserPen },
 ];
