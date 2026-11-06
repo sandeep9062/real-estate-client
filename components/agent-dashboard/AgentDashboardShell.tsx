@@ -1,13 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
-import { Building2 } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { selectUser } from "@/store/authSlice";
 import { AGENT_DASHBOARD_NAV } from "./agent-dashboard-nav";
+
+const SIDEBAR_EXPANDED_WIDTH = "w-60";
+const SIDEBAR_COLLAPSED_WIDTH = "w-16";
+const SIDEBAR_STORAGE_KEY = "agent-dashboard:sidebar:collapsed";
 
 function getInitials(name?: string | null): string {
   if (!name) return "A";
@@ -53,27 +59,53 @@ export default function AgentDashboardShell({
   const user = useSelector(selectUser);
   const avatarUrl = getUserImageUrl(user?.image);
 
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  // Persist the collapsed state so it survives reloads.
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(collapsed));
+    } catch {
+      // Ignore storage errors (e.g. private browsing).
+    }
+  }, [collapsed]);
+
   return (
     <div className="min-h-[100dvh] w-full bg-[#f6f8fb]">
       {/* Full-width shell: intentionally NOT using the site-wide centered
           max-w container that other pages use — only a small gutter (px-2/px-3). */}
       <div className="flex w-full min-w-0 gap-6 px-2 pb-[max(4rem,env(safe-area-inset-bottom))] pt-[calc(5.5rem+env(safe-area-inset-top))] sm:gap-8 sm:px-3 sm:pt-24 md:pb-16">
         {/* Sidebar (desktop) */}
-        <aside className="hidden w-60 shrink-0 md:block">
+        <aside
+          className={cn(
+            "hidden shrink-0 md:block transition-all duration-300 ease-in-out",
+            collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
+          )}
+          data-collapsed={collapsed}
+        >
           <div className="sticky top-28 space-y-7">
             {/* Brand */}
             <div className="flex items-center gap-3">
               <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4161df] to-[#7c93f2] text-white shadow-md shadow-[#4161df]/25">
                 <Building2 className="h-5 w-5" aria-hidden />
               </span>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-bold tracking-tight text-gray-900">
-                  PropertyBulbul
-                </p>
-                <p className="text-[11px] font-medium uppercase tracking-widest text-gray-400">
-                  Agent workspace
-                </p>
-              </div>
+              {!collapsed && (
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold tracking-tight text-gray-900">
+                    PropertyBulbul
+                  </p>
+                  <p className="text-[11px] font-medium uppercase tracking-widest text-gray-400">
+                    Agent workspace
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Primary nav */}
@@ -102,7 +134,7 @@ export default function AgentDashboardShell({
                       )}
                       aria-hidden
                     />
-                    {label}
+                    {!collapsed && label}
                   </Link>
                 );
               })}
@@ -123,17 +155,45 @@ export default function AgentDashboardShell({
                   </span>
                 )}
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-gray-900">
-                    {user?.name ?? "Agent"}
-                  </p>
-                  <p className="truncate text-xs capitalize text-gray-500">
-                    {user?.role ?? "agent"}
-                  </p>
+                  {!collapsed && (
+                    <>
+                      <p className="truncate text-sm font-semibold text-gray-900">
+                        {user?.name ?? "Agent"}
+                      </p>
+                      <p className="truncate text-xs capitalize text-gray-500">
+                        {user?.role ?? "agent"}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Collapse toggle */}
+            <button
+              onClick={() => setCollapsed((prev) => !prev)}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className="flex shrink-0 items-center justify-center rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            >
+              {collapsed ? (
+                <ChevronRight className="h-4 w-4" aria-hidden />
+              ) : (
+                <ChevronLeft className="h-4 w-4" aria-hidden />
+              )}
+            </button>
           </div>
         </aside>
+
+        {/* Sidebar rail: shown only when collapsed so the sidebar can be re-expanded */}
+        {collapsed && (
+          <button
+            onClick={() => setCollapsed(false)}
+            aria-label="Expand sidebar"
+            className="fixed left-2 top-[calc(5.5rem+env(safe-area-inset-top)+1rem)] z-50 flex shrink-0 items-center justify-center rounded-md p-1.5 bg-white border border-gray-200/80 text-gray-400 shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" aria-hidden />
+          </button>
+        )}
 
         {/* Content */}
         <div className="min-w-0 flex-1">
