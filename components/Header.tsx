@@ -36,7 +36,7 @@ const Header: React.FC = () => {
   // On every other route the text stays dark.
 
   // Routes where the transparent header shows white text (over a dark hero).
-  const LIGHT_TEXT_ROUTES = ["/", "/pricing", "/about"];
+  const LIGHT_TEXT_ROUTES = ["/", "/pricing", "/about", "/post-requirement"];
   const lightText = transparent && LIGHT_TEXT_ROUTES.includes(pathname);
 
   const toggleMenu = () => setMenuOpened((prev) => !prev);
