@@ -108,14 +108,24 @@ const QUICK_ACTIONS = [
 
 export default function UserDashboardPage() {
   const user = useSelector(selectUser);
-  const { data: bookings = [], isLoading: bookingsLoading } = useGetBookingsQuery();
-  const { data: favourites = [], isLoading: favouritesLoading } = useGetFavouritesQuery();
-  const { data: recentlyViewed = [], isLoading: recentlyViewedLoading } = useGetRecentlyViewedQuery();
+  const { data: bookings = [], isLoading: bookingsLoading } =
+    useGetBookingsQuery();
+  const { data: favourites = [], isLoading: favouritesLoading } =
+    useGetFavouritesQuery();
+  const { data: recentlyViewed = [], isLoading: recentlyViewedLoading } =
+    useGetRecentlyViewedQuery();
 
   const ownedPropertyCount = user?.ownedProperties?.length ?? 0;
-  const upcomingBookings = bookings.filter((b) => b?.status?.toLowerCase() !== "cancelled" && b?.status?.toLowerCase() !== "completed").length ?? 0;
+  const upcomingBookings =
+    bookings.filter(
+      (b) =>
+        b?.status?.toLowerCase() !== "cancelled" &&
+        b?.status?.toLowerCase() !== "completed",
+    ).length ?? 0;
   const favouriteCount = favourites.length ?? user?.favProperties?.length ?? 0;
-  const recentVisitCount = bookings.filter((b) => b?.status?.toLowerCase() === "completed").length ?? 0;
+  const recentVisitCount =
+    bookings.filter((b) => b?.status?.toLowerCase() === "completed").length ??
+    0;
 
   if (bookingsLoading || favouritesLoading || recentlyViewedLoading) {
     return (
@@ -128,13 +138,25 @@ export default function UserDashboardPage() {
   return (
     <div className="min-w-0">
       <section className="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#4161df] via-[#4f6ee6] to-[#7c93f2] p-6 text-white shadow-lg shadow-[#4161df]/20 sm:mb-8 sm:p-8">
-        <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-20 right-20 h-40 w-40 rounded-full bg-white/5 blur-xl" aria-hidden />
+        <div
+          className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-white/10 blur-2xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -bottom-20 right-20 h-40 w-40 rounded-full bg-white/5 blur-xl"
+          aria-hidden
+        />
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">Welcome back</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">{user?.name ?? "User"} 👋</h1>
-            <p className="mt-1 text-sm text-white/80">Here is what is happening with your properties and bookings today.</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">
+              Welcome back
+            </p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              {user?.name ?? "User"} 👋
+            </h1>
+            <p className="mt-1 text-sm text-white/80">
+              Here is what is happening with your properties and bookings today.
+            </p>
           </div>
           <div className="flex shrink-0 items-center gap-3">
             <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm text-white">

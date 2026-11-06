@@ -4,9 +4,8 @@ import {
   Heart,
   CalendarDays,
   UserPen,
-  Bell,
-  UserRound,
   MessageSquare,
+  Notebook,
 } from "lucide-react";
 
 export type UserDashboardNavItem = {
@@ -25,7 +24,7 @@ export const USER_DASHBOARD_NAV: UserDashboardNavItem[] = [
   },
 
   { href: "/user-dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/saved-searches", label: "Saved", icon: Heart },
+  { href: "/saved-searches", label: "Saved Searches", icon: Notebook },
 
   {
     href: "/user-dashboard/enquiries",
